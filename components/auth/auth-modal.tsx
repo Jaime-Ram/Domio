@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,7 @@ interface AuthModalProps {
 
 export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthModalProps) {
   const router = useRouter()
+  const modalRef = useRef<HTMLDivElement>(null)
   const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
   const [signupStep, setSignupStep] = useState<1 | 2>(1)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -36,6 +37,26 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   const [rememberMe, setRememberMe] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Scroll naar modal wanneer deze opent (zonder auto-focus op input)
+  useEffect(() => {
+    if (open && modalRef.current) {
+      // Kleine delay om zeker te zijn dat de modal gerenderd is
+      setTimeout(() => {
+        // Scroll naar de modal, maar focus niet op inputs
+        modalRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        })
+        // Zorg ervoor dat geen input gefocust wordt
+        const activeElement = document.activeElement as HTMLElement
+        if (activeElement && activeElement.tagName === 'INPUT') {
+          activeElement.blur()
+        }
+      }, 150)
+    }
+  }, [open])
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault()
@@ -152,8 +173,11 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-0 sm:max-w-lg overflow-visible">
-        <div className="p-8">
+      <DialogContent 
+        className="max-w-lg p-0 sm:max-w-lg overflow-visible"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div ref={modalRef} className="p-8">
           {/* Logo */}
           <div className="mb-8 flex justify-center py-4">
             <Logo width={120} height={32} />
