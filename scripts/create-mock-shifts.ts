@@ -14,15 +14,16 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 async function createMockShifts() {
   try {
-    // Find user by email
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserByEmail('jaime21spam@gmail.com')
+    // Find user by email using listUsers
+    const { data: usersData, error: userError } = await supabase.auth.admin.listUsers()
+    const userData = usersData?.users.find(u => u.email === 'jaime21spam@gmail.com')
     
-    if (userError || !userData?.user) {
+    if (userError || !userData) {
       console.error('Error finding user:', userError)
       return
     }
 
-    const userId = userData.user.id
+    const userId = userData.id
     console.log(`Found user: ${userId}`)
 
     // Get user profile to find employer_id
@@ -41,7 +42,7 @@ async function createMockShifts() {
     console.log(`Employer ID: ${employerId}`)
 
     // Get employees for this employer
-    const { data: employees, error: employeesError } = await supabase
+    let { data: employees, error: employeesError } = await supabase
       .from('user_profiles')
       .select('id, full_name, email')
       .eq('employer_id', employerId)
