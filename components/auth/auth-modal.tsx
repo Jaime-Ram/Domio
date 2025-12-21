@@ -1,11 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Logo } from '@/components/Logo'
+import { AlertCircle } from 'lucide-react'
 
 interface AuthModalProps {
   open: boolean
@@ -14,112 +24,427 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthModalProps) {
+  const router = useRouter()
   const [mode, setMode] = useState<'login' | 'signup'>(defaultMode)
+  const [signupStep, setSignupStep] = useState<1 | 2>(1)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [role, setRole] = useState<'employee' | 'employer'>('employer')
+  const [rememberMe, setRememberMe] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleNextStep = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    
+    // Validate step 1 fields
+    if (!name.trim()) {
+      setError('Vul je naam in')
+      return
+    }
+    if (!email.trim()) {
+      setError('Vul je e-mailadres in')
+      return
+    }
+    
+    // Trigger animation
+    setIsAnimating(true)
+    setTimeout(() => {
+      setSignupStep(2)
+      setTimeout(() => {
+        setIsAnimating(false)
+      }, 50)
+    }, 300)
+  }
+
+  const handlePreviousStep = () => {
+    setIsAnimating(true)
+    setTimeout(() => {
+      setSignupStep(1)
+      setTimeout(() => {
+        setIsAnimating(false)
+      }, 50)
+    }, 300)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
-    // Demo mode - simulate loading
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Show demo message
-    alert('🎯 Demo Modus\n\nAuth functionaliteit is uitgeschakeld.\nDit is alleen een UI demonstratie.')
-    
-    setLoading(false)
+    setError(null)
+
+    try {
+      if (mode === 'login') {
+        // Demo mode - simulate loading
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Show demo message and redirect
+        onOpenChange(false)
+        router.push('/dashboard/employer')
+        
+      } else {
+        // Signup logic - validate passwords match
+        if (password !== confirmPassword) {
+          setError('Wachtwoorden komen niet overeen')
+          setLoading(false)
+          return
+        }
+
+        if (password.length < 6) {
+          setError('Wachtwoord moet minimaal 6 tekens lang zijn')
+          setLoading(false)
+          return
+        }
+
+        // Demo mode - simulate loading
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Show demo message and redirect based on role
+        onOpenChange(false)
+        if (role === 'employer') {
+          router.push('/dashboard/employer')
+        } else {
+          router.push('/dashboard/employer') // Demo: both go to employer dashboard
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Er is een fout opgetreden')
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Demo mode - simulate loading
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      alert('🎯 Demo Modus\n\nGoogle OAuth is uitgeschakeld.\nJe wordt doorgestuurd naar het demo dashboard.')
+      
+      onOpenChange(false)
+      router.push('/dashboard/employer')
+    } catch (err: any) {
+      setError(err.message || 'Google inloggen mislukt')
+      setLoading(false)
+    }
+  }
+
+  const resetForm = () => {
+    setName('')
+    setEmail('')
+    setPassword('')
+    setConfirmPassword('')
+    setRole('employer')
+    setRememberMe(false)
+    setSignupStep(1)
+    setError(null)
+  }
+
+  const switchMode = (newMode: 'login' | 'signup') => {
+    setMode(newMode)
+    resetForm()
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === 'login' 
-              ? 'Log in om toegang te krijgen tot je dashboard'
-              : 'Maak een account aan om te starten'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-lg p-0 sm:max-w-lg overflow-visible">
+        <div className="p-8">
+          {/* Logo */}
+          <div className="mb-8 flex justify-center py-4">
+            <Logo width={120} height={32} />
+          </div>
 
-        <Alert>
-          <AlertDescription>
-            🎯 Demo modus - Auth functionaliteit is uitgeschakeld
-          </AlertDescription>
-        </Alert>
+          {/* Title */}
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              {mode === 'login' ? 'Inloggen' : 'Registreren'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400">
+              {mode === 'login'
+                ? 'Welkom terug! Log in op je account.'
+                : 'Maak een account aan om te beginnen.'}
+            </DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'signup' && (
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Volledige naam</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Jan Jansen"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </div>
+          {/* Demo Alert */}
+          <Alert className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              🎯 Demo modus - Auth functionaliteit is uitgeschakeld
+            </AlertDescription>
+          </Alert>
+
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mailadres</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="naam@voorbeeld.nl"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          {/* Form */}
+          <form onSubmit={mode === 'signup' && signupStep === 1 ? handleNextStep : handleSubmit} className="mt-6 space-y-4">
+            {mode === 'signup' ? (
+              <div className="relative overflow-visible" style={{ minHeight: '300px', padding: '0 2px' }}>
+                <>
+                  {signupStep === 1 && (
+                    <div
+                      key="step1"
+                      className={`transition-all duration-300 ease-in-out ${
+                        isAnimating
+                          ? 'opacity-0 -translate-x-full absolute inset-0'
+                          : 'opacity-100 translate-x-0 relative'
+                      }`}
+                    >
+                  {/* Role Selection - Segmented Control */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Ik ben een
+                    </label>
+                    <div className="relative inline-flex w-full rounded-lg border border-[#002A1F] bg-gray-50 p-1">
+                      {/* Sliding background indicator */}
+                      <div
+                        className={`absolute top-1 bottom-1 rounded-md bg-[#002A1F] transition-all duration-300 ease-in-out ${
+                          role === 'employer' ? 'left-1 right-1/2' : 'left-1/2 right-1'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setRole('employer')}
+                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#002A1F] focus-visible:ring-offset-0 ${
+                          role === 'employer'
+                            ? 'text-white'
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        Beheerder
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole('employee')}
+                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#002A1F] focus-visible:ring-offset-0 ${
+                          role === 'employee'
+                            ? 'text-white'
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        Bewoner
+                      </button>
+                    </div>
+                  </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Wachtwoord</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+                  {/* Name Field */}
+                  <div className="space-y-2 mt-4">
+                    <label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Naam
+                    </label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Voer je naam in"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Bezig...' : mode === 'login' ? 'Inloggen' : 'Account aanmaken'}
-          </Button>
+                  {/* Email Field */}
+                  <div className="space-y-2 mt-4">
+                    <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      E-mailadres
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Voer je e-mailadres in"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                    </div>
+                  )}
+                  
+                  {signupStep === 2 && (
+                    <div
+                      key="step2"
+                      className={`transition-all duration-300 ease-in-out ${
+                        isAnimating
+                          ? 'opacity-0 translate-x-full absolute inset-0'
+                          : 'opacity-100 translate-x-0 relative'
+                      }`}
+                    >
+                  <button
+                    type="button"
+                    onClick={handlePreviousStep}
+                    className="text-sm text-gray-600 hover:text-gray-900 mb-2"
+                  >
+                    ← Terug
+                  </button>
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Wachtwoord
+                    </label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Voer je wachtwoord in"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
 
-          <div className="text-center text-sm">
+                  <div className="space-y-2 mt-4">
+                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Bevestig wachtwoord
+                    </label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="Bevestig je wachtwoord"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                    </div>
+                  )}
+                </>
+              </div>
+            ) : (
+              <>
+                {mode === 'login' && (
+                  <>
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        E-mailadres
+                      </label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Voer je e-mailadres in"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Wachtwoord
+                      </label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Voer je wachtwoord in"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {mode === 'login' && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Onthoud mij voor 30 dagen
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className="text-sm font-medium text-[#002A1F] hover:underline"
+                  onClick={() => {
+                    alert('🎯 Demo Modus\n\nWachtwoord reset is uitgeschakeld.')
+                  }}
+                >
+                  Wachtwoord vergeten?
+                </button>
+              </div>
+            )}
+
+            <Button 
+              type="submit" 
+              className={`w-full ${
+                mode === 'login'
+                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  : mode === 'signup' && signupStep === 1
+                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  : mode === 'signup' && signupStep === 2
+                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  : ''
+              }`}
+              disabled={loading}
+            >
+              {loading
+                ? mode === 'login'
+                  ? 'Inloggen...'
+                  : 'Registreren...'
+                : mode === 'signup' && signupStep === 1
+                  ? 'Volgende stap'
+                  : mode === 'signup' && signupStep === 2
+                  ? 'Registreren'
+                  : 'Inloggen'}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+                  Of ga verder met
+                </span>
+              </div>
+            </div>
+
+            <SocialButton
+              type="button"
+              variant="google"
+              className="w-full"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+            >
+              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              {mode === 'login' ? 'Inloggen met Google' : 'Registreren met Google'}
+            </SocialButton>
+          </form>
+
+          {/* Switch Mode */}
+          <div className="mt-6 text-center text-sm">
+            <span className="text-gray-600 dark:text-gray-400">
+              {mode === 'login' ? 'Nog geen account? ' : 'Al een account? '}
+            </span>
             <button
               type="button"
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-primary hover:underline"
+              onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+              className="font-medium text-[#002A1F] hover:underline"
             >
-              {mode === 'login' 
-                ? 'Nog geen account? Registreer hier'
-                : 'Al een account? Log hier in'}
+              {mode === 'login' ? 'Registreren' : 'Inloggen'}
             </button>
           </div>
-
-          {mode === 'login' && (
-            <div className="text-center text-sm">
-              <button
-                type="button"
-                onClick={() => alert('🎯 Demo Modus - Wachtwoord reset is uitgeschakeld')}
-                className="text-muted-foreground hover:underline"
-              >
-                Wachtwoord vergeten?
-              </button>
-            </div>
-          )}
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   )
