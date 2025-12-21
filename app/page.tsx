@@ -10,10 +10,13 @@ import { ContactSection } from '@/components/marketing/contact-section'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { CookieBanner } from '@/components/marketing/cookie-banner'
 import { FunctiesSection } from '@/components/marketing/functies-section'
+import { AuthModal } from '@/components/auth/auth-modal'
 import { ArrowRight, Menu, X, ArrowUpRight } from 'lucide-react'
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
   const [mockupHeight, setMockupHeight] = useState<number>(0)
   const mockupRef = useRef<HTMLImageElement>(null)
 
@@ -75,20 +78,22 @@ export default function Home() {
               <Button 
                 variant="ghost" 
                 className="text-white hover:bg-white/10 hover:text-white"
-                asChild
+                onClick={() => {
+                  setAuthModalMode('login')
+                  setAuthModalOpen(true)
+                }}
               >
-                <Link href="/dashboard/employer">
-                  Demo Dashboard
-                </Link>
+                Inloggen
               </Button>
               <Button
                 className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                asChild
+                onClick={() => {
+                  setAuthModalMode('signup')
+                  setAuthModalOpen(true)
+                }}
               >
-                <Link href="/dashboard/employer">
-                  Aan de slag
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+                Aan de slag
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
             
@@ -140,20 +145,24 @@ export default function Home() {
                 <Button 
                   variant="ghost" 
                   className="justify-start w-full px-4 text-white hover:bg-white/10 hover:text-white"
-                  asChild
+                  onClick={() => {
+                    setAuthModalMode('login')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
                 >
-                  <Link href="/dashboard/employer" onClick={() => setMobileMenuOpen(false)}>
-                    Demo Dashboard
-                  </Link>
+                  Inloggen
                 </Button>
                 <Button
                   className="justify-start w-full px-4 bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                  asChild
+                  onClick={() => {
+                    setAuthModalMode('signup')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
                 >
-                  <Link href="/dashboard/employer" onClick={() => setMobileMenuOpen(false)}>
-                    Aan de slag
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
+                  Aan de slag
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </nav>
@@ -163,7 +172,8 @@ export default function Home() {
         {/* Hero Section */}
         <HeroSection 
           onSignupClick={() => {
-            window.location.href = '/dashboard/employer'
+            setAuthModalMode('signup')
+            setAuthModalOpen(true)
           }}
         />
 
@@ -195,7 +205,8 @@ export default function Home() {
         {/* Pricing Section */}
         <PricingSection 
           onSignupClick={() => {
-            window.location.href = '/dashboard/employer'
+            setAuthModalMode('signup')
+            setAuthModalOpen(true)
           }}
         />
 
@@ -220,11 +231,12 @@ export default function Home() {
                     <Button
                       size="default"
                       className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-xl"
-                      asChild
+                      onClick={() => {
+                        setAuthModalMode('signup')
+                        setAuthModalOpen(true)
+                      }}
                     >
-                      <Link href="/dashboard/employer">
-                        Start 30 dagen gratis
-                      </Link>
+                      Start 30 dagen gratis
                     </Button>
                     <Button
                       asChild
@@ -246,6 +258,13 @@ export default function Home() {
         {/* Footer */}
         <FooterSection />
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen}
+        defaultMode={authModalMode}
+      />
 
       {/* Cookie Banner */}
       <CookieBanner />
