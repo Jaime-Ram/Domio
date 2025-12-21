@@ -30,12 +30,10 @@ export async function GET(request: NextRequest) {
     const employeeId = searchParams.get('employeeId')
     const period = searchParams.get('period') || 'month' // day, week, month
 
-    let query = supabase
-
     switch (reportType) {
       case 'hours': {
         // Fetch work hours with employee and employer info
-        query = supabase
+        let query = supabase
           .from('work_hours')
           .select(`
             *,
@@ -104,7 +102,7 @@ export async function GET(request: NextRequest) {
 
       case 'payroll': {
         // Fetch payments with employee and employer info
-        query = supabase
+        let query = supabase
           .from('payments')
           .select(`
             *,
@@ -160,7 +158,7 @@ export async function GET(request: NextRequest) {
 
       case 'productivity': {
         // Fetch work hours and calculate productivity metrics
-        query = supabase
+        let query = supabase
           .from('work_hours')
           .select(`
             *,

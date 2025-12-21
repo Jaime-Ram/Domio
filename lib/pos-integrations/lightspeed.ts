@@ -20,7 +20,6 @@ interface LightspeedConfig {
 }
 
 export class LightspeedIntegration extends BasePOSIntegration {
-  private locationId: string
 
   constructor(config: LightspeedConfig) {
     super({
@@ -132,7 +131,7 @@ export class LightspeedIntegration extends BasePOSIntegration {
       return response.Employee.map((emp) => ({
         id: emp.employeeID,
         name: `${emp.firstName} ${emp.lastName}`,
-        email: emp.email || emp.contact?.Emails?.[0]?.address,
+        email: emp.email || (emp.contact?.Emails && Array.isArray(emp.contact.Emails) ? emp.contact.Emails[0]?.address : undefined),
       }))
     } catch (error) {
       console.error('Error fetching Lightspeed employees:', error)
@@ -264,7 +263,7 @@ export class LightspeedIntegration extends BasePOSIntegration {
         },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
-          refresh_token: this.refreshToken,
+          refresh_token: this.refreshTokenValue || '',
           client_id: process.env.LIGHTSPEED_CLIENT_ID || '',
           client_secret: process.env.LIGHTSPEED_CLIENT_SECRET || '',
         }),

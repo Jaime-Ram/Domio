@@ -28,19 +28,8 @@ export function AppStoreButton({ size = 'md', href = '#', className }: AppStoreB
     lg: { top: 'text-[11px]', bottom: 'text-base' },
   }
 
-  const Comp = href !== '#' ? Link : 'div'
-
-  return (
-    <Comp
-      href={href !== '#' ? href : undefined}
-      target={href !== '#' ? '_blank' : undefined}
-      rel={href !== '#' ? 'noopener noreferrer' : undefined}
-      className={cn(
-        'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
-        sizeClasses[size],
-        className
-      )}
-    >
+  const content = (
+    <>
       <svg
         className={cn('flex-shrink-0', iconSizes[size])}
         fill="currentColor"
@@ -53,8 +42,24 @@ export function AppStoreButton({ size = 'md', href = '#', className }: AppStoreB
         <span className={cn('leading-tight', textSizes[size].top)}>Download on the</span>
         <span className={cn('font-semibold leading-tight', textSizes[size].bottom)}>App Store</span>
       </div>
-    </Comp>
+    </>
   )
+
+  const buttonClassName = cn(
+    'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
+    sizeClasses[size],
+    className
+  )
+
+  if (href !== '#') {
+    return (
+      <Link href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className={className}>{content}</div>
 }
 
 export function GooglePlayButton({ size = 'md', href = '#', className }: AppStoreButtonProps) {
@@ -76,19 +81,8 @@ export function GooglePlayButton({ size = 'md', href = '#', className }: AppStor
     lg: { top: 'text-[11px]', bottom: 'text-base' },
   }
 
-  const Comp = href !== '#' ? Link : 'div'
-
-  return (
-    <Comp
-      href={href !== '#' ? href : undefined}
-      target={href !== '#' ? '_blank' : undefined}
-      rel={href !== '#' ? 'noopener noreferrer' : undefined}
-      className={cn(
-        'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
-        sizeClasses[size],
-        className
-      )}
-    >
+  const content = (
+    <>
       <svg
         className={cn('flex-shrink-0', iconSizes[size])}
         viewBox="0 0 24 24"
@@ -103,8 +97,24 @@ export function GooglePlayButton({ size = 'md', href = '#', className }: AppStor
         <span className={cn('leading-tight', textSizes[size].top)}>GET IT ON</span>
         <span className={cn('font-semibold leading-tight', textSizes[size].bottom)}>Google Play</span>
       </div>
-    </Comp>
+    </>
   )
+
+  const buttonClassName = cn(
+    'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
+    sizeClasses[size],
+    className
+  )
+
+  if (href !== '#') {
+    return (
+      <Link href={href} target="_blank" rel="noopener noreferrer" className={buttonClassName}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className={buttonClassName}>{content}</div>
 }
 
 export function GalaxyStoreButton({ size = 'md', href = '#', className }: AppStoreButtonProps) {
@@ -126,19 +136,8 @@ export function GalaxyStoreButton({ size = 'md', href = '#', className }: AppSto
     lg: { top: 'text-[11px]', bottom: 'text-base' },
   }
 
-  const Comp = href !== '#' ? Link : 'div'
-
-  return (
-    <Comp
-      href={href !== '#' ? href : undefined}
-      target={href !== '#' ? '_blank' : undefined}
-      rel={href !== '#' ? 'noopener noreferrer' : undefined}
-      className={cn(
-        'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
-        sizeClasses[size],
-        className
-      )}
-    >
+  const content = (
+    <>
       <svg
         className={cn('flex-shrink-0', iconSizes[size])}
         viewBox="0 0 24 24"
@@ -153,7 +152,23 @@ export function GalaxyStoreButton({ size = 'md', href = '#', className }: AppSto
         <span className={cn('leading-tight', textSizes[size].top)}>GET IT ON</span>
         <span className={cn('font-semibold leading-tight', textSizes[size].bottom)}>Galaxy Store</span>
       </div>
-    </Comp>
+    </>
   )
+
+  const buttonClassName = cn(
+    'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
+    sizeClasses[size],
+    className
+  )
+
+  if (href !== '#') {
+    return (
+      <Link href={href} target="_blank" rel="noopener noreferrer" className={buttonClassName}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className={buttonClassName}>{content}</div>
 }
 

@@ -36,6 +36,7 @@ interface ReportData {
   data: any[]
   statistics: any
   grouped?: Record<string, any[]>
+  dailyTrends?: any[]
 }
 
 export default function ReportsPage() {

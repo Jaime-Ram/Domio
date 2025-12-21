@@ -164,7 +164,7 @@ export default function PropertyDetailPage() {
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          Foto's ({photos.length}/5)
+                          Foto&apos;s ({photos.length}/5)
                         </p>
                         <Button size="sm" variant="outline">
                           <Upload className="h-4 w-4 mr-2" />

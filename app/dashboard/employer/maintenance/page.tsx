@@ -207,7 +207,7 @@ export default function MaintenancePage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="photos">Foto's uploaden (optioneel, max 3)</Label>
+                      <Label htmlFor="photos">Foto&apos;s uploaden (optioneel, max 3)</Label>
                       <div className="flex items-center gap-2">
                         <Input
                           id="photos"
@@ -222,7 +222,7 @@ export default function MaintenancePage() {
                         <ImageIcon className="h-4 w-4 text-gray-400" />
                       </div>
                       {maintenanceForm.photos.length > 0 && (
-                        <p className="text-xs text-gray-500">{maintenanceForm.photos.length} foto('s) geselecteerd</p>
+                        <p className="text-xs text-gray-500">{maintenanceForm.photos.length} foto(&apos;s) geselecteerd</p>
                       )}
                     </div>
                     <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-3">

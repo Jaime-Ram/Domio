@@ -235,7 +235,7 @@ export default function TenantDetailPage() {
                   <Card className="border border-gray-200 dark:border-neutral-700">
                     <CardHeader>
                       <CardTitle>Notities</CardTitle>
-                      <CardDescription>Memo's over deze huurder</CardDescription>
+                      <CardDescription>Memo&apos;s over deze huurder</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <Textarea

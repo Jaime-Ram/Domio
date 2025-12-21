@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       transferId: transfer.id,
       amount: transfer.amount,
-      status: transfer.status,
+      status: (transfer as any).status || 'pending',
       destination: transfer.destination,
     });
   } catch (error: any) {

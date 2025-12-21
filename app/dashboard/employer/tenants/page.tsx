@@ -148,8 +148,8 @@ export default function TenantsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">€{tenant.lease.monthlyRent.toLocaleString('nl-NL')}/maand</div>
-                            <div className="text-gray-500">Tot {new Date(tenant.lease.endDate).toLocaleDateString('nl-NL')}</div>
+                            <div className="font-medium">€{tenant.lease?.monthlyRent?.toLocaleString('nl-NL') || '0'}/maand</div>
+                            <div className="text-gray-500">Tot {tenant.lease?.endDate ? new Date(tenant.lease.endDate).toLocaleDateString('nl-NL') : 'N/A'}</div>
                           </div>
                         </TableCell>
                         <TableCell>

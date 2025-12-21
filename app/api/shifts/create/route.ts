@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 
 export async function POST(request: NextRequest) {
   try {
-    // Create supabase client with cookies from request (like middleware does)
+    // Create supabase client with cookies from request
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -23,19 +23,16 @@ export async function POST(request: NextRequest) {
       supabaseAnonKey,
       {
         cookies: {
-          getAll() {
-            return request.cookies.getAll()
+          get(name: string) {
+            return request.cookies.get(name)?.value
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              request.cookies.set(name, value)
-            })
-            response = NextResponse.next({
-              request,
-            })
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options)
-            })
+          set(name: string, value: string, options: any) {
+            request.cookies.set(name, value)
+            response.cookies.set(name, value, options)
+          },
+          remove(name: string, options: any) {
+            request.cookies.delete(name)
+            response.cookies.delete(name)
           },
         },
       }

@@ -403,7 +403,6 @@ export default function TeamPage() {
       {/* Modals */}
       {showInviteForm && (
         <InviteEmployeeForm
-          onClose={() => setShowInviteForm(false)}
           onSuccess={() => {
             setShowInviteForm(false)
             if (restaurant?.id) {
@@ -415,6 +414,7 @@ export default function TeamPage() {
 
       {selectedMember && (
         <EmployeeDetailModal
+          isOpen={!!selectedMember}
           employeeId={selectedMember}
           onClose={() => setSelectedMember(null)}
           onUpdate={() => {

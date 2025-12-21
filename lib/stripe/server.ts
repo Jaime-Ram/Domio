@@ -11,7 +11,7 @@ if (!stripeSecretKey) {
 // This prevents crashes during app startup
 export const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2023-10-16' as any,
       typescript: true,
     })
   : (null as unknown as Stripe); // Type cast to allow imports, but will throw when used

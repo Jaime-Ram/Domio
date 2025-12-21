@@ -364,12 +364,6 @@ export default function SchedulePage() {
       <SidebarNavigationSectionDividers
         items={employerNavItemsWithDividers}
         activeUrl="/dashboard/employer/schedule"
-        userAvatar={{
-          src: userProfile?.avatar_url || userProfile?.profile_picture || undefined,
-          alt: userProfile?.full_name || user?.email || 'User',
-          title: userProfile?.full_name || user?.email || 'User',
-          subtitle: user?.email,
-        }}
         footerItems={[
           {
             label: "Instellingen",
@@ -510,7 +504,7 @@ export default function SchedulePage() {
                 ) : (
                   filteredEmployees.map((employee) => {
                     const employeeShifts = shiftsByEmployee[employee.id] || []
-                    const totalHours = employeeShifts.reduce((sum, shift) => {
+                    const totalHours = employeeShifts.reduce((sum: number, shift: any) => {
                       const [startHour, startMin] = shift.start_time.split(':').map(Number)
                       const [endHour, endMin] = shift.end_time.split(':').map(Number)
                       const start = startHour * 60 + startMin
@@ -580,7 +574,7 @@ export default function SchedulePage() {
                                   Shifts deze week:
                                 </p>
                                 <div className="space-y-1">
-                                  {employeeShifts.map((shift) => (
+                                  {employeeShifts.map((shift: any) => (
                                     <div
                                       key={shift.id}
                                       className="text-xs p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
@@ -710,9 +704,9 @@ export default function SchedulePage() {
                             key={dayIndex}
                             className="flex-1 border-r last:border-r-0 relative"
                           >
-                            {employeeShifts
-                              .filter(shift => isSameDay(new Date(shift.date), day))
-                              .map((shift) => {
+                             {employeeShifts
+                              .filter((shift: any) => isSameDay(new Date(shift.date), day))
+                              .map((shift: any) => {
                                 const style = getShiftStyle(shift, dayIndex)
                                 return (
                                   <div

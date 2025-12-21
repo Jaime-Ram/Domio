@@ -14,7 +14,7 @@ import type {
 export abstract class BasePOSIntegration implements POSIntegrationInterface {
   protected apiKey?: string
   protected accessToken?: string
-  protected refreshToken?: string
+  protected refreshTokenValue?: string
   protected locationId?: string
   protected apiBaseUrl: string
 
@@ -27,7 +27,7 @@ export abstract class BasePOSIntegration implements POSIntegrationInterface {
   }) {
     this.apiKey = config.apiKey
     this.accessToken = config.accessToken
-    this.refreshToken = config.refreshToken
+    this.refreshTokenValue = config.refreshToken
     this.locationId = config.locationId
     this.apiBaseUrl = config.apiBaseUrl
   }
@@ -40,9 +40,9 @@ export abstract class BasePOSIntegration implements POSIntegrationInterface {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.apiBaseUrl}${endpoint}`
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     }
 
     // Add authentication header
@@ -83,7 +83,7 @@ export abstract class BasePOSIntegration implements POSIntegrationInterface {
   /**
    * Optional method for OAuth-based integrations
    */
-  refreshToken?(): Promise<void>
+  refreshAccessToken?(): Promise<void>
 }
 
 

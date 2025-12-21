@@ -18,38 +18,41 @@ export async function GET(request: NextRequest) {
       supabaseAnonKey,
       {
         cookies: {
-          getAll() {
-            return request.cookies.getAll()
+          get(name: string) {
+            return request.cookies.get(name)?.value
           },
-          setAll() {
-            // No-op for GET requests
+          set(name: string, value: string, options: any) {
+            request.cookies.set(name, value)
+          },
+          remove(name: string, options: any) {
+            request.cookies.delete(name)
           },
         },
       }
     )
 
     // Check if shifts table exists and get column types
-    const { data: columns, error } = await supabase.rpc('exec_sql', {
-      query: `
-        SELECT 
-          column_name, 
-          data_type, 
-          character_maximum_length,
-          is_nullable
-        FROM information_schema.columns 
-        WHERE table_name = 'shifts' 
-          AND column_name IN ('start_time', 'end_time', 'date', 'employee_id', 'employer_id')
-        ORDER BY column_name;
-      `
-    }).catch(async () => {
-      // If RPC doesn't work, try a direct query
-      const { data: testData, error: testError } = await supabase
-        .from('shifts')
-        .select('id')
-        .limit(0)
-      
-      return { data: null, error: testError }
-    })
+    let columns = null
+    let rpcError = null
+    try {
+      const result = await supabase.rpc('exec_sql', {
+        query: `
+          SELECT 
+            column_name, 
+            data_type, 
+            character_maximum_length,
+            is_nullable
+          FROM information_schema.columns 
+          WHERE table_name = 'shifts' 
+            AND column_name IN ('start_time', 'end_time', 'date', 'employee_id', 'employer_id')
+          ORDER BY column_name;
+        `
+      })
+      columns = result.data
+      rpcError = result.error
+    } catch (err) {
+      rpcError = err
+    }
 
     // Try to get table info via a simple query
     const { data: tableInfo, error: tableError } = await supabase
@@ -61,7 +64,8 @@ export async function GET(request: NextRequest) {
       success: true,
       tableExists: !tableError || tableError.code !== '42P01', // 42P01 = table does not exist
       tableError: tableError?.message,
-      columns: columns || 'RPC not available - check Supabase dashboard',
+      columns: columns || (rpcError ? 'RPC not available - check Supabase dashboard' : null),
+      rpcError: rpcError && typeof rpcError === 'object' && 'message' in rpcError ? (rpcError as any).message : String(rpcError || ''),
       hint: 'Check the browser console and Supabase logs for more details. If start_time and end_time are TIME type, run: ALTER TABLE shifts ALTER COLUMN start_time TYPE TEXT USING start_time::TEXT; ALTER TABLE shifts ALTER COLUMN end_time TYPE TEXT USING end_time::TEXT;'
     })
   } catch (error: any) {

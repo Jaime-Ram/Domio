@@ -125,7 +125,7 @@ export const FeaturesAlternatingLayout01 = () => {
               Manage your team with reports
             </h2>
             <p className="mt-2 text-base text-gray-600 dark:text-gray-400 md:mt-4 md:text-lg">
-              Measure what matters with Domio's easy-to-use reports. You can filter, export, and drilldown on the data in a couple clicks.
+              Measure what matters with Domio&apos;s easy-to-use reports. You can filter, export, and drilldown on the data in a couple clicks.
             </p>
             <ul className="mt-8 flex flex-col gap-4 pl-2 md:gap-5 md:pl-4">
               {[

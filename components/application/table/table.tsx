@@ -88,7 +88,7 @@ const TableHead = ({
     };
 
     const isSorted = sortDescriptor?.column === id;
-    const sortDirection = isSorted ? sortDescriptor.direction : null;
+    const sortDirection = isSorted ? sortDescriptor?.direction : null;
 
     return (
         <th
@@ -181,5 +181,4 @@ Table.Row = TableRow;
 Table.Cell = TableCell;
 
 export { Table };
-export type { SortDescriptor };
 
