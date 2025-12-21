@@ -8,7 +8,6 @@ import { PricingSection } from '@/components/marketing/pricing-section'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { ContactSection } from '@/components/marketing/contact-section'
 import { FooterSection } from '@/components/marketing/footer-section'
-import { CookieBanner } from '@/components/marketing/cookie-banner'
 import { FunctiesSection } from '@/components/marketing/functies-section'
 import { AuthModal } from '@/components/auth/auth-modal'
 import { ArrowRight, Menu, X, ArrowUpRight } from 'lucide-react'
@@ -265,9 +264,6 @@ export default function Home() {
         onOpenChange={setAuthModalOpen}
         defaultMode={authModalMode}
       />
-
-      {/* Cookie Banner */}
-      <CookieBanner />
     </div>
   )
 }
