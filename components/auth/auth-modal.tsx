@@ -174,10 +174,10 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-lg p-0 sm:max-w-lg overflow-visible"
+        className="max-w-lg p-0 sm:max-w-lg overflow-y-auto max-h-[90vh] sm:max-h-[85vh] m-4 sm:m-0"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div ref={modalRef} className="p-8">
+        <div ref={modalRef} className="p-4 sm:p-8">
           {/* Logo */}
           <div className="mb-8 flex justify-center py-4">
             <Logo width={120} height={32} />
@@ -194,14 +194,6 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                 : 'Maak een account aan om te beginnen.'}
             </DialogDescription>
           </DialogHeader>
-
-          {/* Demo Alert */}
-          <Alert className="mt-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              🎯 Demo modus - Auth functionaliteit is uitgeschakeld
-            </AlertDescription>
-          </Alert>
 
           {/* Error Alert */}
           {error && (

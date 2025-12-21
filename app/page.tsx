@@ -114,8 +114,10 @@ export default function Home() {
 
           {/* Mobile Menu */}
           <div
-            className={`md:hidden absolute top-full left-0 right-0 border-t border-white/10 bg-[#002A1F] transition-all duration-300 ease-in-out overflow-hidden shadow-lg ${
-              mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+            className={`md:hidden absolute top-full left-0 right-0 border-t border-white/10 bg-[#002A1F] transition-all duration-500 ease-in-out overflow-hidden shadow-lg ${
+              mobileMenuOpen 
+                ? 'max-h-screen opacity-100 translate-y-0' 
+                : 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
             }`}
           >
             <nav className="container mx-auto flex flex-col px-4 py-4 space-y-3">

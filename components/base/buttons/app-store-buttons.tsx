@@ -38,7 +38,7 @@ export function AppStoreButton({ size = 'md', href = '#', className }: AppStoreB
       >
         <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
       </svg>
-      <div className="flex flex-col items-start">
+      <div className="flex flex-col items-start justify-center">
         <span className={cn('leading-tight', textSizes[size].top)}>Download on the</span>
         <span className={cn('font-semibold leading-tight', textSizes[size].bottom)}>App Store</span>
       </div>
@@ -47,19 +47,18 @@ export function AppStoreButton({ size = 'md', href = '#', className }: AppStoreB
 
   const buttonClassName = cn(
     'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
-    sizeClasses[size],
-    className
+    sizeClasses[size]
   )
 
   if (href !== '#') {
     return (
-      <Link href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      <Link href={href} target="_blank" rel="noopener noreferrer" className={cn(buttonClassName, className)}>
         {content}
       </Link>
     )
   }
 
-  return <div className={className}>{content}</div>
+  return <div className={cn(buttonClassName, className)}>{content}</div>
 }
 
 export function GooglePlayButton({ size = 'md', href = '#', className }: AppStoreButtonProps) {
@@ -93,7 +92,7 @@ export function GooglePlayButton({ size = 'md', href = '#', className }: AppStor
           fill="currentColor"
         />
       </svg>
-      <div className="flex flex-col items-start">
+      <div className="flex flex-col items-start justify-center">
         <span className={cn('leading-tight', textSizes[size].top)}>GET IT ON</span>
         <span className={cn('font-semibold leading-tight', textSizes[size].bottom)}>Google Play</span>
       </div>
@@ -102,19 +101,18 @@ export function GooglePlayButton({ size = 'md', href = '#', className }: AppStor
 
   const buttonClassName = cn(
     'inline-flex items-center rounded-xl border border-gray-900 bg-gray-900 px-4 py-2.5 text-white transition-colors hover:bg-gray-800',
-    sizeClasses[size],
-    className
+    sizeClasses[size]
   )
 
   if (href !== '#') {
     return (
-      <Link href={href} target="_blank" rel="noopener noreferrer" className={buttonClassName}>
+      <Link href={href} target="_blank" rel="noopener noreferrer" className={cn(buttonClassName, className)}>
         {content}
       </Link>
     )
   }
 
-  return <div className={buttonClassName}>{content}</div>
+  return <div className={cn(buttonClassName, className)}>{content}</div>
 }
 
 export function GalaxyStoreButton({ size = 'md', href = '#', className }: AppStoreButtonProps) {
