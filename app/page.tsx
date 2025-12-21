@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
@@ -16,37 +16,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
-  const [mockupHeight, setMockupHeight] = useState<number>(0)
-  const mockupRef = useRef<HTMLImageElement>(null)
 
-  // Calculate mockup height and set white section height to 70% of mockup
-  useEffect(() => {
-    const updateMockupHeight = () => {
-      if (mockupRef.current) {
-        const height = mockupRef.current.offsetHeight
-        setMockupHeight(height)
-      }
-    }
-
-    // Initial calculation
-    updateMockupHeight()
-
-    // Recalculate on resize
-    window.addEventListener('resize', updateMockupHeight)
-    
-    // Also check after images load
-    const images = document.querySelectorAll('img[src*="mockup"]')
-    images.forEach(img => {
-      img.addEventListener('load', updateMockupHeight)
-    })
-
-    return () => {
-      window.removeEventListener('resize', updateMockupHeight)
-      images.forEach(img => {
-        img.removeEventListener('load', updateMockupHeight)
-      })
-    }
-  }, [])
+  // Removed mockup height calculation for better performance
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
@@ -184,17 +155,17 @@ export default function Home() {
             <div className="relative w-full flex justify-center">
               {/* Mobile Mockup */}
               <img
-                ref={mockupRef}
                 src="/images/mobile mockup.png"
                 alt="Domio op mobiel"
                 className="h-auto w-full max-w-[85%] object-contain drop-shadow-2xl md:hidden mx-auto"
+                loading="lazy"
               />
               {/* Desktop Mockup */}
               <img
-                ref={mockupRef}
                 src="/images/Desktopmockup.png"
                 alt="Domio op desktop"
                 className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
+                loading="lazy"
               />
             </div>
           </div>
