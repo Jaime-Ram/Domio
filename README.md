@@ -1,116 +1,69 @@
-# Domio
+# Domio - Vastgoedbeheer Platform
 
-A modern web application built with Next.js, Tailwind CSS (Untitled UI), Supabase, and Stripe.
+Een modern vastgoedbeheer platform gebouwd met Next.js 16, React 18, en Tailwind CSS.
+
+## Features
+
+- 🏢 **Portfolio Beheer** - Beheer al je panden op één plek
+- 👥 **Huurders Beheer** - Overzicht van huurders en contracten
+- 🔧 **Onderhoud** - Track onderhoudstaken en meldingen
+- 📊 **Financieel Overzicht** - Inzicht in inkomsten en uitgaven
+- 📄 **Documenten** - Centraal documentbeheer
+- ⚙️ **Instellingen** - Configureer je voorkeuren
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS with Untitled UI design system
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Payments**: Stripe
-- **Language**: TypeScript
+- **Framework**: Next.js 16 (App Router)
+- **UI**: React 18 + Tailwind CSS
+- **Components**: Radix UI + Custom Components
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Animations**: GSAP
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ 
-- npm, yarn, or pnpm
-- Supabase account
-- Stripe account
+- npm or yarn
 
 ### Installation
 
-1. Install dependencies:
-
 ```bash
+# Install dependencies
 npm install
-# or
-yarn install
-# or
-pnpm install
-```
 
-2. Set up environment variables:
-
-Copy `.env.example` to `.env.local` and fill in your credentials:
-
-```bash
-cp .env.example .env.local
-```
-
-3. Configure your environment variables:
-
-- **Supabase**: Get your project URL and anon key from your Supabase dashboard
-- **Stripe**: Get your publishable key, secret key, and webhook secret from your Stripe dashboard
-
-4. Run the development server:
-
-```bash
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## Project Structure
 
 ```
 ├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   │   └── stripe/       # Stripe integration
-│   ├── globals.css        # Global styles with Untitled UI
-│   ├── layout.tsx        # Root layout
-│   └── page.tsx          # Home page
+│   ├── dashboard/         # Dashboard pages
+│   │   └── employer/      # Employer dashboard
+│   └── page.tsx           # Landing page
 ├── components/            # React components
-│   └── ui/               # UI components (Untitled UI style)
-├── lib/                   # Utility libraries
-│   ├── supabase/         # Supabase client configuration
-│   ├── stripe/           # Stripe client configuration
-│   └── utils.ts          # Utility functions
-└── middleware.ts         # Next.js middleware for auth
+│   ├── ui/               # UI components
+│   ├── dashboard/        # Dashboard components
+│   └── marketing/        # Marketing components
+├── lib/                  # Utilities and helpers
+└── public/              # Static assets
 ```
 
-## Features
+## Demo
 
-- ✅ Next.js 15 with App Router
-- ✅ Tailwind CSS with Untitled UI design tokens
-- ✅ Supabase authentication and database
-- ✅ Stripe payment integration
-- ✅ TypeScript support
-- ✅ Responsive design
-- ✅ Dark mode support
-
-## Mobile App
-
-The mobile app can be built separately using React Native (Expo) and will share the same Supabase backend. The mobile app can be set up in a separate directory and will use the same Supabase project for authentication and data.
-
-## Environment Variables
-
-Make sure to set up the following environment variables:
-
-- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Your Stripe publishable key
-- `STRIPE_SECRET_KEY`: Your Stripe secret key (server-side only)
-- `STRIPE_WEBHOOK_SECRET`: Your Stripe webhook secret
-
-## Stripe Webhook Setup
-
-To handle Stripe webhooks, you'll need to:
-
-1. Set up a webhook endpoint in your Stripe dashboard
-2. Point it to: `https://your-domain.com/api/stripe/webhook`
-3. Add the webhook secret to your `.env.local` file
+Visit the live demo at [https://domio.vercel.app](https://domio.vercel.app)
 
 ## License
 
-MIT
-
-
-
-
+Private - All rights reserved
