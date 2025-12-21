@@ -1,0 +1,61 @@
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import Script from "next/script";
+import { RouteProvider } from "@/providers/route-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
+import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+export const metadata: Metadata = {
+  title: "Domio",
+  description: "Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders en vastgoedhouders",
+  icons: {
+    icon: [
+      { url: '/icon.png', sizes: 'any', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: [
+      { url: '/icon.png', type: 'image/png' },
+    ],
+  },
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
+      <head>
+        <script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          data-cbid="89ee426f-246b-433f-beee-676fb434af4f"
+          data-blockingmode="auto"
+          data-culture="NL"
+          type="text/javascript"
+          async
+        />
+      </head>
+      <body className="antialiased" suppressHydrationWarning>
+        <RouteProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </RouteProvider>
+      </body>
+    </html>
+  );
+}

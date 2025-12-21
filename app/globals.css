@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Codec Pro Font Face */
+@font-face {
+  font-family: 'Codec Pro';
+  src: url('/fonts/Codec Pro/CodecPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Codec Pro';
+  src: url('/fonts/Codec Pro/CodecPro-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Codec Pro';
+  src: url('/fonts/Codec Pro/CodecPro-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Codec Pro';
+  src: url('/fonts/Codec Pro/CodecPro-Heavy.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Untitled UI Design Tokens */
+@layer base {
+  :root {
+    /* Font family */
+    --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-display: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-mono: ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    
+    /* Font family (backward compatibility) */
+    --font-sans: var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif;
+  }
+  
+  .dark-mode {
+    color-scheme: dark;
+  }
+  
+  .light-mode {
+    color-scheme: light;
+  }
+  
+  * {
+    @apply border-gray-200 dark:border-gray-800;
+  }
+  
+  body {
+    @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    font-family: var(--font-body);
+  }
+  
+  /* Hide amounts functionality */
+  body.blur-amounts [data-amount],
+  body.blur-amounts .amount,
+  body.blur-amounts [class*="amount"] {
+    font-size: 0 !important;
+    line-height: 1;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: baseline;
+  }
+  
+  body.blur-amounts [data-amount]::after,
+  body.blur-amounts .amount::after {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.88 9.88a3 3 0 1 0 4.24 4.24'/%3E%3Cpath d='M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68'/%3E%3Cpath d='M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61'/%3E%3Cline x1='2' x2='22' y1='2' y2='22'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  body.blur-amounts [data-amount].text-4xl::after,
+  body.blur-amounts .amount.text-4xl::after {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+  
+  body.blur-amounts [data-amount].text-2xl::after,
+  body.blur-amounts .amount.text-2xl::after {
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+  }
+}
+
+:root {
+    /* Color scheme variables */
+    --color-background: #ffffff;
+    --color-foreground: #0F172A;
+
+    /* Domio Brand Colors - Primary Green */
+    --color-primary-50: #E6F5F2;
+    --color-primary-100: #CCEBE5;
+    --color-primary-200: #99D7CB;
+    --color-primary-300: #66C3B1;
+    --color-primary-400: #356258; /* Tertiary - Mid Green */
+    --color-primary-500: #002A1F; /* Main - Dark Green */
+    --color-primary-600: #002118;
+    --color-primary-700: #001912;
+    --color-primary-800: #00120C;
+    --color-primary-900: #000B06;
+
+    /* Neutrals - Text & UI */
+    --color-text-primary: #0F172A; /* Midnight */
+    --color-text-secondary: #475569; /* Slate */
+    --color-border: #E2E8F0; /* Soft Gray */
+    --color-surface: #F8FAFC; /* Off-White */
+    --color-white: #FFFFFF;
+
+    /* Secondary colors (using neutrals) */
+    --color-secondary-50: #F8FAFC; /* Off-White */
+    --color-secondary-100: #F1F5F9;
+    --color-secondary-200: #E2E8F0; /* Soft Gray */
+    --color-secondary-300: #CBD5E1;
+    --color-secondary-400: #94A3B8;
+    --color-secondary-500: #475569; /* Slate */
+    --color-secondary-600: #334155;
+    --color-secondary-700: #1E293B;
+    --color-secondary-800: #0F172A; /* Midnight */
+    --color-secondary-900: #020617;
+
+    /* Functional Colors - Status */
+    --color-success: #4ADE80; /* Green */
+    --color-warning: #F59E0B; /* Amber */
+    --color-error: #EF4444; /* Red */
+
+    /* Accent colors (using secondary green) */
+    --color-accent-50: #F0FFEC;
+    --color-accent-100: #E1FFD9;
+    --color-accent-200: #C3FFB3;
+    --color-accent-300: #A5FF8D;
+    --color-accent-400: #9AFF7C; /* Secondary - Light Green */
+    --color-accent-500: #7FE65F;
+    --color-accent-600: #64CC4C;
+    --color-accent-700: #4A9939;
+    --color-accent-800: #2F6626;
+    --color-accent-900: #153313;
+}
+
+@layer base {
+  :root {
+        --background: 0 0% 100%; /* White */
+        --foreground: 222 47% 11%; /* Midnight #0F172A */
+        --card: 0 0% 100%; /* White */
+        --card-foreground: 222 47% 11%; /* Midnight */
+        --popover: 0 0% 100%;
+        --popover-foreground: 222 47% 11%;
+        --primary: 165 100% 8%; /* Domio Main Green #002A1F */
+        --primary-foreground: 0 0% 100%; /* White */
+        --secondary: 210 40% 98%; /* Off-White #F8FAFC */
+        --secondary-foreground: 222 47% 11%; /* Midnight */
+        --muted: 210 40% 96%;
+        --muted-foreground: 215 16% 47%; /* Slate #475569 */
+        --accent: 105 100% 74%; /* Domio Secondary Green #9AFF7C */
+        --accent-foreground: 165 100% 8%; /* Main Green for contrast */
+        --destructive: 0 84% 60%; /* Error Red #EF4444 */
+        --destructive-foreground: 0 0% 98%;
+        --border: 214 32% 91%; /* Soft Gray #E2E8F0 */
+        --input: 214 32% 91%;
+        --ring: 165 100% 8%; /* Domio Main Green */
+        --radius: 0.5rem;
+    }
+  .dark {
+        --background: 222 47% 11%; /* Midnight */
+        --foreground: 0 0% 98%;
+        --card: 222 47% 11%;
+        --card-foreground: 0 0% 98%;
+        --popover: 222 47% 11%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 165 100% 8%; /* Domio Main Green #002A1F */
+        --primary-foreground: 0 0% 100%;
+        --secondary: 215 28% 17%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 215 28% 17%;
+        --muted-foreground: 215 16% 47%;
+        --accent: 105 100% 74%; /* Domio Secondary Green #9AFF7C */
+        --accent-foreground: 165 100% 8%; /* Main Green for contrast */
+        --destructive: 0 62% 50%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 215 28% 17%;
+        --input: 215 28% 17%;
+        --ring: 165 100% 8%; /* Domio Main Green */
+    }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    }
+  html {
+    @apply w-full;
+  }
+  body {
+    @apply bg-background text-foreground w-full;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    }
+  
+  /* Apply Codec Pro to all headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Codec Pro', -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 700;
+  }
+  
+  h1 {
+    font-weight: 800;
+  }
+  
+  h2 {
+    font-weight: 700;
+  }
+  
+  h3, h4, h5, h6 {
+    font-weight: 600;
+  }
+  
+  /* Force all mobile menu links to have the same color */
+  a[href="#contact"] {
+    color: rgb(255 255 255 / 0.8) !important;
+  }
+  
+  a[href="#contact"]:visited {
+    color: rgb(255 255 255 / 0.8) !important;
+  }
+}
+
+@keyframes loading-line {
+  0% {
+    width: 0%;
+    transform: translateX(0);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0);
+  }
+  100% {
+    width: 0%;
+    transform: translateX(100%);
+  }
+}
+

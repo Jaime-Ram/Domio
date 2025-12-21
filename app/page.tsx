@@ -1,0 +1,511 @@
+'use client'
+
+import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Logo } from '@/components/Logo'
+import { PricingSection } from '@/components/marketing/pricing-section'
+import { HeroSection } from '@/components/marketing/hero-section'
+import { ContactSection } from '@/components/marketing/contact-section'
+import { FooterSection } from '@/components/marketing/footer-section'
+import { CookieBanner } from '@/components/marketing/cookie-banner'
+import { FunctiesSection } from '@/components/marketing/functies-section'
+import { AuthModal } from '@/components/auth/auth-modal'
+import { ArrowRight, Users, Zap, Sparkles, Menu, X, Settings, LogOut, LayoutDashboard, ChevronDown, ArrowUpRight } from 'lucide-react'
+import { AvatarLabelGroup } from '@/components/base/avatar/avatar-label-group'
+
+export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
+  const [user, setUser] = useState<any>(null)
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [mockupHeight, setMockupHeight] = useState<number>(0)
+  const mockupRef = useRef<HTMLImageElement>(null)
+  const router = useRouter()
+  const supabase = createClient()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        // First check if there's a session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        // If no session, user is not logged in - this is normal, not an error
+        if (sessionError || !session) {
+          setLoading(false)
+          return
+        }
+
+        // Get user from session
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+        
+        // Handle auth errors gracefully
+        if (authError) {
+          // Auth session missing is expected for logged out users
+          if (authError.message?.includes('session') || authError.message?.includes('JWT')) {
+            // Silently handle - user is just not logged in
+            setLoading(false)
+            return
+          }
+          console.error('Auth error:', authError)
+          setLoading(false)
+          return
+        }
+        
+        if (authUser) {
+          setUser(authUser)
+          
+          // Fetch user profile - gracefully handle if it doesn't exist
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('id', authUser.id)
+              .single()
+            
+            if (profileError) {
+              // PGRST116 = no rows returned, which is OK for new users
+              if (profileError.code !== 'PGRST116') {
+                // Only log if there's actual error information and it's not an RLS error
+                const hasErrorInfo = profileError.code || profileError.message || profileError.details || profileError.hint
+                const isRLSError = profileError.message?.includes('row-level security') || 
+                                  profileError.message?.includes('permission denied') ||
+                                  profileError.code === '42501' ||
+                                  profileError.code === 'PGRST301'
+                
+                if (hasErrorInfo && !isRLSError) {
+                  console.error('Error fetching user profile:', {
+                    code: profileError.code,
+                    message: profileError.message,
+                    details: profileError.details,
+                    hint: profileError.hint,
+                  })
+                } else if (isRLSError) {
+                  // RLS error - provide helpful message
+                  console.warn('User profile access denied. Please check Supabase RLS policies.')
+                }
+                // If error object is empty, silently continue
+              }
+              // Continue without profile - user can still use the site
+            } else if (profile) {
+              setUserProfile(profile)
+            }
+          } catch (profileErr) {
+            // Silently handle profile errors
+            // Continue without profile
+          }
+        }
+      } catch (error: any) {
+        // Silently handle errors - user might just not be logged in
+        if (error?.message?.includes('session') || error?.message?.includes('JWT')) {
+          // Expected for logged out users
+        } else {
+          console.error('Error fetching user:', error)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
+  // Calculate mockup height and set white section height to 70% of mockup
+  useEffect(() => {
+    const updateMockupHeight = () => {
+      if (mockupRef.current) {
+        const height = mockupRef.current.offsetHeight
+        setMockupHeight(height)
+      }
+    }
+
+    // Initial calculation
+    updateMockupHeight()
+
+    // Recalculate on resize
+    window.addEventListener('resize', updateMockupHeight)
+    
+    // Also check after images load
+    const images = document.querySelectorAll('img[src*="mockup"]')
+    images.forEach(img => {
+      img.addEventListener('load', updateMockupHeight)
+    })
+
+    return () => {
+      window.removeEventListener('resize', updateMockupHeight)
+      images.forEach(img => {
+        img.removeEventListener('load', updateMockupHeight)
+      })
+    }
+  }, [])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    setUserProfile(null)
+    router.push('/')
+    router.refresh()
+  }
+
+  const getUserDisplayName = () => {
+    if (userProfile?.full_name) return userProfile.full_name
+    if (user?.user_metadata?.full_name) return user.user_metadata.full_name
+    if (user?.email) return user.email.split('@')[0]
+    return 'Gebruiker'
+  }
+
+  const getDashboardPath = () => {
+    if (userProfile?.role === 'employer') return '/dashboard/employer'
+    if (userProfile?.role === 'employee') return '/dashboard/employee'
+    return '/dashboard'
+  }
+
+  const getAvatarUrl = () => {
+    return userProfile?.avatar_url || userProfile?.profile_picture || user?.user_metadata?.avatar_url || null
+  }
+
+  const getInitials = () => {
+    const name = getUserDisplayName()
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return name.substring(0, 2).toUpperCase()
+  }
+  return (
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      
+
+      {/* Content - Above background */}
+      <div className="relative z-10">
+      {/* Header */}
+      <header
+        className={`sticky top-0 z-50 w-full transition-colors relative ${
+          mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
+        }`}
+      >
+        <div className="container mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 md:px-8">
+          <div className="py-2 flex-1">
+            <Logo width={100} height={28} variant="white" />
+          </div>
+          <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
+            <Link href="#features" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Functies
+            </Link>
+            <Link href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Prijzen
+            </Link>
+            <Link href="#contact" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Contact
+            </Link>
+          </nav>
+          <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
+            {loading ? (
+              <div className="h-9 w-20 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+            ) : user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2 text-white hover:bg-white/10 hover:text-white">
+                    <AvatarLabelGroup
+                      size="sm"
+                      src={getAvatarUrl() || undefined}
+                      alt={getUserDisplayName()}
+                      title={getUserDisplayName()}
+                      subtitle={user?.email}
+                    />
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href={getDashboardPath()} className="flex items-center gap-2 cursor-pointer">
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4" />
+                      Instellingen
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400">
+                    <LogOut className="h-4 w-4" />
+                    Uitloggen
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="text-white hover:bg-white/10 hover:text-white"
+                  onClick={() => {
+                    setAuthModalMode('login')
+                    setAuthModalOpen(true)
+                  }}
+                >
+                  Inloggen
+                </Button>
+                <Button
+                  className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                  onClick={() => {
+                    setAuthModalMode('signup')
+                    setAuthModalOpen(true)
+                  }}
+                >
+                    Aan de slag
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+          
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-white hover:bg-white/10 hover:text-white"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`md:hidden absolute top-full left-0 right-0 border-t border-white/10 bg-[#002A1F] transition-all duration-300 ease-in-out overflow-hidden shadow-lg ${
+            mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+          }`}
+        >
+          <nav className="container mx-auto flex flex-col px-4 py-4 space-y-3">
+            <Link
+              href="#features"
+              className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] visited:text-white/80"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Functies
+            </Link>
+            <Link
+              href="#pricing"
+              className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] visited:text-white/80"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Prijzen
+            </Link>
+            <Link
+              href="#contact"
+              className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] visited:text-white/80"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+                 {user ? (
+                   <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
+                     <div className="px-4 py-2">
+                       <AvatarLabelGroup
+                         size="md"
+                         src={getAvatarUrl() || undefined}
+                         alt={getUserDisplayName()}
+                         title={getUserDisplayName()}
+                         subtitle={user?.email}
+                       />
+                     </div>
+               <Button variant="ghost" asChild className="justify-start w-full px-4 text-white hover:bg-white/10 hover:text-white">
+                  <Link href={getDashboardPath()} onClick={() => setMobileMenuOpen(false)}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </Button>
+               <Button variant="ghost" asChild className="justify-start w-full px-4 text-white hover:bg-white/10 hover:text-white">
+                  <Link href="/settings" onClick={() => setMobileMenuOpen(false)}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Instellingen
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="justify-start w-full px-4 text-red-200 hover:bg-white/10 hover:text-red-100"
+                  onClick={() => {
+                    handleLogout()
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Uitloggen
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
+                <Button 
+                  variant="ghost" 
+                  className="justify-start w-full px-4 text-white hover:bg-white/10 hover:text-white"
+                  onClick={() => {
+                    setAuthModalMode('login')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                    Inloggen
+                </Button>
+                <Button
+                  className="justify-start w-full px-4 bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                  onClick={() => {
+                    setAuthModalMode('signup')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                    Aan de slag
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <HeroSection 
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
+
+      {/* Floating Mockup - positioned so 30% of top overlaps hero, 70% of bottom in white section */}
+      <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-30vh' }}>
+        <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
+          <div className="relative w-full flex justify-center">
+            {/* Mobile Mockup - shown on mobile devices */}
+            <img
+              ref={mockupRef}
+              src="/images/mobile mockup.png"
+              alt="Domio op mobiel"
+              className="h-auto w-full max-w-[85%] object-contain drop-shadow-2xl md:hidden mx-auto"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+              }}
+            />
+            {/* Desktop/Tablet Mockup - shown on larger screens */}
+            <img
+              ref={mockupRef}
+              src="/images/Desktopmockup.png"
+              alt="Domio op desktop"
+              className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+                const parent = target.parentElement
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="flex h-96 items-center justify-center rounded-lg bg-gradient-to-br from-[#002A1F]/10 to-[#002A1F]/5">
+                      <div class="text-center">
+                        <div class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-2xl bg-[#002A1F]/20">
+                          <svg class="h-12 w-12 text-[#002A1F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <p class="text-sm font-medium text-gray-600">Device Mockup</p>
+                      </div>
+                    </div>
+                  `
+                }
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Functies Section */}
+      <FunctiesSection />
+
+      {/* Pricing Section */}
+      <PricingSection 
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
+
+      {/* Contact Section */}
+      <ContactSection />
+
+      {/* CTA Section - Overlapping Footer */}
+      <section className="relative z-20 pt-24 pb-12">
+        {/* Background that extends from middle of CTA into footer */}
+        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
+        <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              {/* Left Side - Content */}
+              <div className="flex flex-col gap-6 lg:max-w-2xl">
+                <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
+                <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
+                  Eerst zien, dan geloven?
+                </h2>
+                <p className="text-lg text-white/90">
+                  Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
+                </p>
+                <div className="flex flex-row items-center gap-3 justify-start">
+                  <Button
+                    size="default"
+                    className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-xl"
+                    onClick={() => {
+                      setAuthModalMode('signup')
+                      setAuthModalOpen(true)
+                    }}
+                  >
+                    Start 30 dagen gratis
+                  </Button>
+                  <Button
+                    asChild
+                    className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                  >
+                    <Link href="/dashboard/employer" className="flex items-center gap-2">
+                      <span className="md:hidden">Demo</span>
+                      <span className="hidden md:inline">Bekijk demo</span>
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <FooterSection />
+      </div>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen}
+        defaultMode={authModalMode}
+      />
+
+      {/* Cookie Banner */}
+      <CookieBanner />
+    </div>
+  )
+}
