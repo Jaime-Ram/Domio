@@ -63,7 +63,8 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
       <div className="mx-auto max-w-4xl text-center">
         <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Pricing</h2>
         <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl">
-          Passende, simpele pricing
+          <span className="hidden sm:inline">Passende, simpele pricing</span>
+          <span className="sm:hidden">Passende simpele pricing</span>
         </p>
       </div>
       <p className="mx-auto mt-6 max-w-2xl text-center text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8">
