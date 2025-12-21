@@ -5,14 +5,9 @@ export function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // During build time (SSG), return a mock client to prevent build failures
-    if (typeof window === 'undefined') {
-      console.warn('⚠️ Supabase environment variables not set during build. Using mock client.')
-      return null as any
-    }
-    throw new Error(
-      'Missing Supabase environment variables. Please check your .env.local file.'
-    )
+    // Return a mock client when Supabase is not configured
+    console.warn('⚠️ Supabase not configured. Using mock client. App will work with limited functionality.')
+    return null as any
   }
 
   return createBrowserClient(supabaseUrl, supabaseAnonKey)

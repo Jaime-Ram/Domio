@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Calculate statistics
-        const totalHours = workHours?.reduce((sum, wh) => {
+        const totalHours = workHours?.reduce((sum: number, wh: any) => {
           const start = new Date(wh.start_time)
           const end = new Date(wh.end_time)
           const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
           return sum + (hours - breakHours)
         }, 0) || 0
 
-        const approvedHours = workHours?.filter(wh => wh.status === 'approved').reduce((sum, wh) => {
+        const approvedHours = workHours?.filter((wh: any) => wh.status === 'approved').reduce((sum: number, wh: any) => {
           const start = new Date(wh.start_time)
           const end = new Date(wh.end_time)
           const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
@@ -137,9 +137,9 @@ export async function GET(request: NextRequest) {
           })
         }
 
-        const totalAmount = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0
-        const completedAmount = payments?.filter(p => p.status === 'completed').reduce((sum, p) => sum + (p.amount || 0), 0) || 0
-        const pendingAmount = payments?.filter(p => p.status === 'pending').reduce((sum, p) => sum + (p.amount || 0), 0) || 0
+        const totalAmount = payments?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0
+        const completedAmount = payments?.filter((p: any) => p.status === 'completed').reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0
+        const pendingAmount = payments?.filter((p: any) => p.status === 'pending').reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0
 
         // Group by period
         const grouped = groupByPeriod(payments || [], period, 'created_at')
@@ -290,14 +290,14 @@ export async function GET(request: NextRequest) {
         }
 
         // Get work hours for each employee
-        const employeesWithStats = await Promise.all(
-          (employees || []).map(async (emp) => {
+      const employeesWithStats = await Promise.all(
+        (employees || []).map(async (emp: any) => {
             const { data: workHours } = await supabase
               .from('work_hours')
               .select('*')
               .eq('employee_id', emp.id)
 
-            const totalHours = workHours?.reduce((sum, wh) => {
+            const totalHours = workHours?.reduce((sum: number, wh: any) => {
               const start = new Date(wh.start_time)
               const end = new Date(wh.end_time)
               const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)

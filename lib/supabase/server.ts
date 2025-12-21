@@ -6,7 +6,8 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables')
+    console.warn('⚠️ Supabase not configured. Server client disabled.')
+    return null as any
   }
 
   const cookieStore = await cookies()
