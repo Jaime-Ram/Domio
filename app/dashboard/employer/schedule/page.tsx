@@ -179,7 +179,7 @@ export default function SchedulePage() {
         .not('employer_email', 'is', null)
       
       // Filter lokaal op email match (case-insensitive)
-      const filteredByEmail = (dataByEmail || []).filter(emp => {
+      const filteredByEmail = (dataByEmail || []).filter((emp: any) => {
         const empEmail = (emp.employer_email || '').toLowerCase().trim()
         return empEmail === normalizedEmail && emp.employer_id !== employerId
       })
@@ -187,8 +187,8 @@ export default function SchedulePage() {
       // Combineer beide resultaten en verwijder duplicaten
       const allEmployees = [
         ...(dataById || []),
-        ...filteredByEmail.filter(emp => 
-          !dataById?.some(e => e.id === emp.id)
+        ...filteredByEmail.filter((emp: any) =>
+          !dataById?.some((e: any) => e.id === emp.id)
         )
       ]
       
