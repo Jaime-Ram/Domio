@@ -9,6 +9,8 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -39,14 +41,15 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
-        <script
+        <link rel="preconnect" href="https://consent.cookiebot.com" />
+        <link rel="dns-prefetch" href="https://consent.cookiebot.com" />
+        <Script
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="89ee426f-246b-433f-beee-676fb434af4f"
           data-blockingmode="auto"
           data-culture="NL"
-          type="text/javascript"
-          async
+          strategy="lazyOnload"
         />
       </head>
       <body className="antialiased" suppressHydrationWarning>

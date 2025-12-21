@@ -1,16 +1,19 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, lazy, Suspense } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
-import { PricingSection } from '@/components/marketing/pricing-section'
 import { HeroSection } from '@/components/marketing/hero-section'
-import { ContactSection } from '@/components/marketing/contact-section'
-import { FooterSection } from '@/components/marketing/footer-section'
-import { FunctiesSection } from '@/components/marketing/functies-section'
-import { AuthModal } from '@/components/auth/auth-modal'
 import { ArrowRight, Menu, X, ArrowUpRight } from 'lucide-react'
+
+// Lazy load heavy sections for better initial load
+const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
+const ContactSection = lazy(() => import('@/components/marketing/contact-section').then(m => ({ default: m.ContactSection })))
+const FooterSection = lazy(() => import('@/components/marketing/footer-section').then(m => ({ default: m.FooterSection })))
+const FunctiesSection = lazy(() => import('@/components/marketing/functies-section').then(m => ({ default: m.FunctiesSection })))
+const AuthModal = lazy(() => import('@/components/auth/auth-modal').then(m => ({ default: m.AuthModal })))
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -25,7 +28,7 @@ export default function Home() {
       <div className="relative z-10">
         {/* Header */}
         <header
-          className={`sticky top-0 z-50 w-full transition-colors relative ${
+          className={`sticky top-0 z-50 w-full transition-colors duration-200 relative ${
             mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
           }`}
         >
@@ -154,36 +157,50 @@ export default function Home() {
           <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
             <div className="relative w-full flex justify-center">
               {/* Mobile Mockup */}
-              <img
+              <Image
                 src="/images/mobile mockup.png"
                 alt="Domio op mobiel"
+                width={400}
+                height={800}
                 className="h-auto w-full max-w-[85%] object-contain drop-shadow-2xl md:hidden mx-auto"
+                priority={false}
                 loading="lazy"
+                quality={85}
               />
               {/* Desktop Mockup */}
-              <img
+              <Image
                 src="/images/Desktopmockup.png"
                 alt="Domio op desktop"
+                width={1000}
+                height={600}
                 className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
+                priority={false}
                 loading="lazy"
+                quality={85}
               />
             </div>
           </div>
         </div>
 
         {/* Functies Section */}
-        <FunctiesSection />
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <FunctiesSection />
+        </Suspense>
 
         {/* Pricing Section */}
-        <PricingSection 
-          onSignupClick={() => {
-            setAuthModalMode('signup')
-            setAuthModalOpen(true)
-          }}
-        />
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <PricingSection 
+            onSignupClick={() => {
+              setAuthModalMode('signup')
+              setAuthModalOpen(true)
+            }}
+          />
+        </Suspense>
 
         {/* Contact Section */}
-        <ContactSection />
+        <Suspense fallback={<div className="min-h-[300px]" />}>
+          <ContactSection />
+        </Suspense>
 
         {/* CTA Section */}
         <section className="relative z-20 pt-24 pb-12">
@@ -228,15 +245,21 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <FooterSection />
+        <Suspense fallback={<div className="min-h-[200px]" />}>
+          <FooterSection />
+        </Suspense>
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        open={authModalOpen} 
-        onOpenChange={setAuthModalOpen}
-        defaultMode={authModalMode}
-      />
+      {authModalOpen && (
+        <Suspense fallback={null}>
+          <AuthModal 
+            open={authModalOpen} 
+            onOpenChange={setAuthModalOpen}
+            defaultMode={authModalMode}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }
