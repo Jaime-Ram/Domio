@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { HeroSection } from '@/components/marketing/hero-section'
+import { AuthModal } from '@/components/auth/auth-modal'
 import { ArrowRight, Menu, X, ArrowUpRight } from 'lucide-react'
 
 // Lazy load heavy sections for better initial load
@@ -13,7 +14,6 @@ const PricingSection = lazy(() => import('@/components/marketing/pricing-section
 const ContactSection = lazy(() => import('@/components/marketing/contact-section').then(m => ({ default: m.ContactSection })))
 const FooterSection = lazy(() => import('@/components/marketing/footer-section').then(m => ({ default: m.FooterSection })))
 const FunctiesSection = lazy(() => import('@/components/marketing/functies-section').then(m => ({ default: m.FunctiesSection })))
-const AuthModal = lazy(() => import('@/components/auth/auth-modal').then(m => ({ default: m.AuthModal })))
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -250,16 +250,12 @@ export default function Home() {
         </Suspense>
       </div>
 
-      {/* Auth Modal */}
-      {authModalOpen && (
-        <Suspense fallback={null}>
-          <AuthModal 
-            open={authModalOpen} 
-            onOpenChange={setAuthModalOpen}
-            defaultMode={authModalMode}
-          />
-        </Suspense>
-      )}
+      {/* Auth Modal - Direct loaded for instant response */}
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen}
+        defaultMode={authModalMode}
+      />
     </div>
   )
 }
