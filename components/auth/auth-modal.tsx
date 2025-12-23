@@ -174,12 +174,34 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="!max-w-none !w-full !h-full !m-0 !p-0 !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 sm:!max-w-lg sm:!w-auto sm:!h-auto sm:!m-0 sm:!p-0 sm:!rounded-lg sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:!left-[50%] sm:!top-[50%] overflow-hidden"
+        className="max-w-none w-screen h-screen m-0 p-0 rounded-none translate-x-0 translate-y-0 left-0 top-0 border-0 sm:max-w-lg sm:w-auto sm:h-auto sm:m-0 sm:p-0 sm:rounded-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:left-[50%] sm:top-[50%] sm:border overflow-hidden"
         onOpenAutoFocus={(e) => e.preventDefault()}
+        style={{
+          maxWidth: '100vw',
+          width: '100vw',
+          height: '100vh',
+          margin: 0,
+          padding: 0,
+          borderRadius: 0,
+          transform: 'none',
+          left: 0,
+          top: 0,
+        }}
       >
-        <div ref={modalRef} className="p-6 sm:p-8 h-full flex flex-col overflow-y-auto">
+        <div ref={modalRef} className="p-6 sm:p-8 h-full flex flex-col overflow-y-auto bg-white dark:bg-gray-900">
+          {/* Close button - visible on mobile */}
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute top-4 right-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span className="sr-only">Close</span>
+          </button>
+          
           {/* Logo */}
-          <div className="mb-8 flex justify-center py-4">
+          <div className="mb-6 sm:mb-8 flex justify-center py-2 sm:py-4">
             <Logo width={120} height={32} />
           </div>
 
@@ -203,9 +225,9 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
           )}
 
           {/* Form */}
-          <form onSubmit={mode === 'signup' && signupStep === 1 ? handleNextStep : handleSubmit} className="mt-6 space-y-4">
+          <form onSubmit={mode === 'signup' && signupStep === 1 ? handleNextStep : handleSubmit} className="mt-4 sm:mt-6 space-y-4 flex-1 flex flex-col min-h-0">
             {mode === 'signup' ? (
-              <div className="relative overflow-visible flex-1 flex flex-col" style={{ minHeight: '300px', padding: '0 2px' }}>
+              <div className="relative overflow-visible flex-1 flex flex-col min-h-0" style={{ padding: '0 2px' }}>
                 <>
                   {signupStep === 1 && (
                     <div
