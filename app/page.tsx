@@ -102,19 +102,20 @@ export default function Home() {
           </div>
 
           {/* Mobile Sidebar - Slides from left like dashboard */}
-          {mobileMenuOpen && (
-            <>
-              {/* Overlay */}
-              <div
-                className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                onClick={() => setMobileMenuOpen(false)}
-              />
-              {/* Sidebar */}
-              <div
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#002A1F] border-r border-white/10 transform transition-transform duration-300 ease-in-out md:hidden ${
-                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
-              >
+          <>
+            {/* Overlay */}
+            <div
+              className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
+                mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            {/* Sidebar */}
+            <div
+              className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#002A1F] border-r border-white/10 transition-transform duration-300 ease-in-out md:hidden ${
+                mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
+            >
                 <div className="flex flex-col h-full">
                   {/* Sidebar Header */}
                   <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -180,8 +181,7 @@ export default function Home() {
                   </nav>
                 </div>
               </div>
-            </>
-          )}
+          </>
         </header>
 
         {/* Hero Section */}
