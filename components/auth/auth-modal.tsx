@@ -174,10 +174,10 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-lg p-0 sm:max-w-lg overflow-y-auto max-h-[90vh] sm:max-h-[85vh] m-4 sm:m-0 animate-in fade-in-0 zoom-in-95 duration-200"
+        className="max-w-lg p-0 sm:max-w-lg overflow-y-auto max-h-[90vh] sm:max-h-[85vh] m-0 sm:m-0 w-screen h-screen sm:w-auto sm:h-auto sm:max-w-lg sm:rounded-lg animate-in fade-in-0 zoom-in-95 duration-200 fixed inset-0 sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:fixed rounded-none sm:rounded-lg"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div ref={modalRef} className="p-4 sm:p-8">
+        <div ref={modalRef} className="p-4 sm:p-8 h-full flex flex-col overflow-y-auto">
           {/* Logo */}
           <div className="mb-8 flex justify-center py-4">
             <Logo width={120} height={32} />
