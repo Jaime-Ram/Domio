@@ -112,7 +112,7 @@ export default function Home() {
             />
             {/* Sidebar */}
             <div
-              className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#002A1F] border-r border-white/10 transition-transform duration-300 ease-in-out md:hidden ${
+              className={`fixed inset-y-0 start-0 z-[60] bg-[#002A1F] border-r border-white/10 transition-all duration-300 transform md:hidden w-64 h-full ${
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
