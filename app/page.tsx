@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User } from 'lucide-react'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
@@ -32,10 +32,24 @@ export default function Home() {
             mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
           }`}
         >
-          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 md:px-8">
-            <div className="py-2 flex-1">
+          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-8">
+            {/* Mobile: Hamburger Menu (Left) */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-white hover:bg-white/10 hover:text-white flex-shrink-0"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+
+            {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
+            <div className="flex-1 flex justify-center md:justify-start md:flex-none">
               <Logo width={100} height={28} variant="white" />
             </div>
+
+            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
               <Link href="#features" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
                 Functies
@@ -47,6 +61,8 @@ export default function Home() {
                 Contact
               </Link>
             </nav>
+
+            {/* Desktop: Auth Buttons */}
             <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
               <Button 
                 variant="ghost" 
@@ -69,79 +85,103 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
-            
-            {/* Mobile Menu Button */}
+
+            {/* Mobile: Account Icon (Right) */}
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-white hover:bg-white/10 hover:text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
+              className="md:hidden text-white hover:bg-white/10 hover:text-white flex-shrink-0"
+              onClick={() => {
+                setAuthModalMode('login')
+                setAuthModalOpen(true)
+              }}
+              aria-label="Account"
             >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              <User className="h-6 w-6" />
             </Button>
           </div>
 
-          {/* Mobile Menu */}
-          <div
-            className={`md:hidden absolute top-full left-0 right-0 border-t border-white/10 bg-[#002A1F] transition-all duration-500 ease-in-out overflow-hidden shadow-lg ${
-              mobileMenuOpen 
-                ? 'max-h-screen opacity-100 translate-y-0' 
-                : 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
-            }`}
-          >
-            <nav className="container mx-auto flex flex-col px-4 py-4 space-y-3">
-              <Link
-                href="#features"
-                className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]"
+          {/* Mobile Sidebar - Slides from left like dashboard */}
+          {mobileMenuOpen && (
+            <>
+              {/* Overlay */}
+              <div
+                className="fixed inset-0 bg-black/50 z-40 md:hidden"
                 onClick={() => setMobileMenuOpen(false)}
+              />
+              {/* Sidebar */}
+              <div
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#002A1F] border-r border-white/10 transform transition-transform duration-300 ease-in-out md:hidden ${
+                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
               >
-                Functies
-              </Link>
-              <Link
-                href="#pricing"
-                className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Prijzen
-              </Link>
-              <Link
-                href="#contact"
-                className="py-2 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Contact
-              </Link>
-              <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
-                <Button 
-                  variant="ghost" 
-                  className="justify-start w-full px-4 text-white hover:bg-white/10 hover:text-white"
-                  onClick={() => {
-                    setAuthModalMode('login')
-                    setAuthModalOpen(true)
-                    setMobileMenuOpen(false)
-                  }}
-                >
-                  Inloggen
-                </Button>
-                <Button
-                  className="justify-start w-full px-4 bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                  onClick={() => {
-                    setAuthModalMode('signup')
-                    setAuthModalOpen(true)
-                    setMobileMenuOpen(false)
-                  }}
-                >
-                  Aan de slag
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <div className="flex flex-col h-full">
+                  {/* Sidebar Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-white/10">
+                    <Logo width={100} height={28} variant="white" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-white/10"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
+
+                  {/* Sidebar Navigation */}
+                  <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+                    <Link
+                      href="#features"
+                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Functies
+                    </Link>
+                    <Link
+                      href="#pricing"
+                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Prijzen
+                    </Link>
+                    <Link
+                      href="#contact"
+                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Contact
+                    </Link>
+
+                    <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                        onClick={() => {
+                          setAuthModalMode('login')
+                          setAuthModalOpen(true)
+                          setMobileMenuOpen(false)
+                        }}
+                      >
+                        Inloggen
+                      </Button>
+                      <Button
+                        className="w-full justify-start bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                        onClick={() => {
+                          setAuthModalMode('signup')
+                          setAuthModalOpen(true)
+                          setMobileMenuOpen(false)
+                        }}
+                      >
+                        Aan de slag
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </nav>
+                </div>
               </div>
-            </nav>
-          </div>
+            </>
+          )}
         </header>
 
         {/* Hero Section */}
@@ -201,48 +241,6 @@ export default function Home() {
         <Suspense fallback={<div className="min-h-[300px]" />}>
           <ContactSection />
         </Suspense>
-
-        {/* CTA Section */}
-        <section className="relative z-20 pt-24 pb-12">
-          <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
-          <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
-            <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
-              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex flex-col gap-6 lg:max-w-2xl">
-                  <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
-                  <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
-                    Eerst zien, dan geloven?
-                  </h2>
-                  <p className="text-lg text-white/90">
-                    Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar.
-                  </p>
-                  <div className="flex flex-row items-center gap-3 justify-start">
-                    <Button
-                      size="default"
-                      className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-xl"
-                      onClick={() => {
-                        setAuthModalMode('signup')
-                        setAuthModalOpen(true)
-                      }}
-                    >
-                      Start 30 dagen gratis
-                    </Button>
-                    <Button
-                      asChild
-                      className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                    >
-                      <Link href="/dashboard/employer" className="flex items-center gap-2">
-                        <span className="md:hidden">Demo</span>
-                        <span className="hidden md:inline">Bekijk demo</span>
-                        <ArrowUpRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Footer */}
         <Suspense fallback={<div className="min-h-[200px]" />}>
