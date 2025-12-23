@@ -12,16 +12,18 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
 
   return (
     <section className="relative -mt-16 overflow-visible bg-[#002A1F] pt-10 pb-0 md:pt-12 md:pb-0">
-      {/* Background blur spots - reduced for better performance */}
+      {/* Background blur spots - hidden on mobile, visible on desktop */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -left-24 h-[32rem] w-[40rem] rounded-[60%] bg-[#9AFF7C]/30 blur-3xl" />
-        <div className="absolute top-1/4 -right-24 h-[36rem] w-[44rem] rounded-[50%] bg-[#9AFF7C]/25 blur-3xl" />
-        <div className="absolute -bottom-28 left-1/3 h-[40rem] w-[48rem] rounded-[55%] bg-[#9AFF7C]/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/4 h-[28rem] w-[36rem] rounded-[45%] bg-[#9AFF7C]/25 blur-3xl" />
-        <div className="absolute top-3/4 right-1/3 h-[32rem] w-[38rem] rounded-[65%] bg-[#9AFF7C]/20 blur-3xl" />
+        {/* Blur spots - only on desktop */}
+        <div className="hidden md:block absolute -top-24 -left-24 h-[32rem] w-[40rem] rounded-[60%] bg-[#9AFF7C]/30 blur-3xl" />
+        <div className="hidden md:block absolute top-1/4 -right-24 h-[36rem] w-[44rem] rounded-[50%] bg-[#9AFF7C]/25 blur-3xl" />
+        <div className="hidden md:block absolute -bottom-28 left-1/3 h-[40rem] w-[48rem] rounded-[55%] bg-[#9AFF7C]/20 blur-3xl" />
+        <div className="hidden md:block absolute top-1/2 left-1/4 h-[28rem] w-[36rem] rounded-[45%] bg-[#9AFF7C]/25 blur-3xl" />
+        <div className="hidden md:block absolute top-3/4 right-1/3 h-[32rem] w-[38rem] rounded-[65%] bg-[#9AFF7C]/20 blur-3xl" />
         {/* Lighter fade so content stays readable - darker on mobile */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/20 md:from-black/0 md:via-black/10 md:to-black/20" />
-        <div className="absolute inset-0 bg-[#002A1F]/70 md:bg-transparent" />
+        {/* Mobile: solid dark background, Desktop: transparent */}
+        <div className="absolute inset-0 bg-[#002A1F] md:bg-transparent" />
       </div>
       
       <div className="container relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center px-6 pt-20 pb-12 md:px-8 md:pt-16 md:pb-16 text-center">
