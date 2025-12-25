@@ -53,7 +53,7 @@ export default function DemoPage() {
           Demo wordt geladen...
         </h2>
         <p className="text-white/80 mb-8">
-          We bereiden je demo dashboard voor
+          We bereiden je demo dashboard voor. Dit duurt even.
         </p>
 
         {/* Progress Bar */}
