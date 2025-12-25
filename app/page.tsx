@@ -32,7 +32,7 @@ export default function Home() {
             mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
           }`}
         >
-          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-8">
+          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
             {/* Mobile: Hamburger Menu (Left) */}
             <Button
               variant="ghost"
@@ -45,12 +45,12 @@ export default function Home() {
             </Button>
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
-            <div className="flex-1 flex justify-center md:justify-start md:flex-none">
+            <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
               <Logo width={100} height={28} variant="white" />
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
+            {/* Desktop Navigation - Centered */}
+            <nav className="hidden md:flex items-center gap-6 flex-1 justify-center absolute left-1/2 -translate-x-1/2">
               <Link href="#features" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
                 Functies
               </Link>
@@ -62,8 +62,8 @@ export default function Home() {
               </Link>
             </nav>
 
-            {/* Desktop: Auth Buttons */}
-            <div className="hidden md:flex items-center gap-4 flex-1 justify-end">
+            {/* Desktop: Auth Buttons (Right) */}
+            <div className="hidden md:flex items-center gap-4 ml-auto">
               <Button 
                 variant="ghost" 
                 className="text-white hover:bg-white/10 hover:text-white"
