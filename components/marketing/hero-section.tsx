@@ -16,7 +16,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       {/* Background Image */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <Image
-          src="/images/achtergrond1.jpg"
+          src="/images/Achtergrond1.jpg"
           alt=""
           fill
           className="object-cover opacity-30"
