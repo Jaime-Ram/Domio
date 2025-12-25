@@ -169,17 +169,6 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div ref={modalRef} className="p-6 sm:p-8 flex flex-col overflow-y-auto bg-white dark:bg-gray-900">
-          {/* Close button */}
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            <span className="sr-only">Close</span>
-          </button>
-          
           {/* Logo */}
           <div className="mb-6 flex justify-center py-2">
             <Logo width={120} height={32} />
