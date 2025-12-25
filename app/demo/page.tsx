@@ -63,22 +63,6 @@ export default function DemoPage() {
             style={{ width: `${loadingProgress}%` }}
           />
         </div>
-
-        {/* Loading Steps */}
-        <div className="mt-8 space-y-2 text-sm text-white/60">
-          <div className="flex items-center justify-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#9AFF7C]" />
-            <span>Dashboard initialiseren</span>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-[#9AFF7C]" />
-            <span>Demo data laden</span>
-          </div>
-          <div className="flex items-center justify-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
-            <span>Bijna klaar...</span>
-          </div>
-        </div>
       </div>
     </div>
   )
