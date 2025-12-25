@@ -273,7 +273,7 @@ export default function Home() {
                       asChild
                       className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
                     >
-                      <Link href="/dashboard/employer" className="flex items-center gap-2">
+                      <Link href="/demo" className="flex items-center gap-2">
                         <span className="md:hidden">Demo</span>
                         <span className="hidden md:inline">Bekijk demo</span>
                         <ArrowUpRight className="h-4 w-4" />

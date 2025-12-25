@@ -44,7 +44,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               asChild
               className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
             >
-              <Link href="/dashboard/employer" className="flex items-center gap-2">
+              <Link href="/demo" className="flex items-center gap-2">
                 Bekijk demo
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
