@@ -165,25 +165,14 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-none w-screen h-screen m-0 p-0 rounded-none translate-x-0 translate-y-0 left-0 top-0 border-0 sm:max-w-lg sm:w-auto sm:h-auto sm:m-0 sm:p-0 sm:rounded-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:left-[50%] sm:top-[50%] sm:border overflow-hidden"
+        className="max-w-lg w-full max-h-[90vh] m-0 p-0 rounded-lg border overflow-hidden shadow-xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
-        style={{
-          maxWidth: '100vw',
-          width: '100vw',
-          height: '100vh',
-          margin: 0,
-          padding: 0,
-          borderRadius: 0,
-          transform: 'none',
-          left: 0,
-          top: 0,
-        }}
       >
-        <div ref={modalRef} className="p-6 sm:p-8 h-full flex flex-col overflow-y-auto bg-white dark:bg-gray-900">
-          {/* Close button - visible on mobile */}
+        <div ref={modalRef} className="p-6 sm:p-8 flex flex-col overflow-y-auto bg-white dark:bg-gray-900">
+          {/* Close button */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:hidden"
+            className="absolute top-4 right-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -192,16 +181,16 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
           </button>
           
           {/* Logo */}
-          <div className="mb-6 sm:mb-8 flex justify-center py-2 sm:py-4">
+          <div className="mb-6 flex justify-center py-2">
             <Logo width={120} height={32} />
           </div>
 
           {/* Title */}
-          <DialogHeader className="text-center mb-4 sm:mb-6">
-            <DialogTitle className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <DialogHeader className="text-center mb-6">
+            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {mode === 'login' ? 'Inloggen' : 'Registreren'}
             </DialogTitle>
-            <DialogDescription className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
+            <DialogDescription className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               {mode === 'login'
                 ? 'Welkom terug! Log in op je account.'
                 : 'Maak een account aan om te beginnen.'}
