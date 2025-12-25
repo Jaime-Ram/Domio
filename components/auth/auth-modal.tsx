@@ -38,23 +38,14 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Scroll naar modal wanneer deze opent (zonder auto-focus op input)
+  // Prevent auto-focus on inputs when modal opens
   useEffect(() => {
-    if (open && modalRef.current) {
-      // Kleine delay om zeker te zijn dat de modal gerenderd is
-      setTimeout(() => {
-        // Scroll naar de modal, maar focus niet op inputs
-        modalRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center',
-          inline: 'nearest'
-        })
-        // Zorg ervoor dat geen input gefocust wordt
-        const activeElement = document.activeElement as HTMLElement
-        if (activeElement && activeElement.tagName === 'INPUT') {
-          activeElement.blur()
-        }
-      }, 150)
+    if (open) {
+      // Zorg ervoor dat geen input gefocust wordt
+      const activeElement = document.activeElement as HTMLElement
+      if (activeElement && activeElement.tagName === 'INPUT') {
+        activeElement.blur()
+      }
     }
   }, [open])
 
