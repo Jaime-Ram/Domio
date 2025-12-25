@@ -43,7 +43,7 @@ export function ContactSection() {
           <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl dark:text-white">
             Nog vragen?
           </h1>
-          <p className="mt-1 text-gray-600 dark:text-neutral-400">
+          <p className="mt-2 text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8 dark:text-gray-400">
             We helpen je graag verder met al je vragen.
           </p>
         </div>
