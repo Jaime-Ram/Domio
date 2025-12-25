@@ -242,6 +242,50 @@ export default function Home() {
           <ContactSection />
         </Suspense>
 
+        {/* CTA Section - Overlapping Footer */}
+        <section className="relative z-20 pt-24 pb-12">
+          {/* Background that extends from middle of CTA into footer */}
+          <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
+          <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+            <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
+              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                {/* Left Side - Content */}
+                <div className="flex flex-col gap-6 lg:max-w-2xl">
+                  <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
+                  <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
+                    Eerst zien, dan geloven?
+                  </h2>
+                  <p className="text-lg text-white/90">
+                    Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
+                  </p>
+                  <div className="flex flex-row items-center gap-3 justify-start">
+                    <Button
+                      size="default"
+                      className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-xl"
+                      onClick={() => {
+                        setAuthModalMode('signup')
+                        setAuthModalOpen(true)
+                      }}
+                    >
+                      Start 30 dagen gratis
+                    </Button>
+                    <Button
+                      asChild
+                      className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                    >
+                      <Link href="/dashboard/employer" className="flex items-center gap-2">
+                        <span className="md:hidden">Demo</span>
+                        <span className="hidden md:inline">Bekijk demo</span>
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Footer */}
         <Suspense fallback={<div className="min-h-[200px]" />}>
           <FooterSection />
