@@ -320,7 +320,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             {/* Left Side - Title */}
-            <div className="pl-16 md:pl-28">
+            <div className="pl-0 md:pl-28">
               <h2 className="text-base font-semibold leading-7 text-[#002A1F] mb-2">Beheerder Types</h2>
               <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
                 Voor <span className="text-[#002A1F]">elke</span> soort beheerder
@@ -361,21 +361,21 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-end">
+            <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
               <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative">
-                <div className="relative lg:ml-12" style={{ width: '400px', maxWidth: '100%' }}>
+                <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
                   <Image
                     src="/images/mobilemockuphalf.png"
                     alt="Domio app op mobiel"
                     width={400}
                     height={400}
-                    className="drop-shadow-2xl"
+                    className="drop-shadow-2xl w-full max-w-[250px] lg:max-w-none lg:w-[400px] h-auto"
                     priority={false}
                     loading="lazy"
                     quality={85}
                     unoptimized
-                    style={{ filter: 'hue-rotate(180deg) saturate(1.2)', width: '400px', height: 'auto', maxWidth: 'none' }}
+                    style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
                   />
                 </div>
               </div>
@@ -450,8 +450,15 @@ export default function Home() {
               </div>
               
               {/* Gradient fade overlay - solid for long time, then quick fade */}
+              {/* Mobile: fade from bottom to top, Desktop: fade from left to right */}
               <div 
-                className="absolute inset-0" 
+                className="absolute inset-0 md:hidden" 
+                style={{
+                  background: 'linear-gradient(to top, rgb(243 244 246) 0%, rgb(243 244 246) 30%, rgb(243 244 246 / 0.8) 40%, rgb(243 244 246 / 0.4) 50%, rgb(243 244 246 / 0.1) 60%, transparent 75%)'
+                }}
+              />
+              <div 
+                className="absolute inset-0 hidden md:block" 
                 style={{
                   background: 'linear-gradient(to right, rgb(243 244 246) 0%, rgb(243 244 246) 30%, rgb(243 244 246 / 0.8) 40%, rgb(243 244 246 / 0.4) 50%, rgb(243 244 246 / 0.1) 60%, transparent 75%)'
                 }}

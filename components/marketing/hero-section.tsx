@@ -14,7 +14,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
   return (
     <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0">
       {/* Background Image */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-16 md:top-0">
         <div className="absolute inset-0">
           <Image
             src="/images/Achtergrond2.jpg"
@@ -32,9 +32,9 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       
       <div className="container relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center px-6 pt-28 pb-12 md:px-8 md:pt-24 md:pb-16 text-center">
         {/* Centered Marketing Message */}
-        <div className="relative z-30 max-w-3xl w-full">
-          <h1 className="text-[3rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
-            <span className="whitespace-nowrap">Het <span className="text-white">platform</span> voor</span>
+        <div className="relative z-30 max-w-3xl w-full px-4">
+          <h1 className="text-3xl font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
+            <span className="block sm:whitespace-nowrap">Het <span className="text-white">platform</span> voor</span>
             <span className="block">vastgoedbeheer</span>
           </h1>
           <p className="mt-2 text-lg font-medium text-pretty text-white/80 sm:text-xl leading-8">
