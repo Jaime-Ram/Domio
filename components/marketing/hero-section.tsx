@@ -30,11 +30,10 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/10" />
       </div>
       
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-12 text-center md:mb-16">
-          <h2 className="text-base font-semibold leading-7 text-white/90">Platform</h2>
-          <h1 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
+          <h1 className="text-[2.5rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
             Het platform voor vastgoedbeheer
           </h1>
           <p className="mt-2 text-lg font-medium text-pretty text-white/80 sm:text-xl leading-8">

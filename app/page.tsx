@@ -450,7 +450,7 @@ export default function Home() {
               />
               
               {/* Content */}
-              <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-center min-h-[500px] md:min-h-[600px]">
+              <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-end md:justify-center min-h-[500px] md:min-h-[600px]">
                 <div className="max-w-xl">
                   {/* Small label */}
                   <div className="flex items-center gap-2 mb-4" style={{ width: 'fit-content' }}>
@@ -508,7 +508,7 @@ export default function Home() {
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Eerst zien, dan geloven?
                 </h2>
-                <p className="text-lg text-white/90">
+                <p className="text-base text-white/90 sm:text-lg leading-7">
                   Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
                 </p>
                 <div className="flex flex-row items-center gap-3 justify-start">
