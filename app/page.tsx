@@ -390,17 +390,17 @@ export default function Home() {
                 <p className="text-lg text-white/90">
                   Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
                 </p>
-                {/* App Store & Google Play Buttons - Same as footer */}
-                <div className="flex flex-row gap-3 mt-4 flex-wrap">
+                {/* App Store & Google Play Buttons - Smaller on mobile to fit side by side */}
+                <div className="flex flex-row gap-2 sm:gap-3 mt-4 flex-nowrap">
                   <GooglePlayButton
-                    size="md"
+                    size="sm"
                     href="https://play.google.com/store/apps/details?id=com.domio"
-                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 min-w-0"
+                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 scale-90 sm:scale-100"
                   />
                   <AppStoreButton
-                    size="md"
+                    size="sm"
                     href="https://apps.apple.com/app/domio"
-                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 min-w-0"
+                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 scale-90 sm:scale-100"
                   />
                 </div>
               </div>
