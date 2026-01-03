@@ -361,10 +361,10 @@ export default function Home() {
       {/* App Section */}
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
-          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
+          <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
-              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative items-end">
+              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative" style={{ alignSelf: 'flex-end' }}>
                 <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
                   <Image
                     src="/images/mobilemockuphalf.png"
@@ -422,7 +422,7 @@ export default function Home() {
         {/* Over Ons Section - Large section with building background and fade overlay */}
         <section className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
           <div className="container mx-auto w-full max-w-7xl px-6 md:px-8">
-            <div className="rounded-3xl relative overflow-hidden min-h-[500px] md:min-h-[600px]">
+            <div className="rounded-3xl relative overflow-hidden min-h-[650px] md:min-h-[600px]">
               {/* Background Image with buildings */}
               <div className="absolute inset-0">
                 <Image
@@ -450,7 +450,7 @@ export default function Home() {
               />
               
               {/* Content */}
-              <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-end md:justify-center min-h-[500px] md:min-h-[600px]">
+              <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-end md:justify-center min-h-[650px] md:min-h-[600px]">
                 <div className="max-w-xl">
                   {/* Small label */}
                   <div className="flex items-center gap-2 mb-4" style={{ width: 'fit-content' }}>
