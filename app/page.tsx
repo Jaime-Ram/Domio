@@ -37,9 +37,7 @@ export default function Home() {
       <div className="relative z-10">
       {/* Header */}
       <header
-          className={`sticky top-0 z-50 w-full transition-colors duration-200 relative ${
-          mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
-        }`}
+          className="sticky top-0 z-50 w-full transition-colors duration-200 relative bg-transparent"
       >
           <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
             {/* Mobile: Hamburger Menu (Left) */}
@@ -294,6 +292,33 @@ export default function Home() {
                     Aan de slag
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
+              </div>
+
+              {/* Footer Links */}
+              <div className="pt-4 mt-auto pb-4 border-t border-gray-200">
+                <div className="flex flex-col gap-2 px-4">
+                  <Link
+                    href="/privacy"
+                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Privacy
+                  </Link>
+                  <Link
+                    href="/terms"
+                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Algemene voorwaarden
+                  </Link>
+                  <Link
+                    href="#"
+                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    FAQ
+                  </Link>
+                </div>
               </div>
           </nav>
         </div>
