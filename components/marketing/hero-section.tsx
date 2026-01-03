@@ -47,6 +47,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         {/* CTA */}
         <div className="flex flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
           <Button
+            className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
+            onClick={onSignupClick}
+          >
+            Start direct
+          </Button>
+          <Button
             asChild
             className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
           >
@@ -54,12 +60,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               Bekijk demo
               <ArrowUpRight className="h-4 w-4" />
             </Link>
-          </Button>
-          <Button
-            className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
-            onClick={onSignupClick}
-          >
-            Start direct
           </Button>
         </div>
       </div>
