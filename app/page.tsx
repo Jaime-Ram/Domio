@@ -364,14 +364,14 @@ export default function Home() {
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
-              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative lg:items-end" style={{ alignSelf: 'flex-end' }}>
-                <div className="relative lg:ml-12 mx-auto lg:mx-0" style={{ maxWidth: '100%' }}>
+              <div className="flex justify-center items-end lg:justify-start lg:flex-[0_0_auto] relative w-full lg:w-auto">
+                <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
                   <Image
                     src="/images/mobilemockuphalf.png"
                     alt="Domio app op mobiel"
                     width={400}
                     height={400}
-                    className="drop-shadow-2xl w-full max-w-[250px] lg:max-w-none lg:w-[400px] h-auto"
+                    className="drop-shadow-2xl w-full max-w-[250px] mx-auto lg:mx-0 lg:max-w-none lg:w-[400px] h-auto"
                     priority={false}
                     loading="lazy"
                     quality={85}
