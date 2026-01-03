@@ -17,7 +17,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
         <div className="absolute inset-0">
           <Image
-            src="/images/Achtergrond3.jpg"
+            src="/images/Achtergrond4.jpg"
             alt=""
             fill
             className="object-cover object-[25%] md:object-center"
@@ -45,7 +45,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col-reverse sm:flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-3 justify-center mt-2 pb-[30vh]">
           <Button
             className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
             onClick={onSignupClick}
