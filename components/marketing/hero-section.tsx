@@ -17,7 +17,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
         <div className="absolute inset-0">
           <Image
-            src="/images/Achtergrond2.jpg"
+            src="/images/Achtergrond3.jpg"
             alt=""
             fill
             className="object-cover object-[25%] md:object-center"

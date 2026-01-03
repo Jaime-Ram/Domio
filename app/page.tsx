@@ -217,17 +217,17 @@ export default function Home() {
 
                   {/* Sidebar Navigation */}
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-                    {/* Proefperiode Card */}
-                    <div className="bg-[#002A1F] rounded-xl p-6 mb-4 relative overflow-hidden">
+                    {/* Proefperiode Card - Smaller */}
+                    <div className="bg-[#002A1F] rounded-xl p-4 mb-4 relative overflow-hidden">
                       <div className="relative z-10">
-                        <h3 className="text-xl font-semibold text-white mb-2">
+                        <h3 className="text-lg font-semibold text-white mb-1.5">
                           Probeer Domio 30 dagen gratis
                         </h3>
-                        <p className="text-sm text-white/90 mb-4">
+                        <p className="text-xs text-white/90 mb-3">
                           Geen creditcard nodig, op elk moment opzegbaar.
                         </p>
                         <Button
-                          className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full"
+                          className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full text-sm"
                           onClick={() => {
                             setAuthModalMode('signup')
                             setAuthModalOpen(true)
@@ -238,7 +238,7 @@ export default function Home() {
                         </Button>
                       </div>
                       {/* Decorative element */}
-                      <div className="absolute right-0 top-0 w-24 h-24 opacity-10">
+                      <div className="absolute right-0 top-0 w-20 h-20 opacity-10">
                         <svg viewBox="0 0 100 100" className="w-full h-full">
                           <path d="M0,50 Q25,25 50,50 T100,50" stroke="white" strokeWidth="2" fill="none" />
                           <path d="M0,60 Q25,35 50,60 T100,60" stroke="white" strokeWidth="2" fill="none" />
@@ -247,29 +247,33 @@ export default function Home() {
                       </div>
                     </div>
 
-            <Link
-              href="#features"
-                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
+                    {/* Header Navigation Items - Larger with color */}
+                    <div className="space-y-1 mb-4">
+                      <Link
+                        href="#features"
+                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Functies
             </Link>
             <Link
               href="#pricing"
-                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
+                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Prijzen
             </Link>
             <Link
               href="#contact"
-                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
+                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
             </Link>
+                     </div>
 
-                    <div className="pt-4 mt-4 border-t border-gray-200 space-y-2">
+                    {/* Inloggen Button */}
+                    <div className="pt-2 mb-4">
                 <Button 
                   variant="ghost" 
                         className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#002A1F]"
@@ -281,44 +285,33 @@ export default function Home() {
                 >
                     Inloggen
                 </Button>
-                <Button
-                        className="w-full justify-start bg-transparent text-[#002A1F] hover:bg-gray-50 border border-[#002A1F] rounded-xl"
-                  onClick={() => {
-                    setAuthModalMode('signup')
-                    setAuthModalOpen(true)
-                    setMobileMenuOpen(false)
-                  }}
-                >
-                    Aan de slag
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
+                    </div>
 
-              {/* Footer Links */}
-              <div className="pt-4 mt-auto pb-4 border-t border-gray-200">
-                <div className="flex flex-col gap-2 px-4">
-                  <Link
-                    href="/privacy"
-                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Privacy
-                  </Link>
-                  <Link
-                    href="/terms"
-                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Algemene voorwaarden
-                  </Link>
-                  <Link
-                    href="#"
-                    className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    FAQ
-                  </Link>
-                </div>
+                    {/* Footer Links - Light gray */}
+                    <div className="pt-4 mt-auto pb-4 border-t border-gray-200">
+                      <div className="flex flex-col gap-2 px-4">
+                        <Link
+                          href="/privacy"
+                          className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Privacy
+                        </Link>
+                        <Link
+                          href="/terms"
+                          className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Algemene voorwaarden
+                        </Link>
+                        <Link
+                          href="#"
+                          className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          FAQ
+                        </Link>
+                      </div>
               </div>
           </nav>
         </div>
