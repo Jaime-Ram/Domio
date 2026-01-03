@@ -20,7 +20,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             src="/images/Achtergrond2.jpg"
             alt=""
             fill
-            className="object-cover object-[75%] md:object-center"
+            className="object-cover object-[25%] md:object-center"
             priority
             quality={90}
           />
