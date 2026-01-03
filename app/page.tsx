@@ -199,18 +199,18 @@ export default function Home() {
             />
             {/* Sidebar */}
             <div
-              className={`fixed inset-y-0 start-0 z-[60] bg-[#002A1F] border-r border-white/10 transition-all duration-300 transform md:hidden w-64 h-full ${
+              className={`fixed inset-y-0 start-0 z-[60] bg-white border-r border-gray-200 transition-all duration-300 transform md:hidden w-64 h-full ${
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
                 <div className="flex flex-col h-full">
                   {/* Sidebar Header */}
-                  <div className="flex items-center justify-between p-4 border-b border-white/10">
-                    <Logo width={100} height={28} variant="white" />
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                    <Logo width={100} height={28} />
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-white hover:bg-white/10"
+                      className="text-gray-700 hover:bg-gray-100"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <X className="h-5 w-5" />
@@ -221,30 +221,30 @@ export default function Home() {
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
             <Link
               href="#features"
-                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Functies
             </Link>
             <Link
               href="#pricing"
-                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Prijzen
             </Link>
             <Link
               href="#contact"
-                      className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
+                      className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
             </Link>
 
-                    <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
+                    <div className="pt-4 mt-4 border-t border-gray-200 space-y-2">
                 <Button 
                   variant="ghost" 
-                        className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                        className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#002A1F]"
                   onClick={() => {
                     setAuthModalMode('login')
                     setAuthModalOpen(true)
@@ -254,7 +254,7 @@ export default function Home() {
                     Inloggen
                 </Button>
                 <Button
-                        className="w-full justify-start bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                        className="w-full justify-start bg-transparent text-[#002A1F] hover:bg-gray-50 border border-[#002A1F] rounded-xl"
                   onClick={() => {
                     setAuthModalMode('signup')
                     setAuthModalOpen(true)
