@@ -220,18 +220,7 @@
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background-image: url('/images/Achtergrond2.jpg');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
     }
-  
-  /* Fixed background on desktop, scroll on mobile for better performance */
-  @media (min-width: 768px) {
-    body {
-      background-attachment: fixed;
-    }
-  }
   
   /* Apply Codec Pro to all headings */
   h1, h2, h3, h4, h5, h6 {

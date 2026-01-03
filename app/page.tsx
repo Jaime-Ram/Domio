@@ -280,7 +280,7 @@ export default function Home() {
       />
 
         {/* Floating Mockup */}
-      <div className="relative w-full pointer-events-none z-40 bg-white" style={{ marginTop: '-25vh' }}>
+      <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
         <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
           <div className="relative w-full flex justify-center">
               {/* Mobile Mockup */}
