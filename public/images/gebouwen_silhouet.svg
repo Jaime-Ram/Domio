@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <!-- Left building (shifted left and down) -->
+  <polygon points="-80,420 220,120 420,320 420,760 -80,760" fill="#dfe6e0"/>
+  <!-- Middle building (shifted left and down) -->
+  <polygon points="420,480 570,390 820,440 820,760 420,760" fill="#e6efe5"/>
+  <!-- Right building (unchanged) -->
+  <polygon points="1050,300 1280,180 1280,720 1050,720" fill="#dfe6e0"/>
+</svg>

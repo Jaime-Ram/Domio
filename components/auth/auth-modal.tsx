@@ -165,7 +165,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-lg w-full max-h-[90vh] m-0 p-0 rounded-lg border overflow-hidden shadow-xl"
+        className="max-w-lg w-full max-h-[90vh] m-0 p-0 rounded-3xl sm:rounded-3xl border overflow-hidden shadow-xl"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div ref={modalRef} className="p-6 sm:p-8 flex flex-col overflow-y-auto bg-white dark:bg-gray-900">

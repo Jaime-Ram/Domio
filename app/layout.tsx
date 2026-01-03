@@ -15,22 +15,30 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Domio",
-  description: "Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders en vastgoedhouders",
+  description: "Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders, huurders en verhuurders",
   icons: {
     icon: [
-      { url: '/icon.png', sizes: 'any', type: 'image/png' },
+      { url: '/images/offerla.png', sizes: 'any', type: 'image/png' },
     ],
     apple: [
-      { url: '/icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/images/offerla.png', sizes: '180x180', type: 'image/png' },
     ],
     shortcut: [
-      { url: '/icon.png', type: 'image/png' },
+      { url: '/images/offerla.png', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'mask-icon',
+        url: '/images/offerla.png',
+        color: '#9AFF7C',
+      },
     ],
   },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light dark",
+  themeColor: "#002A1F",
 };
 
 export default function RootLayout({
@@ -41,6 +49,10 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
+        {/* Theme color for browser chrome */}
+        <meta name="theme-color" content="#002A1F" />
+        {/* Maskable icon for rounded corners (Safari) */}
+        <link rel="mask-icon" href="/images/offerla.png" color="#9AFF7C" />
         <link rel="preconnect" href="https://consent.cookiebot.com" />
         <link rel="dns-prefetch" href="https://consent.cookiebot.com" />
         <Script

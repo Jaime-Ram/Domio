@@ -49,14 +49,14 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
     .join(' ')
 
   return (
-    <Link href="/" className={`flex items-center ${className || ''}`}>
+    <Link href="/" className={`flex items-center overflow-visible ${className || ''}`}>
       <Image
         src={`${imgSrc}?v=2`}
         alt="Domio Logo"
         width={width}
         height={height}
         priority
-        className={imageClass}
+        className={`${imageClass} object-contain`}
         onError={handleError}
         unoptimized={false}
       />

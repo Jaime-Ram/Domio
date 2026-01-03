@@ -47,7 +47,7 @@ const tiers = [
 export function PricingSection({ onSignupClick }: PricingSectionProps) {
   const [isYearly, setIsYearly] = useState(false)
   return (
-    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-24 sm:pb-32 px-6 lg:px-8">
+    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-6 lg:px-8">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
@@ -62,14 +62,13 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
       </div>
       <div className="mx-auto max-w-4xl text-center">
         <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Pricing</h2>
-        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl">
+        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl">
           <span className="hidden sm:inline">Passende, simpele pricing</span>
           <span className="sm:hidden">Passende simpele pricing</span>
         </p>
       </div>
       <p className="mx-auto mt-6 max-w-2xl text-center text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8">
-        Kies een betaalbaar plan dat vol zit met de beste functies voor het beheren van je vastgoedportefeuille,
-        het creëren van klantloyaliteit en het verhogen van je rendement.
+        Kies een betaalbaar plan met de beste functies voor het beheren van je vastgoedportefeuille en het verhogen van je rendement.
       </p>
       
       {/* Billing Toggle */}
@@ -171,7 +170,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
                 tier.featured
                   ? 'bg-[#9AFF7C] text-[#002A1F] shadow-sm hover:bg-[#9AFF7C]/90 focus-visible:outline-[#9AFF7C]'
                   : 'bg-transparent text-[#002A1F] border-2 border-[#002A1F] hover:bg-[#002A1F]/5 focus-visible:outline-[#002A1F]',
-                'mt-8 w-full rounded-xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
+                'mt-8 w-full rounded-2xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
               )}
             >
               Start direct

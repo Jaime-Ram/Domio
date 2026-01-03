@@ -15,9 +15,8 @@ interface ContentHeaderProps {
 
 export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
   return (
-    <header className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-neutral-700">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex h-14 items-center justify-between gap-4 py-4">
+    <header className="w-full bg-white dark:bg-gray-900">
+      <div className="px-6 h-16 flex items-center justify-between gap-4 border-b border-gray-200 dark:border-neutral-700">
           {/* Hamburger menu for mobile */}
           <Button
             variant="ghost"
@@ -53,9 +52,9 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
       </div>
     </header>
   )
 }
+
 

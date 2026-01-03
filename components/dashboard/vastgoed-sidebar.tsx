@@ -146,7 +146,7 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
         )}
       >
         <div className="relative flex flex-col h-full max-h-full">
-          <div className="px-6 pt-4 flex items-center justify-between border-b border-gray-200 dark:border-neutral-700 pb-4">
+          <div className="px-6 h-16 flex items-center justify-between border-b border-gray-200 dark:border-neutral-700">
             <Logo width={100} height={28} />
             <Button
               variant="ghost"

@@ -7,7 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
@@ -19,6 +26,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
+  const [functionsMenuOpen, setFunctionsMenuOpen] = useState(false)
 
   // Removed mockup height calculation for better performance
 
@@ -26,12 +34,12 @@ export default function Home() {
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
       {/* Content - Above background */}
       <div className="relative z-10">
-        {/* Header */}
-        <header
+      {/* Header */}
+      <header
           className={`sticky top-0 z-50 w-full transition-colors duration-200 relative ${
-            mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
-          }`}
-        >
+          mobileMenuOpen ? 'bg-[#002A1F] border-b border-white/10' : 'bg-transparent'
+        }`}
+      >
           <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
             {/* Mobile: Hamburger Menu (Left) */}
             <Button
@@ -46,50 +54,128 @@ export default function Home() {
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
             <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
-              <Logo width={100} height={28} variant="white" />
-            </div>
+            <Logo width={100} height={28} variant="white" />
+          </div>
 
             {/* Desktop Navigation - Centered */}
             <nav className="hidden md:flex items-center gap-6 flex-1 justify-center absolute left-1/2 -translate-x-1/2">
-              <Link href="#features" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-                Functies
-              </Link>
-              <Link href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-                Prijzen
-              </Link>
-              <Link href="#contact" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-                Contact
-              </Link>
-            </nav>
+            <div 
+              className="relative"
+              onMouseEnter={() => setFunctionsMenuOpen(true)}
+              onMouseLeave={() => setFunctionsMenuOpen(false)}
+            >
+              <DropdownMenu open={functionsMenuOpen} onOpenChange={setFunctionsMenuOpen} modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] flex items-center gap-1 group py-2">
+              Functies
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </DropdownMenuTrigger>
+              {/* Invisible bridge to prevent gap hover issue */}
+              {functionsMenuOpen && (
+                <div 
+                  className="absolute top-full left-1/2 -translate-x-1/2 w-full h-2 bg-transparent"
+                  onMouseEnter={() => setFunctionsMenuOpen(true)}
+                />
+              )}
+              <DropdownMenuContent 
+                align="center" 
+                sideOffset={0}
+                className="w-[650px] p-6 bg-white shadow-2xl rounded-3xl border border-gray-100"
+                onMouseEnter={() => setFunctionsMenuOpen(true)}
+                onMouseLeave={() => setFunctionsMenuOpen(false)}
+              >
+                <div className="grid grid-cols-3 gap-6">
+                  {/* Column 1 */}
+                  <div className="space-y-1">
+                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Kernfunctionaliteiten</DropdownMenuLabel>
+                    <div className="space-y-1">
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Object- en Portfoliobeheer</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Huurdersbeheer</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Contractbeheer</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Automatische Huurindexatie</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Column 2 */}
+                  <div className="space-y-1">
+                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Financieel</DropdownMenuLabel>
+                    <div className="space-y-1">
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Facturatie & Betalingsverwerking</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Servicekostenafrekening</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Rapportages & Financieel Beheer</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Column 3 */}
+                  <div className="space-y-1">
+                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Onderhoud & Inspectie</DropdownMenuLabel>
+                    <div className="space-y-1">
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Ticketsysteem voor Onderhoud</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Inspectiemodule</p>
+                      </div>
+                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
+                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Scan & Herken Functie</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <Link href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Prijzen
+            </Link>
+            <Link href="#contact" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Contact
+            </Link>
+          </nav>
 
             {/* Desktop: Auth Buttons (Right) */}
             <div className="hidden md:flex items-center gap-4 ml-auto">
-              <Button 
-                variant="ghost" 
-                className="text-white hover:bg-white/10 hover:text-white"
-                onClick={() => {
-                  setAuthModalMode('login')
-                  setAuthModalOpen(true)
-                }}
-              >
-                Inloggen
-              </Button>
-              <Button
-                className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                onClick={() => {
-                  setAuthModalMode('signup')
-                  setAuthModalOpen(true)
-                }}
-              >
-                Aan de slag
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-
+                <Button 
+                  variant="ghost" 
+                  className="text-white hover:bg-white/10 hover:text-white"
+                  onClick={() => {
+                    setAuthModalMode('login')
+                    setAuthModalOpen(true)
+                  }}
+                >
+                  Inloggen
+                </Button>
+                <Button
+                  className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                  onClick={() => {
+                    setAuthModalMode('signup')
+                    setAuthModalOpen(true)
+                  }}
+                >
+                    Aan de slag
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+          </div>
+          
             {/* Mobile: Account Icon (Right) */}
-            <Button
-              variant="ghost"
-              size="icon"
+          <Button
+            variant="ghost"
+            size="icon"
               className="md:hidden text-white hover:bg-white/10 hover:text-white flex-shrink-0"
               onClick={() => {
                 setAuthModalMode('login')
@@ -98,8 +184,8 @@ export default function Home() {
               aria-label="Account"
             >
               <User className="h-6 w-6" />
-            </Button>
-          </div>
+          </Button>
+        </div>
 
           {/* Mobile Sidebar - Slides from left like dashboard */}
           <>
@@ -132,163 +218,338 @@ export default function Home() {
 
                   {/* Sidebar Navigation */}
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-                    <Link
-                      href="#features"
+            <Link
+              href="#features"
                       className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Functies
-                    </Link>
-                    <Link
-                      href="#pricing"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Functies
+            </Link>
+            <Link
+              href="#pricing"
                       className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Prijzen
-                    </Link>
-                    <Link
-                      href="#contact"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Prijzen
+            </Link>
+            <Link
+              href="#contact"
                       className="block py-3 px-4 text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] hover:bg-white/5 rounded-lg"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Contact
-                    </Link>
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
 
                     <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
-                      <Button 
-                        variant="ghost" 
+                <Button 
+                  variant="ghost" 
                         className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
-                        onClick={() => {
-                          setAuthModalMode('login')
-                          setAuthModalOpen(true)
-                          setMobileMenuOpen(false)
-                        }}
-                      >
-                        Inloggen
-                      </Button>
-                      <Button
+                  onClick={() => {
+                    setAuthModalMode('login')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                    Inloggen
+                </Button>
+                <Button
                         className="w-full justify-start bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                        onClick={() => {
-                          setAuthModalMode('signup')
-                          setAuthModalOpen(true)
-                          setMobileMenuOpen(false)
-                        }}
-                      >
-                        Aan de slag
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </nav>
-                </div>
+                  onClick={() => {
+                    setAuthModalMode('signup')
+                    setAuthModalOpen(true)
+                    setMobileMenuOpen(false)
+                  }}
+                >
+                    Aan de slag
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+          </nav>
+        </div>
               </div>
           </>
-        </header>
+      </header>
 
-        {/* Hero Section */}
-        <HeroSection 
-          onSignupClick={() => {
-            setAuthModalMode('signup')
-            setAuthModalOpen(true)
-          }}
-        />
+      {/* Hero Section */}
+      <HeroSection 
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
 
         {/* Floating Mockup */}
-        <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-30vh' }}>
-          <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
-            <div className="relative w-full flex justify-center">
+      <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
+        <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
+          <div className="relative w-full flex justify-center">
               {/* Mobile Mockup */}
               <Image
-                src="/images/mobile mockup.png"
-                alt="Domio op mobiel"
+              src="/images/mobile mockup.png"
+              alt="Domio op mobiel"
                 width={400}
                 height={800}
-                className="h-auto w-full max-w-[85%] object-contain drop-shadow-2xl md:hidden mx-auto"
+              className="h-auto w-full max-w-[70%] object-contain drop-shadow-2xl md:hidden mx-auto"
                 priority={false}
                 loading="lazy"
                 quality={85}
+                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
               />
               {/* Desktop Mockup */}
               <Image
-                src="/images/Desktopmockup.png"
-                alt="Domio op desktop"
+              src="/images/Desktopmockup.png"
+              alt="Domio op desktop"
                 width={1000}
                 height={600}
-                className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
+              className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
                 priority={false}
                 loading="lazy"
                 quality={85}
-              />
+                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Functies Section */}
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+      <FunctiesSection />
+        </Suspense>
+
+      {/* Beheerder Types Section */}
+      <section className="bg-white py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            {/* Left Side - Title */}
+            <div className="pl-16 md:pl-28">
+              <h2 className="text-base font-semibold leading-7 text-[#002A1F] mb-2">Beheerder Types</h2>
+              <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
+                Voor <span className="text-[#002A1F]">elke</span> soort beheerder
+              </h2>
+            </div>
+
+            {/* Right Side - Three Cards */}
+            <div className="flex flex-col gap-4">
+              {/* VvE's Card */}
+              <div className="rounded-2xl bg-[#f4f4f4] p-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">VvE's</h3>
+                  <p className="text-sm text-gray-600">Perfect voor verenigingen van eigenaren die hun gebouwen efficiënt willen beheren.</p>
+                </div>
+              </div>
+
+              {/* Eigen Vastgoed Card */}
+              <div className="rounded-2xl bg-[#f4f4f4] p-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">Eigen vastgoed</h3>
+                  <p className="text-sm text-gray-600">Ideal voor particuliere vastgoedeigenaren die hun portefeuille zelf beheren.</p>
+                </div>
+              </div>
+
+              {/* Beheerder Vastgoed Card */}
+              <div className="rounded-2xl bg-[#f4f4f4] p-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">Beheerder vastgoed</h3>
+                  <p className="text-sm text-gray-600">Gemaakt voor professionele vastgoedbeheerders die meerdere portefeuilles beheren.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Functies Section */}
+      {/* App Section */}
+      <section className="relative z-20 pt-24 pb-12">
+        <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end">
+              {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
+              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative">
+                <div className="relative lg:ml-12" style={{ width: '400px', maxWidth: '100%' }}>
+                  <Image
+                    src="/images/mobilemockuphalf.png"
+                    alt="Domio app op mobiel"
+                    width={400}
+                    height={400}
+                    className="drop-shadow-2xl"
+                    priority={false}
+                    loading="lazy"
+                    quality={85}
+                    unoptimized
+                    style={{ filter: 'hue-rotate(180deg) saturate(1.2)', width: '400px', height: 'auto', maxWidth: 'none' }}
+                  />
+                </div>
+              </div>
+
+              {/* Right Side - Content */}
+              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] pb-8 md:pb-12 lg:pb-16">
+                <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
+                <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
+                  Beheer je vastgoed <span className="text-[#9AFF7C]">waar je ook bent</span>
+                </h2>
+                <p className="text-lg text-white/90">
+                  Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
+                </p>
+                {/* App Store & Google Play Buttons */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
+                  <a
+                    href="#"
+                    className="inline-flex items-center gap-3 bg-[#f4f4f4] text-[#002A1F] px-6 py-3 rounded-xl hover:bg-[#e8e8e8] transition-colors"
+                    aria-label="Download in de App Store"
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C1.79 15.25 4.96 6.58 9.38 6.58c1.64 0 2.77.74 4.26.74 1.5 0 2.4-.74 4.24-.74 3.8 0 6.9 7.5 3.17 13.22zm-1.86-15.2c.5-.6.84-1.43.84-2.26 0-1.15-.46-2.13-1.2-2.82-1.01-1.05-2.35-1.62-3.73-1.62-1.5 0-2.95.56-3.9.56-1.01 0-2.5-.58-4.1-.58-1.5 0-3.05.7-4.05 1.8C-1.1 2.5.5 5.8 2.5 7.5c.5.4 1.1.7 1.7 1.1.6.4 1.2.8 2 .8 1.5 0 2.1-.4 3.1-.8.8-.3 1.5-.6 2.3-.6.9 0 1.6.3 2.4.6 1 .4 1.6.8 3.1.8.8 0 1.4-.4 2-.8.6-.4 1.2-.7 1.7-1.1 1.2-1 2.8-3.2 1.3-5.1z"/>
+                    </svg>
+                    <div className="flex flex-col items-start leading-tight">
+                      <span className="text-[10px]">Download in de</span>
+                      <span className="text-sm font-semibold">App Store</span>
+                    </div>
+                  </a>
+                  <a
+                    href="#"
+                    className="inline-flex items-center gap-3 bg-[#f4f4f4] text-[#002A1F] px-6 py-3 rounded-xl hover:bg-[#e8e8e8] transition-colors"
+                    aria-label="Ontdek het op Google Play"
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+                    </svg>
+                    <div className="flex flex-col items-start leading-tight">
+                      <span className="text-[10px]">ONTDEK HET OP</span>
+                      <span className="text-sm font-semibold">Google Play</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
         <Suspense fallback={<div className="min-h-[400px]" />}>
-          <FunctiesSection />
+      <PricingSection 
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
         </Suspense>
 
-        {/* Pricing Section */}
-        <Suspense fallback={<div className="min-h-[400px]" />}>
-          <PricingSection 
-            onSignupClick={() => {
-              setAuthModalMode('signup')
-              setAuthModalOpen(true)
-            }}
-          />
-        </Suspense>
-
-        {/* Contact Section */}
-        <Suspense fallback={<div className="min-h-[300px]" />}>
-          <ContactSection />
-        </Suspense>
-
-        {/* CTA Section - Overlapping Footer */}
-        <section className="relative z-20 pt-24 pb-12">
-          {/* Background that extends from middle of CTA into footer */}
-          <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
-          <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
-            <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
-              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-                {/* Left Side - Content */}
-                <div className="flex flex-col gap-6 lg:max-w-2xl">
-                  <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
-                  <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
-                    Eerst zien, dan geloven?
-                  </h2>
-                  <p className="text-lg text-white/90">
-                    Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
-                  </p>
-                  <div className="flex flex-row items-center gap-3 justify-start">
-                    <Button
-                      size="default"
-                      className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-xl"
-                      onClick={() => {
-                        setAuthModalMode('signup')
-                        setAuthModalOpen(true)
-                      }}
-                    >
-                      Start 30 dagen gratis
-                    </Button>
-                    <Button
-                      asChild
-                      className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
-                    >
-                      <Link href="/demo" className="flex items-center gap-2">
-                        <span className="md:hidden">Demo</span>
-                        <span className="hidden md:inline">Bekijk demo</span>
-                        <ArrowUpRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+        {/* Over Ons Section - Large section with building background and fade overlay */}
+        <section className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
+          <div className="container mx-auto w-full max-w-7xl px-6 md:px-8">
+            <div className="rounded-3xl relative overflow-hidden min-h-[500px] md:min-h-[600px]">
+              {/* Background Image with buildings */}
+              <div className="absolute inset-0">
+                <Image
+                  src="/images/Achtergrond5.jpg"
+                  alt=""
+                  fill
+                  className="object-cover object-center"
+                  quality={90}
+                />
+              </div>
+              
+              {/* Gradient fade overlay - solid for long time, then quick fade */}
+              <div 
+                className="absolute inset-0" 
+                style={{
+                  background: 'linear-gradient(to right, rgb(243 244 246) 0%, rgb(243 244 246) 30%, rgb(243 244 246 / 0.8) 40%, rgb(243 244 246 / 0.4) 50%, rgb(243 244 246 / 0.1) 60%, transparent 75%)'
+                }}
+              />
+              
+              {/* Content */}
+              <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-center min-h-[500px] md:min-h-[600px]">
+                <div className="max-w-xl">
+                  {/* Small label */}
+                  <div className="flex items-center gap-2 mb-4" style={{ width: 'fit-content' }}>
+                    <div className="w-4 h-4 text-[#9AFF7C] flex-shrink-0">
+                      <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0L10.5 5.5L16 8L10.5 10.5L8 16L5.5 10.5L0 8L5.5 5.5L8 0Z"/>
+                      </svg>
+                    </div>
+                    <h2 className="text-base font-semibold leading-7 text-[#002A1F] whitespace-nowrap">Over ons</h2>
                   </div>
+                  
+                  {/* Main heading */}
+                  <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl mb-6 w-fit">
+                    Wie zijn wij?
+                  </h2>
+                  
+                  {/* Description */}
+                  <p className="text-base text-gray-700 sm:text-lg leading-7 mb-8 w-fit">
+                    <span className="md:hidden">Domio is ontwikkeld door<br />vastgoedprofessionals. Wij combineren jarenlange ervaring met moderne technologie.</span>
+                    <span className="hidden md:inline">Domio is ontwikkeld door<br />vastgoedprofessionals. Wij combineren jarenlange ervaring<br />met moderne technologie.</span>
+                  </p>
+                  
+                  {/* CTA Button */}
+                  <Button
+                    size="default"
+                    className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-2xl"
+                    onClick={() => {
+                      setAuthModalMode('signup')
+                      setAuthModalOpen(true)
+                    }}
+                  >
+                    Meer over ons
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Footer */}
+      {/* Contact Section */}
+        <Suspense fallback={<div className="min-h-[300px]" />}>
+      <ContactSection />
+        </Suspense>
+
+      {/* CTA Section - Overlapping Footer */}
+      <section className="relative z-20 pt-24 pb-12">
+        {/* Background that extends from middle of CTA into footer */}
+        <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
+        <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              {/* Left Side - Content */}
+              <div className="flex flex-col gap-6 lg:max-w-2xl">
+                <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
+                <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
+                  Eerst zien, dan geloven?
+                </h2>
+                <p className="text-lg text-white/90">
+                  Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
+                </p>
+                <div className="flex flex-row items-center gap-3 justify-start">
+                  <Button
+                    size="default"
+                    className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-2xl"
+                    onClick={() => {
+                      setAuthModalMode('signup')
+                      setAuthModalOpen(true)
+                    }}
+                  >
+                    Start 30 dagen gratis
+                  </Button>
+                  <Button
+                    asChild
+                    className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
+                  >
+                      <Link href="/demo" className="flex items-center gap-2">
+                      <span className="md:hidden">Demo</span>
+                      <span className="hidden md:inline">Bekijk demo</span>
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
         <Suspense fallback={<div className="min-h-[200px]" />}>
-          <FooterSection />
+      <FooterSection />
         </Suspense>
       </div>
 

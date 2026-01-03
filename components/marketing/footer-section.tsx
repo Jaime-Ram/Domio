@@ -12,8 +12,8 @@ export function FooterSection() {
           {/* Left Side - Logo, Description, and App Store Buttons */}
           <div className="flex flex-col gap-6 lg:max-w-md lg:flex-1">
             {/* Logo */}
-            <div>
-              <Logo width={140} height={36} />
+            <div className="overflow-visible">
+              <Logo width={140} height={40} />
             </div>
             
             {/* Description */}
