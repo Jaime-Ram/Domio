@@ -219,6 +219,36 @@ export default function Home() {
 
                   {/* Sidebar Navigation */}
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+                    {/* Proefperiode Card */}
+                    <div className="bg-[#002A1F] rounded-xl p-6 mb-4 relative overflow-hidden">
+                      <div className="relative z-10">
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          Probeer Domio 30 dagen gratis
+                        </h3>
+                        <p className="text-sm text-white/90 mb-4">
+                          Geen creditcard nodig, op elk moment opzegbaar.
+                        </p>
+                        <Button
+                          className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full"
+                          onClick={() => {
+                            setAuthModalMode('signup')
+                            setAuthModalOpen(true)
+                            setMobileMenuOpen(false)
+                          }}
+                        >
+                          Start 30 dagen gratis
+                        </Button>
+                      </div>
+                      {/* Decorative element */}
+                      <div className="absolute right-0 top-0 w-24 h-24 opacity-10">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path d="M0,50 Q25,25 50,50 T100,50" stroke="white" strokeWidth="2" fill="none" />
+                          <path d="M0,60 Q25,35 50,60 T100,60" stroke="white" strokeWidth="2" fill="none" />
+                          <path d="M0,70 Q25,45 50,70 T100,70" stroke="white" strokeWidth="2" fill="none" />
+                        </svg>
+                      </div>
+                    </div>
+
             <Link
               href="#features"
                       className="block py-3 px-4 text-sm font-medium text-gray-700 transition-colors hover:text-[#002A1F] hover:bg-gray-50 rounded-lg"

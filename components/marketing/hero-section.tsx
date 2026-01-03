@@ -45,7 +45,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
           <Button
             className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
             onClick={onSignupClick}
