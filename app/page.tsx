@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
@@ -389,34 +390,18 @@ export default function Home() {
                 <p className="text-lg text-white/90">
                   Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
                 </p>
-                {/* App Store & Google Play Buttons */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-3 bg-[#f4f4f4] text-[#002A1F] px-6 py-3 rounded-xl hover:bg-[#e8e8e8] transition-colors"
-                    aria-label="Download in de App Store"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
-                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C1.79 15.25 4.96 6.58 9.38 6.58c1.64 0 2.77.74 4.26.74 1.5 0 2.4-.74 4.24-.74 3.8 0 6.9 7.5 3.17 13.22zm-1.86-15.2c.5-.6.84-1.43.84-2.26 0-1.15-.46-2.13-1.2-2.82-1.01-1.05-2.35-1.62-3.73-1.62-1.5 0-2.95.56-3.9.56-1.01 0-2.5-.58-4.1-.58-1.5 0-3.05.7-4.05 1.8C-1.1 2.5.5 5.8 2.5 7.5c.5.4 1.1.7 1.7 1.1.6.4 1.2.8 2 .8 1.5 0 2.1-.4 3.1-.8.8-.3 1.5-.6 2.3-.6.9 0 1.6.3 2.4.6 1 .4 1.6.8 3.1.8.8 0 1.4-.4 2-.8.6-.4 1.2-.7 1.7-1.1 1.2-1 2.8-3.2 1.3-5.1z"/>
-                    </svg>
-                    <div className="flex flex-col items-start leading-tight">
-                      <span className="text-[10px]">Download in de</span>
-                      <span className="text-sm font-semibold">App Store</span>
-                    </div>
-                  </a>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-3 bg-[#f4f4f4] text-[#002A1F] px-6 py-3 rounded-xl hover:bg-[#e8e8e8] transition-colors"
-                    aria-label="Ontdek het op Google Play"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
-                      <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-                    </svg>
-                    <div className="flex flex-col items-start leading-tight">
-                      <span className="text-[10px]">ONTDEK HET OP</span>
-                      <span className="text-sm font-semibold">Google Play</span>
-                    </div>
-                  </a>
+                {/* App Store & Google Play Buttons - Same as footer */}
+                <div className="flex flex-row gap-3 mt-4">
+                  <GooglePlayButton
+                    size="md"
+                    href="https://play.google.com/store/apps/details?id=com.domio"
+                    className="bg-transparent border-white text-white hover:bg-white/10"
+                  />
+                  <AppStoreButton
+                    size="md"
+                    href="https://apps.apple.com/app/domio"
+                    className="bg-transparent border-white text-white hover:bg-white/10"
+                  />
                 </div>
               </div>
             </div>
