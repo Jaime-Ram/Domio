@@ -364,7 +364,7 @@ export default function Home() {
           <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
-              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative">
+              <div className="flex justify-center lg:justify-start lg:flex-[0_0_auto] relative items-end">
                 <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
                   <Image
                     src="/images/mobilemockuphalf.png"
@@ -376,13 +376,13 @@ export default function Home() {
                     loading="lazy"
                     quality={85}
                     unoptimized
-                    style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
+                    style={{ filter: 'hue-rotate(180deg) saturate(1.2)', display: 'block' }}
                   />
                 </div>
               </div>
 
               {/* Right Side - Content */}
-              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] pb-8 md:pb-12 lg:pb-16">
+              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] pb-0">
                 <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Beheer je vastgoed <span className="text-[#9AFF7C]">waar je ook bent</span>
@@ -391,16 +391,16 @@ export default function Home() {
                   Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
                 </p>
                 {/* App Store & Google Play Buttons - Same as footer */}
-                <div className="flex flex-row gap-3 mt-4">
+                <div className="flex flex-row gap-3 mt-4 flex-wrap">
                   <GooglePlayButton
                     size="md"
                     href="https://play.google.com/store/apps/details?id=com.domio"
-                    className="bg-transparent border-white text-white hover:bg-white/10"
+                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 min-w-0"
                   />
                   <AppStoreButton
                     size="md"
                     href="https://apps.apple.com/app/domio"
-                    className="bg-transparent border-white text-white hover:bg-white/10"
+                    className="bg-transparent border-white text-white hover:bg-white/10 flex-shrink-0 min-w-0"
                   />
                 </div>
               </div>
