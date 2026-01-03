@@ -14,7 +14,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
   return (
     <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0">
       {/* Background Image */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-16 md:top-0">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
         <div className="absolute inset-0">
           <Image
             src="/images/Achtergrond2.jpg"
@@ -30,38 +30,38 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/10" />
       </div>
       
-      <div className="container relative mx-auto flex w-full max-w-7xl flex-col items-center justify-center px-6 pt-28 pb-12 md:px-8 md:pt-24 md:pb-16 text-center">
-        {/* Centered Marketing Message */}
-        <div className="relative z-30 max-w-3xl w-full px-4">
-          <h1 className="text-3xl font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
-            <span className="block sm:whitespace-nowrap">Het <span className="text-white">platform</span> voor</span>
-            <span className="block">vastgoedbeheer</span>
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
+        {/* Title Section - Same styling as Functies section */}
+        <div className="mb-12 text-center md:mb-16">
+          <h2 className="text-base font-semibold leading-7 text-white/90">Platform</h2>
+          <h1 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
+            Het platform voor vastgoedbeheer
           </h1>
           <p className="mt-2 text-lg font-medium text-pretty text-white/80 sm:text-xl leading-8">
             <span className="hidden sm:inline">Ontworpen door vastgoedprofessionals. Domio helpt je om je portefeuille efficiënt te beheren.</span>
             <span className="sm:hidden">Domio helpt je portefeuille efficiënt te beheren.</span>
           </p>
-
-          {/* CTA */}
-          <div className="flex flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
-            <Button
-              asChild
-              className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
-            >
-              <Link href="/demo" className="flex items-center gap-2">
-                Bekijk demo
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
-              onClick={onSignupClick}
-            >
-              Start direct
-            </Button>
-          </div>
-          </div>
         </div>
+
+        {/* CTA */}
+        <div className="flex flex-row items-center gap-3 justify-center mt-6 pb-[30vh]">
+          <Button
+            asChild
+            className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
+          >
+            <Link href="/demo" className="flex items-center gap-2">
+              Bekijk demo
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button
+            className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
+            onClick={onSignupClick}
+          >
+            Start direct
+          </Button>
+        </div>
+      </div>
 
     </section>
   )
