@@ -26,14 +26,14 @@ export function FunctiesSection() {
           <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Functies</h2>
           <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl leading-tight">
             <span className="text-[#002A1F]">Alles </span>
-            <span className="text-[#356258]">wat je nodig hebt </span>
+            <span className="text-[#356258]/70">wat je nodig hebt </span>
             <span className="text-[#002A1F]">op één plek.</span>
             <br />
-            <span className="text-[#356258]">Domio helpt jouw </span>
-            <span className="text-[#356258]">portefeuille </span>
-            <span className="text-[#356258]">zo </span>
-            <span className="text-[#356258]">efficiënt </span>
-            <span className="text-[#356258]">mogelijk te beheren.</span>
+            <span className="text-[#356258]/70">Domio helpt jouw </span>
+            <span className="text-[#356258]/70">portefeuille </span>
+            <span className="text-[#356258]/70">zo </span>
+            <span className="text-[#356258]/70">efficiënt </span>
+            <span className="text-[#356258]/70">mogelijk te beheren.</span>
           </h2>
         </div>
 
@@ -169,21 +169,21 @@ export function FunctiesSection() {
                 key={type.id}
                 onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
                 className={cn(
-                  'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200',
+                  'px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300',
                   selectedType === type.id
-                    ? 'bg-[#9AFF7C] text-[#002A1F]'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-[#9AFF7C] text-[#002A1F] scale-110'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 )}
               >
                 {type.label}
               </button>
             ))}
-            {/* Alle functies button - bright green with arrow */}
+            {/* Alle functies button - bright green with arrow, no pill shape */}
             <Link
               href="#features"
               className={cn(
-                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200 flex items-center gap-2',
-                'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                'text-sm font-medium transition-colors duration-200 flex items-center gap-2',
+                'text-[#9AFF7C] hover:text-[#9AFF7C]/80'
               )}
             >
               Alle functies
