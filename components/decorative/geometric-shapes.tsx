@@ -17,40 +17,50 @@ export function GeometricShapes({
 }: GeometricShapesProps) {
   const baseClasses = "absolute pointer-events-none"
   
-  // Consistent angle for all shapes (45 degrees diagonal)
-  const angle = 45
-  
+  // Building silhouette shapes - abstract chevron/arrow patterns
   const variants = {
     rhombus: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single thick diagonal line from edge to edge */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="90" width="400" height="80" fill={color} />
-        </g>
+        {/* Building silhouette - chevron pattern */}
+        <defs>
+          <pattern id="building-pattern-rhombus" x="0" y="0" width="80" height="200" patternUnits="userSpaceOnUse">
+            <path d="M0,200 L40,120 L80,200 Z" fill={color} />
+          </pattern>
+        </defs>
+        <rect width="200" height="200" fill="url(#building-pattern-rhombus)" />
       </svg>
     ),
     'diagonal-stripes': (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single very thick diagonal line from edge to edge */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="90" width="400" height="96" fill={color} />
-        </g>
+        {/* Building silhouette - continuous chevron pattern */}
+        <defs>
+          <pattern id="building-pattern-stripes" x="0" y="0" width="100" height="200" patternUnits="userSpaceOnUse">
+            <path d="M0,200 L50,100 L100,200 Z" fill={color} />
+          </pattern>
+        </defs>
+        <rect width="200" height="200" fill="url(#building-pattern-stripes)" />
       </svg>
     ),
     corner: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single thick diagonal line from edge to edge */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="90" width="400" height="80" fill={color} />
-        </g>
+        {/* Building silhouette - large chevron from corner */}
+        <defs>
+          <pattern id="building-pattern-corner" x="0" y="0" width="120" height="200" patternUnits="userSpaceOnUse">
+            <path d="M0,200 L60,80 L120,200 Z" fill={color} />
+          </pattern>
+        </defs>
+        <rect width="200" height="200" fill="url(#building-pattern-corner)" />
       </svg>
     ),
     trapezoid: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single very thick diagonal line from edge to edge */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="90" width="400" height="96" fill={color} />
-        </g>
+        {/* Building silhouette - wide chevron pattern */}
+        <defs>
+          <pattern id="building-pattern-trapezoid" x="0" y="0" width="90" height="200" patternUnits="userSpaceOnUse">
+            <path d="M0,200 L45,110 L90,200 Z" fill={color} />
+          </pattern>
+        </defs>
+        <rect width="200" height="200" fill="url(#building-pattern-trapezoid)" />
       </svg>
     )
   }
