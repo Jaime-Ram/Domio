@@ -54,15 +54,16 @@ export function FunctiesSection() {
                 {type.label}
               </button>
             ))}
-            {/* Alles functies button - same style as beheerder type buttons */}
+            {/* Alle functies button - bright green with arrow */}
             <Link
               href="#features"
               className={cn(
-                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200',
-                'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200 flex items-center gap-2',
+                'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
               )}
             >
-              Alles functies
+              Alle functies
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
