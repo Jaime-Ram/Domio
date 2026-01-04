@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { ArrowUpRight } from 'lucide-react'
 
 interface HeroSectionProps {
@@ -59,22 +60,41 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-row items-center gap-3 justify-center pb-[20vh]">
+        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center pb-[20vh]">
           <Button
             className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
             onClick={onSignupClick}
           >
             Start direct
           </Button>
-          <Button
-            asChild
-            className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
+          
+          {/* Demo email input - integrated input and button */}
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault()
+              const email = (e.currentTarget.elements.namedItem('demo-email') as HTMLInputElement)?.value
+              if (email) {
+                window.location.href = `/demo?email=${encodeURIComponent(email)}`
+              }
+            }}
+            className="flex items-stretch w-full max-w-md sm:w-auto"
           >
-            <Link href="/demo" className="flex items-center gap-2">
-              Bekijk demo
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </Button>
+            <div className="flex items-stretch rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm overflow-hidden flex-1">
+              <Input
+                type="email"
+                name="demo-email"
+                placeholder="Enter your email"
+                required
+                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4"
+              />
+              <Button
+                type="submit"
+                className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-0 rounded-r-2xl rounded-l-none px-6 font-medium"
+              >
+                Bekijk demo
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
 
