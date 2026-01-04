@@ -241,13 +241,13 @@ export default function Home() {
                           Start 30 dagen gratis
                         </Button>
                       </div>
-                      {/* Geometric decorative element - subtle, in quiet corner */}
+                      {/* Geometric decorative element - same style as 30 dagen gratis section, subtle in quiet corner */}
                       <GeometricShapes 
-                        variant="corner" 
-                        className="left-0 bottom-0 w-24 h-24"
+                        variant="trapezoid" 
+                        className="right-0 bottom-0 w-40 h-40"
                         color="#9AFF7C"
-                        opacity={0.08}
-                        layers={1}
+                        opacity={0.12}
+                        layers={2}
                       />
                     </div>
 
@@ -432,12 +432,12 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - positioned where no text (top left corner) */}
+            {/* Geometric decorative element - same style as 30 dagen gratis section */}
             <GeometricShapes 
-              variant="diagonal-stripes" 
-              className="left-0 top-0 w-72 h-72 lg:w-96 lg:h-96"
+              variant="trapezoid" 
+              className="right-0 top-0 w-56 h-56 lg:w-72 lg:h-72"
               color="#9AFF7C"
-              opacity={0.12}
+              opacity={0.18}
               layers={2}
             />
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
