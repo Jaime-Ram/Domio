@@ -25,15 +25,15 @@ export default function EmployerDashboardLayout({
   return (
     <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
       {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position */}
-      <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 px-4 py-3 w-full z-50">
-        <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+      <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-3 w-full z-50">
+        <div className="container mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center justify-start w-full sm:w-auto">
             <span className="text-sm font-medium text-[#002A1F]">
               Welkom bij de domio demo omgeving.{' '}
               <span className="underline">Meer informatie over functionaliteiten</span>
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto sm:ml-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
