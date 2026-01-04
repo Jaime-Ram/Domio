@@ -572,10 +572,10 @@ export default function Home() {
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - positioned where no text (bottom right) */}
+            {/* Geometric decorative element - positioned where no text (bottom right, shifted more right/bottom on mobile) */}
             <GeometricShapes 
               variant="trapezoid" 
-              className="right-0 bottom-0 w-56 h-56 lg:w-72 lg:h-72"
+              className="right-0 bottom-0 translate-x-4 translate-y-4 lg:translate-x-0 lg:translate-y-0 w-56 h-56 lg:w-72 lg:h-72"
               color="#9AFF7C"
               opacity={0.18}
               layers={2}
