@@ -23,52 +23,52 @@ export function GeometricShapes({
   const variants = {
     rhombus: (
       <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Thick diagonal bar from edge to edge - path-based for smooth edges */}
+        {/* Thick diagonal bar from edge to edge - extends beyond viewport */}
         <path
-          d="M-2000 1650
-             L-600 290
-             L2000 -340
-             L2000 -650
-             L-2000 -650 Z"
+          d="M-500 1150
+             L400 90
+             L1500 340
+             L1500 650
+             L-500 650 Z"
           fill={color}
         />
       </svg>
     ),
     'diagonal-stripes': (
       <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal bar from edge to edge - path-based for smooth edges */}
+        {/* Very thick diagonal bar from edge to edge - extends beyond viewport */}
         <path
-          d="M-2000 1650
-             L-600 290
-             L2000 -340
-             L2000 -650
-             L-2000 -650 Z"
+          d="M-500 1150
+             L400 90
+             L1500 340
+             L1500 650
+             L-500 650 Z"
           fill={color}
         />
       </svg>
     ),
     corner: (
       <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Thick diagonal bar from edge to edge - path-based for smooth edges */}
+        {/* Thick diagonal bar from edge to edge - extends beyond viewport */}
         <path
-          d="M-2000 1650
-             L-600 290
-             L2000 -340
-             L2000 -650
-             L-2000 -650 Z"
+          d="M-500 1150
+             L400 90
+             L1500 340
+             L1500 650
+             L-500 650 Z"
           fill={color}
         />
       </svg>
     ),
     trapezoid: (
       <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal bar from edge to edge - path-based for smooth edges */}
+        {/* Very thick diagonal bar from edge to edge - extends beyond viewport */}
         <path
-          d="M-2000 1650
-             L-600 290
-             L2000 -340
-             L2000 -650
-             L-2000 -650 Z"
+          d="M-500 1150
+             L400 90
+             L1500 340
+             L1500 650
+             L-500 650 Z"
           fill={color}
         />
       </svg>
