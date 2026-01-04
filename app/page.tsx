@@ -354,8 +354,8 @@ export default function Home() {
                L0 120 Z"
             fill="#002A1F"
           />
-          {/* Second bar - rotated 10 degrees, secondary green color */}
-          <g transform="rotate(10 500 60)">
+          {/* Second bar - rotated 3 degrees, secondary green color */}
+          <g transform="rotate(3 500 60)">
             <path
               d="M0 30 
                  L1000 0 
