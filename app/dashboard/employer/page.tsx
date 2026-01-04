@@ -11,7 +11,7 @@ export default function EmployerDashboardPage() {
   const userName = 'Demo Gebruiker'
   
   return (
-    <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+    <>
       {/* Page Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -200,7 +200,7 @@ export default function EmployerDashboardPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </>
   )
 }
 
