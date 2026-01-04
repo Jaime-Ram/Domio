@@ -163,7 +163,7 @@ export function FunctiesSection() {
 
         {/* Beheerder Type Selector - Below function display */}
         <div className="mt-12 md:mt-16">
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             {beheerderTypes.map((type) => (
               <button
                 key={type.id}
@@ -171,9 +171,10 @@ export function FunctiesSection() {
                 className={cn(
                   'px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300',
                   selectedType === type.id
-                    ? 'bg-[#9AFF7C] text-[#002A1F] scale-110'
+                    ? 'bg-[#9AFF7C] text-[#002A1F] scale-110 z-10 relative'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                 )}
+                style={selectedType === type.id ? { transform: 'scale(1.1)' } : undefined}
               >
                 {type.label}
               </button>
