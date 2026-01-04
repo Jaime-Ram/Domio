@@ -23,33 +23,33 @@ export function GeometricShapes({
   const variants = {
     rhombus: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single thick diagonal line - extends far beyond viewport edges so start/end are never visible */}
+        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-1000" y="60" width="2000" height="80" fill={color} />
+          <rect x="-5000" y="40" width="10000" height="120" fill={color} />
         </g>
       </svg>
     ),
     'diagonal-stripes': (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single very thick diagonal line - extends far beyond viewport edges so start/end are never visible */}
+        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-1000" y="52" width="2000" height="96" fill={color} />
+          <rect x="-5000" y="32" width="10000" height="136" fill={color} />
         </g>
       </svg>
     ),
     corner: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single thick diagonal line - extends far beyond viewport edges so start/end are never visible */}
+        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-1000" y="60" width="2000" height="80" fill={color} />
+          <rect x="-5000" y="40" width="10000" height="120" fill={color} />
         </g>
       </svg>
     ),
     trapezoid: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single very thick diagonal line - extends far beyond viewport edges so start/end are never visible */}
+        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-1000" y="52" width="2000" height="96" fill={color} />
+          <rect x="-5000" y="32" width="10000" height="136" fill={color} />
         </g>
       </svg>
     )
