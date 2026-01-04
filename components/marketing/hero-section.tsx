@@ -37,10 +37,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl">
-            <h1 className="text-[2.5rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
-              Het platform voor vastgoedbeheer
+            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl leading-tight">
+              <span className="block">Het platform</span>
+              <span className="block">binnen het</span>
+              <span className="block">vastgoedbeheer</span>
             </h1>
-            <p className="mt-2 text-lg font-medium text-pretty text-white/80 sm:text-xl leading-8 w-full">
+            <p className="mt-2 text-base font-medium text-pretty text-white/80 sm:text-lg leading-8 max-w-[90%] mx-auto">
               <span className="hidden sm:inline">Ontworpen door vastgoedprofessionals. Domio helpt je om je portefeuille efficiënt te beheren.</span>
               <span className="sm:hidden">Domio helpt je portefeuille efficiënt te beheren.</span>
             </p>
