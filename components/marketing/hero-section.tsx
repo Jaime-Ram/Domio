@@ -37,11 +37,10 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl w-full">
-            {/* Mobile: Larger title on 3 lines */}
+            {/* Mobile: Larger title */}
             <h1 className="md:hidden text-5xl font-semibold tracking-tight text-white leading-tight text-center">
-              <span className="block">Het platform</span>
-              <span className="block">binnen het</span>
-              <span className="block">vastgoedbeheer</span>
+              <span className="block">Het beheer-</span>
+              <span className="block">platform voor vastgoed</span>
             </h1>
             {/* Desktop: Original single-line title */}
             <h1 className="hidden md:block text-5xl font-semibold tracking-tight text-balance text-white md:text-6xl leading-tight">

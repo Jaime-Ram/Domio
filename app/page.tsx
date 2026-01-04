@@ -227,8 +227,11 @@ export default function Home() {
                         <h3 className="text-lg font-semibold text-white mb-1">
                           Probeer Domio
                         </h3>
-                        <p className="text-base font-semibold text-white mb-3">
+                        <p className="text-base font-semibold text-white mb-2">
                           30 dagen gratis
+                        </p>
+                        <p className="text-xs text-white/90 mb-3">
+                          Geen creditcard nodig, op elk moment opzegbaar.
                         </p>
                         <Button
                           className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full text-sm"
