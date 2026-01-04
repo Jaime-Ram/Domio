@@ -353,7 +353,6 @@ export default function Home() {
                L1000 90 
                L0 120 Z"
             fill="#002A1F"
-            opacity={0.15}
           />
           {/* Second layer - rotated and different color for depth */}
           <g transform="rotate(180 500 60)">
@@ -363,7 +362,7 @@ export default function Home() {
                  L1000 90 
                  L0 120 Z"
               fill="#9AFF7C"
-              opacity={0.12}
+              opacity={0.3}
             />
           </g>
         </svg>
