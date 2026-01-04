@@ -48,8 +48,8 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center pb-[25vh]">
-          {/* Desktop: Email input with "Open Account" button - integrated rounded-2xl shape */}
+        <div className="flex flex-row items-center gap-3 justify-center pb-[25vh]">
+          {/* Desktop: Email input with "Start direct" button - integrated rounded-2xl shape */}
           <form 
             onSubmit={(e) => {
               e.preventDefault()
@@ -59,7 +59,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             }}
             className="hidden md:flex items-stretch w-full max-w-md"
           >
-            <div className="flex items-stretch rounded-2xl border border-white/30 bg-white/20 backdrop-blur-sm overflow-hidden flex-1">
+            <div className="flex items-stretch rounded-2xl border border-white/40 bg-[#002A1F]/60 overflow-hidden flex-1">
               <Input
                 type="email"
                 name="account-email"
@@ -71,17 +71,17 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                 type="submit"
                 className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-0 rounded-r-2xl rounded-l-none px-6 font-medium"
               >
-                Open Account
+                Start direct
               </Button>
             </div>
           </form>
           
-          {/* Mobile: Open Account button only */}
+          {/* Mobile: Start direct button */}
           <Button
             onClick={onSignupClick}
             className="md:hidden bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
           >
-            Open Account
+            Start direct
           </Button>
           
           {/* Bekijk demo button - visible on all screen sizes */}
