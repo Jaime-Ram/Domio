@@ -17,62 +17,40 @@ export function GeometricShapes({
 }: GeometricShapesProps) {
   const baseClasses = "absolute pointer-events-none"
   
-  // Building silhouette shapes - thick mirrored lines creating abstract building shapes
+  // Consistent angle for all shapes (45 degrees diagonal)
+  const angle = 45
+  
   const variants = {
     rhombus: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Mirrored thick lines creating building silhouette */}
-        <defs>
-          <pattern id="building-rhombus" x="0" y="0" width="100" height="200" patternUnits="userSpaceOnUse">
-            {/* Left diagonal line */}
-            <rect x="0" y="0" width="80" height="200" transform="skewX(-20)" fill={color} />
-            {/* Mirrored right diagonal line */}
-            <rect x="20" y="0" width="80" height="200" transform="skewX(20)" fill={color} />
-          </pattern>
-        </defs>
-        <rect width="200" height="200" fill="url(#building-rhombus)" />
+        {/* Single thick diagonal line from edge to edge - fills entire viewport */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-200" y="60" width="600" height="80" fill={color} />
+        </g>
       </svg>
     ),
     'diagonal-stripes': (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Mirrored thick lines creating building silhouette */}
-        <defs>
-          <pattern id="building-stripes" x="0" y="0" width="120" height="200" patternUnits="userSpaceOnUse">
-            {/* Left diagonal line */}
-            <rect x="0" y="0" width="96" height="200" transform="skewX(-25)" fill={color} />
-            {/* Mirrored right diagonal line */}
-            <rect x="24" y="0" width="96" height="200" transform="skewX(25)" fill={color} />
-          </pattern>
-        </defs>
-        <rect width="200" height="200" fill="url(#building-stripes)" />
+        {/* Single very thick diagonal line from edge to edge - fills entire viewport */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-200" y="52" width="600" height="96" fill={color} />
+        </g>
       </svg>
     ),
     corner: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Mirrored thick lines creating building silhouette from corner */}
-        <defs>
-          <pattern id="building-corner" x="0" y="0" width="110" height="200" patternUnits="userSpaceOnUse">
-            {/* Left diagonal line */}
-            <rect x="0" y="0" width="80" height="200" transform="skewX(-22)" fill={color} />
-            {/* Mirrored right diagonal line */}
-            <rect x="30" y="0" width="80" height="200" transform="skewX(22)" fill={color} />
-          </pattern>
-        </defs>
-        <rect width="200" height="200" fill="url(#building-corner)" />
+        {/* Single thick diagonal line from edge to edge - fills entire viewport */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-200" y="60" width="600" height="80" fill={color} />
+        </g>
       </svg>
     ),
     trapezoid: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Mirrored thick lines creating building silhouette */}
-        <defs>
-          <pattern id="building-trapezoid" x="0" y="0" width="130" height="200" patternUnits="userSpaceOnUse">
-            {/* Left diagonal line */}
-            <rect x="0" y="0" width="96" height="200" transform="skewX(-28)" fill={color} />
-            {/* Mirrored right diagonal line */}
-            <rect x="34" y="0" width="96" height="200" transform="skewX(28)" fill={color} />
-          </pattern>
-        </defs>
-        <rect width="200" height="200" fill="url(#building-trapezoid)" />
+        {/* Single very thick diagonal line from edge to edge - fills entire viewport */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-200" y="52" width="600" height="96" fill={color} />
+        </g>
       </svg>
     )
   }
