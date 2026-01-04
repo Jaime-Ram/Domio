@@ -24,48 +24,17 @@ export function FunctiesSection() {
         {/* Title Section */}
         <div className="mb-12 text-center md:mb-16">
           <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Functies</h2>
-          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl leading-tight">
+          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl leading-tight">
             <span className="text-[#002A1F]">Alles </span>
-            <span className="text-[#002A1F]">wat je nodig hebt </span>
+            <span className="text-[#356258]">wat je nodig hebt </span>
             <span className="text-[#002A1F]">op één plek.</span>
             <br />
-            <span className="text-[#002A1F]">Domio helpt jouw </span>
-            <span className="text-[#002A1F]">portefeuille </span>
-            <span className="text-[#002A1F]">zo </span>
-            <span className="text-[#002A1F]">efficiënt </span>
-            <span className="text-[#002A1F]">mogelijk te beheren.</span>
+            <span className="text-[#356258]">Domio helpt jouw </span>
+            <span className="text-[#356258]">portefeuille </span>
+            <span className="text-[#356258]">zo </span>
+            <span className="text-[#356258]">efficiënt </span>
+            <span className="text-[#356258]">mogelijk te beheren.</span>
           </h2>
-        </div>
-
-        {/* Beheerder Type Selector */}
-        <div className="mb-12 md:mb-16">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {beheerderTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
-                className={cn(
-                  'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200',
-                  selectedType === type.id
-                    ? 'bg-[#9AFF7C] text-[#002A1F]'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                )}
-              >
-                {type.label}
-              </button>
-            ))}
-            {/* Alle functies button - bright green with arrow */}
-            <Link
-              href="#features"
-              className={cn(
-                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200 flex items-center gap-2',
-                'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
-              )}
-            >
-              Alle functies
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3 lg:grid-rows-2">
@@ -192,6 +161,36 @@ export function FunctiesSection() {
           </div>
         </div>
 
+        {/* Beheerder Type Selector - Below function display */}
+        <div className="mt-12 md:mt-16">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {beheerderTypes.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
+                className={cn(
+                  'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200',
+                  selectedType === type.id
+                    ? 'bg-[#9AFF7C] text-[#002A1F]'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                )}
+              >
+                {type.label}
+              </button>
+            ))}
+            {/* Alle functies button - bright green with arrow */}
+            <Link
+              href="#features"
+              className={cn(
+                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200 flex items-center gap-2',
+                'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+              )}
+            >
+              Alle functies
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   )
