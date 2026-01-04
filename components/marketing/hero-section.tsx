@@ -44,7 +44,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/10" />
       </div>
       
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-24 pb-8 md:pt-20 md:pb-12">
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl">
@@ -59,7 +59,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col-reverse sm:flex-row items-center gap-3 justify-center pb-[30vh]">
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-3 justify-center pb-[20vh]">
           <Button
             className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
             onClick={onSignupClick}
