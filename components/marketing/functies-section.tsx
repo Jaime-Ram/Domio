@@ -63,13 +63,6 @@ export function FunctiesSection() {
           <div className="relative lg:row-span-2">
             <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-              {/* Geometric decorative element - fills entire card */}
-              <GeometricShapes 
-                variant="rhombus" 
-                className="inset-0 w-full h-full"
-                color="#002A1F"
-                opacity={0.08}
-              />
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
@@ -97,13 +90,6 @@ export function FunctiesSection() {
           <div className="relative max-lg:row-start-1">
             <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
-              {/* Geometric decorative element - fills entire card */}
-              <GeometricShapes 
-                variant="corner" 
-                className="inset-0 w-full h-full"
-                color="#002A1F"
-                opacity={0.08}
-              />
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
@@ -127,13 +113,6 @@ export function FunctiesSection() {
           <div className="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
             <div className="absolute inset-px rounded-lg bg-white" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
-              {/* Geometric decorative element - fills entire card */}
-              <GeometricShapes 
-                variant="diagonal-stripes" 
-                className="inset-0 w-full h-full"
-                color="#002A1F"
-                opacity={0.08}
-              />
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
@@ -157,13 +136,6 @@ export function FunctiesSection() {
           <div className="relative lg:row-span-2">
             <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-b-4xl lg:rounded-r-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
-              {/* Geometric decorative element - fills entire card */}
-              <GeometricShapes 
-                variant="trapezoid" 
-                className="inset-0 w-full h-full"
-                color="#002A1F"
-                opacity={0.08}
-              />
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">

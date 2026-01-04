@@ -241,12 +241,12 @@ export default function Home() {
                           Start 30 dagen gratis
                         </Button>
                       </div>
-                      {/* Geometric decorative element - fills entire card */}
+                      {/* Geometric decorative element - positioned where no text */}
                       <GeometricShapes 
                         variant="corner" 
-                        className="inset-0 w-full h-full"
+                        className="right-0 top-0 w-32 h-32"
                         color="#9AFF7C"
-                        opacity={0.12}
+                        opacity={0.15}
                       />
                     </div>
 
@@ -337,6 +337,16 @@ export default function Home() {
         }}
       />
 
+      {/* Geometric decorative element between hero and next section */}
+      <div className="relative w-full h-24 -mt-12 overflow-hidden pointer-events-none">
+        <GeometricShapes 
+          variant="diagonal-stripes" 
+          className="inset-0 w-full h-full"
+          color="#002A1F"
+          opacity={0.05}
+        />
+      </div>
+
         {/* Floating Mockup */}
       <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
         <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
@@ -420,12 +430,12 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - fills entire block */}
+            {/* Geometric decorative element - positioned where no text (top right) */}
             <GeometricShapes 
               variant="diagonal-stripes" 
-              className="inset-0 w-full h-full"
+              className="right-0 top-0 w-48 h-48 lg:w-64 lg:h-64"
               color="#9AFF7C"
-              opacity={0.1}
+              opacity={0.12}
             />
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
@@ -566,12 +576,12 @@ export default function Home() {
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - fills entire block */}
+            {/* Geometric decorative element - positioned where no text (bottom right) */}
             <GeometricShapes 
               variant="trapezoid" 
-              className="inset-0 w-full h-full"
+              className="right-0 bottom-0 w-56 h-56 lg:w-72 lg:h-72"
               color="#9AFF7C"
-              opacity={0.12}
+              opacity={0.15}
             />
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between relative z-10">
               {/* Left Side - Content */}

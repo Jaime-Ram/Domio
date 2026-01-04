@@ -49,13 +49,6 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
   const [isYearly, setIsYearly] = useState(false)
   return (
     <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-6 lg:px-8">
-      {/* Geometric decorative elements - fill section edges */}
-      <GeometricShapes 
-        variant="diagonal-stripes" 
-        className="left-0 top-0 w-full h-full"
-        color="#002A1F"
-        opacity={0.06}
-      />
       <div
         aria-hidden="true"
         className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
