@@ -23,33 +23,33 @@ export function GeometricShapes({
   const variants = {
     rhombus: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single diagonal line from edge to edge */}
+        {/* Single thick diagonal line from edge to edge */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="95" width="400" height="10" fill={color} />
+          <rect x="-100" y="90" width="400" height="80" fill={color} />
         </g>
       </svg>
     ),
     'diagonal-stripes': (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single thick diagonal line from edge to edge */}
+        {/* Single very thick diagonal line from edge to edge */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="95" width="400" height="12" fill={color} />
+          <rect x="-100" y="90" width="400" height="96" fill={color} />
         </g>
       </svg>
     ),
     corner: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single diagonal line from edge to edge */}
+        {/* Single thick diagonal line from edge to edge */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="95" width="400" height="10" fill={color} />
+          <rect x="-100" y="90" width="400" height="80" fill={color} />
         </g>
       </svg>
     ),
     trapezoid: (
       <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Single diagonal line from edge to edge */}
+        {/* Single very thick diagonal line from edge to edge */}
         <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-100" y="95" width="400" height="12" fill={color} />
+          <rect x="-100" y="90" width="400" height="96" fill={color} />
         </g>
       </svg>
     )
