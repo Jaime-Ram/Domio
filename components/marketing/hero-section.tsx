@@ -49,7 +49,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
 
         {/* CTA */}
         <div className="flex flex-col sm:flex-row items-center gap-3 justify-center pb-[25vh]">
-          {/* Email input with "Open Account" button - integrated rounded-2xl shape */}
+          {/* Desktop: Email input with "Open Account" button - integrated rounded-2xl shape */}
           <form 
             onSubmit={(e) => {
               e.preventDefault()
@@ -57,15 +57,15 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                 onSignupClick()
               }
             }}
-            className="flex items-stretch w-full max-w-md sm:w-auto"
+            className="hidden md:flex items-stretch w-full max-w-md"
           >
-            <div className="flex items-stretch rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm overflow-hidden flex-1">
+            <div className="flex items-stretch rounded-2xl border border-white/30 bg-white/20 backdrop-blur-sm overflow-hidden flex-1">
               <Input
                 type="email"
                 name="account-email"
                 placeholder="Enter your email"
                 required
-                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4 py-3"
+                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/80 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4 py-3"
               />
               <Button
                 type="submit"
@@ -76,7 +76,15 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             </div>
           </form>
           
-          {/* Launch Demo button - separate rounded-2xl shape in light/white */}
+          {/* Mobile: Open Account button only */}
+          <Button
+            onClick={onSignupClick}
+            className="md:hidden bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
+          >
+            Open Account
+          </Button>
+          
+          {/* Bekijk demo button - visible on all screen sizes */}
           <Button
             asChild
             className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
