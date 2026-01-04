@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -12,18 +11,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
-  // Background images from Achtergrond6.jpg to Achtergrond14.jpg (9 images)
-  const backgrounds = Array.from({ length: 9 }, (_, i) => `/images/Achtergrond${i + 6}.jpg`)
-  const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0)
-
-  // Rotate background every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBackgroundIndex((prev) => (prev + 1) % backgrounds.length)
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [backgrounds.length])
+  // Use Achtergrond13.jpg as fixed background, mirrored
 
   return (
     <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0">
@@ -31,12 +19,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
         <div className="absolute inset-0">
           <Image
-            key={currentBackgroundIndex}
-            src={backgrounds[currentBackgroundIndex]}
+            src="/images/Achtergrond13.jpg"
             alt=""
             fill
-            className="object-cover object-[25%] md:object-center transition-opacity duration-1000"
-            priority={currentBackgroundIndex === 0}
+            className="object-cover object-[25%] md:object-center"
+            style={{ transform: 'scaleX(-1)' }}
+            priority
             quality={90}
           />
         </div>
