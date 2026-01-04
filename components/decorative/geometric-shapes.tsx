@@ -22,35 +22,55 @@ export function GeometricShapes({
   
   const variants = {
     rhombus: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-5000" y="40" width="10000" height="120" fill={color} />
-        </g>
+      <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Thick diagonal bar from edge to edge - path-based for smooth edges */}
+        <path
+          d="M-2000 1650
+             L-600 290
+             L2000 -340
+             L2000 -650
+             L-2000 -650 Z"
+          fill={color}
+        />
       </svg>
     ),
     'diagonal-stripes': (
-      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-5000" y="32" width="10000" height="136" fill={color} />
-        </g>
+      <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Very thick diagonal bar from edge to edge - path-based for smooth edges */}
+        <path
+          d="M-2000 1650
+             L-600 290
+             L2000 -340
+             L2000 -650
+             L-2000 -650 Z"
+          fill={color}
+        />
       </svg>
     ),
     corner: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-5000" y="40" width="10000" height="120" fill={color} />
-        </g>
+      <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Thick diagonal bar from edge to edge - path-based for smooth edges */}
+        <path
+          d="M-2000 1650
+             L-600 290
+             L2000 -340
+             L2000 -650
+             L-2000 -650 Z"
+          fill={color}
+        />
       </svg>
     ),
     trapezoid: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
-        {/* Very thick diagonal line - extends extremely far beyond viewport so only middle section is visible */}
-        <g transform={`rotate(${angle} 100 100)`}>
-          <rect x="-5000" y="32" width="10000" height="136" fill={color} />
-        </g>
+      <svg viewBox="0 0 1000 650" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Very thick diagonal bar from edge to edge - path-based for smooth edges */}
+        <path
+          d="M-2000 1650
+             L-600 290
+             L2000 -340
+             L2000 -650
+             L-2000 -650 Z"
+          fill={color}
+        />
       </svg>
     )
   }
