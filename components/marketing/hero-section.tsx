@@ -38,7 +38,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl">
             {/* Mobile: Larger title on 3 lines */}
-            <h1 className="md:hidden text-4xl font-semibold tracking-tight text-white leading-tight">
+            <h1 className="md:hidden text-5xl font-semibold tracking-tight text-white leading-tight">
               <span className="block">Het platform</span>
               <span className="block">binnen het</span>
               <span className="block">vastgoedbeheer</span>
@@ -66,11 +66,11 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             }}
             className="hidden md:flex items-stretch w-full max-w-md"
           >
-            <div className="flex items-stretch rounded-2xl border border-white/40 bg-[#002A1F]/60 overflow-hidden flex-1">
+            <div className="flex items-stretch rounded-2xl border border-white/40 bg-white/20 overflow-hidden flex-1">
               <Input
                 type="email"
                 name="account-email"
-                placeholder="Enter your email"
+                placeholder="Vul je email in"
                 required
                 className="flex-1 bg-transparent border-0 text-white placeholder:text-white/80 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4 py-3"
               />
