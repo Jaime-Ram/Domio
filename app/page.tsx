@@ -430,7 +430,7 @@ export default function Home() {
               opacity={0.18}
               layers={2}
             />
-            <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
+            <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-center relative z-10">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
               <div className="flex justify-center items-end lg:justify-start lg:flex-[0_0_auto] relative w-full lg:w-auto">
                 <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
@@ -450,7 +450,7 @@ export default function Home() {
               </div>
 
               {/* Right Side - Content */}
-              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] pb-0">
+              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px]">
                 <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Beheer je vastgoed <span className="text-[#9AFF7C]">waar je ook bent</span>
