@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Building2, DollarSign, Users, Wrench, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 type BeheerderType = 'vve' | 'particulier' | 'institutioneel' | 'vastgoedbeheerder'
 
@@ -21,16 +24,16 @@ export function FunctiesSection() {
         {/* Title Section */}
         <div className="mb-12 text-center md:mb-16">
           <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Functies</h2>
-          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl md:text-6xl leading-tight">
+          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl leading-tight">
             <span className="text-[#002A1F]">Alles </span>
-            <span className="text-[#356258]">wat je nodig hebt </span>
+            <span className="text-[#002A1F]">wat je nodig hebt </span>
             <span className="text-[#002A1F]">op één plek.</span>
             <br />
-            <span className="text-[#356258]">Domio helpt jouw </span>
-            <span className="text-[#356258]">portefeuille </span>
-            <span className="text-[#356258]">zo </span>
-            <span className="text-[#356258]">efficiënt </span>
-            <span className="text-[#356258]">mogelijk te beheren.</span>
+            <span className="text-[#002A1F]">Domio helpt jouw </span>
+            <span className="text-[#002A1F]">portefeuille </span>
+            <span className="text-[#002A1F]">zo </span>
+            <span className="text-[#002A1F]">efficiënt </span>
+            <span className="text-[#002A1F]">mogelijk te beheren.</span>
           </h2>
         </div>
 
@@ -60,9 +63,14 @@ export function FunctiesSection() {
             <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
-                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                  Panden beheren
-                </p>
+                <div className="flex items-center gap-3 max-lg:justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                    Panden beheren
+                  </p>
+                </div>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 max-lg:text-center">
                   Overzicht per pand met status, huurprijs, huurder en documenten. Alles op één plek.
                 </p>
@@ -82,9 +90,14 @@ export function FunctiesSection() {
             <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                  Financiën
-                </p>
+                <div className="flex items-center gap-3 max-lg:justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                    Financiën
+                  </p>
+                </div>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 max-lg:text-center">
                   Inkomsten en uitgaven bijhouden, openstaande betalingen en export naar CSV.
                 </p>
@@ -100,9 +113,14 @@ export function FunctiesSection() {
             <div className="absolute inset-px rounded-lg bg-white" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
-                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                  Huurderportaal
-                </p>
+                <div className="flex items-center gap-3 max-lg:justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                    Huurderportaal
+                  </p>
+                </div>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 max-lg:text-center">
                   Gegevens, notities en betalingsstatus per huurder. Altijd up-to-date.
                 </p>
@@ -118,9 +136,14 @@ export function FunctiesSection() {
             <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-b-4xl lg:rounded-r-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
-                <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                  Onderhoud
-                </p>
+                <div className="flex items-center gap-3 max-lg:justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
+                    <Wrench className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
+                    Onderhoud
+                  </p>
+                </div>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 max-lg:text-center">
                   Meldingen registreren, status bijhouden en kosten noteren. Alles overzichtelijk.
                 </p>
@@ -156,6 +179,20 @@ export function FunctiesSection() {
             </div>
             <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-r-4xl" />
           </div>
+        </div>
+
+        {/* Bekijk alle functies Button */}
+        <div className="mt-12 flex justify-end">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#002A1F] text-[#002A1F] hover:bg-[#002A1F] hover:text-white rounded-2xl"
+          >
+            <Link href="#features" className="flex items-center gap-2">
+              Bekijk alle functies
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

@@ -139,6 +139,9 @@ export default function Home() {
               </DropdownMenuContent>
               </DropdownMenu>
             </div>
+            <Link href="#over-ons" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
+              Over ons
+            </Link>
             <Link href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
               Prijzen
             </Link>
@@ -252,25 +255,32 @@ export default function Home() {
                       <Link
                         href="#features"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Functies
-            </Link>
-            <Link
-              href="#pricing"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Functies
+                      </Link>
+                      <Link
+                        href="#over-ons"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Prijzen
-            </Link>
-            <Link
-              href="#contact"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Over ons
+                      </Link>
+                      <Link
+                        href="#pricing"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
-                     </div>
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Prijzen
+                      </Link>
+                      <Link
+                        href="#contact"
+                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Contact
+                      </Link>
+                    </div>
 
                     {/* Inloggen Button */}
                     <div className="pt-2 mb-4">
@@ -468,7 +478,7 @@ export default function Home() {
         </Suspense>
 
         {/* Over Ons Section - Large section with building background and fade overlay */}
-        <section className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
+        <section id="over-ons" className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
           <div className="container mx-auto w-full max-w-7xl px-6 md:px-8">
             <div className="rounded-3xl relative overflow-hidden min-h-[650px] md:min-h-[600px]">
               {/* Background Image with buildings */}
