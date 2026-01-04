@@ -29,8 +29,11 @@ export default function EmployerDashboardLayout({
         <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
             <span className="text-sm font-medium text-[#002A1F]">
-              Je bekijkt de Domio demo
+              Welkom bij de domio demo omgeving.{' '}
+              <span className="underline">Meer informatie over functionaliteiten</span>
             </span>
+          </div>
+          <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -42,7 +45,7 @@ export default function EmployerDashboardLayout({
                   <ChevronDown className="ml-2 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setViewAs('verhuurder')}>
                   Bekijk als verhuurder
                 </DropdownMenuItem>
@@ -51,19 +54,19 @@ export default function EmployerDashboardLayout({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button
+              asChild
+              className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-lg h-8 px-4 text-sm"
+            >
+              <Link href="/" onClick={(e) => {
+                e.preventDefault()
+                // Open signup modal or navigate to signup
+                window.location.href = '/'
+              }}>
+                Open Account
+              </Link>
+            </Button>
           </div>
-          <Button
-            asChild
-            className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-lg h-8 px-4 text-sm"
-          >
-            <Link href="/" onClick={(e) => {
-              e.preventDefault()
-              // Open signup modal or navigate to signup
-              window.location.href = '/'
-            }}>
-              Open Account
-            </Link>
-          </Button>
         </div>
       </div>
       
