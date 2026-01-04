@@ -224,11 +224,11 @@ export default function Home() {
                     {/* Proefperiode Card - Smaller */}
                     <div className="bg-[#002A1F] rounded-xl p-4 mb-4 relative overflow-hidden">
                       <div className="relative z-10">
-                        <h3 className="text-lg font-semibold text-white mb-1.5">
-                          Probeer Domio 30 dagen gratis
+                        <h3 className="text-lg font-semibold text-white mb-1">
+                          Probeer Domio
                         </h3>
-                        <p className="text-xs text-white/90 mb-3">
-                          Geen creditcard nodig, op elk moment opzegbaar.
+                        <p className="text-base font-semibold text-white mb-3">
+                          30 dagen gratis
                         </p>
                         <Button
                           className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full text-sm"
@@ -238,7 +238,7 @@ export default function Home() {
                             setMobileMenuOpen(false)
                           }}
                         >
-                          Start 30 dagen gratis
+                          Start proefperiode
                         </Button>
                       </div>
                       {/* Geometric decorative element - same style as 30 dagen gratis section, subtle in quiet corner */}

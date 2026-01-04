@@ -22,36 +22,19 @@ export function FunctiesSection() {
     <section id="features" className="bg-white py-24 sm:py-32 pb-16 sm:pb-20">
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         {/* Title Section */}
-        <div className="mb-12 text-center md:mb-16 relative">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex-1">
-              <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Functies</h2>
-              <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl leading-tight">
-                <span className="text-[#002A1F]">Alles </span>
-                <span className="text-[#002A1F]">wat je nodig hebt </span>
-                <span className="text-[#002A1F]">op één plek.</span>
-                <br />
-                <span className="text-[#002A1F]">Domio helpt jouw </span>
-                <span className="text-[#002A1F]">portefeuille </span>
-                <span className="text-[#002A1F]">zo </span>
-                <span className="text-[#002A1F]">efficiënt </span>
-                <span className="text-[#002A1F]">mogelijk te beheren.</span>
-              </h2>
-            </div>
-            {/* Alles functies button - right side */}
-            <div className="md:flex-shrink-0">
-              <Button
-                asChild
-                variant="outline"
-                className="border-[#002A1F] text-[#002A1F] hover:bg-[#002A1F] hover:text-white rounded-2xl"
-              >
-                <Link href="#features" className="flex items-center gap-2">
-                  Alles functies
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
+        <div className="mb-12 text-center md:mb-16">
+          <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Functies</h2>
+          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl leading-tight">
+            <span className="text-[#002A1F]">Alles </span>
+            <span className="text-[#002A1F]">wat je nodig hebt </span>
+            <span className="text-[#002A1F]">op één plek.</span>
+            <br />
+            <span className="text-[#002A1F]">Domio helpt jouw </span>
+            <span className="text-[#002A1F]">portefeuille </span>
+            <span className="text-[#002A1F]">zo </span>
+            <span className="text-[#002A1F]">efficiënt </span>
+            <span className="text-[#002A1F]">mogelijk te beheren.</span>
+          </h2>
         </div>
 
         {/* Beheerder Type Selector */}
@@ -71,6 +54,16 @@ export function FunctiesSection() {
                 {type.label}
               </button>
             ))}
+            {/* Alles functies button - same style as beheerder type buttons */}
+            <Link
+              href="#features"
+              className={cn(
+                'px-4 py-2 rounded-2xl text-sm font-medium transition-colors duration-200',
+                'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              )}
+            >
+              Alles functies
+            </Link>
           </div>
         </div>
 
