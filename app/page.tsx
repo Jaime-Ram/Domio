@@ -246,7 +246,8 @@ export default function Home() {
                         variant="corner" 
                         className="right-0 top-0 w-32 h-32"
                         color="#9AFF7C"
-                        opacity={0.15}
+                        opacity={0.18}
+                        layers={2}
                       />
                     </div>
 
@@ -343,7 +344,8 @@ export default function Home() {
           variant="diagonal-stripes" 
           className="inset-0 w-full h-full"
           color="#002A1F"
-          opacity={0.05}
+          opacity={0.08}
+          layers={2}
         />
       </div>
 
@@ -435,7 +437,8 @@ export default function Home() {
               variant="diagonal-stripes" 
               className="right-0 top-0 w-48 h-48 lg:w-64 lg:h-64"
               color="#9AFF7C"
-              opacity={0.12}
+              opacity={0.15}
+              layers={2}
             />
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
@@ -581,7 +584,8 @@ export default function Home() {
               variant="trapezoid" 
               className="right-0 bottom-0 w-56 h-56 lg:w-72 lg:h-72"
               color="#9AFF7C"
-              opacity={0.15}
+              opacity={0.18}
+              layers={2}
             />
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between relative z-10">
               {/* Left Side - Content */}
