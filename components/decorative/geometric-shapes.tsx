@@ -17,57 +17,48 @@ export function GeometricShapes({
 }: GeometricShapesProps) {
   const baseClasses = "absolute pointer-events-none"
   
+  // Consistent angle for all shapes (45 degrees diagonal)
+  const angle = 45
+  
   const variants = {
     rhombus: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" style={{ opacity }}>
-        {/* Large diagonal rhombus */}
-        <path 
-          d="M-20,100 L50,30 L120,100 L50,170 Z" 
-          fill={color}
-          stroke={color}
-          strokeWidth="1"
-          strokeOpacity="0.3"
-        />
-        {/* Smaller rhombus on the right */}
-        <path 
-          d="M150,20 L180,50 L150,80 L120,50 Z" 
-          fill={color}
-          stroke={color}
-          strokeWidth="1"
-          strokeOpacity="0.3"
-        />
+      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Diagonal bars from edge to edge with consistent 45-degree angle */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-50" y="70" width="300" height="30" fill={color} />
+          <rect x="-50" y="110" width="300" height="30" fill={color} />
+        </g>
       </svg>
     ),
     'diagonal-stripes': (
-      <svg viewBox="0 0 200 200" className="w-full h-full" style={{ opacity }}>
-        <g transform="rotate(-45 100 100)">
-          <rect x="-50" y="60" width="300" height="25" fill={color} />
-          <rect x="-50" y="100" width="300" height="25" fill={color} />
+      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Thick diagonal bars from edge to edge */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-100" y="50" width="400" height="40" fill={color} />
+          <rect x="-100" y="110" width="400" height="40" fill={color} />
         </g>
       </svg>
     ),
     corner: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" style={{ opacity }}>
-        {/* L-shaped corner form */}
-        <path 
-          d="M0,150 L0,120 L30,120 L80,70 L130,70 L130,40 L200,40 L200,150 Z" 
-          fill={color}
-          stroke={color}
-          strokeWidth="1"
-          strokeOpacity="0.2"
-        />
+      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* L-shaped bars with 45-degree angles, filling from edges */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-50" y="80" width="300" height="35" fill={color} />
+          <rect x="-50" y="125" width="300" height="35" fill={color} />
+        </g>
+        {/* Additional perpendicular bar for corner effect */}
+        <g transform={`rotate(${-angle} 100 100)`}>
+          <rect x="60" y="-50" width="40" height="300" fill={color} />
+        </g>
       </svg>
     ),
     trapezoid: (
-      <svg viewBox="0 0 200 200" className="w-full h-full" style={{ opacity }}>
-        {/* Trapezoid shape */}
-        <path 
-          d="M0,180 L40,60 L160,60 L200,180 Z" 
-          fill={color}
-          stroke={color}
-          strokeWidth="1"
-          strokeOpacity="0.2"
-        />
+      <svg viewBox="0 0 200 200" className="w-full h-full" preserveAspectRatio="none" style={{ opacity }}>
+        {/* Diagonal bars from edge to edge */}
+        <g transform={`rotate(${angle} 100 100)`}>
+          <rect x="-100" y="60" width="400" height="45" fill={color} />
+          <rect x="-100" y="120" width="400" height="45" fill={color} />
+        </g>
       </svg>
     )
   }

@@ -241,12 +241,12 @@ export default function Home() {
                           Start 30 dagen gratis
                         </Button>
                       </div>
-                      {/* Geometric decorative element */}
+                      {/* Geometric decorative element - fills entire card */}
                       <GeometricShapes 
                         variant="corner" 
-                        className="right-0 top-0 w-24 h-24"
+                        className="inset-0 w-full h-full"
                         color="#9AFF7C"
-                        opacity={0.15}
+                        opacity={0.12}
                       />
                     </div>
 
@@ -420,12 +420,12 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            {/* Geometric decorative element */}
+            {/* Geometric decorative element - fills entire block */}
             <GeometricShapes 
               variant="diagonal-stripes" 
-              className="right-0 top-0 w-40 h-40 lg:w-60 lg:h-60"
+              className="inset-0 w-full h-full"
               color="#9AFF7C"
-              opacity={0.08}
+              opacity={0.1}
             />
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
@@ -566,12 +566,12 @@ export default function Home() {
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
-            {/* Geometric decorative element */}
+            {/* Geometric decorative element - fills entire block */}
             <GeometricShapes 
               variant="trapezoid" 
-              className="right-0 bottom-0 w-48 h-48 lg:w-64 lg:h-64"
+              className="inset-0 w-full h-full"
               color="#9AFF7C"
-              opacity={0.1}
+              opacity={0.12}
             />
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between relative z-10">
               {/* Left Side - Content */}
