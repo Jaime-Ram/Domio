@@ -432,10 +432,10 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - same style as 30 dagen gratis section */}
+            {/* Geometric decorative element - same style as 30 dagen gratis section, 2x larger, bottom right */}
             <GeometricShapes 
               variant="trapezoid" 
-              className="right-0 top-0 w-56 h-56 lg:w-72 lg:h-72"
+              className="right-0 bottom-0 w-[112px] h-[112px] lg:w-[144px] lg:h-[144px]"
               color="#9AFF7C"
               opacity={0.18}
               layers={2}
