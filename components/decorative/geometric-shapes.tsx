@@ -21,7 +21,7 @@ export function GeometricShapes({
   
   // Create multiple layers with different tints and offsets
   const createLayer = (layerIndex: number) => {
-    const offset = layerIndex * 120 // Offset each layer
+    const offset = layerIndex * 160 // Offset each layer (2x the original 80)
     const layerOpacity = opacity * (1 - layerIndex * 0.2) // Slightly lighter for each layer
     
     // Calculate lighter tint (add white to make it lighter)
@@ -50,15 +50,17 @@ export function GeometricShapes({
       Math.round(rgb.b + (255 - rgb.b) * blendFactor)
     ) : color
     
-    // Much larger path - extends far beyond viewport
+    // Original shape but 2x larger - extends beyond viewport
+    // Original: M-500 1150 L400 90 L1500 340 L1500 650 L-500 650 Z
+    // 2x: M-1000 2300 L800 180 L3000 680 L3000 1300 L-1000 1300 Z
     return (
       <path
         key={layerIndex}
-        d={`M${-1500 - offset} ${2150 + offset}
-           L${-200 - offset} ${-310 - offset}
-           L${2500 + offset} ${940 + offset}
-           L${2500 + offset} ${1650 + offset}
-           L${-1500 - offset} ${1650 + offset} Z`}
+        d={`M${-1000 - offset} ${2300 + offset}
+           L${800 - offset} ${180 - offset}
+           L${3000 + offset} ${680 + offset}
+           L${3000 + offset} ${1300 + offset}
+           L${-1000 - offset} ${1300 + offset} Z`}
         fill={layerColor}
         style={{ opacity: layerOpacity }}
       />
