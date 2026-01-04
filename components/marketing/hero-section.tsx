@@ -42,9 +42,9 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               <span className="block">Het beheer-</span>
               <span className="block">platform voor vastgoed</span>
             </h1>
-            {/* Desktop: Original single-line title */}
+            {/* Desktop: Title */}
             <h1 className="hidden md:block text-5xl font-semibold tracking-tight text-balance text-white md:text-6xl leading-tight">
-              Het platform voor vastgoedbeheer
+              Het beheerplatform voor vastgoed
             </h1>
             <p className="mt-2 text-base font-medium text-pretty text-white/80 sm:text-lg leading-8 max-w-[90%] mx-auto">
               Ontworpen door vastgoedprofessionals. Domio helpt je om je portefeuille efficiënt te beheren.

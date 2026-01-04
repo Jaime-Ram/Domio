@@ -453,7 +453,7 @@ export default function Home() {
               </div>
 
               {/* Right Side - Content */}
-              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px]">
+              <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] lg:-mt-8">
                 <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Beheer je vastgoed <span className="text-[#9AFF7C]">waar je ook bent</span>
