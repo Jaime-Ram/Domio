@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { VastgoedSidebar } from "@/components/dashboard/vastgoed-sidebar"
 import { ContentHeader } from "@/components/dashboard/content-header"
-import { HelpButton } from "@/components/dashboard/help-button"
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import {
@@ -26,14 +25,16 @@ export default function EmployerDashboardLayout({
     <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
       {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position */}
       <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-3 w-full z-50">
-        <div className="container mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center justify-start w-full sm:w-auto">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Left side - aligned with sidebar logo (px-6) */}
+          <div className="flex items-center justify-start w-full sm:w-auto pl-6">
             <span className="text-sm font-medium text-[#002A1F]">
               Welkom bij de domio demo omgeving.{' '}
               <span className="underline">Meer informatie over functionaliteiten</span>
             </span>
           </div>
-          <div className="flex items-center gap-3 ml-auto sm:ml-0">
+          {/* Right side - aligned with header profile (px-6 sm:px-8 lg:px-12) */}
+          <div className="flex items-center gap-3 pr-6 sm:pr-8 lg:pr-12 ml-auto sm:ml-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -82,7 +83,6 @@ export default function EmployerDashboardLayout({
               {children}
             </div>
           </main>
-          <HelpButton />
         </div>
       </div>
     </div>
