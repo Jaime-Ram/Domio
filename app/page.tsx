@@ -419,7 +419,7 @@ export default function Home() {
                     alt="Domio app op mobiel"
                     width={400}
                     height={400}
-                    className="drop-shadow-2xl w-full max-w-[250px] mx-auto lg:mx-0 lg:max-w-none lg:w-[400px] h-auto"
+                    className="drop-shadow-2xl w-full max-w-[250px] mx-auto lg:mx-0 lg:max-w-none lg:w-[320px] h-auto"
                     priority={false}
                     loading="lazy"
                     quality={85}
