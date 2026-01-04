@@ -45,7 +45,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/10" />
       </div>
       
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-24 pb-8 md:pt-20 md:pb-12">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl">
@@ -60,41 +60,44 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center pb-[20vh]">
-          <Button
-            className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
-            onClick={onSignupClick}
-          >
-            Start direct
-          </Button>
-          
-          {/* Demo email input - integrated input and button */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center pb-[25vh]">
+          {/* Email input with "Open Account" button - integrated pill shape */}
           <form 
             onSubmit={(e) => {
               e.preventDefault()
-              const email = (e.currentTarget.elements.namedItem('demo-email') as HTMLInputElement)?.value
-              if (email) {
-                window.location.href = `/demo?email=${encodeURIComponent(email)}`
+              if (onSignupClick) {
+                onSignupClick()
               }
             }}
             className="flex items-stretch w-full max-w-md sm:w-auto"
           >
-            <div className="flex items-stretch rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm overflow-hidden flex-1">
+            <div className="flex items-stretch rounded-full border border-white/20 bg-white/10 backdrop-blur-sm overflow-hidden flex-1">
               <Input
                 type="email"
-                name="demo-email"
+                name="account-email"
                 placeholder="Enter your email"
                 required
-                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4"
+                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-full rounded-r-none px-4 py-6"
               />
               <Button
                 type="submit"
-                className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-0 rounded-r-2xl rounded-l-none px-6 font-medium"
+                className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-0 rounded-r-full rounded-l-none px-6 font-medium py-6"
               >
-                Bekijk demo
+                Open Account
               </Button>
             </div>
           </form>
+          
+          {/* Launch Demo button - separate pill shape in light/white */}
+          <Button
+            asChild
+            className="bg-white/10 text-white hover:bg-white/20 border border-white/20 rounded-full px-6 py-6"
+          >
+            <Link href="/demo" className="flex items-center gap-2">
+              Launch Demo
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
 
