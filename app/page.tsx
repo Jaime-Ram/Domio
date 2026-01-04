@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
+import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
@@ -240,47 +241,46 @@ export default function Home() {
                           Start 30 dagen gratis
                         </Button>
                       </div>
-                      {/* Decorative element */}
-                      <div className="absolute right-0 top-0 w-20 h-20 opacity-10">
-                        <svg viewBox="0 0 100 100" className="w-full h-full">
-                          <path d="M0,50 Q25,25 50,50 T100,50" stroke="white" strokeWidth="2" fill="none" />
-                          <path d="M0,60 Q25,35 50,60 T100,60" stroke="white" strokeWidth="2" fill="none" />
-                          <path d="M0,70 Q25,45 50,70 T100,70" stroke="white" strokeWidth="2" fill="none" />
-                        </svg>
-                      </div>
+                      {/* Geometric decorative element */}
+                      <GeometricShapes 
+                        variant="corner" 
+                        className="right-0 top-0 w-24 h-24"
+                        color="#9AFF7C"
+                        opacity={0.15}
+                      />
                     </div>
 
                     {/* Header Navigation Items - Larger with color */}
                     <div className="space-y-1 mb-4">
-                      <Link
-                        href="#features"
+            <Link
+              href="#features"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Functies
-                      </Link>
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Functies
+            </Link>
                       <Link
                         href="#over-ons"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         Over ons
-                      </Link>
-                      <Link
-                        href="#pricing"
+            </Link>
+            <Link
+              href="#pricing"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Prijzen
-                      </Link>
-                      <Link
-                        href="#contact"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Prijzen
+            </Link>
+            <Link
+              href="#contact"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Contact
-                      </Link>
-                    </div>
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+                     </div>
 
                     {/* Inloggen Button */}
                     <div className="pt-2 mb-4">
@@ -420,7 +420,14 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#002A1F] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end">
+            {/* Geometric decorative element */}
+            <GeometricShapes 
+              variant="diagonal-stripes" 
+              className="right-0 top-0 w-40 h-40 lg:w-60 lg:h-60"
+              color="#9AFF7C"
+              opacity={0.08}
+            />
+            <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-end relative z-10">
               {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
               <div className="flex justify-center items-end lg:justify-start lg:flex-[0_0_auto] relative w-full lg:w-auto">
                 <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
@@ -558,8 +565,15 @@ export default function Home() {
         {/* Background that extends from middle of CTA into footer */}
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
-          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10">
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="rounded-3xl bg-[#002A1F] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
+            {/* Geometric decorative element */}
+            <GeometricShapes 
+              variant="trapezoid" 
+              className="right-0 bottom-0 w-48 h-48 lg:w-64 lg:h-64"
+              color="#9AFF7C"
+              opacity={0.1}
+            />
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between relative z-10">
               {/* Left Side - Content */}
               <div className="flex flex-col gap-6 lg:max-w-2xl">
                 <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>

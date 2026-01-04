@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Building2, DollarSign, Users, Wrench, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
 type BeheerderType = 'vve' | 'particulier' | 'institutioneel' | 'vastgoedbeheerder'
 
@@ -62,6 +63,12 @@ export function FunctiesSection() {
           <div className="relative lg:row-span-2">
             <div className="absolute inset-px rounded-lg bg-white lg:rounded-l-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
+              {/* Geometric decorative element */}
+              <GeometricShapes 
+                variant="rhombus" 
+                className="right-4 bottom-4 w-24 h-24 opacity-5"
+                color="#002A1F"
+              />
               <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
@@ -89,6 +96,12 @@ export function FunctiesSection() {
           <div className="relative max-lg:row-start-1">
             <div className="absolute inset-px rounded-lg bg-white max-lg:rounded-t-4xl" />
             <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
+              {/* Geometric decorative element */}
+              <GeometricShapes 
+                variant="corner" 
+                className="right-2 top-2 w-16 h-16 opacity-5"
+                color="#002A1F"
+              />
               <div className="px-8 pt-8 sm:px-10 sm:pt-10">
                 <div className="flex items-center gap-3 max-lg:justify-center">
                   <div className="w-10 h-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
