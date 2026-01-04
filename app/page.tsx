@@ -338,7 +338,7 @@ export default function Home() {
         }}
       />
 
-      {/* SVG Bar transition between hero and next section - two layers with rotation and different colors */}
+      {/* SVG Bar transition between hero and next section - three layers with rotation and different colors */}
       <div className="relative w-full h-30 -mt-12 overflow-hidden pointer-events-none">
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -346,7 +346,7 @@ export default function Home() {
           preserveAspectRatio="none"
           className="w-full h-full"
         >
-          {/* First layer - base color */}
+          {/* First layer - dark green base color */}
           <path
             d="M0 30 
                L1000 0 
@@ -354,7 +354,7 @@ export default function Home() {
                L0 120 Z"
             fill="#002A1F"
           />
-          {/* Second layer - rotated and different color for depth */}
+          {/* Second layer - rotated 180 degrees, light green for depth */}
           <g transform="rotate(180 500 60)">
             <path
               d="M0 30 
@@ -362,7 +362,18 @@ export default function Home() {
                  L1000 90 
                  L0 120 Z"
               fill="#9AFF7C"
-              opacity={0.3}
+              opacity={0.4}
+            />
+          </g>
+          {/* Third layer - more rotation (270 degrees), light green variant */}
+          <g transform="rotate(270 500 60)">
+            <path
+              d="M0 30 
+                 L1000 0 
+                 L1000 90 
+                 L0 120 Z"
+              fill="#9AFF7C"
+              opacity={0.25}
             />
           </g>
         </svg>
