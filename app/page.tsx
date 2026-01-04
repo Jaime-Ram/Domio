@@ -338,15 +338,35 @@ export default function Home() {
         }}
       />
 
-      {/* Geometric decorative element between hero and next section */}
-      <div className="relative w-full h-24 -mt-12 overflow-hidden pointer-events-none">
-        <GeometricShapes 
-          variant="diagonal-stripes" 
-          className="inset-0 w-full h-full"
-          color="#002A1F"
-          opacity={0.08}
-          layers={2}
-        />
+      {/* SVG Bar transition between hero and next section - two layers with rotation and different colors */}
+      <div className="relative w-full h-30 -mt-12 overflow-hidden pointer-events-none">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 1000 120" 
+          preserveAspectRatio="none"
+          className="w-full h-full"
+        >
+          {/* First layer - base color */}
+          <path
+            d="M0 30 
+               L1000 0 
+               L1000 90 
+               L0 120 Z"
+            fill="#002A1F"
+            opacity={0.15}
+          />
+          {/* Second layer - rotated and different color for depth */}
+          <g transform="rotate(180 500 60)">
+            <path
+              d="M0 30 
+                 L1000 0 
+                 L1000 90 
+                 L0 120 Z"
+              fill="#9AFF7C"
+              opacity={0.12}
+            />
+          </g>
+        </svg>
       </div>
 
         {/* Floating Mockup */}
