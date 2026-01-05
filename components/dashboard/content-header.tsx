@@ -31,25 +31,26 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
             <span className="sr-only">Toggle menu</span>
           </Button>
 
-          {/* Search Bar - Center */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
+          {/* Search Bar and Quick Actions - Center */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-4 items-center gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="search"
                 placeholder="Zoek voor alles..."
-                className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700"
+                className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700 rounded-full"
               />
             </div>
-          </div>
-
-          {/* Right Side Actions */}
-          <div className="flex items-center gap-2 ml-auto">
             {/* Quick Actions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="hidden sm:flex">
-                  <Zap className="h-5 w-5" />
+                <Button 
+                  variant="default" 
+                  size="default"
+                  className="hidden sm:flex items-center gap-2 rounded-full bg-[#002A1F] text-white hover:bg-[#002A1F]/90 px-4 h-10"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -67,6 +68,10 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2 ml-auto">
 
             {/* Notifications */}
             <Button variant="ghost" size="icon">
