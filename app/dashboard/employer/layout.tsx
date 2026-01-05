@@ -41,7 +41,7 @@ export default function EmployerDashboardLayout({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-[#356258] text-white border-[#356258] hover:bg-[#356258]/90 rounded-full h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
+                  className="bg-white text-[#002A1F] border-gray-200 hover:bg-gray-100 rounded-full h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
                 >
                   <span className="hidden sm:inline">Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}</span>
                   <span className="sm:hidden">{viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}</span>

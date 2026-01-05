@@ -47,7 +47,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 <Button 
                   variant="default" 
                   size="default"
-                  className="hidden sm:flex items-center gap-2 rounded-full bg-[#002A1F] text-white hover:bg-[#002A1F]/90 px-4 h-10"
+                  className="hidden sm:flex items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-4 h-10"
                 >
                   <Zap className="h-4 w-4" />
                   <span>Snelle acties</span>
