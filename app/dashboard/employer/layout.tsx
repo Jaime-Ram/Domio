@@ -23,8 +23,8 @@ export default function EmployerDashboardLayout({
 
   return (
     <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
-      {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position */}
-      <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-2 sm:py-3 w-full z-50">
+      {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position - Hidden on mobile */}
+      <div className="hidden md:flex fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-3 w-full z-50">
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
           {/* Left side - aligned with sidebar logo (px-6) */}
           <div className="flex items-center justify-start w-full sm:w-auto pl-4 sm:pl-6">
@@ -74,8 +74,8 @@ export default function EmployerDashboardLayout({
         </div>
       </div>
       
-      {/* Spacer for fixed banner - responsive height */}
-      <div className="h-[53px] sm:h-[57px]"></div>
+      {/* Spacer for fixed banner - only on desktop */}
+      <div className="hidden md:block h-[57px]"></div>
       
       <div className="flex flex-1 min-h-0 w-full">
         <VastgoedSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
