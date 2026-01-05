@@ -24,26 +24,28 @@ export default function EmployerDashboardLayout({
   return (
     <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
       {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position */}
-      <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-3 w-full z-50">
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-2 sm:py-3 w-full z-50">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
           {/* Left side - aligned with sidebar logo (px-6) */}
-          <div className="flex items-center justify-start w-full sm:w-auto pl-6">
-            <span className="text-sm font-medium text-[#002A1F]">
-              Welkom bij de domio demo omgeving.{' '}
-              <span className="underline">Meer informatie over functionaliteiten</span>
+          <div className="flex items-center justify-start w-full sm:w-auto pl-4 sm:pl-6">
+            <span className="text-xs sm:text-sm font-medium text-[#002A1F] leading-tight">
+              <span className="hidden sm:inline">Welkom bij de domio demo omgeving.{' '}</span>
+              <span className="sm:hidden">Domio demo</span>
+              <span className="underline">Meer informatie</span>
             </span>
           </div>
           {/* Right side - aligned with header profile (px-6 sm:px-8 lg:px-12) */}
-          <div className="flex items-center gap-3 pr-6 sm:pr-8 lg:pr-12 ml-auto sm:ml-0">
+          <div className="flex items-center gap-2 sm:gap-3 pr-4 sm:pr-6 lg:pr-8 xl:pr-12 w-full sm:w-auto justify-end sm:justify-start">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-white/80 text-[#002A1F] border-[#002A1F]/20 hover:bg-white rounded-lg h-8 px-3 text-sm"
+                  className="bg-white/80 text-[#002A1F] border-[#002A1F]/20 hover:bg-white rounded-lg h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
                 >
-                  Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}
-                  <ChevronDown className="ml-2 h-3 w-3" />
+                  <span className="hidden sm:inline">Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}</span>
+                  <span className="sm:hidden">{viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}</span>
+                  <ChevronDown className="ml-1 sm:ml-2 h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -57,22 +59,23 @@ export default function EmployerDashboardLayout({
             </DropdownMenu>
             <Button
               asChild
-              className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-lg h-8 px-4 text-sm"
+              className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-lg h-7 sm:h-8 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0"
             >
               <Link href="/" onClick={(e) => {
                 e.preventDefault()
                 // Open signup modal or navigate to signup
                 window.location.href = '/'
               }}>
-                Open Account
+                <span className="hidden sm:inline">Open Account</span>
+                <span className="sm:hidden">Account</span>
               </Link>
             </Button>
           </div>
         </div>
       </div>
       
-      {/* Spacer for fixed banner */}
-      <div className="h-[57px]"></div>
+      {/* Spacer for fixed banner - responsive height */}
+      <div className="h-[53px] sm:h-[57px]"></div>
       
       <div className="flex flex-1 min-h-0 w-full">
         <VastgoedSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

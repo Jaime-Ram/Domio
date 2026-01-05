@@ -140,7 +140,7 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
       )}
       <div
         className={cn(
-          "fixed top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 w-64 rounded-tr-3xl rounded-br-3xl",
+          "fixed top-[53px] sm:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 w-64 rounded-tr-3xl rounded-br-3xl",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:w-64 lg:flex-shrink-0"
         )}
