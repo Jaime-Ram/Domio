@@ -77,10 +77,10 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 <Button 
                   variant="default" 
                   size="default"
-                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9 rounded-full"
+                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9"
                 >
                   <Zap className="h-4 w-4" />
-                  <span className="hidden sm:inline">Snelle acties</span>
+                  <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
