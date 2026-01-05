@@ -27,6 +27,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
   X,
   Home,
   Briefcase,
@@ -154,7 +155,7 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
               className="lg:hidden"
               onClick={onClose}
             >
-              <X className="size-4" />
+              <ChevronLeft className="size-4" />
             </Button>
           </div>
 
