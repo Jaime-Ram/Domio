@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Menu, Bell, Settings, User, Search, Zap, LayoutGrid, List } from 'lucide-react'
+import { Menu, Bell, Settings, User, Search, Zap } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,6 @@ interface ContentHeaderProps {
 }
 
 export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
@@ -68,26 +67,6 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* View Toggle */}
-            <div className="hidden sm:flex items-center border border-gray-200 dark:border-neutral-700 rounded-lg overflow-hidden">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="icon"
-                className="h-8 w-8 rounded-none"
-                onClick={() => setViewMode('grid')}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="icon"
-                className="h-8 w-8 rounded-none"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
 
             {/* Notifications */}
             <Button variant="ghost" size="icon">

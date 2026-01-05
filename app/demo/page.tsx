@@ -24,11 +24,11 @@ export default function DemoPage() {
         {/* Logo */}
         <Logo width={140} height={40} variant="white" />
 
-        {/* Three animated dots */}
+        {/* Three animated dots - more active */}
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '1.4s' }}></div>
-          <div className="w-2 h-2 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0.2s', animationDuration: '1.4s' }}></div>
-          <div className="w-2 h-2 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0.4s', animationDuration: '1.4s' }}></div>
+          <div className="w-2.5 h-2.5 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '0.8s' }}></div>
+          <div className="w-2.5 h-2.5 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0.15s', animationDuration: '0.8s' }}></div>
+          <div className="w-2.5 h-2.5 bg-[#9AFF7C] rounded-full animate-bounce" style={{ animationDelay: '0.3s', animationDuration: '0.8s' }}></div>
         </div>
       </div>
     </div>
