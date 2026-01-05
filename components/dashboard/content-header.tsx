@@ -41,16 +41,46 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700 rounded-full"
               />
             </div>
-            {/* Quick Actions Dropdown */}
+            {/* Quick Actions Dropdown - Desktop */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="default" 
                   size="default"
-                  className="hidden sm:flex items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-4 h-10"
+                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-4 h-10"
                 >
                   <Zap className="h-4 w-4" />
                   <span>Snelle acties</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  Nieuw pand toevoegen
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Huurder toevoegen
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Factuur aanmaken
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Onderhoudsmelding
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Quick Actions Dropdown - Mobile */}
+          <div className="flex md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="default" 
+                  size="default"
+                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden sm:inline">Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
