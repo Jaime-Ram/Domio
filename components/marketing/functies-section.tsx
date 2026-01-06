@@ -1,22 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Building2, DollarSign, Users, Wrench, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { Building2, DollarSign, Users, Wrench } from 'lucide-react'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
-type BeheerderType = 'vve' | 'particulier' | 'vastgoedbeheerder'
-
 export function FunctiesSection() {
-  const [selectedType, setSelectedType] = useState<BeheerderType | null>(null)
-
-  const beheerderTypes: { id: BeheerderType; label: string }[] = [
-    { id: 'vve', label: 'VvE' },
-    { id: 'particulier', label: 'Particulier vastgoedhouder' },
-    { id: 'vastgoedbeheerder', label: 'Vastgoedbeheerder' },
-  ]
 
   return (
     <section id="features" className="bg-white py-24 sm:py-32 pb-16 sm:pb-20">
@@ -161,37 +149,6 @@ export function FunctiesSection() {
           </div>
         </div>
 
-        {/* Beheerder Type Selector - Below function display */}
-        <div className="mt-12 md:mt-16">
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {beheerderTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
-                className={cn(
-                  'px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300',
-                  selectedType === type.id
-                    ? 'bg-[#9AFF7C] text-[#002A1F] scale-110 z-10 relative'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                )}
-                style={selectedType === type.id ? { transform: 'scale(1.1)' } : undefined}
-              >
-                {type.label}
-              </button>
-            ))}
-            {/* Alle functies button - bright green with arrow, no pill shape */}
-            <Link
-              href="#features"
-              className={cn(
-                'text-sm font-medium transition-colors duration-200 flex items-center gap-2',
-                'text-[#9AFF7C] hover:text-[#9AFF7C]/80'
-              )}
-            >
-              Alle functies
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
       </div>
     </section>
   )
