@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Menu, Bell, Settings, User, Search, Zap } from 'lucide-react'
+import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,19 +53,33 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  Nieuw pand toevoegen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Huurder toevoegen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Factuur aanmaken
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Onderhoudsmelding
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-64 p-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Nieuw pand</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Huurder</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Factuur</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Wrench className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Onderhoud</span>
+                  </button>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -83,19 +97,33 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  Nieuw pand toevoegen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Huurder toevoegen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Factuur aanmaken
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Onderhoudsmelding
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-64 p-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Building2 className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Nieuw pand</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Huurder</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Factuur</span>
+                  </button>
+                  <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
+                      <Wrench className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 text-center">Onderhoud</span>
+                  </button>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
