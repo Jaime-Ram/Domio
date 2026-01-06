@@ -82,8 +82,10 @@ export default function EmployerDashboardLayout({
         <div className="flex-1 flex flex-col min-w-0 w-full lg:ml-64">
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden">
-            <div className="container mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 py-4 sm:py-6 lg:py-10">
-              {children}
+            <div className="w-full px-6 sm:px-8 lg:px-12 py-4 sm:py-6 lg:py-10">
+              <div className="max-w-7xl mx-auto">
+                {children}
+              </div>
             </div>
           </main>
         </div>
