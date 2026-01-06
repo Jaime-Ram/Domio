@@ -38,11 +38,11 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl w-full">
             {/* Mobile: Larger title */}
-            <h1 className="md:hidden text-5xl font-semibold tracking-tight text-white leading-tight text-center">
+            <h1 className="md:hidden text-[2.5rem] font-semibold tracking-tight text-white leading-tight text-center">
               Het platform voor het beheren van vastgoed
             </h1>
             {/* Desktop: Title */}
-            <h1 className="hidden md:block text-5xl font-semibold tracking-tight text-balance text-white md:text-6xl leading-tight">
+            <h1 className="hidden md:block text-[2.5rem] font-semibold tracking-tight text-balance text-white sm:text-5xl md:text-6xl leading-tight">
               Het beheerplatform voor vastgoed
             </h1>
             <p className="mt-2 text-base font-medium text-pretty text-white/80 sm:text-lg leading-8 max-w-[90%] mx-auto">
