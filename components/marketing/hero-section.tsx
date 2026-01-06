@@ -22,15 +22,15 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             src="/images/Achtergrond13.jpg"
             alt=""
             fill
-            className="object-cover object-[35%] md:object-center"
+            className="object-cover object-[45%] md:object-center"
             style={{ transform: 'scaleX(-1)' }}
             priority
             quality={90}
           />
         </div>
         
-        {/* Black fade from top to bottom for header visibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/10" />
+        {/* Black fade from top to bottom for header visibility - darker at top, faster fade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-transparent" />
       </div>
       
       <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
