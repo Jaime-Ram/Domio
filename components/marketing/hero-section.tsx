@@ -94,7 +94,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           {/* Bekijk demo button - visible on all screen sizes */}
           <Button
             asChild
-            className="bg-transparent text-white hover:bg-white/10 border border-white rounded-2xl"
+            className="bg-transparent text-[#002A1F] hover:bg-[#002A1F]/10 border border-[#002A1F] rounded-2xl"
           >
             <Link href="/demo" className="flex items-center gap-2">
               Bekijk demo
