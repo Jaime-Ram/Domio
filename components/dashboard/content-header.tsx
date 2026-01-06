@@ -19,7 +19,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
-      <div className="container mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
           {/* Hamburger menu for mobile */}
           <Button
             variant="ghost"
