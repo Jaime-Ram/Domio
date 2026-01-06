@@ -152,10 +152,10 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden flex items-center"
               onClick={onClose}
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-4 shrink-0" />
             </Button>
           </div>
 
