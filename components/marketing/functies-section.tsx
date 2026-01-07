@@ -86,7 +86,7 @@ export function FunctiesSection() {
                     <Users className="w-5 h-5 text-white" />
                   </div>
                   <p className="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">
-                    Huurderportaal
+                    Huurdersportaal
                   </p>
                 </div>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-gray-600 max-lg:text-center">

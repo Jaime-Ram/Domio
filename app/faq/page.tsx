@@ -61,7 +61,7 @@ export default function FAQPage() {
             </Button>
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
-            <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
+            <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0 md:flex-1">
               <Logo width={100} height={28} />
             </div>
 

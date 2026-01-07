@@ -3,19 +3,26 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench } from 'lucide-react'
+import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink, Moon, Sun, Monitor, ChevronRight } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
+import Link from 'next/link'
 
 interface ContentHeaderProps {
   onMenuClick?: () => void
 }
 
 export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
+  const [appearance, setAppearance] = useState<'light' | 'dark' | 'system'>('system')
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
@@ -139,19 +146,108 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Instellingen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profiel
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-64 bg-white dark:bg-gray-800">
+                {/* User Info Section */}
+                <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-[#002A1F] flex items-center justify-center flex-shrink-0">
+                      <User className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                          Admin
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                        Demo Gebruiker
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        demo@domiovastgoedbeheer.nl
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation Links */}
+                <div className="py-1">
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/employer/settings" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      Profiel
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notificaties
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Beveiliging
+                  </DropdownMenuItem>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* External Links */}
+                <div className="py-1">
+                  <DropdownMenuItem asChild>
+                    <Link href="/privacy" className="flex items-center">
+                      Privacy
+                      <ExternalLink className="ml-auto h-3 w-3" />
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    Perks
+                    <ExternalLink className="ml-auto h-3 w-3" />
+                  </DropdownMenuItem>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* Appearance Settings */}
+                <div className="py-1">
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center">
+                      <Monitor className="mr-2 h-4 w-4" />
+                      Weergave
+                      <ChevronRight className="ml-auto h-4 w-4" />
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setAppearance('light')}>
+                        <Sun className="mr-2 h-4 w-4" />
+                        Licht
+                        {appearance === 'light' && <span className="ml-auto">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setAppearance('dark')}>
+                        <Moon className="mr-2 h-4 w-4" />
+                        Donker
+                        {appearance === 'dark' && <span className="ml-auto">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setAppearance('system')}>
+                        <Monitor className="mr-2 h-4 w-4" />
+                        Systeem standaard
+                        {appearance === 'system' && <span className="ml-auto">✓</span>}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* Logout */}
+                <div className="py-1">
+                  <DropdownMenuItem className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Uitloggen
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
