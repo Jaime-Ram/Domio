@@ -66,7 +66,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="#contact"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#002A1F] dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#002A1F] dark:hover:text-[#002A1F] !text-gray-600"
                   >
                     Contact
                   </Link>

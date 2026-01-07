@@ -279,7 +279,7 @@ export default function Home() {
             </Link>
             <Link
               href="#contact"
-                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
+              className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg !text-[#002A1F]"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
