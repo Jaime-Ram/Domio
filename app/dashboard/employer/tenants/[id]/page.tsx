@@ -43,7 +43,7 @@ export default function TenantDetailPage() {
   
   if (!tenant) {
     return (
-      <div className="container mx-auto max-w-7xl px-4">
+      <>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Huurder niet gevonden
@@ -52,7 +52,7 @@ export default function TenantDetailPage() {
             Terug naar overzicht
           </Button>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -96,7 +96,7 @@ export default function TenantDetailPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8">
               <Button 
@@ -328,7 +328,7 @@ export default function TenantDetailPage() {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
+    </>
   )
 }
 

@@ -9,29 +9,29 @@ import Link from 'next/link'
 export default function EmployerDashboardPage() {
   // Demo data
   const userName = 'Demo Gebruiker'
-  
+
   return (
     <>
-      {/* Page Header */}
+            {/* Page Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Welkom, {userName}
-        </h1>
+                  </h1>
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-          Overzicht van je vastgoedportefeuille
-        </p>
-      </div>
-
-      {/* MVP Widgets - Max 4 */}
+                Overzicht van je vastgoedportefeuille
+                  </p>
+                </div>
+                
+            {/* MVP Widgets - Max 4 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <Card className="border border-gray-200 dark:border-neutral-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <Card className="border border-gray-200 dark:border-neutral-700">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Totaal Panden
-            </CardTitle>
+                  </CardTitle>
             <Building2 className="h-4 w-4 text-[#002A1F]" />
-          </CardHeader>
-          <CardContent>
+            </CardHeader>
+            <CardContent>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">12</div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               +2 deze maand
@@ -50,28 +50,28 @@ export default function EmployerDashboardPage() {
             <div className="text-2xl font-bold text-gray-900 dark:text-white">28</div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               95% bezettingsgraad
-            </p>
-          </CardContent>
-        </Card>
+                      </p>
+            </CardContent>
+          </Card>
 
-        <Card className="border border-gray-200 dark:border-neutral-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <Card className="border border-gray-200 dark:border-neutral-700">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Openstaande Taken
-            </CardTitle>
+                  </CardTitle>
             <AlertCircle className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
+                    </CardHeader>
+                    <CardContent>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">7</div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               3 urgent
             </p>
-          </CardContent>
-        </Card>
+                    </CardContent>
+                  </Card>
 
         <Card className="border border-gray-200 dark:border-neutral-700">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Maandelijkse Huur
             </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
@@ -93,9 +93,9 @@ export default function EmployerDashboardPage() {
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-[#002A1F]" />
               Panden Beheren
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+                      </CardTitle>
+                    </CardHeader>
+                <CardContent>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Bekijk en beheer al je panden
             </p>
@@ -103,7 +103,7 @@ export default function EmployerDashboardPage() {
               <Link href="/dashboard/employer/portfolio/properties">
                 Ga naar Panden
               </Link>
-            </Button>
+                    </Button>
           </CardContent>
         </Card>
 
@@ -122,7 +122,7 @@ export default function EmployerDashboardPage() {
               <Link href="/dashboard/employer/tenants">
                 Ga naar Huurders
               </Link>
-            </Button>
+                        </Button>
           </CardContent>
         </Card>
 
@@ -141,17 +141,17 @@ export default function EmployerDashboardPage() {
               <Link href="/dashboard/employer/maintenance">
                 Ga naar Onderhoud
               </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+                        </Button>
+                    </CardContent>
+                  </Card>
+                      </div>
 
       {/* Recent Activity */}
       <Card className="border border-gray-200 dark:border-neutral-700 mb-6 sm:mb-8">
-        <CardHeader>
+              <CardHeader>
           <CardTitle>Laatste Activiteit</CardTitle>
-        </CardHeader>
-        <CardContent>
+                      </CardHeader>
+              <CardContent>
           <div className="space-y-4">
             <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-neutral-700">
               <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-green-500"></div>
@@ -188,18 +188,18 @@ export default function EmployerDashboardPage() {
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
                   Huurcontract verlengd
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Maria de Vries - Appartement 2A
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   1 dag geleden
-                </p>
-              </div>
+                      </p>
+                            </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+                              </div>
+                      </CardContent>
+                    </Card>
     </>
   )
 }

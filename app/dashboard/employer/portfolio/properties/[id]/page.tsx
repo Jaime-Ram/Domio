@@ -36,7 +36,7 @@ export default function PropertyDetailPage() {
   
   if (!property) {
     return (
-      <div className="container mx-auto max-w-7xl px-4">
+      <>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Object niet gevonden
@@ -45,7 +45,7 @@ export default function PropertyDetailPage() {
             Terug naar overzicht
           </Button>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -75,7 +75,7 @@ export default function PropertyDetailPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8">
               <Button 
@@ -376,7 +376,7 @@ export default function PropertyDetailPage() {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
+    </>
   )
 }
 

@@ -57,7 +57,7 @@ export default function TenantsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -194,7 +194,7 @@ export default function TenantsPage() {
                 </Table>
               </CardContent>
             </Card>
-          </div>
+    </>
   )
 }
 

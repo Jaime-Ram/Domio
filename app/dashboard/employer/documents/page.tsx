@@ -123,7 +123,7 @@ export default function DocumentsPage() {
   }, {} as Record<string, number>)
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -396,7 +396,7 @@ export default function DocumentsPage() {
                 </Table>
               </CardContent>
             </Card>
-          </div>
+    </>
   )
 }
 

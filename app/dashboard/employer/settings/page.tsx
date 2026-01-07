@@ -60,7 +60,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -382,7 +382,7 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
             </Tabs>
-    </div>
+    </>
   )
 }
 

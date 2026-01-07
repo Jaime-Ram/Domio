@@ -142,7 +142,7 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -513,7 +513,7 @@ export default function MaintenancePage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-    </div>
+    </>
   )
 }
 

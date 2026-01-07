@@ -139,7 +139,7 @@ export default function FinancialPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4">
+    <>
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -499,7 +499,7 @@ export default function FinancialPage() {
                 </Table>
               </CardContent>
             </Card>
-          </div>
+    </>
   )
 }
 
