@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Logo } from '@/components/Logo'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { ChevronDown } from 'lucide-react'
@@ -46,21 +45,6 @@ export default function FAQPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white">
-      {/* Background Image - Similar to hero section */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/Achtergrond13.jpg"
-            alt=""
-            fill
-            className="object-cover object-center opacity-20"
-            priority={false}
-            quality={90}
-          />
-        </div>
-        <div className="absolute inset-0 bg-white/80" />
-      </div>
-
       {/* Content */}
       <div className="relative z-10">
         {/* Header - Same as landing page */}
