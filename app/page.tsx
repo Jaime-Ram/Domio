@@ -319,7 +319,7 @@ export default function Home() {
                           Algemene voorwaarden
                         </Link>
                         <Link
-                          href="#"
+                          href="/faq"
                           className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
