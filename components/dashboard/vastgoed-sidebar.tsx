@@ -28,6 +28,7 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronLeft,
+  ChevronRight,
   X,
   Home,
   Briefcase,
@@ -50,9 +51,11 @@ interface SidebarItem {
 interface VastgoedSidebarProps {
   isOpen?: boolean
   onClose?: () => void
+  collapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
-export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProps) {
+export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse }: VastgoedSidebarProps) {
   const pathname = usePathname()
   const [openItems, setOpenItems] = useState<string[]>([])
 
@@ -145,26 +148,44 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
       )}
       <div
         className={cn(
-          "fixed top-0 md:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 w-64 rounded-tr-3xl rounded-br-3xl",
+          "fixed top-0 md:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:fixed lg:z-auto lg:w-64 lg:flex-shrink-0"
+          "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
+          collapsed ? "lg:w-16" : "lg:w-64"
         )}
       >
         <div className="relative flex flex-col h-full max-h-full">
-          <div className="px-6 h-16 flex items-center justify-between border-b border-gray-200 dark:border-neutral-700">
-            <Logo width={100} height={28} />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden flex items-center"
-              onClick={onClose}
-            >
-              <ChevronLeft className="size-4 shrink-0" />
-            </Button>
+          <div className={cn(
+            "h-16 flex items-center justify-between border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
+            collapsed ? "px-2 justify-center" : "px-6"
+          )}>
+            {!collapsed && <Logo width={100} height={28} />}
+            {collapsed && <Logo width={40} height={40} />}
+            <div className="flex items-center gap-2">
+              {onToggleCollapse && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden lg:flex items-center"
+                  onClick={onToggleCollapse}
+                  title={collapsed ? "Uitklappen" : "Inklappen"}
+                >
+                  {collapsed ? <ChevronRight className="size-4 shrink-0" /> : <ChevronLeft className="size-4 shrink-0" />}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden flex items-center"
+                onClick={onClose}
+              >
+                <ChevronLeft className="size-4 shrink-0" />
+              </Button>
+            </div>
           </div>
 
           <div className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            <nav className="p-3 w-full flex flex-col flex-wrap">
+            <nav className={cn("w-full flex flex-col flex-wrap transition-all duration-300", collapsed ? "p-2" : "p-3")}>
               <ul className="flex flex-col space-y-1">
                 {menuItems.map((item) => {
                   const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
@@ -173,6 +194,29 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                   const Icon = item.icon
 
                   if (item.children) {
+                    if (collapsed) {
+                      // Collapsed mode: show only icon with tooltip
+                      return (
+                        <li key={item.label} id={itemId} className="relative group">
+                          <button
+                            type="button"
+                            onClick={() => toggleItem(itemId)}
+                            className={cn(
+                              "w-full flex items-center justify-center py-2 px-2 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                              hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
+                            )}
+                            title={item.label}
+                          >
+                            <Icon className="shrink-0 size-5" />
+                          </button>
+                          {/* Tooltip */}
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                            {item.label}
+                          </div>
+                        </li>
+                      )
+                    }
+                    
                     return (
                       <li key={item.label} id={itemId}>
                         <button
@@ -231,6 +275,34 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                   }
 
                   const active = isActive(item.href)
+                  
+                  if (collapsed) {
+                    // Collapsed mode: show only icon with tooltip
+                    return (
+                      <li key={item.label} className="relative group">
+                        <Link
+                          href={item.href || '#'}
+                          className={cn(
+                            "w-full flex items-center justify-center py-2 px-2 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                            active 
+                              ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                              : "text-gray-800 dark:text-neutral-200"
+                          )}
+                          title={item.label}
+                        >
+                          <Icon className="shrink-0 size-5" />
+                          {item.badge && (
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#002A1F] rounded-full" />
+                          )}
+                        </Link>
+                        {/* Tooltip */}
+                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                          {item.label}
+                        </div>
+                      </li>
+                    )
+                  }
+                  
                   return (
                     <li key={item.label}>
                       <Link
