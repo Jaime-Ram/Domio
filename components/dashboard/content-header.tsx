@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink, Moon, Sun, Monitor, ChevronRight } from 'lucide-react'
+import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 
@@ -22,7 +19,6 @@ interface ContentHeaderProps {
 }
 
 export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
-  const [appearance, setAppearance] = useState<'light' | 'dark' | 'system'>('system')
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
@@ -208,40 +204,12 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                       <ExternalLink className="ml-auto h-3 w-3" />
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Perks
-                    <ExternalLink className="ml-auto h-3 w-3" />
+                  <DropdownMenuItem asChild>
+                    <Link href="/terms" className="flex items-center">
+                      Algemene voorwaarden
+                      <ExternalLink className="ml-auto h-3 w-3" />
+                    </Link>
                   </DropdownMenuItem>
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* Appearance Settings */}
-                <div className="py-1">
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center">
-                      <Monitor className="mr-2 h-4 w-4" />
-                      Weergave
-                      <ChevronRight className="ml-auto h-4 w-4" />
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => setAppearance('light')}>
-                        <Sun className="mr-2 h-4 w-4" />
-                        Licht
-                        {appearance === 'light' && <span className="ml-auto">✓</span>}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setAppearance('dark')}>
-                        <Moon className="mr-2 h-4 w-4" />
-                        Donker
-                        {appearance === 'dark' && <span className="ml-auto">✓</span>}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setAppearance('system')}>
-                        <Monitor className="mr-2 h-4 w-4" />
-                        Systeem standaard
-                        {appearance === 'system' && <span className="ml-auto">✓</span>}
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
                 </div>
 
                 <DropdownMenuSeparator />
