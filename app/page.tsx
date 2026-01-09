@@ -185,7 +185,7 @@ export default function Home() {
                 setAuthModalOpen(true)
               }}
               aria-label="Account"
-            >
+          >
               <User className="h-6 w-6" />
           </Button>
         </div>
@@ -193,7 +193,7 @@ export default function Home() {
           {/* Mobile Sidebar - Slides from left like dashboard */}
           <>
             {/* Overlay */}
-            <div
+        <div
               className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
                 mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
@@ -315,7 +315,7 @@ export default function Home() {
                           href="/terms"
                           className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
-                        >
+                >
                           Algemene voorwaarden
                         </Link>
                         <Link
@@ -340,6 +340,39 @@ export default function Home() {
           setAuthModalOpen(true)
         }}
       />
+
+
+        {/* Floating Mockup */}
+      <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
+        <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
+          <div className="relative w-full flex justify-center">
+              {/* Mobile Mockup */}
+              <Image
+              src="/images/mobile mockup.png"
+              alt="Domio op mobiel"
+                width={400}
+                height={800}
+              className="h-auto w-full max-w-[70%] object-contain drop-shadow-2xl md:hidden mx-auto"
+                priority={false}
+                loading="lazy"
+                quality={85}
+                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
+            />
+              {/* Desktop Mockup */}
+              <Image
+              src="/images/Desktopmockup.png"
+              alt="Domio op desktop"
+                width={1000}
+                height={600}
+              className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
+                priority={false}
+                loading="lazy"
+                quality={85}
+                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Functies Section */}
         <Suspense fallback={<div className="min-h-[400px]" />}>
