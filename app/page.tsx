@@ -538,7 +538,7 @@ export default function Home() {
                   
                   {/* Main heading */}
                   <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl mb-6 w-fit">
-                    Wie zijn wij?
+                    Domio is meer dan software
                   </h2>
                   
                   {/* Description */}
