@@ -162,7 +162,12 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
             collapsed ? "px-2 justify-center" : "px-6 justify-between"
           )}>
-            {!collapsed && <Logo width={100} height={28} />}
+            <div className={cn(
+              "transition-all duration-300 ease-in-out",
+              collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
+            )}>
+              <Logo width={100} height={28} />
+            </div>
             <div className="flex items-center gap-2">
               {onToggleCollapse && (
                 <Button
