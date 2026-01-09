@@ -175,8 +175,8 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                           type="button"
                           onClick={() => toggleItem(itemId)}
                           className={cn(
-                            "w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-colors",
-                            hasActiveChild && "bg-gray-100 dark:bg-neutral-700"
+                            "w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                           )}
                         >
                           <Icon className="shrink-0 size-4" />
@@ -208,9 +208,9 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                                   <Link
                                     href={child.href}
                                     className={cn(
-                                      "flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition-colors",
+                                      "flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                                       active 
-                                        ? "bg-gray-100 text-[#002A1F] font-medium dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                                        ? "bg-gray-200 text-[#002A1F] font-semibold border-l-2 border-[#002A1F] dark:bg-neutral-700 dark:text-[#9AFF7C] dark:border-[#9AFF7C]" 
                                         : "text-gray-800 dark:text-neutral-200"
                                     )}
                                   >
@@ -232,9 +232,9 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                       <Link
                         href={item.href || '#'}
                         className={cn(
-                          "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 transition-colors",
+                          "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                           active 
-                            ? "bg-gray-100 text-[#002A1F] font-medium dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                            ? "bg-gray-200 text-[#002A1F] font-semibold border-l-2 border-[#002A1F] dark:bg-neutral-700 dark:text-[#9AFF7C] dark:border-[#9AFF7C]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
                       >
