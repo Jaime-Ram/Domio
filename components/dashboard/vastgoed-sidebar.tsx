@@ -122,6 +122,10 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
 
   const isActive = (href?: string) => {
     if (!href) return false
+    // Special case: dashboard should only be active on exact match
+    if (href === '/dashboard/employer') {
+      return pathname === href
+    }
     return pathname === href || pathname?.startsWith(href + '/')
   }
 
@@ -210,7 +214,7 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                                     className={cn(
                                       "flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                                       active 
-                                        ? "bg-gray-200 text-[#002A1F] font-semibold border-l-2 border-[#002A1F] dark:bg-neutral-700 dark:text-[#9AFF7C] dark:border-[#9AFF7C]" 
+                                        ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                                         : "text-gray-800 dark:text-neutral-200"
                                     )}
                                   >
@@ -234,7 +238,7 @@ export function VastgoedSidebar({ isOpen = false, onClose }: VastgoedSidebarProp
                         className={cn(
                           "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                           active 
-                            ? "bg-gray-200 text-[#002A1F] font-semibold border-l-2 border-[#002A1F] dark:bg-neutral-700 dark:text-[#9AFF7C] dark:border-[#9AFF7C]" 
+                            ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
                       >
