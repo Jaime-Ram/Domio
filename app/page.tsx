@@ -543,8 +543,7 @@ export default function Home() {
                   
                   {/* Description */}
                   <p className="text-base text-gray-700 sm:text-lg leading-7 mb-8 w-fit">
-                    <span className="md:hidden">Domio is ontwikkeld door<br />vastgoedprofessionals. Wij combineren jarenlange ervaring met moderne technologie.</span>
-                    <span className="hidden md:inline">Domio is ontwikkeld door<br />vastgoedprofessionals. Wij combineren jarenlange ervaring<br />met moderne technologie.</span>
+                    Domio denkt mee, luistert naar wat nodig is en is altijd op de hoogte van het laatste nieuws
                   </p>
                   
                   {/* CTA Button */}
