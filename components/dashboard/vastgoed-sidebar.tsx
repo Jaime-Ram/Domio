@@ -144,7 +144,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+          className="fixed inset-0 bg-gray-900/50 z-50 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -189,10 +189,11 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden flex items-center"
+                className="lg:hidden flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-neutral-700"
                 onClick={onClose}
+                title="Sluiten"
               >
-                <ChevronLeft className="size-4 shrink-0" />
+                <PanelLeftClose className="size-4 shrink-0" />
               </Button>
             </div>
           </div>
