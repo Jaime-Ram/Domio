@@ -151,16 +151,11 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       <div
         className={cn(
           "fixed top-0 md:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
-          "transition-[width,transform] duration-300 ease-in-out",
+          "transition-all duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
           collapsed ? "lg:w-16" : "lg:w-64"
         )}
-        style={{
-          transitionProperty: 'width, transform',
-          transitionDuration: '300ms',
-          transitionTimingFunction: 'ease-in-out'
-        }}
       >
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
@@ -239,22 +234,24 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         >
                           <Icon className="shrink-0 size-4" />
                           <span className={cn(
-                            "flex-1 transition-opacity duration-300",
-                            collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+                            "flex-1 transition-all duration-300 ease-in-out",
+                            collapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-full"
                           )}>{item.label}</span>
-                          {item.badge && !collapsed && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full">
+                          {item.badge && (
+                            <span className={cn(
+                              "px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full transition-all duration-300 ease-in-out",
+                              collapsed && "opacity-0 max-w-0 overflow-hidden"
+                            )}>
                               {item.badge}
                             </span>
                           )}
-                          {!collapsed && (
-                            <ChevronDown 
-                              className={cn(
-                                "ms-auto shrink-0 size-4 transition-transform duration-300 ease-in-out",
-                                isOpen && "rotate-180"
-                              )}
-                            />
-                          )}
+                          <ChevronDown 
+                            className={cn(
+                              "ms-auto shrink-0 size-4 transition-all duration-300 ease-in-out",
+                              isOpen && "rotate-180",
+                              collapsed && "opacity-0 max-w-0 overflow-hidden"
+                            )}
+                          />
                         </button>
                         <div 
                           className={cn(
@@ -331,11 +328,14 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       >
                         <Icon className="shrink-0 size-4" />
                         <span className={cn(
-                          "flex-1 transition-opacity duration-300",
-                          collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+                          "flex-1 transition-all duration-300 ease-in-out",
+                          collapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-full"
                         )}>{item.label}</span>
-                        {item.badge && !collapsed && (
-                          <span className="px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full">
+                        {item.badge && (
+                          <span className={cn(
+                            "px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full transition-all duration-300 ease-in-out",
+                            collapsed && "opacity-0 max-w-0 overflow-hidden"
+                          )}>
                             {item.badge}
                           </span>
                         )}
