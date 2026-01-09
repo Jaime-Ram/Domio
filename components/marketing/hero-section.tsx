@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ArrowUpRight } from 'lucide-react'
 
 interface HeroSectionProps {
@@ -56,28 +55,10 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
 
           {/* CTA */}
         <div className="flex flex-row items-center gap-3 justify-center pb-[25vh]">
-          {/* Desktop: Email input with "Start direct" button - integrated rounded-2xl shape */}
-          <div className="hidden md:flex items-stretch w-full max-w-md">
-            <div className="flex items-stretch rounded-2xl border border-white/40 bg-white/40 overflow-hidden flex-1">
-              <Input
-                type="email"
-                name="account-email"
-                placeholder="Vul je email in (optioneel)"
-                className="flex-1 bg-transparent border-0 text-white placeholder:text-white/80 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-2xl rounded-r-none px-4 py-3"
-              />
-              <Button
-                onClick={onSignupClick}
-                className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-0 rounded-r-2xl rounded-l-none px-6 font-medium"
-              >
-                Start direct
-              </Button>
-            </div>
-          </div>
-          
-          {/* Mobile: Start direct button */}
+          {/* Start direct button - visible on all screen sizes */}
           <Button
             onClick={onSignupClick}
-            className="md:hidden bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
+            className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
           >
             Start direct
           </Button>
