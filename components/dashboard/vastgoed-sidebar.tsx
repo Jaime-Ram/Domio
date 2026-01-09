@@ -29,6 +29,8 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  PanelLeftClose,
+  PanelRightClose,
   X,
   Home,
   Briefcase,
@@ -156,21 +158,20 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       >
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
-            "h-16 flex items-center justify-between border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
-            collapsed ? "px-2 justify-center" : "px-6"
+            "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
+            collapsed ? "px-2 justify-center" : "px-6 justify-between"
           )}>
             {!collapsed && <Logo width={100} height={28} />}
-            {collapsed && <Logo width={40} height={40} />}
             <div className="flex items-center gap-2">
               {onToggleCollapse && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden lg:flex items-center"
+                  className="hidden lg:flex items-center justify-center h-8 w-8"
                   onClick={onToggleCollapse}
                   title={collapsed ? "Uitklappen" : "Inklappen"}
                 >
-                  {collapsed ? <ChevronRight className="size-4 shrink-0" /> : <ChevronLeft className="size-4 shrink-0" />}
+                  {collapsed ? <PanelRightClose className="size-4 shrink-0" /> : <PanelLeftClose className="size-4 shrink-0" />}
                 </Button>
               )}
               <Button
