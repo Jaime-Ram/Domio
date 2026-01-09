@@ -387,10 +387,10 @@ export default function Home() {
             <div className="pl-0 md:pl-28">
               <h2 className="text-base font-semibold leading-7 text-[#002A1F] mb-2">Beheerder Types</h2>
               <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
-                Of je nu een VvE beheert, eigen vastgoed hebt of professioneel vastgoedbeheerder bent, Domio biedt de juiste oplossing voor jouw specifieke behoeften
+                Voor elke soort beheerder, de juiste oplossing
               </h2>
               <p className="mt-4 text-lg font-medium text-pretty text-gray-600 max-w-3xl">
-                Ons platform is ontworpen om flexibel te zijn en aan te passen aan verschillende soorten vastgoedbeheer.
+                Of je nu een VvE beheert, eigen vastgoed hebt of professioneel vastgoedbeheerder bent, Domio biedt de juiste oplossing voor jouw specifieke behoeften. Ons platform is ontworpen om flexibel te zijn en aan te passen aan verschillende soorten vastgoedbeheer.
               </p>
             </div>
 
