@@ -49,17 +49,18 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
               />
             </div>
             {/* Quick Actions Dropdown - Desktop */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="default" 
-                  size="default"
-                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-4 h-10"
-                >
-                  <Zap className="h-4 w-4" />
-                  <span>Snelle acties</span>
-                </Button>
-              </DropdownMenuTrigger>
+            <div suppressHydrationWarning>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="default" 
+                    size="default"
+                    className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-4 h-10"
+                  >
+                    <Zap className="h-4 w-4" />
+                    <span>Snelle acties</span>
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 p-3">
                 <div className="grid grid-cols-2 gap-3">
                   <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
@@ -88,22 +89,24 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   </button>
                 </div>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Quick Actions Dropdown - Mobile */}
           <div className="flex md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="default" 
-                  size="default"
-                  className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9"
-                >
-                  <Zap className="h-4 w-4" />
-                  <span>Snelle acties</span>
-                </Button>
-              </DropdownMenuTrigger>
+            <div suppressHydrationWarning>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="default" 
+                    size="default"
+                    className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9"
+                  >
+                    <Zap className="h-4 w-4" />
+                    <span>Snelle acties</span>
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 p-3">
                 <div className="grid grid-cols-2 gap-3">
                   <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
@@ -132,7 +135,8 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   </button>
                 </div>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Right Side Actions */}
@@ -144,14 +148,15 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
             </Button>
             
             {/* Profile Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
-                    <User className="h-4 w-4 text-white" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
+            <div suppressHydrationWarning>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 bg-white dark:bg-gray-800">
                 {/* User Info Section */}
                 <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -249,7 +254,8 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   </DropdownMenuItem>
                 </div>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
       </div>
     </header>

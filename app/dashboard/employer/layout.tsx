@@ -36,27 +36,29 @@ export default function EmployerDashboardLayout({
           </div>
           {/* Right side - aligned with header profile (px-6 sm:px-8 lg:px-12) */}
           <div className="flex items-center gap-2 sm:gap-3 pr-4 sm:pr-6 lg:pr-8 xl:pr-12 w-full sm:w-auto justify-end sm:justify-start">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white text-[#002A1F] border-gray-200 hover:bg-gray-100 rounded-full h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
-                >
-                  <span className="hidden sm:inline">Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}</span>
-                  <span className="sm:hidden">{viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}</span>
-                  <ChevronDown className="ml-1 sm:ml-2 h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setViewAs('verhuurder')}>
-                  Bekijk als verhuurder
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setViewAs('huurder')}>
-                  Bekijk als huurder
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div suppressHydrationWarning>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white text-[#002A1F] border-gray-200 hover:bg-gray-100 rounded-full h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
+                  >
+                    <span className="hidden sm:inline">Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}</span>
+                    <span className="sm:hidden">{viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}</span>
+                    <ChevronDown className="ml-1 sm:ml-2 h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setViewAs('verhuurder')}>
+                    Bekijk als verhuurder
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setViewAs('huurder')}>
+                    Bekijk als huurder
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Button
               asChild
               className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-full h-7 sm:h-8 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0"
