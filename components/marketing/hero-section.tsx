@@ -14,7 +14,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
   // Use Achtergrond13.jpg as fixed background, mirrored
 
   return (
-    <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0">
+    <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0 flex flex-col">
       {/* Background Image */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
         <div className="absolute inset-0">
@@ -33,7 +33,8 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-transparent" />
       </div>
       
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
+      {/* Content Section */}
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16 flex-shrink-0">
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl w-full">
@@ -55,7 +56,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-row items-center gap-3 justify-center pb-[25vh]">
+        <div className="flex flex-row items-center gap-3 justify-center pb-8 md:pb-12">
           {/* Desktop: Email input with "Start direct" button - integrated rounded-2xl shape */}
           <form 
             onSubmit={(e) => {
@@ -101,6 +102,21 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </Button>
+        </div>
+      </div>
+
+      {/* Device Mockup - positioned at bottom of hero section, aligned to bottom edge */}
+      <div className="relative w-full flex justify-center items-end flex-shrink-0 mt-auto">
+        <div className="relative w-full max-w-7xl px-6 md:px-8">
+          <Image
+            src="/images/device-mockup_1.5x_postspark_2026-01-09_15-30-09.png"
+            alt="Domio app mockup"
+            width={1200}
+            height={800}
+            className="h-auto w-full max-w-full object-contain mx-auto"
+            priority
+            quality={90}
+          />
         </div>
       </div>
 
