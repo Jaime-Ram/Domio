@@ -151,11 +151,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       <div
         className={cn(
           "fixed top-0 md:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
-          "transition-all duration-300 ease-in-out",
+          "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
           collapsed ? "lg:w-16" : "lg:w-64"
         )}
+        style={{
+          transitionProperty: 'width, transform',
+          transitionDuration: '300ms',
+          transitionTimingFunction: 'ease-in-out'
+        }}
       >
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(

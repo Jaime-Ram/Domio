@@ -88,12 +88,19 @@ export default function EmployerDashboardLayout({
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        <div className={cn(
-          "flex-1 flex flex-col min-w-0 w-full transition-all duration-300 ease-in-out",
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-        )}>
+        <div 
+          className={cn(
+            "flex-1 flex flex-col min-w-0 w-full transition-[margin-left] duration-300 ease-in-out",
+            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          )}
+          style={{
+            transitionProperty: 'margin-left',
+            transitionDuration: '300ms',
+            transitionTimingFunction: 'ease-in-out'
+          }}
+        >
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
-          <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden">
+          <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10">
           {children}
             </div>
