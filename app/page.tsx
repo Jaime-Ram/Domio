@@ -543,7 +543,9 @@ export default function Home() {
                   
                   {/* Description */}
                   <p className="text-base text-gray-700 sm:text-lg leading-7 mb-8 w-fit">
-                    Domio denkt mee, luistert naar wat nodig is en is altijd op de hoogte van het laatste nieuws
+                    Domio denkt mee<br />
+                    Luister naar wat nodig is<br />
+                    Altijd op de hoogte van het laatste nieuws
                   </p>
                   
                   {/* CTA Button */}
