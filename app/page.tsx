@@ -389,6 +389,9 @@ export default function Home() {
               <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
                 Voor <span className="text-[#002A1F]">elke</span> soort beheerder
               </h2>
+              <p className="mt-4 text-lg font-medium text-pretty text-gray-600 max-w-3xl">
+                Of je nu een VvE beheert, eigen vastgoed hebt of professioneel vastgoedbeheerder bent, Domio biedt de juiste oplossing voor jouw specifieke behoeften. Ons platform is ontworpen om flexibel te zijn en aan te passen aan verschillende soorten vastgoedbeheer.
+              </p>
             </div>
 
             {/* Right Side - Three Cards */}
