@@ -90,13 +90,15 @@ export default function EmployerDashboardLayout({
         />
         <div 
           className={cn(
-            "flex-1 flex flex-col min-w-0 w-full transition-[margin-left] duration-300 ease-in-out",
+            "flex-1 flex flex-col min-w-0 w-full",
+            "transition-[margin-left] duration-300 ease-in-out",
             sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
           )}
           style={{
             transitionProperty: 'margin-left',
             transitionDuration: '300ms',
-            transitionTimingFunction: 'ease-in-out'
+            transitionTimingFunction: 'ease-in-out',
+            willChange: 'margin-left'
           }}
         >
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />

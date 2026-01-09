@@ -159,7 +159,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         style={{
           transitionProperty: 'width, transform',
           transitionDuration: '300ms',
-          transitionTimingFunction: 'ease-in-out'
+          transitionTimingFunction: 'ease-in-out',
+          willChange: 'width'
         }}
       >
         <div className="relative flex flex-col h-full max-h-full">
