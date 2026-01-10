@@ -37,7 +37,8 @@ import {
   MessageSquare,
   Archive,
   ShieldCheck,
-  Euro
+  Euro,
+  BookOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -103,6 +104,11 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Financieel',
       href: '/dashboard/employer/financial',
       icon: Euro,
+    },
+    {
+      label: 'Boekhouden',
+      href: '/dashboard/employer/accounting',
+      icon: BookOpen,
     },
     {
       label: 'Documenten',

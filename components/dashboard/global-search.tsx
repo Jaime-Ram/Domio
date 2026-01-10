@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
-import { Search, Building2, Users, FileText, Wrench, Euro, FolderOpen, ShieldCheck, Settings, Plus, Download, Send, Edit, Eye, Calendar, BarChart3, Home, UserCircle, Briefcase, Link2, CreditCard, Receipt, TrendingUp, CheckCircle, AlertCircle, Zap } from 'lucide-react'
+import { Search, Building2, Users, FileText, Wrench, Euro, FolderOpen, ShieldCheck, Settings, Plus, Download, Send, Edit, Eye, Calendar, BarChart3, Home, UserCircle, Briefcase, Link2, CreditCard, Receipt, TrendingUp, CheckCircle, AlertCircle, Zap, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SearchAction {
@@ -96,6 +96,11 @@ export function GlobalSearch() {
     { id: 'portfolio-owners', label: 'Eigenaren bekijken', category: 'Portefeuille', keywords: ['eigenaar', 'owner', 'eigenaren', 'owners'], icon: UserCircle, action: () => router.push('/dashboard/employer/portfolio/owners'), description: 'Bekijk alle eigenaren' },
     { id: 'property-delete', label: 'Pand verwijderen', category: 'Panden', keywords: ['pand', 'verwijderen', 'delete', 'verwijder'], icon: AlertCircle, action: () => router.push('/dashboard/employer/portfolio'), description: 'Verwijder een pand' },
     
+    // Boekhouden
+    { id: 'accounting-view', label: 'Boekhouden', category: 'Boekhouden', keywords: ['boekhouden', 'accounting', 'boekhouding', 'administratie'], icon: BookOpen, action: () => router.push('/dashboard/employer/accounting'), description: 'Beheer boekhouding en integraties' },
+    { id: 'accounting-integration', label: 'Boekhoudprogramma koppelen', category: 'Boekhouden', keywords: ['boekhoudprogramma', 'koppelen', 'integratie', 'exact', 'moneybird', 'afas'], icon: Link2, action: () => router.push('/dashboard/employer/accounting'), description: 'Koppel een boekhoudprogramma' },
+    { id: 'accounting-export', label: 'Exporteer boekhouding', category: 'Boekhouden', keywords: ['export', 'exporteren', 'boekhouding', 'data'], icon: Download, action: () => router.push('/dashboard/employer/accounting'), description: 'Exporteer boekhouddata' },
+    
     // Pagina's
     { id: 'page-dashboard', label: 'Dashboard', category: 'Pagina\'s', keywords: ['dashboard', 'overzicht', 'home'], icon: BarChart3, action: () => router.push('/dashboard/employer'), description: 'Ga naar het dashboard' },
     { id: 'page-portfolio', label: 'Portefeuille', category: 'Pagina\'s', keywords: ['portefeuille', 'portfolio', 'panden', 'objecten'], icon: Building2, action: () => router.push('/dashboard/employer/portfolio'), description: 'Bekijk je portefeuille' },
@@ -103,6 +108,7 @@ export function GlobalSearch() {
     { id: 'page-contracts', label: 'Contracten', category: 'Pagina\'s', keywords: ['contracten', 'contracts', 'huurovereenkomsten'], icon: FileText, action: () => router.push('/dashboard/employer/contracts/leases'), description: 'Bekijk alle contracten' },
     { id: 'page-maintenance', label: 'Onderhoud', category: 'Pagina\'s', keywords: ['onderhoud', 'maintenance', 'tickets'], icon: Wrench, action: () => router.push('/dashboard/employer/maintenance'), description: 'Bekijk onderhoud' },
     { id: 'page-financial', label: 'Financieel', category: 'Pagina\'s', keywords: ['financieel', 'financial', 'geld', 'facturen'], icon: Euro, action: () => router.push('/dashboard/employer/financial'), description: 'Bekijk financiën' },
+    { id: 'page-accounting', label: 'Boekhouden', category: 'Pagina\'s', keywords: ['boekhouden', 'accounting', 'boekhouding'], icon: BookOpen, action: () => router.push('/dashboard/employer/accounting'), description: 'Bekijk boekhouden' },
     { id: 'page-documents', label: 'Documenten', category: 'Pagina\'s', keywords: ['documenten', 'documents', 'bestanden'], icon: FolderOpen, action: () => router.push('/dashboard/employer/documents'), description: 'Bekijk documenten' },
     { id: 'page-compliance', label: 'Compliance', category: 'Pagina\'s', keywords: ['compliance', 'naleving'], icon: ShieldCheck, action: () => router.push('/dashboard/employer/compliance'), description: 'Bekijk compliance' },
     { id: 'page-settings', label: 'Instellingen', category: 'Pagina\'s', keywords: ['instellingen', 'settings', 'configuratie'], icon: Settings, action: () => router.push('/dashboard/employer/settings'), description: 'Bekijk instellingen' },
@@ -150,8 +156,8 @@ export function GlobalSearch() {
     allActions.find(a => a.id === 'invoice-create'),
     allActions.find(a => a.id === 'maintenance-create'),
     allActions.find(a => a.id === 'document-upload'),
+    allActions.find(a => a.id === 'accounting-view'),
     allActions.find(a => a.id === 'page-dashboard'),
-    allActions.find(a => a.id === 'page-portfolio'),
   ].filter(Boolean) as SearchAction[], [])
 
   const filteredActions = useMemo(() => {
