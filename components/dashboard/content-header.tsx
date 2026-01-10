@@ -19,6 +19,21 @@ interface ContentHeaderProps {
 }
 
 export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
+  // Demo gebruiker gegevens
+  const userName = 'Demo Gebruiker'
+  const userEmail = 'demo@domiovastgoedbeheer.nl'
+  const userRole = 'Admin'
+  
+  // Genereer initialen van de gebruikersnaam
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.substring(0, 2).toUpperCase()
+  }
+  
+  const initials = getInitials(userName)
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
@@ -141,9 +156,17 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
             <div suppressHydrationWarning>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
+                  <Button variant="ghost" className="h-9 px-3 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-700">
+                    <div className="flex items-center gap-2">
+                      <div className="h-6 w-6 rounded-full bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-semibold text-white dark:text-[#002A1F]">
+                          {initials}
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline">
+                        {userName}
+                      </span>
+                      <User className="h-4 w-4 text-gray-600 dark:text-gray-400 sm:hidden" />
                     </div>
               </Button>
             </DropdownMenuTrigger>
@@ -157,14 +180,14 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
-                          Admin
+                          {userRole}
                   </span>
                 </div>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                        Demo Gebruiker
+                        {userName}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        demo@domiovastgoedbeheer.nl
+                        {userEmail}
                 </p>
               </div>
                   </div>
