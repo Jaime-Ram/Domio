@@ -38,8 +38,8 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
           <div className="hidden md:flex flex-1 max-w-2xl items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="search"
+                  <Input
+                    type="search"
                 placeholder="Zoek voor alles..."
                 className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700 rounded-full"
               />
@@ -76,25 +76,25 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                       <FileText className="w-6 h-6 text-white" />
                     </div>
                     <span className="text-xs font-medium text-gray-700 text-center">Factuur</span>
-                  </button>
+                    </button>
                   <button className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors">
                     <div className="w-12 h-12 rounded-xl bg-[#002A1F] flex items-center justify-center">
                       <Wrench className="w-6 h-6 text-white" />
-                    </div>
+                  </div>
                     <span className="text-xs font-medium text-gray-700 text-center">Onderhoud</span>
                   </button>
                 </div>
               </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-          </div>
+                </div>
+              </div>
 
           {/* Quick Actions Dropdown - Mobile */}
           <div className="flex md:hidden">
             <div suppressHydrationWarning>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
+                  <Button
                     variant="default" 
                     size="default"
                     className="items-center gap-2 rounded-full bg-white text-[#002A1F] hover:bg-gray-100 border border-gray-200 px-3 h-9"
@@ -130,29 +130,29 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                     <span className="text-xs font-medium text-gray-700 text-center">Onderhoud</span>
                   </button>
                 </div>
-              </DropdownMenuContent>
+                </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
+            </div>
 
-          {/* Right Side Actions */}
+        {/* Right Side Actions */}
           <div className="flex items-center gap-2 ml-auto">
 
-            {/* Notifications */}
+          {/* Notifications */}
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
-            </Button>
-            
+          </Button>
+
             {/* Profile Dropdown */}
             <div suppressHydrationWarning>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
                       <User className="h-4 w-4 text-white" />
                     </div>
-                  </Button>
-                </DropdownMenuTrigger>
+              </Button>
+            </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 bg-white dark:bg-gray-800">
                 {/* User Info Section */}
                 <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -164,26 +164,26 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                           Admin
-                        </span>
-                      </div>
+                  </span>
+                </div>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         Demo Gebruiker
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         demo@domiovastgoedbeheer.nl
-                      </p>
-                    </div>
+                </p>
+              </div>
                   </div>
                 </div>
 
                 {/* Navigation Links */}
                 <div className="py-1">
-                  <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild>
                     <Link href="/dashboard/employer/settings" className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
                       Profiel
-                    </Link>
-                  </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Bell className="mr-2 h-4 w-4" />
                     Notificaties
@@ -198,34 +198,34 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
 
                 {/* External Links */}
                 <div className="py-1">
-                  <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild>
                     <Link href="/privacy" className="flex items-center">
                       Privacy
                       <ExternalLink className="ml-auto h-3 w-3" />
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                     <Link href="/terms" className="flex items-center">
                       Algemene voorwaarden
                       <ExternalLink className="ml-auto h-3 w-3" />
-                    </Link>
-                  </DropdownMenuItem>
-                </div>
+                  </Link>
+                </DropdownMenuItem>
+              </div>
 
-                <DropdownMenuSeparator />
+              <DropdownMenuSeparator />
 
                 {/* Logout */}
                 <div className="py-1">
                   <DropdownMenuItem className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
                     <LogOut className="mr-2 h-4 w-4" />
                     Uitloggen
-                  </DropdownMenuItem>
+              </DropdownMenuItem>
                 </div>
-              </DropdownMenuContent>
-              </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
             </div>
           </div>
-      </div>
+        </div>
     </header>
   )
 }

@@ -77,12 +77,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     },
     {
       label: 'Portefeuille',
+      href: '/dashboard/employer/portfolio',
       icon: Building2,
-      children: [
-        { label: 'Objecten', href: '/dashboard/employer/portfolio/properties', icon: Home },
-        { label: 'Eigenaren', href: '/dashboard/employer/portfolio/owners', icon: UserCircle },
-        { label: 'Overzicht', href: '/dashboard/employer/portfolio', icon: BarChart3 },
-      ],
     },
     {
       label: 'Huurders',
@@ -172,7 +168,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               "transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              <Logo width={100} height={28} />
+            <Logo width={100} height={28} />
             </div>
             <div className="flex items-center gap-2">
               {onToggleCollapse && (
@@ -186,15 +182,15 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   {collapsed ? <PanelRightClose className="size-4 shrink-0" /> : <PanelLeftClose className="size-4 shrink-0" />}
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="icon"
+            <Button
+              variant="ghost"
+              size="icon"
                 className="lg:hidden flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-neutral-700"
-                onClick={onClose}
+              onClick={onClose}
                 title="Sluiten"
-              >
+            >
                 <PanelLeftClose className="size-4 shrink-0" />
-              </Button>
+            </Button>
             </div>
           </div>
 
