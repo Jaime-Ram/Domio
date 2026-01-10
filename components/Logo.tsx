@@ -10,9 +10,10 @@ export interface LogoProps {
   className?: string
   imgClassName?: string
   variant?: 'default' | 'white'
+  href?: string
 }
 
-export function Logo({ width = 140, height = 40, className, imgClassName, variant = 'default' }: LogoProps) {
+export function Logo({ width = 140, height = 40, className, imgClassName, variant = 'default', href = '/' }: LogoProps) {
   // Gebruik altijd DomioLogo.png als primair logo
   const [imgSrc, setImgSrc] = useState('/images/DomioLogo.png')
   const [hasError, setHasError] = useState(false)
@@ -31,7 +32,7 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
   if (hasError) {
     // Als logo niet bestaat, toon tekst logo met kleuren die matchen je brand
     return (
-      <Link href="/" className={`flex items-center gap-2 ${className || ''}`}>
+      <Link href={href} className={`flex items-center gap-2 ${className || ''}`}>
         <span className="text-2xl font-bold">
           <span className={variant === 'white' ? 'text-white' : 'text-[#002A1F] dark:text-[#9AFF7C]'}>Dom</span>
           <span className={variant === 'white' ? 'text-white/90' : 'text-[#356258] dark:text-[#9AFF7C]'}>io</span>
@@ -49,7 +50,7 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
     .join(' ')
 
   return (
-    <Link href="/" className={`flex items-center overflow-visible ${className || ''}`}>
+    <Link href={href} className={`flex items-center overflow-visible ${className || ''}`}>
       <Image
         src={`${imgSrc}?v=2`}
         alt="Domio Logo"

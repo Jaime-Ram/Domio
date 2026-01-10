@@ -174,7 +174,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               "transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-            <Logo width={100} height={28} />
+              <Logo width={100} height={28} href="/dashboard/employer" />
             </div>
             <Button
               variant="ghost"
