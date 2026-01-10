@@ -156,9 +156,9 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
             <div suppressHydrationWarning>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 px-3 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-700">
+                  <Button variant="ghost" className="h-9 px-3 rounded-lg bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-700">
                     <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded-full bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center flex-shrink-0">
+                      <div className="h-6 w-6 rounded bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center flex-shrink-0">
                         <span className="text-xs font-semibold text-white dark:text-[#002A1F]">
                           {initials}
                         </span>
