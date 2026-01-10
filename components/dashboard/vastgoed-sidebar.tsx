@@ -387,8 +387,11 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
           </div>
           
           {/* 30 dagen gratis blokje - Only visible after sidebar animation completes */}
-          {showTrialBlock && (
-            <div className="border-t border-gray-200 dark:border-neutral-700 p-3 flex-shrink-0">
+          <div className={cn(
+            "border-t border-gray-200 dark:border-neutral-700 p-3 flex-shrink-0 transition-opacity duration-200",
+            showTrialBlock ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}>
+            {showTrialBlock && (
               <div className="bg-[#002A1F] rounded-xl p-4 relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-sm font-semibold text-white mb-1">
@@ -413,8 +416,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   layers={2}
                 />
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </>
