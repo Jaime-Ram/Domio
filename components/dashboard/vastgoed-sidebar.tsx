@@ -42,6 +42,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { GeometricShapes } from '@/components/decorative/geometric-shapes'
+import { useRouter } from 'next/navigation'
 
 interface SidebarItem {
   label: string
@@ -60,6 +62,7 @@ interface VastgoedSidebarProps {
 
 export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse }: VastgoedSidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
 
   const toggleItem = (id: string) => {
@@ -206,7 +209,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
           </div>
 
           <div className={cn(
-            "h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
+            "flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
             collapsed && "overflow-x-hidden"
           )}>
             <nav className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "p-2" : "p-3")}>
@@ -365,6 +368,36 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               </ul>
             </nav>
           </div>
+          
+          {/* 30 dagen gratis blokje - Only visible when not collapsed */}
+          {!collapsed && (
+            <div className="border-t border-gray-200 dark:border-neutral-700 p-3 flex-shrink-0">
+              <div className="bg-[#002A1F] rounded-xl p-4 relative overflow-hidden">
+                <div className="relative z-10">
+                  <h3 className="text-sm font-semibold text-white mb-1">
+                    Het zelf ervaren?
+                  </h3>
+                  <p className="text-xs font-medium text-white mb-3">
+                    Proberen 30 dagen gratis
+                  </p>
+                  <Button
+                    className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-lg w-full text-xs h-8"
+                    onClick={() => router.push('/')}
+                  >
+                    Registreren
+                  </Button>
+                </div>
+                {/* Geometric decorative element - subtle in quiet corner */}
+                <GeometricShapes 
+                  variant="trapezoid" 
+                  className="right-0 bottom-0 w-32 h-32"
+                  color="#9AFF7C"
+                  opacity={0.12}
+                  layers={2}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
