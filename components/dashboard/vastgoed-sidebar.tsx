@@ -170,24 +170,17 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
             collapsed ? "px-2.5 justify-start" : "px-6 justify-between"
           )}>
-            {/* Logo - Always on same position */}
+            {/* Logo - Disappears when collapsed */}
             <div className={cn(
               "flex items-center transition-all duration-300 ease-in-out",
-              collapsed ? "w-5 h-5" : "w-auto"
+              collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              {collapsed ? (
-                <Link href="/dashboard/employer" className="w-5 h-5 flex items-center justify-center">
-                  <div className="w-5 h-5 rounded bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white dark:text-[#002A1F]">D</span>
-                  </div>
-                </Link>
-              ) : (
-                <Logo width={100} height={28} href="/dashboard/employer" />
-              )}
+              <Logo width={100} height={28} href="/dashboard/employer" />
             </div>
+            {/* Toggle button and mobile close - Same position as icons when collapsed */}
             <div className={cn(
               "flex items-center gap-2 transition-all duration-300",
-              collapsed ? "ml-auto" : ""
+              collapsed ? "" : "ml-auto"
             )}>
               {onToggleCollapse && (
                 <Button
@@ -200,15 +193,15 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   {collapsed ? <PanelRightClose className="size-4 shrink-0" /> : <PanelLeftClose className="size-4 shrink-0" />}
                 </Button>
               )}
-            <Button
-              variant="ghost"
-              size="icon"
+              <Button
+                variant="ghost"
+                size="icon"
                 className="lg:hidden flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-neutral-700"
-              onClick={onClose}
+                onClick={onClose}
                 title="Sluiten"
-            >
+              >
                 <PanelLeftClose className="size-4 shrink-0" />
-            </Button>
+              </Button>
             </div>
           </div>
 
