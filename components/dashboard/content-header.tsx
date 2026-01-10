@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Menu, Bell, Settings, User, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink } from 'lucide-react'
+import { Menu, Bell, Settings, User, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink, Calendar } from 'lucide-react'
 import { GlobalSearch } from './global-search'
 import {
   DropdownMenu,
@@ -23,17 +23,6 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
   const userName = 'Demo Gebruiker'
   const userEmail = 'demo@domiovastgoedbeheer.nl'
   const userRole = 'Admin'
-  
-  // Genereer initialen van de gebruikersnaam
-  const getInitials = (name: string) => {
-    const parts = name.trim().split(' ')
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
-  }
-  
-  const initials = getInitials(userName)
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white dark:bg-gray-900">
@@ -147,22 +136,117 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
         {/* Right Side Actions */}
           <div className="flex items-center gap-2 ml-auto">
 
-          {/* Notifications */}
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-          </Button>
+          {/* Notifications Dropdown */}
+            <div suppressHydrationWarning>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    {/* Notification badge - optional, can be shown when there are unread notifications */}
+                    <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 bg-white dark:bg-gray-800">
+                  <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <DropdownMenuLabel className="px-0 font-semibold text-gray-900 dark:text-white">
+                        Notificaties
+                      </DropdownMenuLabel>
+                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#002A1F] dark:text-[#9AFF7C]">
+                        Alles markeren als gelezen
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {/* Sample notifications */}
+                    <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-neutral-700 cursor-pointer">
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                          <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            Nieuwe huurder toegevoegd
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Jan Jansen is toegevoegd als nieuwe huurder
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            5 minuten geleden
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-neutral-700 cursor-pointer">
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                          <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            Betaling ontvangen
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            €1.200 huur ontvangen voor Appartement 101
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            1 uur geleden
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-neutral-700 cursor-pointer">
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
+                          <Wrench className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            Onderhoudsmelding
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Nieuwe melding voor Appartement 102
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            2 uur geleden
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-3 py-3 hover:bg-gray-50 dark:hover:bg-neutral-700 cursor-pointer">
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                          <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            Contract verlopen
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Contract voor Kantoorruimte A verloopt binnenkort
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            3 uur geleden
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+                    <Button variant="ghost" size="sm" className="w-full justify-center text-sm text-[#002A1F] dark:text-[#9AFF7C]">
+                      Alle notificaties bekijken
+                    </Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             {/* Profile Dropdown */}
             <div suppressHydrationWarning>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 px-3 rounded-lg bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-700">
+                  <Button variant="ghost" className="h-9 px-3 rounded-lg bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-700">
                     <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-semibold text-white dark:text-[#002A1F]">
-                          {initials}
-                        </span>
-                      </div>
                       <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline">
                         {userName}
                       </span>
