@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Menu, Bell, Settings, User, Search, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink } from 'lucide-react'
+import { Menu, Bell, Settings, User, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink } from 'lucide-react'
+import { GlobalSearch } from './global-search'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,14 +36,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
 
           {/* Search Bar and Quick Actions - Center */}
           <div className="hidden md:flex flex-1 max-w-2xl items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="search"
-                placeholder="Zoek voor alles..."
-                className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700 rounded-full"
-              />
-            </div>
+            <GlobalSearch />
             {/* Quick Actions Dropdown - Desktop */}
             <div suppressHydrationWarning>
               <DropdownMenu>
@@ -89,8 +82,9 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 </div>
               </div>
 
-          {/* Quick Actions Dropdown - Mobile */}
-          <div className="flex md:hidden">
+          {/* Search and Quick Actions - Mobile */}
+          <div className="flex md:hidden items-center gap-2 flex-1">
+            <GlobalSearch />
             <div suppressHydrationWarning>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
