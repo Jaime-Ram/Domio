@@ -34,11 +34,19 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      {/* Hero Section First - Full height background */}
+      <HeroSection 
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
+      
       {/* Content - Above background */}
       <div className="relative z-10">
-      {/* Header */}
+      {/* Header - Absolute positioned over hero */}
       <header
-          className="sticky top-0 z-50 w-full transition-colors duration-200 relative bg-transparent"
+          className="fixed top-0 left-0 right-0 z-50 w-full transition-colors duration-200 bg-transparent"
       >
           <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
             {/* Mobile: Hamburger Menu (Left) */}
@@ -332,15 +340,6 @@ export default function Home() {
               </div>
           </>
       </header>
-
-      {/* Hero Section */}
-      <HeroSection 
-        onSignupClick={() => {
-          setAuthModalMode('signup')
-          setAuthModalOpen(true)
-        }}
-      />
-
 
         {/* Floating Mockup */}
       <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
