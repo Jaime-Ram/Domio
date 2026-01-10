@@ -221,12 +221,12 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             type="button"
                             onClick={() => toggleItem(itemId)}
                             className={cn(
-                              "w-full flex items-center justify-center py-2 px-2 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                              "w-full flex items-center justify-start py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                               hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                             )}
                             title={item.label}
                           >
-                            <Icon className="shrink-0 size-5" />
+                            <Icon className="shrink-0 size-5 w-5 h-5" />
                           </button>
                           {/* Tooltip */}
                           <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
@@ -242,14 +242,14 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           type="button"
                           onClick={() => toggleItem(itemId)}
                           className={cn(
-                            "w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            "w-full text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                             hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                           )}
                         >
-                          <Icon className="shrink-0 size-4" />
+                          <Icon className="shrink-0 size-5 w-5 h-5" />
                           <span className={cn(
-                            "flex-1 transition-all duration-300 ease-in-out",
-                            collapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-full"
+                            "flex-1 ml-3.5 transition-all duration-300 ease-in-out",
+                            collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
                           )}>{item.label}</span>
                           {item.badge && (
                             <span className={cn(
@@ -261,7 +261,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           )}
                           <ChevronDown 
                             className={cn(
-                              "ms-auto shrink-0 size-4 transition-all duration-300 ease-in-out",
+                              "ms-auto shrink-0 size-5 w-5 h-5 transition-all duration-300 ease-in-out",
                               isOpen && "rotate-180",
                               collapsed && "opacity-0 max-w-0 overflow-hidden"
                             )}
@@ -282,14 +282,14 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                   <Link
                                     href={child.href}
                                     className={cn(
-                                      "flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                                      "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                                       active 
                                         ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                                         : "text-gray-800 dark:text-neutral-200"
                                     )}
                                   >
-                                    <ChildIcon className="shrink-0 size-4" />
-                                    {child.label}
+                                    <ChildIcon className="shrink-0 size-5 w-5 h-5" />
+                                    <span className="ml-3.5">{child.label}</span>
                                   </Link>
                                 </li>
                               )
@@ -309,14 +309,14 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         <Link
                           href={item.href || '#'}
                           className={cn(
-                            "w-full flex items-center justify-center py-2 px-2 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                            "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                             active 
                               ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                               : "text-gray-800 dark:text-neutral-200"
                           )}
                           title={item.label}
                         >
-                          <Icon className="shrink-0 size-5" />
+                          <Icon className="shrink-0 size-5 w-5 h-5" />
                           {item.badge && (
                             <span className="absolute top-0 right-0 w-2 h-2 bg-[#002A1F] rounded-full" />
                           )}
@@ -334,16 +334,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       <Link
                         href={item.href || '#'}
                         className={cn(
-                          "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                          "w-full flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                           active 
                             ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
                       >
-                        <Icon className="shrink-0 size-4" />
+                        <Icon className="shrink-0 size-5 w-5 h-5" />
                         <span className={cn(
-                          "flex-1 transition-all duration-300 ease-in-out",
-                          collapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-full"
+                          "flex-1 ml-3.5 transition-all duration-300 ease-in-out",
+                          collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
                         )}>{item.label}</span>
                         {item.badge && (
                           <span className={cn(
