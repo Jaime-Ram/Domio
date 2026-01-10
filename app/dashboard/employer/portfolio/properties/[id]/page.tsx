@@ -23,6 +23,10 @@ import {
   Trash2,
   Upload,
   Image as ImageIcon,
+  UserCircle,
+  Briefcase,
+  Building,
+  Edit,
 } from 'lucide-react'
 import { mockProperties, mockDocuments } from '@/lib/mock-data/vastgoed'
 
@@ -159,6 +163,95 @@ export default function PropertyDetailPage() {
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
                       {getStatusBadge(property.status)}
                     </div>
+
+                    {/* Tenaamstelling / Vastgoedhouder */}
+                    {property.registration && (
+                      <div className="p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700">
+                        <div className="flex items-start gap-3 mb-4">
+                          {property.registration.type === 'bedrijf' ? (
+                            <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                          ) : (
+                            <UserCircle className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                          )}
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tenaamstelling</p>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                              {property.registration.name}
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                  {property.registration.type === 'bedrijf' ? 'Bedrijf' : 'Persoon'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Adres</p>
+                                <div className="flex items-start gap-1">
+                                  <MapPin className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                                  <p className="text-sm text-gray-900 dark:text-white">
+                                    {property.registration.address}
+                                  </p>
+                                </div>
+                              </div>
+                              {property.registration.kvkNumber && (
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">KVK Nummer</p>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                    {property.registration.kvkNumber}
+                                  </p>
+                                </div>
+                              )}
+                              {property.registration.rsin && (
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">RSIN</p>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                    {property.registration.rsin}
+                                  </p>
+                                </div>
+                              )}
+                              {property.registration.email && (
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                                  <div className="flex items-center gap-1">
+                                    <Mail className="h-3 w-3 text-gray-400" />
+                                    <a 
+                                      href={`mailto:${property.registration.email}`}
+                                      className="text-sm text-[#002A1F] dark:text-[#9AFF7C] hover:underline"
+                                    >
+                                      {property.registration.email}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                              {property.registration.phone && (
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Telefoon</p>
+                                  <div className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3 text-gray-400" />
+                                    <a 
+                                      href={`tel:${property.registration.phone}`}
+                                      className="text-sm text-[#002A1F] dark:text-[#9AFF7C] hover:underline"
+                                    >
+                                      {property.registration.phone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            Deze informatie is belangrijk voor boekhouding en administratieve doeleinden.
+                          </p>
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4 mr-2" />
+                            Tenaamstelling bewerken
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Foto's */}
                     <div>

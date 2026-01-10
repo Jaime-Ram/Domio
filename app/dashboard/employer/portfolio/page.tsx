@@ -20,6 +20,8 @@ import {
   Image as ImageIcon,
   Ruler,
   DoorOpen,
+  UserCircle,
+  Briefcase,
 } from 'lucide-react'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
 import Link from 'next/link'
@@ -55,6 +57,35 @@ export default function PortfolioPage() {
     return property.status === 'verhuurd' ? property.monthlyRent : 0
   }
 
+  // Group properties by registration/owner
+  type Property = typeof mockProperties[0]
+  type Registration = NonNullable<Property['registration']>
+  
+  const groupedByOwner = mockProperties.reduce((acc, property) => {
+    if (property.registration) {
+      const key = property.registration.name
+      if (!acc[key]) {
+        acc[key] = {
+          registration: property.registration,
+          properties: [] as Property[],
+          totalIncome: 0,
+          totalProperties: 0,
+        }
+      }
+      acc[key].properties.push(property)
+      acc[key].totalIncome += getMonthlyIncome(property)
+      acc[key].totalProperties += 1
+    }
+    return acc
+  }, {} as Record<string, {
+    registration: Registration
+    properties: Property[]
+    totalIncome: number
+    totalProperties: number
+  }>)
+
+  const ownerGroups = Object.values(groupedByOwner)
+
   return (
     <>
       {/* Header */}
@@ -75,6 +106,82 @@ export default function PortfolioPage() {
           Nieuw Pand
         </Button>
       </div>
+
+      {/* Vastgoedhouders / Tenaamstellingen Overzicht */}
+      {ownerGroups.length > 0 && (
+        <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+              Vastgoedhouders & Tenaamstellingen
+            </CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Overzicht van panden gegroepeerd per vastgoedhouder of tenaamstelling
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {ownerGroups.map((group, index) => (
+                <Card 
+                  key={index}
+                  className="border border-gray-200 dark:border-neutral-700 hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors cursor-pointer"
+                  onClick={() => {
+                    // Filter properties by this owner
+                    const ownerProperties = group.properties
+                    console.log('Filter by owner:', group.registration.name, ownerProperties)
+                    // You could add filtering functionality here
+                  }}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start gap-3">
+                      {group.registration.type === 'bedrijf' ? (
+                        <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                      ) : (
+                        <UserCircle className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                          {group.registration.name}
+                        </CardTitle>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize mb-2">
+                          {group.registration.type === 'bedrijf' ? 'Bedrijf' : 'Persoon'}
+                        </p>
+                        {group.registration.kvkNumber && (
+                          <Badge variant="outline" className="text-xs">
+                            KVK: {group.registration.kvkNumber}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Panden</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {group.totalProperties}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Maandinkomsten</p>
+                        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                          €{group.totalIncome.toLocaleString('nl-NL')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">{group.registration.address}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Search and View Toggle */}
       <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
@@ -145,6 +252,30 @@ export default function PortfolioPage() {
               </CardHeader>
 
               <CardContent className="pt-0 space-y-4">
+                {/* Tenaamstelling */}
+                {property.registration && (
+                  <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700">
+                    <div className="flex items-start gap-2">
+                      {property.registration.type === 'bedrijf' ? (
+                        <Briefcase className="h-4 w-4 text-gray-400 mt-0.5" />
+                      ) : (
+                        <UserCircle className="h-4 w-4 text-gray-400 mt-0.5" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tenaamstelling</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {property.registration.name}
+                        </p>
+                        {property.registration.kvkNumber && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            KVK: {property.registration.kvkNumber}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Property Details */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2 text-sm">
@@ -215,6 +346,7 @@ export default function PortfolioPage() {
                   <tr className="border-b border-gray-200 dark:border-neutral-700">
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Pand</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Type</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Tenaamstelling</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Soort</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Huurders</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Maandinkomsten</th>
@@ -248,6 +380,29 @@ export default function PortfolioPage() {
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-900 dark:text-white">
                         {property.type}
+                      </td>
+                      <td className="py-4 px-4">
+                        {property.registration ? (
+                          <div className="flex items-center gap-2">
+                            {property.registration.type === 'bedrijf' ? (
+                              <Briefcase className="h-4 w-4 text-gray-400" />
+                            ) : (
+                              <UserCircle className="h-4 w-4 text-gray-400" />
+                            )}
+                            <div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                {property.registration.name}
+                              </div>
+                              {property.registration.kvkNumber && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  KVK: {property.registration.kvkNumber}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">Niet opgegeven</span>
+                        )}
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-400">
                         {property.type === 'Appartement' ? 'Woonruimte' : 'Commercieel'}
