@@ -168,15 +168,27 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
             "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
-            collapsed ? "px-2 justify-center" : "px-6 justify-between"
+            collapsed ? "px-2.5 justify-start" : "px-6 justify-between"
           )}>
+            {/* Logo - Always on same position */}
             <div className={cn(
-              "transition-all duration-300 ease-in-out",
-              collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
+              "flex items-center transition-all duration-300 ease-in-out",
+              collapsed ? "w-5 h-5" : "w-auto"
             )}>
-            <Logo width={100} height={28} href="/dashboard/employer" />
+              {collapsed ? (
+                <Link href="/dashboard/employer" className="w-5 h-5 flex items-center justify-center">
+                  <div className="w-5 h-5 rounded bg-[#002A1F] dark:bg-[#9AFF7C] flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-white dark:text-[#002A1F]">D</span>
+                  </div>
+                </Link>
+              ) : (
+                <Logo width={100} height={28} href="/dashboard/employer" />
+              )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className={cn(
+              "flex items-center gap-2 transition-all duration-300",
+              collapsed ? "ml-auto" : ""
+            )}>
               {onToggleCollapse && (
                 <Button
                   variant="ghost"
