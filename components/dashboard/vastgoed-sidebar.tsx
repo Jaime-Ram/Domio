@@ -174,8 +174,20 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               "transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              <Logo width={100} height={28} href="/dashboard/employer" />
+            <Logo width={100} height={28} href="/dashboard/employer" />
             </div>
+            <div className="flex items-center gap-2">
+              {onToggleCollapse && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden lg:flex items-center justify-center h-8 w-8"
+                  onClick={onToggleCollapse}
+                  title={collapsed ? "Uitklappen" : "Inklappen"}
+                >
+                  {collapsed ? <PanelRightClose className="size-4 shrink-0" /> : <PanelLeftClose className="size-4 shrink-0" />}
+                </Button>
+              )}
             <Button
               variant="ghost"
               size="icon"
@@ -185,14 +197,15 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             >
                 <PanelLeftClose className="size-4 shrink-0" />
             </Button>
+            </div>
           </div>
 
           <div className={cn(
-            "flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
+            "h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
             collapsed && "overflow-x-hidden"
           )}>
-            <nav className={cn("w-full flex flex-col h-full transition-[padding] duration-300 ease-in-out", collapsed ? "px-0 py-2" : "p-3")}>
-              <ul className={cn("flex flex-col flex-1", collapsed ? "space-y-2 items-center" : "space-y-1")}>
+            <nav className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "p-2" : "p-3")}>
+              <ul className="flex flex-col space-y-1">
                 {menuItems.map((item) => {
                   const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
                   const isOpen = openItems.includes(itemId)
@@ -208,7 +221,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             type="button"
                             onClick={() => toggleItem(itemId)}
                             className={cn(
-                              "w-12 h-12 mx-auto flex items-center justify-center text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                              "w-full flex items-center justify-start py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                               hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                             )}
                             title={item.label}
@@ -296,7 +309,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         <Link
                           href={item.href || '#'}
                           className={cn(
-                            "w-12 h-12 mx-auto flex items-center justify-center text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                            "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                             active 
                               ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
                               : "text-gray-800 dark:text-neutral-200"
@@ -347,34 +360,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               </ul>
             </nav>
           </div>
-          
-          {/* Collapse button at bottom - only show in desktop collapsed mode */}
-          {onToggleCollapse && collapsed && (
-            <div className="border-t border-gray-200 dark:border-neutral-700 p-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 mx-auto flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700"
-                onClick={onToggleCollapse}
-                title="Uitklappen"
-              >
-                <PanelRightClose className="size-4 shrink-0" />
-              </Button>
-            </div>
-          )}
-          {onToggleCollapse && !collapsed && (
-            <div className="border-t border-gray-200 dark:border-neutral-700 p-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700"
-                onClick={onToggleCollapse}
-                title="Inklappen"
-              >
-                <PanelLeftClose className="size-4 shrink-0" />
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </>

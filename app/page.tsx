@@ -41,7 +41,7 @@ export default function Home() {
           setAuthModalOpen(true)
         }}
       />
-      
+
       {/* Content - Above background */}
       <div className="relative z-10">
       {/* Header - Absolute positioned over hero */}
