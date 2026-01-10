@@ -109,8 +109,8 @@ export default function EmployerDashboardLayout({
               {/* Subtle Domio logo at bottom center - light gray, small, subtle */}
               <div className="flex justify-center items-center mt-16 pt-8">
                 <Logo 
-                  width={60} 
-                  height={18} 
+                  width={80} 
+                  height={24} 
                   href="/dashboard/employer"
                   className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
                   imgClassName="grayscale brightness-90 dark:brightness-110"
