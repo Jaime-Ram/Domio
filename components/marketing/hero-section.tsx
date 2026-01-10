@@ -10,7 +10,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
-  // Use Achtergrond13.jpg as fixed background, mirrored
+  // Use AchtergrondX.jpg as fixed background, mirrored
 
   return (
     <section className="relative overflow-visible pt-0 pb-0 md:pt-0 md:pb-0">
@@ -18,7 +18,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/Achtergrond13.jpg"
+            src="/images/AchtergrondX.jpg"
             alt=""
             fill
             className="object-cover object-[10%_60%] md:object-[0%_50%]"
