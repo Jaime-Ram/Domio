@@ -110,7 +110,7 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
       >
         <div className="relative flex flex-col h-full max-h-full">
           <div className="px-6 pt-4 flex items-center justify-between">
-            <Logo width={120} height={32} />
+            <Logo width={120} height={32} href="/dashboard/admin" />
             <Button
               variant="ghost"
               size="icon"
