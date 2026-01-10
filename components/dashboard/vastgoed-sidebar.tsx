@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/Logo'
@@ -64,6 +64,23 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const pathname = usePathname()
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
+  const [showTrialBlock, setShowTrialBlock] = useState(!collapsed)
+
+  // Only show trial block after sidebar animation completes (300ms)
+  useEffect(() => {
+    if (collapsed) {
+      // Hide immediately when collapsing
+      setShowTrialBlock(false)
+    } else {
+      // If already expanded on mount, show immediately
+      // Otherwise show after animation completes when expanding
+      const timer = setTimeout(() => {
+        setShowTrialBlock(true)
+      }, 350) // Slightly longer than sidebar transition (300ms) to ensure animation is complete
+      
+      return () => clearTimeout(timer)
+    }
+  }, [collapsed])
 
   const toggleItem = (id: string) => {
     setOpenItems(prev => 
@@ -369,8 +386,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             </nav>
           </div>
           
-          {/* 30 dagen gratis blokje - Only visible when not collapsed */}
-          {!collapsed && (
+          {/* 30 dagen gratis blokje - Only visible after sidebar animation completes */}
+          {showTrialBlock && (
             <div className="border-t border-gray-200 dark:border-neutral-700 p-3 flex-shrink-0">
               <div className="bg-[#002A1F] rounded-xl p-4 relative overflow-hidden">
                 <div className="relative z-10">
