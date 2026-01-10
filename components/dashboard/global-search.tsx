@@ -142,9 +142,25 @@ export function GlobalSearch() {
     return charMatches > 0 ? (charMatches / patternLower.length) * 0.4 : 0
   }
 
+  // Popular/Default suggestions when no query
+  const defaultSuggestions = useMemo(() => [
+    allActions.find(a => a.id === 'property-add'),
+    allActions.find(a => a.id === 'tenant-add'),
+    allActions.find(a => a.id === 'contract-create'),
+    allActions.find(a => a.id === 'invoice-create'),
+    allActions.find(a => a.id === 'maintenance-create'),
+    allActions.find(a => a.id === 'document-upload'),
+    allActions.find(a => a.id === 'page-dashboard'),
+    allActions.find(a => a.id === 'page-portfolio'),
+  ].filter(Boolean) as SearchAction[], [])
+
   const filteredActions = useMemo(() => {
-    if (query.trim() === '') return []
+    // Show default suggestions when search is empty but open
+    if (query.trim() === '') {
+      return defaultSuggestions
+    }
     
+    // Filter actions based on query
     return allActions
       .map(action => ({
         ...action,
@@ -158,7 +174,7 @@ export function GlobalSearch() {
       .filter(action => action.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 8)
-  }, [query])
+  }, [query, defaultSuggestions])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -226,51 +242,58 @@ export function GlobalSearch() {
       </div>
 
       {/* Search Results Dropdown */}
-      {isOpen && query.trim() !== '' && (
+      {isOpen && filteredActions.length > 0 && (
         <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-          {filteredActions.length > 0 ? (
-            <>
-              {filteredActions.map((action, index) => {
-                const Icon = action.icon
-                return (
-                  <button
-                    key={action.id}
-                    onClick={() => handleActionClick(action)}
-                    className={cn(
-                      "w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors text-left border-b border-gray-100 dark:border-neutral-700 last:border-0",
-                      index === selectedIndex && "bg-gray-50 dark:bg-neutral-700"
-                    )}
-                  >
-                    <div className="mt-0.5 flex-shrink-0">
-                      <Icon className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {action.label}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded">
-                          {action.category}
-                        </span>
-                      </div>
-                      {action.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                          {action.description}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                )
-              })}
-            </>
-          ) : (
-            <div className="px-4 py-8 text-center">
-              <Search className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Geen resultaten gevonden voor &quot;{query}&quot;
-              </p>
+          {query.trim() === '' && (
+            <div className="px-4 py-2 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Populaire acties</p>
             </div>
           )}
+          {filteredActions.map((action, index) => {
+            const Icon = action.icon
+            return (
+              <button
+                key={action.id}
+                onClick={() => handleActionClick(action)}
+                onMouseEnter={() => setSelectedIndex(index)}
+                className={cn(
+                  "w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors text-left border-b border-gray-100 dark:border-neutral-700 last:border-0",
+                  index === selectedIndex && "bg-gray-50 dark:bg-neutral-700"
+                )}
+              >
+                <div className="mt-0.5 flex-shrink-0">
+                  <Icon className="h-5 w-5 text-gray-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {action.label}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded">
+                      {action.category}
+                    </span>
+                  </div>
+                  {action.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                      {action.description}
+                    </p>
+                  )}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
+      
+      {/* No Results Message */}
+      {isOpen && query.trim() !== '' && filteredActions.length === 0 && (
+        <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg z-50">
+          <div className="px-4 py-8 text-center">
+            <Search className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Geen resultaten gevonden voor &quot;{query}&quot;
+            </p>
+          </div>
         </div>
       )}
     </div>
