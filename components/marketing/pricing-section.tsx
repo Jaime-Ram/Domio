@@ -161,7 +161,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
                 'mt-8 w-full rounded-2xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
               )}
             >
-              Start direct
+              Registreren
             </button>
           </div>
         ))}

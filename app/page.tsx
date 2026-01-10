@@ -164,13 +164,13 @@ export default function Home() {
                   Inloggen
                 </Button>
                 <Button
-                  className="bg-transparent text-white hover:bg-white/10 border border-white rounded-xl"
+                  className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-xl"
                   onClick={() => {
                     setAuthModalMode('signup')
                     setAuthModalOpen(true)
                   }}
                 >
-                    Aan de slag
+                    Registreren
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
           </div>
@@ -241,7 +241,7 @@ export default function Home() {
                             setMobileMenuOpen(false)
                           }}
                         >
-                          Start proefperiode
+                          Registreren
                         </Button>
                       </div>
                       {/* Geometric decorative element - same style as 30 dagen gratis section, subtle in quiet corner */}
@@ -603,7 +603,7 @@ export default function Home() {
                       setAuthModalOpen(true)
                     }}
                   >
-                    Start 30 dagen gratis
+                    Registreren
                   </Button>
                   <Button
                     asChild

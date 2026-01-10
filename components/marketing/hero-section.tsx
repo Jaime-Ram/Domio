@@ -13,9 +13,9 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
   // Use Achtergrond13.jpg as fixed background, mirrored
 
   return (
-    <section className="relative -mt-16 overflow-visible pt-10 pb-0 md:pt-12 md:pb-0">
+    <section className="relative overflow-visible pt-16 pb-0 md:pt-16 md:pb-0">
       {/* Background Image */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden -top-32 md:top-0">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="/images/Achtergrond13.jpg"
@@ -32,7 +32,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-transparent" />
       </div>
       
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-28 pb-12 md:pt-24 md:pb-16">
+      <div className="mx-auto max-w-2xl px-6 lg:max-w-4xl lg:px-8 relative z-10 pt-12 pb-12 md:pt-16 md:pb-16">
         {/* Title Section - Same styling as Functies section */}
         <div className="mb-6 text-center md:mb-8">
           <div className="inline-block max-w-full lg:max-w-2xl w-full">
@@ -55,12 +55,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
 
           {/* CTA */}
         <div className="flex flex-row items-center gap-3 justify-center pb-[25vh]">
-          {/* Start direct button - visible on all screen sizes */}
+          {/* Registreren button - visible on all screen sizes */}
           <Button
             onClick={onSignupClick}
             className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
           >
-            Start direct
+            Registreren
           </Button>
           
           {/* Bekijk demo button - visible on all screen sizes */}
