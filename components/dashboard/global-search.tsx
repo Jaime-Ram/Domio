@@ -73,27 +73,15 @@ export function GlobalSearch() {
     // Huurders acties
     { id: 'tenant-delete', label: 'Huurder verwijderen', category: 'Huurders', keywords: ['huurder', 'verwijderen', 'delete', 'verwijder'], icon: AlertCircle, action: () => router.push('/dashboard/employer/tenants'), description: 'Verwijder een huurder' },
     
-    // Contract acties
-    { id: 'contract-renew', label: 'Contract verlengen', category: 'Contracten', keywords: ['contract', 'verlengen', 'renew', 'verlenging'], icon: Calendar, action: () => router.push('/dashboard/employer/contracts/leases'), description: 'Verleng een huurcontract' },
-    { id: 'contract-terminate', label: 'Contract beëindigen', category: 'Contracten', keywords: ['contract', 'beëindigen', 'terminate', 'opzeggen', 'ontbinden'], icon: AlertCircle, action: () => router.push('/dashboard/employer/contracts/leases'), description: 'Beëindig een huurcontract' },
-    
-    // Onderhoud acties
-    { id: 'maintenance-assign', label: 'Onderhoud toewijzen', category: 'Onderhoud', keywords: ['onderhoud', 'toewijzen', 'assign', 'leverancier', 'supplier'], icon: Edit, action: () => router.push('/dashboard/employer/maintenance'), description: 'Wijs onderhoud toe aan leverancier' },
-    { id: 'maintenance-complete', label: 'Onderhoud voltooien', category: 'Onderhoud', keywords: ['onderhoud', 'voltooien', 'complete', 'afronden', 'afgewerkt'], icon: CheckCircle, action: () => router.push('/dashboard/employer/maintenance'), description: 'Markeer onderhoud als voltooid' },
+    // Onderhoud acties (extra)
     { id: 'maintenance-inspection', label: 'Inspectie plannen', category: 'Onderhoud', keywords: ['inspectie', 'inspection', 'plannen', 'schedule', 'plan'], icon: Calendar, action: () => router.push('/dashboard/employer/maintenance/inspections'), description: 'Plan een nieuwe inspectie' },
     
-    // Financieel acties
-    { id: 'invoice-send', label: 'Factuur verzenden', category: 'Financieel', keywords: ['factuur', 'verzenden', 'send', 'email', 'sturen', 'invoice'], icon: Send, action: () => router.push('/dashboard/employer/financial/invoices'), description: 'Verstuur factuur via email' },
-    { id: 'invoice-download', label: 'Factuur downloaden', category: 'Financieel', keywords: ['factuur', 'downloaden', 'download', 'pdf', 'invoice'], icon: Download, action: () => router.push('/dashboard/employer/financial/invoices'), description: 'Download factuur als PDF' },
+    // Financieel acties (extra)
     { id: 'payment-record', label: 'Betaling registreren', category: 'Financieel', keywords: ['betaling', 'registreren', 'record', 'payment', 'toevoegen'], icon: Plus, action: () => router.push('/dashboard/employer/financial/payments'), description: 'Registreer een nieuwe betaling' },
     { id: 'indexation-calculate', label: 'Indexatie berekenen', category: 'Financieel', keywords: ['indexatie', 'indexation', 'berekenen', 'calculate', 'verhogen'], icon: TrendingUp, action: () => router.push('/dashboard/employer/financial/indexation'), description: 'Bereken huurindexatie' },
     { id: 'service-costs', label: 'Servicekosten afrekenen', category: 'Financieel', keywords: ['servicekosten', 'service', 'afrekenen', 'settlement', 'afrekening'], icon: Receipt, action: () => router.push('/dashboard/employer/financial/service-costs'), description: 'Maak servicekostenafrekening' },
     
-    // Document acties
-    { id: 'document-send', label: 'Document verzenden', category: 'Documenten', keywords: ['document', 'verzenden', 'send', 'email', 'sturen'], icon: Send, action: () => router.push('/dashboard/employer/documents'), description: 'Verstuur document via email' },
-    
-    // Portefeuille acties
-    { id: 'portfolio-owners', label: 'Eigenaren bekijken', category: 'Portefeuille', keywords: ['eigenaar', 'owner', 'eigenaren', 'owners'], icon: UserCircle, action: () => router.push('/dashboard/employer/portfolio/owners'), description: 'Bekijk alle eigenaren' },
+    // Portefeuille acties (extra)
     { id: 'property-delete', label: 'Pand verwijderen', category: 'Panden', keywords: ['pand', 'verwijderen', 'delete', 'verwijder'], icon: AlertCircle, action: () => router.push('/dashboard/employer/portfolio'), description: 'Verwijder een pand' },
     
     // Boekhouden
