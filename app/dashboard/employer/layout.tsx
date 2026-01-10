@@ -7,6 +7,7 @@ import { ContentHeader } from "@/components/dashboard/content-header"
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Logo } from '@/components/Logo'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -103,8 +104,18 @@ export default function EmployerDashboardLayout({
         >
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
-            <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10">
+            <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16">
           {children}
+              {/* Subtle Domio logo at bottom center - light gray, small, subtle */}
+              <div className="flex justify-center items-center mt-16 pt-8">
+                <Logo 
+                  width={60} 
+                  height={18} 
+                  href="/dashboard/employer"
+                  className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
+                  imgClassName="grayscale brightness-90 dark:brightness-110"
+                />
+              </div>
             </div>
         </main>
         </div>
