@@ -35,6 +35,34 @@
   font-display: swap;
 }
 
+/* Header uitklap - inhoud fade-in */
+@keyframes headerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown-onderdelen: fade + slide omhoog met stagger */
+@keyframes dropdownItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item-in {
+  animation: dropdownItemIn 0.25s ease-out both;
+}
+
 /* Untitled UI Design Tokens */
 @layer base {
   :root {

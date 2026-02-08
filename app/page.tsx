@@ -1,20 +1,13 @@
 'use client'
 
-import React, { useState, lazy, Suspense } from 'react'
+import React, { useState, useRef, lazy, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, BookOpen, Mail, Headphones, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
@@ -24,36 +17,91 @@ const ContactSection = lazy(() => import('@/components/marketing/contact-section
 const FooterSection = lazy(() => import('@/components/marketing/footer-section').then(m => ({ default: m.FooterSection })))
 const FunctiesSection = lazy(() => import('@/components/marketing/functies-section').then(m => ({ default: m.FunctiesSection })))
 
+const GRAY_BAR_HEIGHT = 32 // 8 * 4px
+
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
   const [functionsMenuOpen, setFunctionsMenuOpen] = useState(false)
+  const [supportMenuOpen, setSupportMenuOpen] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const rafRef = useRef<number | null>(null)
 
-  // Removed mockup height calculation for better performance
+  // Header beweegt vloeiend mee met scroll (1:1 tot grijze balk weg is)
+  React.useEffect(() => {
+    const onScroll = () => {
+      if (rafRef.current != null) return
+      rafRef.current = requestAnimationFrame(() => {
+        setScrollY(typeof window !== 'undefined' ? window.scrollY : 0)
+        rafRef.current = null
+      })
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  const handleHeaderMouseLeave = () => {
+    if (!functionsMenuOpen && !supportMenuOpen) return
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    setIsClosing(true)
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsClosing(false)
+      setFunctionsMenuOpen(false)
+      setSupportMenuOpen(false)
+      closeTimeoutRef.current = null
+    }, 350) //zelfde duur als transition voor soepele inklap-animatie
+  }
+
+  const handleHeaderMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+    setIsClosing(false)
+  }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-      {/* Hero Section First - Full height background */}
-      <HeroSection 
-        onSignupClick={() => {
-          setAuthModalMode('signup')
-          setAuthModalOpen(true)
-        }}
-      />
+    <div className="relative flex min-h-screen w-full flex-col">
+      {/* Grijze balk – in flow, scrollt mee; staat bovenaan zodat hij bij scroll 0 boven de header lijkt */}
+      <div className="h-8 flex-shrink-0 bg-gray-100 z-[60] relative">
+        <div className="container mx-auto flex h-full w-full max-w-7xl items-center justify-end gap-4 px-4 md:px-8">
+          <Link href="/privacy" className="text-xs text-gray-600 hover:text-[#002A1F] transition-colors">
+            Gegevensbescherming
+          </Link>
+          <div className="relative inline-flex items-center">
+            <select
+              className="text-xs text-gray-600 hover:text-[#002A1F] bg-transparent border-0 cursor-pointer focus:ring-0 focus:outline-none py-1 pl-0 pr-5 appearance-none"
+              defaultValue="nl"
+              aria-label="Taal"
+            >
+              <option value="nl">NL</option>
+              <option value="en">EN</option>
+            </select>
+            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500 pointer-events-none" />
+          </div>
+        </div>
+      </div>
 
-      {/* Content - Above background */}
-      <div className="relative z-10">
-      {/* Header - Absolute positioned over hero */}
-      <header
-          className="fixed top-0 left-0 right-0 z-50 w-full transition-colors duration-200 bg-transparent"
+      {/* Header – fixed top-8, vloeiend omhoog met translateY tot tegen plafond */}
+      <header 
+        className="fixed top-8 left-0 right-0 z-50 w-full bg-white flex-shrink-0 shadow-sm will-change-transform"
+        style={{ transform: `translateY(-${Math.min(scrollY, GRAY_BAR_HEIGHT)}px)` }}
+        onMouseLeave={handleHeaderMouseLeave}
+        onMouseEnter={handleHeaderMouseEnter}
       >
           <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
             {/* Mobile: Hamburger Menu (Left) */}
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-white hover:bg-white/10 hover:text-white flex-shrink-0"
+              className="md:hidden text-[#002A1F] hover:bg-gray-100 hover:text-[#002A1F] flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -62,108 +110,44 @@ export default function Home() {
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
             <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
-            <Logo width={100} height={28} variant="white" />
+            <Logo width={100} height={28} />
           </div>
 
-            {/* Desktop Navigation - Centered */}
-            <nav className="hidden md:flex items-center gap-6 flex-1 justify-center absolute left-1/2 -translate-x-1/2">
-            <div 
-              className="relative"
-              onMouseEnter={() => setFunctionsMenuOpen(true)}
-              onMouseLeave={() => setFunctionsMenuOpen(false)}
-            >
-              <DropdownMenu open={functionsMenuOpen} onOpenChange={setFunctionsMenuOpen} modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <button className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C] flex items-center gap-1 group py-2">
-              Functies
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                </DropdownMenuTrigger>
-              {/* Invisible bridge to prevent gap hover issue */}
-              {functionsMenuOpen && (
-                <div 
-                  className="absolute top-full left-1/2 -translate-x-1/2 w-full h-2 bg-transparent"
-                  onMouseEnter={() => setFunctionsMenuOpen(true)}
-                />
-              )}
-              <DropdownMenuContent 
-                align="center" 
-                sideOffset={0}
-                className="w-[650px] p-6 bg-white shadow-2xl rounded-3xl border border-gray-100"
-                onMouseEnter={() => setFunctionsMenuOpen(true)}
-                onMouseLeave={() => setFunctionsMenuOpen(false)}
+            {/* Desktop Navigation - links uitgelijnd */}
+            <nav className="hidden md:flex items-center gap-6 flex-1 justify-start pl-8">
+              {/* Functies - opent header naar beneden */}
+              <div
+                className="relative"
+                onMouseEnter={() => { setFunctionsMenuOpen(true); setSupportMenuOpen(false); }}
               >
-                <div className="grid grid-cols-3 gap-6">
-                  {/* Column 1 */}
-                  <div className="space-y-1">
-                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Kernfunctionaliteiten</DropdownMenuLabel>
-                    <div className="space-y-1">
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Object- en Portfoliobeheer</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Huurdersbeheer</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Contractbeheer</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Automatische Huurindexatie</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Column 2 */}
-                  <div className="space-y-1">
-                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Financieel</DropdownMenuLabel>
-                    <div className="space-y-1">
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Facturatie & Betalingsverwerking</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Servicekostenafrekening</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Rapportages & Financieel Beheer</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Column 3 */}
-                  <div className="space-y-1">
-                    <DropdownMenuLabel className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-0 mb-4">Onderhoud & Inspectie</DropdownMenuLabel>
-                    <div className="space-y-1">
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Ticketsysteem voor Onderhoud</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Inspectiemodule</p>
-                      </div>
-                      <div className="py-2.5 px-3 rounded-xl hover:bg-[#f4f4f4] transition-colors cursor-pointer group">
-                        <p className="text-sm font-medium text-[#002A1F] group-hover:text-[#002A1F]">Scan & Herken Functie</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <Link href="#over-ons" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-              Over ons
-            </Link>
-            <Link href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-              Prijzen
-            </Link>
-            <Link href="#contact" className="text-sm font-medium text-white/80 transition-colors hover:text-[#9AFF7C]">
-              Contact
-            </Link>
-          </nav>
+                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+                  Functies
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+              {/* Ondersteuning - mega menu */}
+              <div
+                className="relative"
+                onMouseEnter={() => { setSupportMenuOpen(true); setFunctionsMenuOpen(false); }}
+              >
+                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+                  Ondersteuning
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${supportMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+              <Link href="#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]">
+                Prijzen
+              </Link>
+              <Link href="#over-ons" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]">
+                Over ons
+              </Link>
+            </nav>
 
             {/* Desktop: Auth Buttons (Right) */}
             <div className="hidden md:flex items-center gap-4 ml-auto">
                 <Button 
                   variant="ghost" 
-                  className="text-white hover:bg-white/10 hover:text-white"
+                  className="text-gray-600 hover:bg-gray-100 hover:text-[#002A1F]"
                   onClick={() => {
                     setAuthModalMode('login')
                     setAuthModalOpen(true)
@@ -178,8 +162,7 @@ export default function Home() {
                     setAuthModalOpen(true)
                   }}
                 >
-                    Registreren
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  Registreren
                 </Button>
           </div>
           
@@ -187,7 +170,7 @@ export default function Home() {
           <Button
             variant="ghost"
             size="icon"
-              className="md:hidden text-white hover:bg-white/10 hover:text-white flex-shrink-0"
+              className="md:hidden text-[#002A1F] hover:bg-gray-100 hover:text-[#002A1F] flex-shrink-0"
               onClick={() => {
                 setAuthModalMode('login')
                 setAuthModalOpen(true)
@@ -196,11 +179,108 @@ export default function Home() {
           >
               <User className="h-6 w-6" />
           </Button>
-        </div>
+          </div>
 
-          {/* Mobile Sidebar - Slides from left like dashboard */}
+          {/* Dropdown overlay - soepele animatie; height animeert ook bij wisselen van menu */}
+          <div
+            className="hidden md:block absolute left-0 right-0 top-full z-50 overflow-hidden bg-white shadow-lg origin-top"
+            style={{
+              height: (functionsMenuOpen || supportMenuOpen) && !isClosing ? (functionsMenuOpen ? 290 : 260) : 0,
+              opacity: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 1 : 0,
+              transform: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 'translateY(0)' : 'translateY(-12px)',
+              pointerEvents: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 'auto' : 'none',
+              transition: 'height 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            }}
+          >
+            <>
+            {/* Functies-inhoud */}
+            <div
+              className="absolute inset-x-0 top-0 bg-white"
+              style={{
+                opacity: functionsMenuOpen ? 1 : 0,
+                pointerEvents: functionsMenuOpen ? 'auto' : 'none',
+                transition: 'opacity 200ms ease-out',
+              }}
+              aria-hidden={!functionsMenuOpen}
+            >
+              <div key={functionsMenuOpen ? 'f-open' : 'f-closed'}>
+                <div className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-3 gap-x-8 gap-y-1">
+                  {[
+                    { title: 'Object- en Portfoliobeheer', desc: 'Beheer al je panden en portefeuilles', icon: Building2 },
+                    { title: 'Huurdersbeheer', desc: 'Huurders en contracten inzichtelijk', icon: Users },
+                    { title: 'Contractbeheer', desc: 'Contracten en verlengingen beheren', icon: FileText },
+                    { title: 'Automatische Huurindexatie', desc: 'Indexatie berekenen en toepassen', icon: Percent },
+                    { title: 'Facturatie & Betalingsverwerking', desc: 'Facturen aanmaken en incasseren', icon: Euro },
+                    { title: 'Servicekostenafrekening', desc: 'Servicekosten verrekenen met huurders', icon: Calculator },
+                    { title: 'Rapportages & Financieel Beheer', desc: 'Inzicht en rapportages op maat', icon: BarChart3 },
+                    { title: 'Ticketsysteem voor Onderhoud', desc: 'Meldingen en onderhoud plannen', icon: Wrench },
+                    { title: 'Inspectiemodule', desc: 'Inspecties vastleggen en rapporteren', icon: ClipboardCheck },
+                    { title: 'Scan & Herken Functie', desc: 'Documenten scannen en herkennen', icon: Scan },
+                  ].map((item, i) => (
+                    <div key={item.title} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${25 + i * 35}ms` }}>
+                      <item.icon className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#002A1F] group-hover:text-[#002A1F]">{item.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div
+              className="absolute inset-x-0 top-0 bg-white"
+              style={{
+                opacity: supportMenuOpen ? 1 : 0,
+                pointerEvents: supportMenuOpen ? 'auto' : 'none',
+                transition: 'opacity 200ms ease-out',
+              }}
+              aria-hidden={!supportMenuOpen}
+            >
+                <div key={supportMenuOpen ? 's-open' : 's-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+                  <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
+                    {[
+                      { title: 'Kennisbank', desc: 'Antwoord op je vragen', icon: BookOpen },
+                      { title: 'Support', desc: 'Stel je vragen', icon: Mail },
+                      { title: 'Livesessies', desc: 'Leer meer over Domio', icon: Headphones },
+                      { title: 'Vind je Expert', desc: 'Ondersteuning bij boekhouden', icon: Search },
+                    ].map((item, i) => (
+                      <div key={item.title} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${i * 35}ms` }}>
+                        <item.icon className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-[#002A1F] group-hover:text-[#002A1F]">{item.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="md:col-span-7 dropdown-item-in flex" style={{ animationDelay: '100ms' }}>
+                    <div className="rounded-2xl bg-[#002A1F] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden">
+                      {/* Geometric decorative element - same style as "Eerst zien dan geloven" section */}
+                      <GeometricShapes 
+                        variant="trapezoid" 
+                        className="right-0 bottom-0 w-40 h-40"
+                        color="#9AFF7C"
+                        opacity={0.18}
+                        layers={2}
+                      />
+                      <div className="relative z-10 flex flex-col items-start gap-4">
+                        <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
+                          Overstappen naar <span className="text-[#9AFF7C]">Domio</span>
+                        </h3>
+                        <p className="text-sm text-white/90 leading-6">Een nieuw platform? Geen gedoe, maar een slimme stap vooruit. Meer overzicht, minder gedoe.</p>
+                        <Button size="default" className="bg-transparent border border-white text-white hover:bg-white/10 rounded-2xl font-semibold">
+                          Bekijk hoe je snel overstapt
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          </div>
           <>
-            {/* Overlay */}
+            {/* Mobile Sidebar - Overlay */}
         <div
               className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
                 mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -341,41 +421,19 @@ export default function Home() {
           </>
       </header>
 
-        {/* Floating Mockup */}
-      <div className="relative w-full pointer-events-none z-40" style={{ marginTop: '-25vh' }}>
-        <div className="container relative mx-auto w-full max-w-7xl px-6 md:px-8">
-          <div className="relative w-full flex justify-center">
-              {/* Mobile Mockup */}
-              <Image
-              src="/images/mobile mockup.png"
-              alt="Domio op mobiel"
-                width={400}
-                height={800}
-              className="h-auto w-full max-w-[70%] object-contain drop-shadow-2xl md:hidden mx-auto"
-                priority={false}
-                loading="lazy"
-                quality={85}
-                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
-            />
-              {/* Desktop Mockup */}
-              <Image
-              src="/images/Desktopmockup.png"
-              alt="Domio op desktop"
-                width={1000}
-                height={600}
-              className="hidden md:block h-auto w-full max-w-[560px] object-contain drop-shadow-2xl lg:max-w-none lg:w-[700px] xl:w-[850px] 2xl:w-[1000px] mx-auto"
-                priority={false}
-                loading="lazy"
-                quality={85}
-                style={{ filter: 'hue-rotate(180deg) saturate(1.2)' }}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Inhoud begint onder de vaste header (top-8 + h-16 = 6rem) */}
+      <div className="pt-24 flex flex-col flex-1">
+      <HeroSection
+        onSignupClick={() => {
+          setAuthModalMode('signup')
+          setAuthModalOpen(true)
+        }}
+      />
 
+      <div className="relative z-10 overflow-x-hidden">
       {/* Functies Section */}
         <Suspense fallback={<div className="min-h-[400px]" />}>
-      <FunctiesSection />
+          <FunctiesSection />
         </Suspense>
 
       {/* Beheerder Types Section */}
@@ -625,6 +683,7 @@ export default function Home() {
         <Suspense fallback={<div className="min-h-[200px]" />}>
       <FooterSection />
         </Suspense>
+      </div>
       </div>
 
       {/* Auth Modal - Direct loaded for instant response */}

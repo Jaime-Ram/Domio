@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders, huurders en verhuurders',
     start_url: '/',
     display: 'standalone',
-    background_color: '#002A1F',
-    theme_color: '#002A1F',
+    background_color: '#ffffff',
+    theme_color: '#ffffff',
     icons: [
       {
         src: '/images/offerla.png',

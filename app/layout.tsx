@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light dark",
-  themeColor: "#002A1F",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -50,7 +50,7 @@ export default function RootLayout({
     <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
         {/* Theme color for browser chrome */}
-        <meta name="theme-color" content="#002A1F" />
+        <meta name="theme-color" content="#ffffff" />
         {/* Maskable icon for rounded corners (Safari) */}
         <link rel="mask-icon" href="/images/offerla.png" color="#9AFF7C" />
         <link rel="preconnect" href="https://consent.cookiebot.com" />

@@ -395,7 +395,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               <div className="bg-[#002A1F] rounded-xl p-4 relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-sm font-semibold text-white mb-1">
-                    Het zelf ervaren?
+                    Domio zelf ervaren?
                   </h3>
                   <p className="text-xs font-medium text-white mb-3">
                     Proberen 30 dagen gratis

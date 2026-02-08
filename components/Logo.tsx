@@ -42,12 +42,16 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
   }
 
   const imageClass = [
-    'h-auto',
+    'h-auto object-contain',
     variant === 'white' ? 'brightness-0 invert' : '',
     imgClassName || '',
   ]
     .filter(Boolean)
     .join(' ')
+
+  // Donkergroen (#002A1F): alleen de logo-vorm, geen blok – via filter
+  const darkGreenFilter =
+    'brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(2000%) hue-rotate(128deg)'
 
   return (
     <Link href={href} className={`flex items-center overflow-visible ${className || ''}`}>
@@ -57,7 +61,8 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
         width={width}
         height={height}
         priority
-        className={`${imageClass} object-contain`}
+        className={imageClass}
+        style={variant === 'default' ? { filter: darkGreenFilter } : undefined}
         onError={handleError}
         unoptimized={false}
       />

@@ -1,7 +1,8 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Building2, Users, FileText, AlertCircle, TrendingUp, DollarSign, Calendar, ArrowRight } from 'lucide-react'
+import { FunctieBlock } from '@/components/ui/functie-block'
+import { Building2, Users, AlertCircle, TrendingUp, DollarSign, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -12,77 +13,43 @@ export default function EmployerDashboardPage() {
   return (
     <>
       {/* Page Header - Same spacing as sidebar menu items */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Welkom, {userName}
-                  </h1>
+        </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-                Overzicht van je vastgoedportefeuille
-                  </p>
-                </div>
-                
-      {/* Stats Grid - Compact cards with same spacing as sidebar */}
+          Overzicht van je vastgoedportefeuille
+        </p>
+      </div>
+
+      {/* Stats Grid – zelfde FunctieBlock-stijl als landing Functies */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Totaal Panden
-                  </CardTitle>
-            <Building2 className="h-4 w-4 text-[#002A1F]" />
-            </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-2xl font-semibold text-gray-900 dark:text-white">12</div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              +2 deze maand
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Actieve Huurders
-            </CardTitle>
-            <Users className="h-4 w-4 text-[#002A1F]" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-2xl font-semibold text-gray-900 dark:text-white">28</div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              95% bezettingsgraad
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Openstaande Taken
-            </CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-2xl font-semibold text-gray-900 dark:text-white">7</div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              3 urgent
-                      </p>
-            </CardContent>
-          </Card>
-
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Maandelijkse Huur
-                  </CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-2xl font-semibold text-gray-900 dark:text-white">€24,500</div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-green-600" />
-              +5.2% vs vorige maand
-            </p>
-          </CardContent>
-        </Card>
+        <FunctieBlock
+          icon={<Building2 className="h-5 w-5 text-white" />}
+          title="Totaal Panden"
+          value="12"
+          subtitle="+2 deze maand"
+        />
+        <FunctieBlock
+          icon={<Users className="h-5 w-5 text-white" />}
+          title="Actieve Huurders"
+          value="28"
+          subtitle="95% bezettingsgraad"
+        />
+        <FunctieBlock
+          icon={<AlertCircle className="h-5 w-5 text-white" />}
+          iconBgClassName="bg-orange-500"
+          title="Openstaande Taken"
+          value="7"
+          subtitle="3 urgent"
+        />
+        <FunctieBlock
+          icon={<DollarSign className="h-5 w-5 text-white" />}
+          trend={<TrendingUp className="h-5 w-5" />}
+          title="Maandelijkse Huur"
+          value="€24,500"
+          subtitle="+5.2% vs vorige maand"
+        />
       </div>
 
       {/* Quick Actions - Same spacing as sidebar menu items */}
