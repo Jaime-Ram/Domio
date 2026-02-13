@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -123,7 +124,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 1: Basisinfo */}
               <TabsContent value="basic">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Object Details</CardTitle>
                     <CardDescription>Algemene informatie over het object</CardDescription>
@@ -290,7 +291,7 @@ export default function PropertyDetailPage() {
                   {property.tenant && property.lease ? (
                     <>
                       {/* Huurder Info */}
-                      <Card className="border border-gray-200 dark:border-neutral-700">
+                      <Card className={dashboardCardClass()}>
                         <CardHeader>
                           <CardTitle>Huurder Gegevens</CardTitle>
                         </CardHeader>
@@ -311,7 +312,7 @@ export default function PropertyDetailPage() {
                       </Card>
 
                       {/* Contract Info */}
-                      <Card className="border border-gray-200 dark:border-neutral-700">
+                      <Card className={dashboardCardClass()}>
                         <CardHeader>
                           <CardTitle>Contract Details</CardTitle>
                         </CardHeader>
@@ -387,7 +388,7 @@ export default function PropertyDetailPage() {
                       </Card>
                     </>
                   ) : (
-                    <Card className="border border-gray-200 dark:border-neutral-700">
+                    <Card className={dashboardCardClass()}>
                       <CardContent className="py-12 text-center">
                         <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -407,7 +408,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 3: Documenten */}
               <TabsContent value="documents">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>

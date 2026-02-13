@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -99,7 +100,7 @@ export default function CompliancePage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -110,7 +111,7 @@ export default function CompliancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -121,7 +122,7 @@ export default function CompliancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -143,7 +144,7 @@ export default function CompliancePage() {
 
               {/* Tab 1: Compliance Checklist */}
               <TabsContent value="checklist">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Compliance per Pand</CardTitle>
                     <CardDescription>Status van verplichte items per object</CardDescription>
@@ -312,7 +313,7 @@ export default function CompliancePage() {
 
               {/* Tab 2: Huurachterstand Procedures */}
               <TabsContent value="arrears">
-                <Card className="border border-gray-200 dark:border-neutral-700 mb-6">
+                <Card className={dashboardCardClass('mb-6')}>
                   <CardHeader>
                     <CardTitle>Actieve Huurachterstand Procedures</CardTitle>
                     <CardDescription>Procedures voor huurders met achterstand</CardDescription>
@@ -420,7 +421,7 @@ export default function CompliancePage() {
                 </Card>
 
                 {/* Brief Templates */}
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Brief Templates</CardTitle>
                     <CardDescription>Standaard templates voor huurachterstand communicatie</CardDescription>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -90,7 +91,7 @@ export default function SettingsPage() {
 
               {/* Tab 1: Mijn Account */}
               <TabsContent value="account">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Persoonlijke Gegevens</CardTitle>
                     <CardDescription>Update je persoonlijke informatie</CardDescription>
@@ -171,7 +172,7 @@ export default function SettingsPage() {
 
               {/* Tab 2: Bedrijfsgegevens */}
               <TabsContent value="company">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Bedrijfsgegevens</CardTitle>
                     <CardDescription>Informatie voor correspondentie en documenten</CardDescription>
@@ -291,7 +292,7 @@ export default function SettingsPage() {
 
               {/* Tab 3: Notificaties */}
               <TabsContent value="notifications">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <CardTitle>Notificatie Voorkeuren</CardTitle>
                     <CardDescription>Kies welke notificaties je wilt ontvangen</CardDescription>

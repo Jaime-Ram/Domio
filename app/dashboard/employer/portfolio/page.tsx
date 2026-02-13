@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
 import Link from 'next/link'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function PortfolioPage() {
   const router = useRouter()
@@ -109,7 +110,7 @@ export default function PortfolioPage() {
 
       {/* Vastgoedhouders / Tenaamstellingen Overzicht */}
       {ownerGroups.length > 0 && (
-        <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+        <Card className={dashboardCardClass('mb-6')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
@@ -124,7 +125,7 @@ export default function PortfolioPage() {
               {ownerGroups.map((group, index) => (
                 <Card 
                   key={index}
-                  className="border border-gray-200 dark:border-neutral-700 hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors cursor-pointer"
+                  className={dashboardCardClass('hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors cursor-pointer')}
                   onClick={() => {
                     // Filter properties by this owner
                     const ownerProperties = group.properties
@@ -184,7 +185,7 @@ export default function PortfolioPage() {
       )}
 
       {/* Search and View Toggle */}
-      <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+      <Card className={dashboardCardClass('mb-6')}>
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
@@ -335,7 +336,7 @@ export default function PortfolioPage() {
 
       {/* Properties Overview - Table View */}
       {viewMode === 'table' && (
-        <Card className="border border-gray-200 dark:border-neutral-700">
+        <Card className={dashboardCardClass()}>
           <CardHeader>
             <CardTitle>Alle Panden ({filteredProperties.length})</CardTitle>
           </CardHeader>
@@ -441,7 +442,7 @@ export default function PortfolioPage() {
       )}
 
       {filteredProperties.length === 0 && (
-        <Card className="border border-gray-200 dark:border-neutral-700">
+        <Card className={dashboardCardClass()}>
           <CardContent className="py-12 text-center">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-400">Geen panden gevonden</p>

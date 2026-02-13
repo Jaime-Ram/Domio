@@ -29,7 +29,7 @@ const tiers = [
     name: 'Uitgebreide portefeuille',
     id: 'tier-extended',
     href: '/signup',
-    priceMonthly: '€195',
+    priceMonthly: '€249',
     priceYearly: '€156',
     description: 'Voor vastgoedbeheerders met een groeiende portefeuille.',
     features: [

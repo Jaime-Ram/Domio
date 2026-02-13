@@ -52,6 +52,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function MaintenancePage() {
   const router = useRouter()
@@ -245,7 +246,7 @@ export default function MaintenancePage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -258,7 +259,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -271,7 +272,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -284,7 +285,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -300,7 +301,7 @@ export default function MaintenancePage() {
             </div>
 
             {/* Filters */}
-            <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass('mb-6')}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <DropdownMenu>
@@ -338,7 +339,7 @@ export default function MaintenancePage() {
             </Card>
 
             {/* Maintenance Table */}
-            <Card className="border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass()}>
               <CardHeader>
                 <CardTitle>Alle Meldingen ({filteredRequests.length})</CardTitle>
                 <CardDescription>Klik op een melding voor meer details</CardDescription>

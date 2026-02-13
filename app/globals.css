@@ -63,6 +63,38 @@
   animation: dropdownItemIn 0.25s ease-out both;
 }
 
+/* Huurdersportaal – elk bolletje individueel: schaal 0→1 + fade */
+@keyframes avatarBolIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.avatar-bol-in {
+  animation: avatarBolIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Middelste avatar in carousel: flowende pulse */
+@keyframes avatarCenterPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 42, 31, 0.15);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(0, 42, 31, 0.08);
+  }
+}
+
+.avatar-center-pulse {
+  animation: avatarCenterPulse 2.5s ease-in-out infinite;
+}
+
 /* Untitled UI Design Tokens */
 @layer base {
   :root {

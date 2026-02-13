@@ -221,9 +221,9 @@ export function GlobalSearch() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 max-w-2xl">
+    <div ref={containerRef} className="relative flex-1 max-w-2xl min-w-0">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
         <Input
           ref={inputRef}
           type="search"
@@ -231,59 +231,63 @@ export function GlobalSearch() {
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-neutral-700 rounded-full"
+          className="pl-10 pr-4 h-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-[#002A1F] dark:focus-visible:ring-[#9AFF7C]"
         />
       </div>
 
       {/* Search Results Dropdown */}
       {isOpen && filteredActions.length > 0 && (
-        <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full mt-2 w-full rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg z-50 max-h-96 overflow-y-auto overflow-x-hidden">
           {query.trim() === '' && (
-            <div className="px-4 py-2 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+            <div className="px-4 py-3 border-b border-gray-200/80 dark:border-neutral-700 bg-gray-50/80 dark:bg-neutral-800/50">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Populaire acties</p>
             </div>
           )}
-          {filteredActions.map((action, index) => {
-            const Icon = action.icon
-            return (
-              <button
-                key={action.id}
-                onClick={() => handleActionClick(action)}
-                onMouseEnter={() => setSelectedIndex(index)}
-                className={cn(
-                  "w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors text-left border-b border-gray-100 dark:border-neutral-700 last:border-0",
-                  index === selectedIndex && "bg-gray-50 dark:bg-neutral-700"
-                )}
-              >
-                <div className="mt-0.5 flex-shrink-0">
-                  <Icon className="h-5 w-5 text-gray-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {action.label}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-700 px-1.5 py-0.5 rounded">
-                      {action.category}
-                    </span>
-                  </div>
-                  {action.description && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                      {action.description}
-                    </p>
+          <div className="p-2">
+            {filteredActions.map((action, index) => {
+              const Icon = action.icon
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => handleActionClick(action)}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  className={cn(
+                    'w-full flex items-start gap-3 px-3 py-2.5 rounded-2xl transition-colors text-left',
+                    index === selectedIndex
+                      ? 'bg-gray-100 dark:bg-neutral-800'
+                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800/70'
                   )}
-                </div>
-              </button>
-            )
-          })}
+                >
+                  <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#002A1F]/10 dark:bg-[#9AFF7C]/10 flex items-center justify-center">
+                    <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9AFF7C]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {action.label}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-700 px-2 py-0.5 rounded-xl">
+                        {action.category}
+                      </span>
+                    </div>
+                    {action.description && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                        {action.description}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
-      
+
       {/* No Results Message */}
       {isOpen && query.trim() !== '' && filteredActions.length === 0 && (
-        <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-neutral-700 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full mt-2 w-full rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg z-50 overflow-hidden">
           <div className="px-4 py-8 text-center">
-            <Search className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <Search className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Geen resultaten gevonden voor &quot;{query}&quot;
             </p>

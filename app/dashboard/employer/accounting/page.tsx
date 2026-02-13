@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -146,7 +147,7 @@ export default function AccountingPage() {
       </div>
 
       {/* Eigen Boekhouding Section */}
-      <Card className="mb-8 border border-gray-200 dark:border-neutral-700">
+      <Card className={dashboardCardClass('mb-8')}>
         <CardHeader>
           <div className="flex items-start gap-4">
             <div className="p-3 bg-[#002A1F]/10 dark:bg-[#9AFF7C]/10 rounded-lg">
@@ -270,7 +271,7 @@ export default function AccountingPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableIntegrations.map((integration) => (
-            <Card key={integration.id} className="border border-gray-200 dark:border-neutral-700 hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors">
+            <Card key={integration.id} className={dashboardCardClass('hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors')}>
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">

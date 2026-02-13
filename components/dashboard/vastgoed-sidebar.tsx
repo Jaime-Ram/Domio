@@ -38,7 +38,9 @@ import {
   Archive,
   ShieldCheck,
   Euro,
-  BookOpen
+  BookOpen,
+  AlertTriangle,
+  ClipboardCheck
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -65,6 +67,25 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
   const [showTrialBlock, setShowTrialBlock] = useState(!collapsed)
+
+  // Auto-expand parent when a child route is active
+  useEffect(() => {
+    const menuItemsWithChildren = [
+      { id: 'portefeuille-accordion', paths: ['/dashboard/employer/portfolio', '/dashboard/employer/tenants', '/dashboard/employer/contracts'] },
+      { id: 'compliance-accordion', paths: ['/dashboard/employer/compliance'] },
+      { id: 'financieel-accordion', paths: ['/dashboard/employer/financial'] },
+      { id: 'onderhoud-accordion', paths: ['/dashboard/employer/maintenance'] },
+      { id: 'communicatie-accordion', paths: ['/dashboard/employer/messages', '/dashboard/employer/documents'] },
+    ]
+    const toOpen = menuItemsWithChildren
+      .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
+      .map(({ id }) => id)
+    setOpenItems((prev) => {
+      const next = new Set(prev)
+      toOpen.forEach((id) => next.add(id))
+      return Array.from(next)
+    })
+  }, [pathname])
 
   // Only show trial block after sidebar animation completes (300ms)
   useEffect(() => {
@@ -98,47 +119,58 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     },
     {
       label: 'Portefeuille',
-      href: '/dashboard/employer/portfolio',
       icon: Building2,
-    },
-    {
-      label: 'Huurders',
-      href: '/dashboard/employer/tenants',
-      icon: Users,
-    },
-    {
-      label: 'Contracten',
-      icon: FileText,
       children: [
-        { label: 'Huurovereenkomsten', href: '/dashboard/employer/contracts/leases', icon: FileText },
-        { label: 'Assets', href: '/dashboard/employer/contracts/assets', icon: Briefcase },
-        { label: 'Leveranciers', href: '/dashboard/employer/contracts/suppliers', icon: Link2 },
+        { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
+        { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
+        { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
+      ],
+    },
+    {
+      label: 'Compliance',
+      icon: ShieldCheck,
+      children: [
+        { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
+        { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
+        { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+      ],
+    },
+    {
+      label: 'Financieel',
+      icon: Euro,
+      children: [
+        { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
+        { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
+        { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
+        { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
       ],
     },
     {
       label: 'Onderhoud',
-      href: '/dashboard/employer/maintenance',
       icon: Wrench,
+      children: [
+        { label: 'Tickets', href: '/dashboard/employer/maintenance', icon: Wrench },
+        { label: 'Inspecties', href: '/dashboard/employer/maintenance/inspecties', icon: ClipboardCheck },
+        { label: 'Planning', href: '/dashboard/employer/maintenance/planning', icon: Calendar },
+      ],
     },
     {
-      label: 'Financieel',
-      href: '/dashboard/employer/financial',
-      icon: Euro,
+      label: 'Communicatie',
+      icon: MessageSquare,
+      children: [
+        { label: 'Berichten', href: '/dashboard/employer/messages', icon: MessageSquare },
+        { label: 'Documenten', href: '/dashboard/employer/documents', icon: FolderOpen },
+      ],
     },
     {
-      label: 'Boekhouden',
-      href: '/dashboard/employer/accounting',
-      icon: BookOpen,
+      label: 'VvE',
+      href: '/dashboard/employer/vve',
+      icon: Home,
     },
     {
-      label: 'Documenten',
-      href: '/dashboard/employer/documents',
-      icon: FolderOpen,
-    },
-    {
-      label: 'Compliance',
-      href: '/dashboard/employer/compliance',
-      icon: ShieldCheck,
+      label: 'Rapportages',
+      href: '/dashboard/employer/reports',
+      icon: FileCheck,
     },
     {
       label: 'Instellingen',

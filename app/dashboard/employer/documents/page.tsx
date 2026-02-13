@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -215,7 +216,7 @@ export default function DocumentsPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Totaal</p>
@@ -223,7 +224,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Contracten</p>
@@ -231,7 +232,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Keuringen</p>
@@ -239,7 +240,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Verzekeringen</p>
@@ -247,7 +248,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Facturen</p>
@@ -258,7 +259,7 @@ export default function DocumentsPage() {
             </div>
 
             {/* Search and Filters */}
-            <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass('mb-6')}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <div className="flex-1 relative">
@@ -303,7 +304,7 @@ export default function DocumentsPage() {
             </Card>
 
             {/* Documents Table */}
-            <Card className="border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass()}>
               <CardHeader>
                 <CardTitle>Alle Documenten ({filteredDocuments.length})</CardTitle>
                 <CardDescription>Bekijk, download of verwijder documenten</CardDescription>

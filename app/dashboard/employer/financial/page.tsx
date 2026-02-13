@@ -47,6 +47,7 @@ import {
 import { mockPayments, mockExpenses, mockTenants, mockProperties } from '@/lib/mock-data/vastgoed'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function FinancialPage() {
   const router = useRouter()
@@ -161,7 +162,7 @@ export default function FinancialPage() {
 
             {/* Totals Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Totaal Inkomsten
@@ -178,7 +179,7 @@ export default function FinancialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Totaal Uitgaven
@@ -195,7 +196,7 @@ export default function FinancialPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-200 dark:border-neutral-700">
+              <Card className={dashboardCardClass()}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Saldo
@@ -214,7 +215,7 @@ export default function FinancialPage() {
             </div>
 
             {/* Inkomsten Section */}
-            <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass('mb-6')}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -350,7 +351,7 @@ export default function FinancialPage() {
             </Card>
 
             {/* Uitgaven Section */}
-            <Card className="border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass()}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function RestaurantPage() {
   return (
@@ -14,7 +15,7 @@ export default function RestaurantPage() {
         </p>
       </div>
 
-      <Card className="border border-gray-200 dark:border-neutral-700">
+      <Card className={dashboardCardClass()}>
         <CardHeader>
           <CardTitle>Restaurant Overzicht</CardTitle>
           <CardDescription>Beheer je restaurant en POS integraties</CardDescription>

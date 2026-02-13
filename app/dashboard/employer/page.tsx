@@ -1,182 +1,309 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FunctieBlock } from '@/components/ui/functie-block'
-import { Building2, Users, AlertCircle, TrendingUp, DollarSign, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import {
+  portfolioTotals,
+  recentActivities,
+  complianceSummary,
+  complianceAlerts,
+  monthlyFinancials,
+  upcomingTasks,
+  currentUser,
+  openInvoicesTotal,
+} from '@/lib/mock-data/domio-dashboard'
+import {
+  Building2,
+  Users,
+  TrendingUp,
+  Euro,
+  Wrench,
+  FileText,
+  UserPlus,
+  ArrowUpRight,
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+} from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { FunctieBlock } from '@/components/ui/functie-block'
+
+const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
+const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
+const ICON_CIRCLE_CLASS = 'h-10 w-10 rounded-full bg-[#002A1F] dark:bg-[#002A1F] flex items-center justify-center shrink-0'
+
+// Bar heights voor weergave (relatief)
+const FINANCIAL_BARS = [
+  { label: 'Huurinkomsten', value: monthlyFinancials.huurinkomsten, color: 'bg-white/20' },
+  { label: 'Onderhoud', value: monthlyFinancials.onderhoud, color: 'bg-white/15' },
+  { label: 'Beheerkosten', value: monthlyFinancials.beheerkosten, color: 'bg-white/10' },
+  { label: 'Netto', value: monthlyFinancials.netto, color: 'bg-[#9AFF7C]' },
+]
+const maxFinancial = Math.max(...FINANCIAL_BARS.map((b) => b.value))
+
+function ActivityIcon({ type }: { type: string }) {
+  const iconClass = 'h-4 w-4 text-white'
+  switch (type) {
+    case 'huur_ontvangen':
+      return <Euro className={iconClass} />
+    case 'storingsmelding':
+      return <Wrench className={iconClass} />
+    case 'contract_verlengd':
+      return <FileText className={iconClass} />
+    case 'nieuwe_huurder':
+      return <UserPlus className={iconClass} />
+    case 'wws_herberekening':
+      return <TrendingUp className={iconClass} />
+    default:
+      return <ArrowUpRight className={iconClass} />
+  }
+}
+
+function AlertIcon({ type }: { type: string }) {
+  if (type === 'huur_boven_max') return <span className="text-red-500"><AlertTriangle className="h-4 w-4" /></span>
+  if (type === 'puntentelling_verlopen') return <span className="text-amber-500"><AlertTriangle className="h-4 w-4" /></span>
+  return <span className="text-blue-500"><FileText className="h-4 w-4" /></span>
+}
 
 export default function EmployerDashboardPage() {
-  // Demo data
-  const userName = 'Demo Gebruiker'
+  const greeting = (() => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Goedemorgen'
+    if (h < 18) return 'Goedemiddag'
+    return 'Goedenavond'
+  })()
 
   return (
     <>
-      {/* Page Header - Same spacing as sidebar menu items */}
+      {/* Welkomstbanner */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Welkom, {userName}
+          {greeting}, {currentUser.name.split(' ')[0]}
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Overzicht van je vastgoedportefeuille
+          Je hebt 3 actiepunten vandaag
         </p>
       </div>
 
-      {/* Stats Grid – zelfde FunctieBlock-stijl als landing Functies */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+      {/* KPI strip – gevarieerde stijlen */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
         <FunctieBlock
-          icon={<Building2 className="h-5 w-5 text-white" />}
-          title="Totaal Panden"
-          value="12"
-          subtitle="+2 deze maand"
+          icon={<Building2 className="h-4 w-4 text-white" />}
+          title="Totaal objecten"
+          value={String(portfolioTotals.totalObjects)}
+          subtitle={`↑${portfolioTotals.objectsThisMonth} deze maand`}
         />
         <FunctieBlock
-          icon={<Users className="h-5 w-5 text-white" />}
-          title="Actieve Huurders"
-          value="28"
-          subtitle="95% bezettingsgraad"
+          icon={<Users className="h-4 w-4 text-white" />}
+          title="Bezettingsgraad"
+          value={`${portfolioTotals.occupancyPercent}%`}
+          subtitle="Portefeuille"
         />
         <FunctieBlock
-          icon={<AlertCircle className="h-5 w-5 text-white" />}
-          iconBgClassName="bg-orange-500"
-          title="Openstaande Taken"
-          value="7"
-          subtitle="3 urgent"
+          icon={<Euro className="h-4 w-4 text-white" />}
+          iconBgClassName="bg-amber-500"
+          title="Openstaande facturen"
+          value={`€${openInvoicesTotal.toLocaleString('nl-NL')}`}
+          subtitle="Te innen"
         />
         <FunctieBlock
-          icon={<DollarSign className="h-5 w-5 text-white" />}
-          trend={<TrendingUp className="h-5 w-5" />}
-          title="Maandelijkse Huur"
-          value="€24,500"
-          subtitle="+5.2% vs vorige maand"
+          icon={<CheckCircle2 className="h-4 w-4 text-white" />}
+          trend={<span className="text-lg font-bold text-[#002A1F] dark:text-[#9AFF7C]">{complianceSummary.score}%</span>}
+          title="Compliance score"
+          value={null}
+          subtitle={`${complianceSummary.compliant} van ${complianceSummary.total} compliant`}
         />
       </div>
 
-      {/* Quick Actions - Same spacing as sidebar menu items */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          <CardHeader className="px-4 pt-4 pb-3">
-            <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#002A1F] flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-white" />
-              </div>
-              Panden Beheren
-            </CardTitle>
-                    </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Bekijk en beheer al je panden
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard/employer/portfolio/properties" className="flex items-center justify-center gap-2">
-                Ga naar Panden
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+      {/* 2 kolommen: Recente activiteit | Compliance status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+        {/* Recente activiteit – witte kaart, grijze rijen (zoals functies) */}
+        <div className={cn(CARD_CLASS, 'p-5')}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+              Recente activiteit
+            </h3>
+            <Link
+              href="/dashboard/employer/portfolio"
+              className="text-sm text-[#002A1F] dark:text-[#9AFF7C] font-medium flex items-center gap-1 hover:underline"
+            >
+              Alles
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {recentActivities.slice(0, 5).map((item) => (
+              <li
+                key={item.id}
+                className={cn('flex items-center gap-3 py-3 px-4', INNER_BLOCK_CLASS)}
+              >
+                <div className={ICON_CIRCLE_CLASS}>
+                  <ActivityIcon type={item.type} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                    {item.title}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {item.subtitle}
+                  </p>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                    {item.time}
+                  </p>
+                </div>
+                {item.amount != null && (
+                  <span className="text-sm font-semibold text-[#002A1F] dark:text-[#9AFF7C] shrink-0">
+                    €{item.amount.toLocaleString('nl-NL')}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          <CardHeader className="px-4 pt-4 pb-3">
-            <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#002A1F] flex items-center justify-center">
-                <Users className="h-4 w-4 text-white" />
-                      </div>
-              Huurders
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Beheer huurders en contracten
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard/employer/tenants" className="flex items-center justify-center gap-2">
-                Ga naar Huurders
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-                    </CardContent>
-                  </Card>
-
-        <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-          <CardHeader className="px-4 pt-4 pb-3">
-            <CardTitle className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#002A1F] flex items-center justify-center">
-                <AlertCircle className="h-4 w-4 text-white" />
-              </div>
-              Onderhoud
-                      </CardTitle>
-                    </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Beheer onderhoudstaken en meldingen
-            </p>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard/employer/maintenance" className="flex items-center justify-center gap-2">
-                Ga naar Onderhoud
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-                        </Button>
-                    </CardContent>
-                  </Card>
-                      </div>
-
-      {/* Recent Activity - Same spacing as sidebar */}
-      <Card className="border border-gray-200 dark:border-neutral-700 bg-white dark:bg-gray-900">
-        <CardHeader className="px-4 pt-4 pb-3">
-          <CardTitle className="text-base font-semibold text-gray-900 dark:text-white">
-            Laatste Activiteit
-          </CardTitle>
-                      </CardHeader>
-        <CardContent className="px-4 pb-4">
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 py-2 border-b border-gray-200 dark:border-neutral-700 last:border-0">
-              <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Nieuwe huurder toegevoegd
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Jan Jansen - Appartement 4B
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  2 uur geleden
-                </p>
-              </div>
+        {/* Compliance status – donut-achtig + alerts */}
+        <div className={cn(CARD_CLASS, 'p-5')}>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+            Compliance status
+          </h3>
+          <div className="flex flex-wrap items-center gap-6 mb-4">
+            {/* Donut-achtige weergave: 3 segmenten */}
+            <div className="relative h-24 w-24 shrink-0">
+              <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="rgb(229, 231, 235)"
+                  strokeWidth="2.5"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#002A1F"
+                  strokeWidth="2.5"
+                  strokeDasharray={`${(complianceSummary.compliant / complianceSummary.total) * 100}, 100`}
+                  className="transition-all"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="2.5"
+                  strokeDasharray={`${(complianceSummary.actionNeeded / complianceSummary.total) * 100}, 100`}
+                  strokeDashoffset={`-${(complianceSummary.compliant / complianceSummary.total) * 100}`}
+                  className="transition-all"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#EF4444"
+                  strokeWidth="2.5"
+                  strokeDasharray={`${(complianceSummary.expired / complianceSummary.total) * 100}, 100`}
+                  strokeDashoffset={`-${((complianceSummary.compliant + complianceSummary.actionNeeded) / complianceSummary.total) * 100}`}
+                  className="transition-all"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-gray-900 dark:text-white">
+                {complianceSummary.score}%
+              </span>
             </div>
-
-            <div className="flex items-start gap-3 py-2 border-b border-gray-200 dark:border-neutral-700 last:border-0">
-              <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-orange-500"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Onderhoudsmelding ontvangen
-                      </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Lekkage badkamer - Pand Kerkstraat 12
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  5 uur geleden
-                </p>
+            <div className="flex flex-col gap-1.5 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#002A1F]" />
+                {complianceSummary.compliant} compliant
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" />
+                {complianceSummary.actionNeeded} actie nodig
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />
+                {complianceSummary.expired} verlopen
+              </span>
+            </div>
+          </div>
+          <div className={cn('rounded-2xl p-3 space-y-2', INNER_BLOCK_CLASS)}>
+            {complianceAlerts.map((alert, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <AlertIcon type={alert.type} />
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{alert.address}:</span>
+                <span className="text-gray-600 dark:text-gray-400">{alert.label}</span>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-            <div className="flex items-start gap-3 py-2">
-              <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Huurcontract verlengd
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Maria de Vries - Appartement 2A
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  1 dag geleden
-                      </p>
-                            </div>
-            </div>
-                              </div>
-                      </CardContent>
-                    </Card>
+      {/* Onderste rij: Financieel (met balken) | Aankomende taken */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        {/* Financieel deze maand – donkere kaart met balken (zoals homepage Maandelijkse inkomsten) */}
+        <div className={cn(CARD_CLASS, '!bg-[#002A1F] !border-[#002A1F]/20 p-6')}>
+          <p className="text-white/80 text-sm font-medium mb-1">
+            Financieel deze maand
+          </p>
+          <p className="text-3xl font-bold text-white mb-5">
+            €{monthlyFinancials.huurinkomsten.toLocaleString('nl-NL')}
+          </p>
+          <div className="space-y-3 mb-5">
+            {FINANCIAL_BARS.map((bar) => (
+              <div key={bar.label} className="flex items-center gap-3">
+                <div className="w-24 text-xs text-white/80 shrink-0">{bar.label}</div>
+                <div className="flex-1 h-6 rounded-xl bg-white/10 overflow-hidden">
+                  <div
+                    className={cn('h-full rounded-xl transition-all duration-500', bar.color)}
+                    style={{ width: `${(bar.value / maxFinancial) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-white w-20 text-right">
+                  €{bar.value.toLocaleString('nl-NL')}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/dashboard/employer/financial"
+            className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 text-sm font-semibold transition-colors"
+          >
+            Bekijk financieel
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {/* Aankomende taken – witte kaart, grijze rijen */}
+        <div className={cn(CARD_CLASS, 'p-5')}>
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+            Aankomende taken
+          </h3>
+          <ul className="space-y-2">
+            {upcomingTasks.map((task) => (
+              <li
+                key={task.id}
+                className={cn(
+                  'flex items-center gap-3 py-3 px-4',
+                  INNER_BLOCK_CLASS
+                )}
+              >
+                <div className="h-10 w-10 rounded-full bg-amber-500/20 dark:bg-amber-500/30 flex items-center justify-center shrink-0">
+                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {task.title}
+                  </p>
+                  {task.subtitle && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {task.subtitle}
+                    </p>
+                  )}
+                </div>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">
+                  {task.date}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </>
   )
 }

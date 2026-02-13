@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -148,7 +149,7 @@ export default function TenantDetailPage() {
               {/* Tab 1: Gegevens */}
               <TabsContent value="details">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <Card className="lg:col-span-2 border border-gray-200 dark:border-neutral-700">
+                  <Card className={dashboardCardClass('lg:col-span-2')}>
                     <CardHeader>
                       <CardTitle>Persoonlijke Gegevens</CardTitle>
                       <CardDescription>Contact- en contractinformatie</CardDescription>
@@ -232,7 +233,7 @@ export default function TenantDetailPage() {
                   </Card>
 
                   {/* Notities */}
-                  <Card className="border border-gray-200 dark:border-neutral-700">
+                  <Card className={dashboardCardClass()}>
                     <CardHeader>
                       <CardTitle>Notities</CardTitle>
                       <CardDescription>Memo&apos;s over deze huurder</CardDescription>
@@ -254,7 +255,7 @@ export default function TenantDetailPage() {
 
               {/* Tab 2: Betalingen */}
               <TabsContent value="payments">
-                <Card className="border border-gray-200 dark:border-neutral-700">
+                <Card className={dashboardCardClass()}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>

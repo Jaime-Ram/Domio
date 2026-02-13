@@ -35,6 +35,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function TenantsPage() {
   const router = useRouter()
@@ -78,7 +79,7 @@ export default function TenantsPage() {
             </div>
 
             {/* Search */}
-            <Card className="mb-6 border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass('mb-6')}>
               <CardContent className="p-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -93,7 +94,7 @@ export default function TenantsPage() {
             </Card>
 
             {/* Tenants Table */}
-            <Card className="border border-gray-200 dark:border-neutral-700">
+            <Card className={dashboardCardClass()}>
               <CardHeader>
                 <CardTitle>Alle Huurders ({filteredTenants.length})</CardTitle>
               </CardHeader>
