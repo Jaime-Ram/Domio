@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { VastgoedSidebar } from "@/components/dashboard/vastgoed-sidebar"
 import { ContentHeader } from "@/components/dashboard/content-header"
@@ -24,35 +24,58 @@ export default function EmployerDashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [viewAs, setViewAs] = useState<'verhuurder' | 'huurder'>('verhuurder')
 
+  // Op mobiel: body scroll vergrendelen wanneer sidebar open is
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches
+    if (isMobile && sidebarOpen) {
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = ''
+      }
+    }
+  }, [sidebarOpen])
+
   return (
     <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
-      {/* Demo Banner - Bright green bar at top, spanning entire page, fixed position - Hidden on mobile */}
-      <div className="hidden md:flex fixed top-0 left-0 right-0 bg-[#9AFF7C] border-b border-[#9AFF7C]/20 py-3 w-full z-50">
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
-          {/* Left side - aligned with sidebar logo (px-6) */}
-          <div className="flex items-center justify-start w-full sm:w-auto pl-4 sm:pl-6">
-            <span className="text-xs sm:text-sm font-medium text-[#002A1F] leading-tight">
-              <span className="hidden sm:inline">Welkom bij de domio demo omgeving.{' '}</span>
-              <span className="sm:hidden">Domio demo</span>
-              <span className="underline">Meer informatie</span>
-            </span>
-          </div>
-          {/* Right side - aligned with header profile (px-6 sm:px-8 lg:px-12) */}
-          <div className="flex items-center gap-2 sm:gap-3 pr-4 sm:pr-6 lg:pr-8 xl:pr-12 w-full sm:w-auto justify-end sm:justify-start">
-            <div suppressHydrationWarning>
+      {/* Demo bar: volle breedte (ook boven sidebar), groen; inhoud uitgelijnd met contentkolom */}
+      <div className="hidden md:flex fixed top-0 left-0 right-0 z-50 h-12 bg-brand-accent">
+        <div
+          className={cn(
+            "flex-1 flex items-center min-w-0 h-full transition-[margin-left] duration-300 ease-in-out",
+            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          )}
+          style={{
+            transitionProperty: 'margin-left',
+            transitionDuration: '300ms',
+            transitionTimingFunction: 'ease-in-out',
+            willChange: 'margin-left'
+          }}
+        >
+          <div className="w-full max-w-7xl px-6 sm:px-8 lg:px-12 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-brand-primary truncate">
+              Dit is een demo.
+              <Link
+                href="/"
+                className="ml-1.5 text-brand-primary hover:underline underline-offset-2"
+                onClick={(e) => { e.preventDefault(); window.location.href = '/' }}
+              >
+                Meer informatie
+              </Link>
+            </p>
+            <div className="flex items-center gap-2 shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-white text-[#002A1F] border-gray-200 hover:bg-gray-100 rounded-full h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm flex-shrink-0"
+                    className="h-9 px-3.5 rounded-2xl border-gray-200/80 bg-white text-brand-primary hover:bg-gray-50 font-medium text-sm"
                   >
-                    <span className="hidden sm:inline">Bekijk als {viewAs === 'verhuurder' ? 'verhuurder' : 'huurder'}</span>
-                    <span className="sm:hidden">{viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}</span>
-                    <ChevronDown className="ml-1 sm:ml-2 h-3 w-3" />
+                    {viewAs === 'verhuurder' ? 'Verhuurder' : 'Huurder'}
+                    <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="rounded-card border border-gray-200/80 bg-white shadow-lg">
                   <DropdownMenuItem onClick={() => setViewAs('verhuurder')}>
                     Bekijk als verhuurder
                   </DropdownMenuItem>
@@ -61,27 +84,23 @@ export default function EmployerDashboardLayout({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <Button
+                asChild
+                size="sm"
+                className="h-9 px-4 rounded-2xl bg-brand-primary text-white hover:bg-brand-primary-hover font-medium text-sm"
+              >
+                <Link href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/' }}>
+                  Open account
+                </Link>
+              </Button>
             </div>
-            <Button
-              asChild
-              className="bg-[#002A1F] text-white hover:bg-[#002A1F]/90 rounded-full h-7 sm:h-8 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0"
-            >
-              <Link href="/" onClick={(e) => {
-                e.preventDefault()
-                // Open signup modal or navigate to signup
-                window.location.href = '/'
-              }}>
-                <span className="hidden sm:inline">Open Account</span>
-                <span className="sm:hidden">Account</span>
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
-      
-      {/* Spacer for fixed banner - only on desktop */}
-      <div className="hidden md:block h-[57px]"></div>
-      
+
+      {/* Spacer zodat sidebar + content onder de bar beginnen */}
+      <div className="hidden md:block h-12 flex-shrink-0" />
+
       <div className="flex flex-1 min-h-0 w-full">
         <VastgoedSidebar 
           isOpen={sidebarOpen} 
@@ -102,7 +121,7 @@ export default function EmployerDashboardLayout({
             willChange: 'margin-left'
           }}
         >
-          <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
+          <ContentHeader onMenuClick={() => setSidebarOpen(true)} stickyOffsetClassName="md:top-12" />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16">
           {children}

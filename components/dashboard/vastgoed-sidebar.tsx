@@ -68,7 +68,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const [openItems, setOpenItems] = useState<string[]>([])
   const [showTrialBlock, setShowTrialBlock] = useState(!collapsed)
 
-  // Auto-expand parent when a child route is active
+  // Auto-expand alleen de sectie van de actieve route; maximaal één accordion open
   useEffect(() => {
     const menuItemsWithChildren = [
       { id: 'portefeuille-accordion', paths: ['/dashboard/employer/portfolio', '/dashboard/employer/tenants', '/dashboard/employer/contracts'] },
@@ -80,11 +80,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
       .map(({ id }) => id)
-    setOpenItems((prev) => {
-      const next = new Set(prev)
-      toOpen.forEach((id) => next.add(id))
-      return Array.from(next)
-    })
+    setOpenItems(toOpen)
   }, [pathname])
 
   // Only show trial block after sidebar animation completes (300ms)
@@ -107,7 +103,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     setOpenItems(prev => 
       prev.includes(id) 
         ? prev.filter(item => item !== id)
-        : [...prev, id]
+        : [id]
     )
   }
 
@@ -188,23 +184,32 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     return pathname === href || pathname?.startsWith(href + '/')
   }
 
+  /** Binnen een accordion alleen het meest specifieke (langste) pad als actief; voorkomt dat Facturatie én Rendement beide geselecteerd zijn. */
+  const getActiveChildHref = (children: SidebarItem['children']): string | null => {
+    if (!children?.length) return null
+    const matching = children.filter((c) => pathname === c.href || pathname.startsWith(c.href + '/'))
+    if (matching.length === 0) return null
+    return matching.sort((a, b) => b.href.length - a.href.length)[0].href
+  }
+
   const isParentActive = (children?: SidebarItem['children']) => {
     if (!children) return false
-    return children.some(child => isActive(child.href))
+    return getActiveChildHref(children) !== null
   }
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Overlay for mobile - hoge z-index zodat boven header en dropdowns */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-gray-900/50 z-50 lg:hidden"
+          className="fixed inset-0 bg-gray-900/50 z-[100] lg:hidden"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
       <div
         className={cn(
-          "fixed top-0 md:top-[57px] bottom-0 start-0 z-[60] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
+          "fixed top-0 md:top-9 bottom-0 start-0 z-[110] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
@@ -261,7 +266,13 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             "flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
             collapsed && "overflow-x-hidden"
           )}>
-            <nav className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "p-2" : "p-3")}>
+            <nav
+              className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "p-2" : "p-3")}
+              onClick={(e) => {
+                const link = (e.target as HTMLElement).closest('a[href]')
+                if (link && onClose) onClose()
+              }}
+            >
               <ul className="flex flex-col space-y-1">
                 {menuItems.map((item) => {
                   const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
@@ -333,7 +344,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           <ul className="ps-8 pt-1 space-y-1">
                             {item.children.map((child) => {
                               const ChildIcon = child.icon || FileText
-                              const active = isActive(child.href)
+                              const active = getActiveChildHref(item.children) === child.href
                               return (
                                 <li key={child.label}>
                                   <Link
@@ -341,7 +352,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                     className={cn(
                                       "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                                       active 
-                                        ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                                        ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                                         : "text-gray-800 dark:text-neutral-200"
                                     )}
                                   >
@@ -368,7 +379,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           className={cn(
                             "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                             active 
-                              ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                              ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                               : "text-gray-800 dark:text-neutral-200"
                           )}
                           title={item.label}
@@ -393,7 +404,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         className={cn(
                           "w-full flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                           active 
-                            ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9AFF7C]" 
+                            ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
                       >
@@ -433,7 +444,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                     Proberen 30 dagen gratis
                   </p>
                   <Button
-                    className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-lg w-full text-xs h-8"
+                    className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 rounded-lg w-full text-xs h-8"
                     onClick={() => router.push('/')}
                   >
                     Registreren
@@ -443,7 +454,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                 <GeometricShapes 
                   variant="trapezoid" 
                   className="right-0 bottom-0 w-32 h-32"
-                  color="#9AFF7C"
+                  color="#9FE870"
                   opacity={0.12}
                   layers={2}
                 />

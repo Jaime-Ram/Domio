@@ -15,7 +15,14 @@ const config: Config = {
       },
     },
     extend: {
+      /* Domio brand (Wise-inspired consistency): gebruik bg-brand-primary, text-brand-accent, etc. */
       colors: {
+        brand: {
+          primary: 'var(--color-primary-500)',   /* #002A1F */
+          'primary-hover': 'var(--color-primary-400)',
+          accent: 'var(--color-accent-400)',    /* #9FE870 */
+          'accent-hover': 'var(--color-accent-500)',
+        },
         primary: {
           '50': 'var(--color-primary-50)',
           '100': 'var(--color-primary-100)',
@@ -75,7 +82,21 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
         '4xl': '2rem',
-      }
+        /* Wise-style: cards en blokken */
+        card: 'var(--radius-card)',
+        block: 'var(--radius-block)',
+        pill: 'var(--radius-pill)',
+      },
+      spacing: {
+        'wise-xs': 'var(--space-x-small)',
+        'wise-sm': 'var(--space-small)',
+        'wise-md': 'var(--space-medium)',
+        'wise-lg': 'var(--space-large)',
+      },
+      boxShadow: {
+        /* Schaduw boven + onder voor zwevende kaarten op groene achtergrond */
+        'card-elevated': '0 -6px 20px -5px rgba(0,0,0,0.08), 0 20px 50px -8px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.08)',
+      },
     }
   },
   plugins: [require("tailwindcss-animate")],

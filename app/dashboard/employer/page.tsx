@@ -27,17 +27,17 @@ import {
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { FunctieBlock } from '@/components/ui/functie-block'
+import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
 
 const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
 const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
-const ICON_CIRCLE_CLASS = 'h-10 w-10 rounded-full bg-[#002A1F] dark:bg-[#002A1F] flex items-center justify-center shrink-0'
 
 // Bar heights voor weergave (relatief)
 const FINANCIAL_BARS = [
   { label: 'Huurinkomsten', value: monthlyFinancials.huurinkomsten, color: 'bg-white/20' },
   { label: 'Onderhoud', value: monthlyFinancials.onderhoud, color: 'bg-white/15' },
   { label: 'Beheerkosten', value: monthlyFinancials.beheerkosten, color: 'bg-white/10' },
-  { label: 'Netto', value: monthlyFinancials.netto, color: 'bg-[#9AFF7C]' },
+  { label: 'Netto', value: monthlyFinancials.netto, color: 'bg-[#9FE870]' },
 ]
 const maxFinancial = Math.max(...FINANCIAL_BARS.map((b) => b.value))
 
@@ -108,7 +108,7 @@ export default function EmployerDashboardPage() {
         />
         <FunctieBlock
           icon={<CheckCircle2 className="h-4 w-4 text-white" />}
-          trend={<span className="text-lg font-bold text-[#002A1F] dark:text-[#9AFF7C]">{complianceSummary.score}%</span>}
+          trend={<span className="text-lg font-bold text-[#002A1F] dark:text-[#9FE870]">{complianceSummary.score}%</span>}
           title="Compliance score"
           value={null}
           subtitle={`${complianceSummary.compliant} van ${complianceSummary.total} compliant`}
@@ -117,49 +117,19 @@ export default function EmployerDashboardPage() {
 
       {/* 2 kolommen: Recente activiteit | Compliance status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
-        {/* Recente activiteit – witte kaart, grijze rijen (zoals functies) */}
-        <div className={cn(CARD_CLASS, 'p-5')}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-              Recente activiteit
-            </h3>
-            <Link
-              href="/dashboard/employer/portfolio"
-              className="text-sm text-[#002A1F] dark:text-[#9AFF7C] font-medium flex items-center gap-1 hover:underline"
-            >
-              Alles
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <ul className="space-y-2">
-            {recentActivities.slice(0, 5).map((item) => (
-              <li
-                key={item.id}
-                className={cn('flex items-center gap-3 py-3 px-4', INNER_BLOCK_CLASS)}
-              >
-                <div className={ICON_CIRCLE_CLASS}>
-                  <ActivityIcon type={item.type} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {item.subtitle}
-                  </p>
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
-                    {item.time}
-                  </p>
-                </div>
-                {item.amount != null && (
-                  <span className="text-sm font-semibold text-[#002A1F] dark:text-[#9AFF7C] shrink-0">
-                    €{item.amount.toLocaleString('nl-NL')}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* Recente activiteit – SaaS transactie-widget */}
+        <TransactionListWidget
+          title="Recente activiteit"
+          seeAllHref="/dashboard/employer/portfolio"
+          seeAllLabel="Alles"
+          items={recentActivities.slice(0, 5).map((item, i) => ({
+            icon: <ActivityIcon type={item.type} />,
+            iconAccent: i === 0,
+            name: item.title,
+            description: `${item.subtitle} • ${item.time}`,
+            amount: item.amount != null ? `€${item.amount.toLocaleString('nl-NL')}` : undefined,
+          }))}
+        />
 
         {/* Compliance status – donut-achtig + alerts */}
         <div className={cn(CARD_CLASS, 'p-5')}>
@@ -262,7 +232,7 @@ export default function EmployerDashboardPage() {
           </div>
           <Link
             href="/dashboard/employer/financial"
-            className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 text-sm font-semibold transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
           >
             Bekijk financieel
             <ChevronRight className="h-4 w-4" />

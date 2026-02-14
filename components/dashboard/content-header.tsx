@@ -12,13 +12,16 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { currentUser, notifications, unreadNotificationsCount } from '@/lib/mock-data/domio-dashboard'
 
 interface ContentHeaderProps {
   onMenuClick?: () => void
+  /** Sticky offset (e.g. md:top-12 when demo bar is above) */
+  stickyOffsetClassName?: string
 }
 
-export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
+export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHeaderProps) {
   const userName = currentUser.name
   const userEmail = currentUser.email
   const userRole = 'Admin'
@@ -31,18 +34,22 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
   const quickActionIconClass = 'w-10 h-10 rounded-full bg-[#002A1F] flex items-center justify-center'
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur">
+    <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-3">
         {/* Hamburger menu for mobile */}
         <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden h-9 w-9 rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
-          onClick={onMenuClick}
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
+            variant="ghost"
+            size="icon"
+            className="lg:hidden h-10 w-10 min-h-[44px] min-w-[44px] rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 touch-manipulation"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onMenuClick?.()
+            }}
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Menu openen</span>
+          </Button>
 
         {/* Search + Snelle acties - Desktop */}
         <div className="hidden md:flex flex-1 max-w-2xl items-center gap-3">
@@ -52,9 +59,9 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 px-4 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9AFF7C] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm"
+                  className="h-10 px-4 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
                 >
-                  <Zap className="h-4 w-4" />
+                  <Zap className="h-4 w-4 shrink-0" />
                   <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -102,7 +109,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9AFF7C] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
+                  className="h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
                 >
                   <Zap className="h-4 w-4" />
                 </Button>
@@ -166,7 +173,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                     <DropdownMenuLabel className="p-0 font-semibold text-gray-900 dark:text-white">
                       Notificaties
                     </DropdownMenuLabel>
-                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#002A1F] dark:text-[#9AFF7C] font-medium">
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#002A1F] dark:text-[#9FE870] font-medium">
                       Alles gelezen
                     </Button>
                   </div>
@@ -183,8 +190,8 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                             : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
                         }`}
                       >
-                        <div className="h-9 w-9 rounded-2xl bg-[#002A1F]/10 dark:bg-[#9AFF7C]/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9AFF7C]" />
+                        <div className="h-9 w-9 rounded-2xl bg-[#002A1F]/10 dark:bg-[#9FE870]/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9FE870]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{n.title}</p>
@@ -196,7 +203,7 @@ export function ContentHeader({ onMenuClick }: ContentHeaderProps) {
                   })}
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200/80 dark:border-neutral-700">
-                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-[#002A1F] dark:text-[#9AFF7C] rounded-2xl">
+                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-[#002A1F] dark:text-[#9FE870] rounded-2xl">
                     Alle notificaties bekijken
                   </Button>
                 </div>

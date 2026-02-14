@@ -20,7 +20,7 @@ export interface FunctieBlockProps extends React.HTMLAttributes<HTMLDivElement> 
   subtitle?: string
   /** Lange beschrijving (voor grote blokken) */
   description?: string
-  /** Achtergrondkleur icoon (default: #002A1F) */
+  /** Achtergrondkleur icoon (default: brand-primary) */
   iconBgClassName?: string
   /** Extra inhoud onder value (beschrijving, knop) */
   children?: React.ReactNode
@@ -45,7 +45,7 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
       value,
       subtitle,
       description,
-      iconBgClassName = 'bg-[#002A1F]',
+      iconBgClassName = 'bg-brand-primary',
       children,
       compact = false,
       ...props
@@ -58,7 +58,7 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden',
+          'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden',
           compact ? 'p-3' : 'p-5',
           className
         )}
@@ -81,7 +81,7 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
               </div>
             )}
             {trend != null && (
-              <div className="flex-shrink-0 text-[#002A1F] dark:text-[#9AFF7C] [&>svg]:h-5 [&>svg]:w-5">
+              <div className="flex-shrink-0 text-brand-primary dark:text-brand-accent [&>svg]:h-5 [&>svg]:w-5">
                 {trend}
               </div>
             )}
@@ -92,7 +92,7 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
         </p>
         {value != null && (
           <div className={cn('rounded-2xl bg-gray-100 dark:bg-neutral-800 p-3 mt-2', compact && 'p-2')}>
-            <div className={cn('font-bold text-[#002A1F] dark:text-[#9AFF7C] tracking-tight', compact ? 'text-base' : 'text-2xl')}>
+            <div className={cn('font-bold text-brand-primary dark:text-brand-accent tracking-tight', compact ? 'text-base' : 'text-2xl')}>
               {value}
             </div>
             {subtitle != null && subtitle !== '' && (

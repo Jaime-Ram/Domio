@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ArrowUpRight } from 'lucide-react'
-import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
 interface HeroSectionProps {
   onSignupClick?: () => void
@@ -12,22 +11,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-white flex items-center min-h-[calc(82vh-4rem)] pt-16 pb-10 md:pt-20 md:pb-12">
-      {/* Decoratieve hoek rechtsonder – twee kleuren */}
-      <GeometricShapes
-        variant="trapezoid"
-        className="right-0 bottom-0 w-[20rem] h-[20rem] md:w-[26rem] md:h-[26rem] lg:w-[32rem] lg:h-[32rem]"
-        color="#9AFF7C"
-        opacity={0.3}
-        layers={1}
-      />
-      <GeometricShapes
-        variant="trapezoid"
-        className="right-0 bottom-0 w-[18rem] h-[18rem] md:w-[22rem] md:h-[22rem] lg:w-[28rem] lg:h-[28rem] translate-x-8 translate-y-4"
-        color="#002A1F"
-        opacity={0.25}
-        layers={1}
-      />
+    <section className="relative overflow-hidden bg-white flex items-center min-h-[calc(88vh-4rem)] pt-16 pb-10 md:pt-20 md:pb-12">
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-8">
         {/* Left: Title + CTA */}
         <div className="flex-shrink-0 max-w-2xl">
@@ -46,7 +30,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           <div className="flex flex-row items-center gap-3 justify-start">
             <Button
               onClick={onSignupClick}
-              className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-2xl"
+              className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border border-[#9FE870]/20 rounded-2xl"
             >
               Gratis aanmelden
             </Button>

@@ -214,13 +214,23 @@
     --color-accent-100: #E1FFD9;
     --color-accent-200: #C3FFB3;
     --color-accent-300: #A5FF8D;
-    --color-accent-400: #9AFF7C; /* Secondary - Light Green */
+    --color-accent-400: #9FE870; /* Secondary - Light Green */
     --color-accent-500: #7FE65F;
     --color-accent-600: #64CC4C;
     --color-accent-700: #4A9939;
     --color-accent-800: #2F6626;
     --color-accent-900: #153313;
-}
+
+    /* Wise-style semantic spacing (use in components for consistency) */
+    --space-x-small: 8px;
+    --space-small: 16px;
+    --space-medium: 24px;
+    --space-large: 32px;
+    /* Wise-style radius (cards, blocks) */
+    --radius-card: 1.75rem;
+    --radius-block: 1rem;
+    --radius-pill: 9999px;
+  }
 
 @layer base {
   :root {
@@ -236,7 +246,7 @@
         --secondary-foreground: 222 47% 11%; /* Midnight */
         --muted: 210 40% 96%;
         --muted-foreground: 215 16% 47%; /* Slate #475569 */
-        --accent: 105 100% 74%; /* Domio Secondary Green #9AFF7C */
+        --accent: 102 72% 68%; /* Domio Secondary Green #9FE870 */
         --accent-foreground: 165 100% 8%; /* Main Green for contrast */
         --destructive: 0 84% 60%; /* Error Red #EF4444 */
         --destructive-foreground: 0 0% 98%;
@@ -258,7 +268,7 @@
         --secondary-foreground: 0 0% 98%;
         --muted: 215 28% 17%;
         --muted-foreground: 215 16% 47%;
-        --accent: 105 100% 74%; /* Domio Secondary Green #9AFF7C */
+        --accent: 102 72% 68%; /* Domio Secondary Green #9FE870 */
         --accent-foreground: 165 100% 8%; /* Main Green for contrast */
         --destructive: 0 62% 50%;
         --destructive-foreground: 0 0% 98%;
@@ -301,10 +311,12 @@
   }
   
   /* Force all mobile menu links to have the same color */
+  a[href="/contact"],
   a[href="#contact"] {
     color: rgb(255 255 255 / 0.8) !important;
   }
   
+  a[href="/contact"]:visited,
   a[href="#contact"]:visited {
     color: rgb(255 255 255 / 0.8) !important;
   }

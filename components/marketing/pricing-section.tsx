@@ -98,7 +98,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
             <h3
               id={tier.id}
               className={cn(
-                tier.featured ? 'text-[#9AFF7C]' : 'text-[#002A1F]',
+                tier.featured ? 'text-[#9FE870]' : 'text-[#002A1F]',
                 'text-base font-semibold leading-7',
               )}
             >
@@ -142,7 +142,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
                   <Check
                     aria-hidden="true"
                     className={cn(
-                      tier.featured ? 'text-[#9AFF7C]' : 'text-[#002A1F]',
+                      tier.featured ? 'text-[#9FE870]' : 'text-[#002A1F]',
                       'h-6 w-5 flex-none',
                     )}
                   />
@@ -156,7 +156,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
               aria-describedby={tier.id}
               className={cn(
                 tier.featured
-                  ? 'bg-[#9AFF7C] text-[#002A1F] shadow-sm hover:bg-[#9AFF7C]/90 focus-visible:outline-[#9AFF7C]'
+                  ? 'bg-[#9FE870] text-[#002A1F] shadow-sm hover:bg-[#9FE870]/90 focus-visible:outline-[#9FE870]'
                   : 'bg-transparent text-[#002A1F] border-2 border-[#002A1F] hover:bg-[#002A1F]/5 focus-visible:outline-[#002A1F]',
                 'mt-8 w-full rounded-2xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
               )}

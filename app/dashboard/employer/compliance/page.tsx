@@ -433,7 +433,7 @@ export default function CompliancePage() {
                           key={template.id}
                           className="border border-gray-200 dark:border-neutral-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
                         >
-                          <FileText className="h-8 w-8 text-[#002A1F] dark:text-[#9AFF7C] mb-3" />
+                          <FileText className="h-8 w-8 text-[#002A1F] dark:text-[#9FE870] mb-3" />
                           <h4 className="font-medium text-gray-900 dark:text-white mb-2">
                             {template.name}
                           </h4>

@@ -201,10 +201,10 @@ export default function FinancialPage() {
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Saldo
                   </CardTitle>
-                  <Euro className="h-4 w-4 text-[#002A1F] dark:text-[#9AFF7C]" />
+                  <Euro className="h-4 w-4 text-[#002A1F] dark:text-[#9FE870]" />
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${balance >= 0 ? 'text-[#002A1F] dark:text-[#9AFF7C]' : 'text-red-600'}`}>
+                  <div className={`text-2xl font-bold ${balance >= 0 ? 'text-[#002A1F] dark:text-[#9FE870]' : 'text-red-600'}`}>
                     €{balance.toLocaleString('nl-NL')}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">

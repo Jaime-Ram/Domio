@@ -34,8 +34,8 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
     return (
       <Link href={href} className={`flex items-center gap-2 ${className || ''}`}>
         <span className="text-2xl font-bold">
-          <span className={variant === 'white' ? 'text-white' : 'text-[#002A1F] dark:text-[#9AFF7C]'}>Dom</span>
-          <span className={variant === 'white' ? 'text-white/90' : 'text-[#356258] dark:text-[#9AFF7C]'}>io</span>
+          <span className={variant === 'white' ? 'text-white' : 'text-[#002A1F] dark:text-[#9FE870]'}>Dom</span>
+          <span className={variant === 'white' ? 'text-white/90' : 'text-[#356258] dark:text-[#9FE870]'}>io</span>
         </span>
       </Link>
     )

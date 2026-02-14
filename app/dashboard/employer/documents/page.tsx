@@ -73,7 +73,7 @@ export default function DocumentsPage() {
   })
 
   const getTypeIcon = (type: string) => {
-    return <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+    return <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
   }
 
   const getTypeBadge = (type: string) => {
@@ -152,7 +152,7 @@ export default function DocumentsPage() {
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="file">Selecteer bestand</Label>
-                      <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#002A1F] dark:hover:border-[#9AFF7C] transition-colors cursor-pointer">
+                      <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#002A1F] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
                         <Input
                           id="file"
                           type="file"
@@ -340,7 +340,7 @@ export default function DocumentsPage() {
                             {doc.property ? (
                               <Button 
                                 variant="link" 
-                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9AFF7C]"
+                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9FE870]"
                                 onClick={() => router.push(`/dashboard/employer/portfolio/properties/${doc.property?.id}`)}
                               >
                                 {doc.property.address}

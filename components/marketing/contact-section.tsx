@@ -41,7 +41,7 @@ export function ContactSection() {
       <div className="max-w-2xl lg:max-w-5xl mx-auto">
         <div className="text-center">
           <h1 className="text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl dark:text-white">
-            Nog vragen?
+            We helpen je graag
           </h1>
           <p className="mt-2 text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8 dark:text-gray-400">
             We helpen je graag verder met al je vragen.
@@ -188,7 +188,7 @@ export function ContactSection() {
                 </p>
                 <Link
                   className="mt-2 inline-flex items-center gap-x-2 text-sm font-medium text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 dark:text-neutral-400 dark:hover:text-neutral-200 dark:focus:text-neutral-200"
-                  href="#faq"
+                  href="/faq"
                 >
                   Bekijk FAQ
                   <ArrowRight className="shrink-0 size-2.5 transition ease-in-out group-hover:translate-x-1 group-focus:translate-x-1" />

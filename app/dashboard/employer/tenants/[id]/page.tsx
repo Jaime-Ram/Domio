@@ -196,7 +196,7 @@ export default function TenantDetailPage() {
                               <Home className="h-4 w-4 text-gray-400" />
                               <Button 
                                 variant="link" 
-                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9AFF7C]"
+                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9FE870]"
                                 onClick={() => router.push(`/dashboard/employer/portfolio/properties/${tenant.property?.id}`)}
                               >
                                 {tenant.property?.address}

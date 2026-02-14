@@ -1,15 +1,16 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import {
   FileText,
   ArrowUpRight,
   Wrench,
   Euro,
-  ChevronRight,
   UserPlus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
 
 const CHART_BARS = [
   { label: 'Ma', value: 65 },
@@ -22,13 +23,13 @@ const CHART_BARS = [
 ]
 
 const ACTIVITIES = [
-  { type: 'tenant', label: 'Nieuwe huurder toegevoegd', sub: 'Jan Jansen - Appartement 4B', time: '2 uur geleden' },
+  { type: 'tenant', label: 'Nieuwe huurder toegevoegd', sub: 'Jan Jansen - Appartement 4B', time: '2 uur geleden', amount: '€1.450' },
   { type: 'maintenance', label: 'Onderhoudsmelding ontvangen', sub: 'Lekkage badkamer - Kerkstraat 12', time: '5 uur geleden' },
-  { type: 'contract', label: 'Huurcontract verlengd', sub: 'Maria de Vries - Appartement 2A', time: '1 dag geleden' },
+  { type: 'contract', label: 'Huurcontract verlengd', sub: 'Maria de Vries - Appartement 2A', time: '1 dag geleden', amount: '€1.180' },
 ]
 
-function ActivityIcon({ type }: { type: string }) {
-  const iconClass = 'h-4 w-4 text-white'
+function activityIcon(type: string) {
+  const iconClass = 'h-4 w-4'
   switch (type) {
     case 'rent':
     case 'payment':
@@ -44,15 +45,15 @@ function ActivityIcon({ type }: { type: string }) {
   }
 }
 
-const CARD_CLASS = 'rounded-[1.75rem] bg-white dark:bg-neutral-900 shadow-lg border border-gray-200/80 dark:border-neutral-700'
+/* Schaduw boven én onder voor zwevend effect op groene achtergrond; overflow-visible zodat schaduw niet wordt geknipt */
+const CARD_CLASS = 'rounded-[1.75rem] bg-white dark:bg-neutral-900 shadow-card-elevated border border-gray-200/60 dark:border-neutral-700 overflow-visible'
 const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
-const ICON_CIRCLE_CLASS = 'h-10 w-10 rounded-full bg-[#002A1F] dark:bg-[#002A1F] flex items-center justify-center shrink-0'
 
 export function FunctiesSection() {
   return (
     <section
       id="features"
-      className="py-24 sm:py-32 pb-16 sm:pb-20 rounded-[3rem] overflow-hidden mx-4 sm:mx-6 lg:mx-8 bg-[#FAF7F2] dark:bg-neutral-900/80"
+      className="w-full py-24 sm:py-32 pb-16 sm:pb-20 bg-[#9FE870] dark:bg-[#7bc755]"
     >
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         <div className="mb-12 text-center md:mb-16">
@@ -84,7 +85,7 @@ export function FunctiesSection() {
                       className="w-full rounded-t-xl transition-all duration-300"
                       style={{
                         height: `${bar.value}%`,
-                        backgroundColor: i === 3 ? '#9AFF7C' : 'rgba(255,255,255,0.2)',
+                        backgroundColor: i === 3 ? '#9FE870' : 'rgba(255,255,255,0.2)',
                       }}
                     />
                   </div>
@@ -106,7 +107,7 @@ export function FunctiesSection() {
                 </button>
                 <button
                   type="button"
-                  className="flex-1 rounded-full py-2.5 px-4 bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 text-sm font-semibold transition-colors"
+                  className="flex-1 rounded-full py-2.5 px-4 bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
                 >
                   Rapport
                 </button>
@@ -114,48 +115,21 @@ export function FunctiesSection() {
             </div>
           </div>
 
-          {/* 2. Recente activiteit */}
+          {/* 2. Recente activiteit – SaaS transactie-widget */}
           <div className="w-full">
-            <div className={cn(CARD_CLASS, 'p-5')}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                  Recente activiteit
-                </h3>
-                <button
-                  type="button"
-                  className="text-sm text-[#002A1F] dark:text-[#9AFF7C] font-medium flex items-center gap-1 hover:underline"
-                >
-                  Alles
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-              <ul className="space-y-2">
-                {ACTIVITIES.map((item, i) => (
-                  <li
-                    key={i}
-                    className={cn(
-                      'flex items-center gap-3 py-3 px-4',
-                      INNER_BLOCK_CLASS
-                    )}
-                  >
-                    <div className={ICON_CIRCLE_CLASS}>
-                      <ActivityIcon type={item.type} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                        {item.label}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {item.sub}
-                      </p>
-                      <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
-                        {item.time}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <TransactionListWidget
+              elevatedShadow
+              title="Recente activiteit"
+              seeAllHref="/dashboard/employer"
+              seeAllLabel="Alles"
+              items={ACTIVITIES.map((item, i) => ({
+                icon: activityIcon(item.type),
+                iconAccent: i === 0,
+                name: item.label,
+                description: `${item.sub} • ${item.time}`,
+                amount: item.amount,
+              }))}
+            />
           </div>
 
           {/* 3. Maandoverzicht */}
@@ -189,6 +163,16 @@ export function FunctiesSection() {
               </p>
             </div>
           </div>
+
+        </div>
+
+        <div className="mt-14 sm:mt-16 flex justify-center">
+          <Link
+            href="/#features"
+            className="inline-flex items-center justify-center px-10 py-3.5 rounded-full bg-[#002A1F] text-white font-semibold text-base shadow-lg shadow-[#002A1F]/20 hover:bg-[#002A1F]/90 transition-colors"
+          >
+            Ontdek alle functies
+          </Link>
         </div>
       </div>
     </section>

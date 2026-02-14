@@ -46,7 +46,7 @@ export default function ReportsPage() {
       </div>
 
       {toastMessage && (
-        <div className="rounded-lg bg-[#002A1F] dark:bg-[#9AFF7C]/20 text-white dark:text-[#002A1F] px-4 py-3 text-sm font-medium flex items-center gap-2">
+        <div className="rounded-lg bg-[#002A1F] dark:bg-[#9FE870]/20 text-white dark:text-[#002A1F] px-4 py-3 text-sm font-medium flex items-center gap-2">
           <FileText className="h-4 w-4 flex-shrink-0" />
           {toastMessage}
         </div>
@@ -58,15 +58,15 @@ export default function ReportsPage() {
           return (
             <Card key={r.id} className="flex flex-col">
               <CardHeader>
-                <div className="h-10 w-10 rounded-lg bg-[#002A1F]/10 dark:bg-[#9AFF7C]/10 flex items-center justify-center mb-2">
-                  <Icon className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                <div className="h-10 w-10 rounded-lg bg-[#002A1F]/10 dark:bg-[#9FE870]/10 flex items-center justify-center mb-2">
+                  <Icon className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
                 </div>
                 <CardTitle className="text-base">{r.title}</CardTitle>
                 <CardDescription className="text-sm">{r.description}</CardDescription>
               </CardHeader>
               <CardContent className="mt-auto pt-2">
                 <Button
-                  className="w-full bg-[#002A1F] hover:bg-[#002A1F]/90 dark:bg-[#9AFF7C] dark:text-[#002A1F] dark:hover:bg-[#9AFF7C]/90"
+                  className="w-full bg-[#002A1F] hover:bg-[#002A1F]/90 dark:bg-[#9FE870] dark:text-[#002A1F] dark:hover:bg-[#9FE870]/90"
                   onClick={() => handleGenerate(r.id, r.title)}
                   disabled={generatingId !== null}
                 >

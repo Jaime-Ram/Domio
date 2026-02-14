@@ -116,8 +116,8 @@ export default function TenantsPage() {
                       <TableRow key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[#002A1F]/10 dark:bg-[#9AFF7C]/20 flex items-center justify-center">
-                              <Users className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                            <div className="w-10 h-10 rounded-full bg-[#002A1F]/10 dark:bg-[#9FE870]/20 flex items-center justify-center">
+                              <Users className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
                             </div>
                             <div>
                               <div className="font-medium text-gray-900 dark:text-white">

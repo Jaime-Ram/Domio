@@ -13,16 +13,13 @@ export function FooterSection() {
           <div className="flex flex-col gap-6 lg:max-w-md lg:flex-1">
             {/* Logo */}
             <div className="overflow-visible">
-              <Logo width={140} height={40} />
+              <Logo width={200} height={56} />
             </div>
             
             {/* Description */}
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Start met het beheren van je vastgoedportefeuille met één overzichtelijk platform.
             </p>
-
-            {/* Coming Soon Label */}
-            <p className="text-sm font-medium italic text-gray-500 dark:text-gray-400 mb-1">Coming soon</p>
 
             {/* App Store Buttons - Side by Side */}
             <div className="flex flex-row gap-3">
@@ -39,7 +36,7 @@ export function FooterSection() {
             </div>
           </div>
 
-          {/* Right Side - Three Columns of Links and AVG Icon */}
+          {/* Right Side - Link Columns */}
           <div className="flex flex-col gap-8 items-end">
             {/* Two Columns of Links */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 w-full">
@@ -65,7 +62,7 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
-                    href="#contact"
+                    href="/contact"
                     className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#002A1F] dark:hover:text-[#002A1F] !text-gray-600"
                   >
                     Contact
@@ -104,15 +101,6 @@ export function FooterSection() {
                 </li>
               </ul>
             </div>
-            </div>
-            
-            {/* AVG Icon - Right aligned, same height as app store buttons (h-12), with rounded corners, black and white */}
-            <div className="flex justify-end">
-              <img
-                src="/images/AVG.png"
-                alt="AVG"
-                className="h-12 w-auto object-contain rounded-lg grayscale"
-              />
             </div>
           </div>
         </div>

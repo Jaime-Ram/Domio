@@ -38,6 +38,11 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Sync mode when modal opens with new defaultMode
+  useEffect(() => {
+    if (open) setMode(defaultMode ?? 'login')
+  }, [open, defaultMode])
+
   // Prevent auto-focus on inputs when modal opens
   useEffect(() => {
     if (open) {
@@ -390,11 +395,11 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
               type="submit" 
               className={`w-full mt-auto ${
                 mode === 'login'
-                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  ? 'bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90'
                   : mode === 'signup' && signupStep === 1
-                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  ? 'bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90'
                   : mode === 'signup' && signupStep === 2
-                  ? 'bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90'
+                  ? 'bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90'
                   : ''
               }`}
               disabled={loading}

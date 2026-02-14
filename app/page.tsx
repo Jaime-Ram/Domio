@@ -3,21 +3,20 @@
 import React, { useState, useRef, lazy, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { HeroSection } from '@/components/marketing/hero-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, BookOpen, Mail, Headphones, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, BookOpen, Mail, Phone, Copy, Headphones, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
-const ContactSection = lazy(() => import('@/components/marketing/contact-section').then(m => ({ default: m.ContactSection })))
 const FooterSection = lazy(() => import('@/components/marketing/footer-section').then(m => ({ default: m.FooterSection })))
 const FunctiesSection = lazy(() => import('@/components/marketing/functies-section').then(m => ({ default: m.FunctiesSection })))
-
-const GRAY_BAR_HEIGHT = 32 // 8 * 4px
+const HuurSection = lazy(() => import('@/components/marketing/huur-section').then(m => ({ default: m.HuurSection })))
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -25,36 +24,26 @@ export default function Home() {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
   const [functionsMenuOpen, setFunctionsMenuOpen] = useState(false)
   const [supportMenuOpen, setSupportMenuOpen] = useState(false)
-  const [isClosing, setIsClosing] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const rafRef = useRef<number | null>(null)
+  const [contactMenuOpen, setContactMenuOpen] = useState(false)
+  const [copiedField, setCopiedField] = useState<'kvk' | 'btw' | null>(null)
 
-  // Header beweegt vloeiend mee met scroll (1:1 tot grijze balk weg is)
-  React.useEffect(() => {
-    const onScroll = () => {
-      if (rafRef.current != null) return
-      rafRef.current = requestAnimationFrame(() => {
-        setScrollY(typeof window !== 'undefined' ? window.scrollY : 0)
-        rafRef.current = null
-      })
-    }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-    }
-  }, [])
+  const handleCopy = (text: string, field: 'kvk' | 'btw') => {
+    void navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 1500)
+  }
+  const [isClosing, setIsClosing] = useState(false)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleHeaderMouseLeave = () => {
-    if (!functionsMenuOpen && !supportMenuOpen) return
+    if (!functionsMenuOpen && !supportMenuOpen && !contactMenuOpen) return
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
     setIsClosing(true)
     closeTimeoutRef.current = setTimeout(() => {
       setIsClosing(false)
       setFunctionsMenuOpen(false)
       setSupportMenuOpen(false)
+      setContactMenuOpen(false)
       closeTimeoutRef.current = null
     }, 350) //zelfde duur als transition voor soepele inklap-animatie
   }
@@ -69,30 +58,9 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col">
-      {/* Grijze balk – in flow, scrollt mee; staat bovenaan zodat hij bij scroll 0 boven de header lijkt */}
-      <div className="h-8 flex-shrink-0 bg-gray-100 z-[60] relative">
-        <div className="container mx-auto flex h-full w-full max-w-7xl items-center justify-end gap-4 px-4 md:px-8">
-          <Link href="/privacy" className="text-xs text-gray-600 hover:text-[#002A1F] transition-colors">
-            Gegevensbescherming
-          </Link>
-          <div className="relative inline-flex items-center">
-            <select
-              className="text-xs text-gray-600 hover:text-[#002A1F] bg-transparent border-0 cursor-pointer focus:ring-0 focus:outline-none py-1 pl-0 pr-5 appearance-none"
-              defaultValue="nl"
-              aria-label="Taal"
-            >
-              <option value="nl">NL</option>
-              <option value="en">EN</option>
-            </select>
-            <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-500 pointer-events-none" />
-          </div>
-        </div>
-      </div>
-
-      {/* Header – fixed top-8, vloeiend omhoog met translateY tot tegen plafond */}
+      {/* Header – fixed top */}
       <header 
-        className="fixed top-8 left-0 right-0 z-50 w-full bg-white flex-shrink-0 shadow-sm will-change-transform"
-        style={{ transform: `translateY(-${Math.min(scrollY, GRAY_BAR_HEIGHT)}px)` }}
+        className="fixed top-0 left-0 right-0 z-50 w-full bg-white flex-shrink-0 shadow-sm"
         onMouseLeave={handleHeaderMouseLeave}
         onMouseEnter={handleHeaderMouseEnter}
       >
@@ -118,7 +86,7 @@ export default function Home() {
               {/* Functies - opent header naar beneden */}
               <div
                 className="relative"
-                onMouseEnter={() => { setFunctionsMenuOpen(true); setSupportMenuOpen(false); }}
+                onMouseEnter={() => { setFunctionsMenuOpen(true); setSupportMenuOpen(false); setContactMenuOpen(false); }}
               >
                 <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
                   Functies
@@ -128,7 +96,7 @@ export default function Home() {
               {/* Ondersteuning - mega menu */}
               <div
                 className="relative"
-                onMouseEnter={() => { setSupportMenuOpen(true); setFunctionsMenuOpen(false); }}
+                onMouseEnter={() => { setSupportMenuOpen(true); setFunctionsMenuOpen(false); setContactMenuOpen(false); }}
               >
                 <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
                   Ondersteuning
@@ -138,9 +106,16 @@ export default function Home() {
               <Link href="#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]">
                 Prijzen
               </Link>
-              <Link href="#over-ons" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]">
-                Over ons
-              </Link>
+              {/* Contact - dropdown met Nog vragen */}
+              <div
+                className="relative"
+                onMouseEnter={() => { setContactMenuOpen(true); setFunctionsMenuOpen(false); setSupportMenuOpen(false); }}
+              >
+                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+                  Contact
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${contactMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
             </nav>
 
             {/* Desktop: Auth Buttons (Right) */}
@@ -156,7 +131,7 @@ export default function Home() {
                   Inloggen
                 </Button>
                 <Button
-                  className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border border-[#9AFF7C]/20 rounded-xl"
+                  className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border border-[#9FE870]/20 rounded-xl"
                   onClick={() => {
                     setAuthModalMode('signup')
                     setAuthModalOpen(true)
@@ -181,14 +156,23 @@ export default function Home() {
           </Button>
           </div>
 
+          {/* Blur backdrop wanneer dropdown open – alleen onder de header, lichte blur */}
+          <div
+            className={cn(
+              'hidden md:block fixed top-16 left-0 right-0 bottom-0 z-40 pointer-events-none transition-opacity duration-350 backdrop-blur-sm bg-white/20',
+              (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'opacity-100' : 'opacity-0'
+            )}
+            aria-hidden="true"
+          />
+
           {/* Dropdown overlay - soepele animatie; height animeert ook bij wisselen van menu */}
           <div
             className="hidden md:block absolute left-0 right-0 top-full z-50 overflow-hidden bg-white shadow-lg origin-top"
             style={{
-              height: (functionsMenuOpen || supportMenuOpen) && !isClosing ? (functionsMenuOpen ? 290 : 260) : 0,
-              opacity: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 1 : 0,
-              transform: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 'translateY(0)' : 'translateY(-12px)',
-              pointerEvents: (functionsMenuOpen || supportMenuOpen) && !isClosing ? 'auto' : 'none',
+              height: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? (contactMenuOpen ? 260 : functionsMenuOpen ? 290 : 260) : 0,
+              opacity: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 1 : 0,
+              transform: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'translateY(0)' : 'translateY(-12px)',
+              pointerEvents: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'auto' : 'none',
               transition: 'height 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             }}
           >
@@ -237,8 +221,8 @@ export default function Home() {
               }}
               aria-hidden={!supportMenuOpen}
             >
-                <div key={supportMenuOpen ? 's-open' : 's-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
-                  <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
+                <div key={supportMenuOpen ? 's-open' : 's-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 md:items-stretch">
+                  <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-4 place-content-start md:min-h-[200px]">
                     {[
                       { title: 'Kennisbank', desc: 'Antwoord op je vragen', icon: BookOpen },
                       { title: 'Support', desc: 'Stel je vragen', icon: Mail },
@@ -254,19 +238,12 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <div className="md:col-span-7 dropdown-item-in flex" style={{ animationDelay: '100ms' }}>
+                  <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '100ms' }}>
                     <div className="rounded-2xl bg-[#002A1F] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden">
-                      {/* Geometric decorative element - same style as "Eerst zien dan geloven" section */}
-                      <GeometricShapes 
-                        variant="trapezoid" 
-                        className="right-0 bottom-0 w-40 h-40"
-                        color="#9AFF7C"
-                        opacity={0.18}
-                        layers={2}
-                      />
+                      <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
                       <div className="relative z-10 flex flex-col items-start gap-4">
                         <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
-                          Overstappen naar <span className="text-[#9AFF7C]">Domio</span>
+                          Overstappen naar <span className="text-[#9FE870]">Domio</span>
                         </h3>
                         <p className="text-sm text-white/90 leading-6">Een nieuw platform? Geen gedoe, maar een slimme stap vooruit. Meer overzicht, minder gedoe.</p>
                         <Button size="default" className="bg-transparent border border-white text-white hover:bg-white/10 rounded-2xl font-semibold">
@@ -277,6 +254,72 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            {/* Contact-inhoud – 2x2 links + nog vragen blok rechts */}
+            <div
+              className="absolute inset-x-0 top-0 bg-white"
+              style={{
+                opacity: contactMenuOpen ? 1 : 0,
+                pointerEvents: contactMenuOpen ? 'auto' : 'none',
+                transition: 'opacity 200ms ease-out',
+              }}
+              aria-hidden={!contactMenuOpen}
+            >
+              <div key={contactMenuOpen ? 'c-open' : 'c-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 md:items-stretch">
+                <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-4 place-content-start md:min-h-[200px]">
+                  <a href="tel:+31646231696" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                    <Phone className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#002A1F]">Telefoon</p>
+                      <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
+                    </div>
+                  </a>
+                  <a href="mailto:contact@domiovastgoedbeheer.nl" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                    <Mail className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#002A1F]">E-mail</p>
+                      <p className="text-xs text-gray-500 mt-0.5">contact@domiovastgoedbeheer.nl</p>
+                    </div>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('92211542', 'kvk')}
+                    className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
+                  >
+                    <Copy className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#002A1F]">KVK</p>
+                      <p className="text-xs text-gray-500 mt-0.5 tabular-nums">{copiedField === 'kvk' ? 'Gekopieerd!' : '92211542'}</p>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy('NL003830384B29', 'btw')}
+                    className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
+                  >
+                    <Copy className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#002A1F]">BTW</p>
+                      <p className="text-xs text-gray-500 mt-0.5 font-mono">{copiedField === 'btw' ? 'Gekopieerd!' : 'NL003830384B29'}</p>
+                    </div>
+                  </button>
+                </div>
+                <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '25ms' }}>
+                  <Link href="/contact" className="rounded-2xl bg-[#002A1F] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                    <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
+                    <div className="relative z-10 flex flex-col items-start gap-4">
+                      <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
+                        Nog vragen?
+                      </h3>
+                      <p className="text-sm text-white/90 leading-6">Stel je vraag via het contactformulier. We helpen je graag verder.</p>
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#9FE870] group-hover:gap-3 transition-all">
+                        Ga naar contactformulier
+                        <ArrowUpRight className="h-4 w-4 shrink-0" />
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
             </>
           </div>
           <>
@@ -322,7 +365,7 @@ export default function Home() {
                           Geen creditcard nodig, op elk moment opzegbaar.
                         </p>
                         <Button
-                          className="bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 rounded-xl w-full text-sm"
+                          className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm"
                           onClick={() => {
                             setAuthModalMode('signup')
                             setAuthModalOpen(true)
@@ -336,7 +379,7 @@ export default function Home() {
                       <GeometricShapes 
                         variant="trapezoid" 
                         className="right-0 bottom-0 w-40 h-40"
-                        color="#9AFF7C"
+                        color="#9FE870"
                         opacity={0.12}
                         layers={2}
                       />
@@ -351,13 +394,6 @@ export default function Home() {
             >
               Functies
             </Link>
-                      <Link
-                        href="#over-ons"
-                        className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Over ons
-            </Link>
             <Link
               href="#pricing"
                         className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg"
@@ -366,11 +402,11 @@ export default function Home() {
               Prijzen
             </Link>
             <Link
-              href="#contact"
+              href="/contact"
               className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg !text-[#002A1F]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Contact
+              Contact / Nog vragen
             </Link>
                      </div>
 
@@ -421,8 +457,8 @@ export default function Home() {
           </>
       </header>
 
-      {/* Inhoud begint onder de vaste header (top-8 + h-16 = 6rem) */}
-      <div className="pt-24 flex flex-col flex-1">
+      {/* Inhoud begint onder de vaste header (h-16 = 4rem) */}
+      <div className="pt-16 flex flex-col flex-1">
       <HeroSection
         onSignupClick={() => {
           setAuthModalMode('signup')
@@ -436,46 +472,58 @@ export default function Home() {
           <FunctiesSection />
         </Suspense>
 
-      {/* Beheerder Types Section */}
+      {/* Beheerder Types Section – Wise-achtige layout: headline + CTA links, drie componenten met icoon + tekst eronder */}
       <section className="bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            {/* Left Side - Title */}
-            <div className="pl-0 md:pl-28">
-              <h2 className="text-base font-semibold leading-7 text-[#002A1F] mb-2">Beheerder Types</h2>
-              <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
-                Voor elke soort beheerder, de juiste oplossing
-              </h2>
-              <p className="mt-4 text-lg font-medium text-pretty text-gray-600 max-w-3xl">
-                Domio past zich aan aan jouw specifieke behoeften.
+          {/* Boven: headline + tekst + CTA (geen illustratie) */}
+          <div className="max-w-2xl">
+            <h2 className="text-base font-semibold leading-7 text-[#002A1F] mb-2">Beheerder types</h2>
+            <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-5xl md:text-6xl">
+              Voor elke soort beheerder
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-xl">
+              Duizenden verhuurders en beheerders vertrouwen op Domio om hun vastgoedportefeuille te beheren. Of je nu een VvE, particuliere eigenaar of professioneel beheerder bent.
+            </p>
+            <Button
+              size="default"
+              className="mt-6 bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 rounded-2xl font-semibold"
+              onClick={() => {
+                setAuthModalMode('signup')
+                setAuthModalOpen(true)
+              }}
+            >
+              Bekijk hoe Domio jou ondersteunt
+            </Button>
+          </div>
+
+          {/* Drie componenten: grijs rond icoon + tekst eronder (zoals Wise) */}
+          <div className="mt-16 grid grid-cols-1 gap-10 sm:gap-8 md:grid-cols-3">
+            <div className="group cursor-default transition-colors">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#002A1F] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#002A1F]">
+                <Building2 className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#002A1F] dark:text-white mb-1 transition-colors group-hover:text-[#002A1F]">VvE&apos;s</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#002A1F] dark:group-hover:text-[#002A1F]">
+                Perfect voor verenigingen van eigenaren die hun gebouwen efficiënt willen beheren.
               </p>
             </div>
-
-            {/* Right Side - Three Cards */}
-            <div className="flex flex-col gap-4">
-              {/* VvE's Card */}
-              <div className="rounded-2xl bg-[#f4f4f4] p-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">VvE's</h3>
-                  <p className="text-sm text-gray-600">Perfect voor verenigingen van eigenaren die hun gebouwen efficiënt willen beheren.</p>
-                </div>
+            <div className="group cursor-default transition-colors">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#002A1F] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#002A1F]">
+                <HomeIcon className="h-8 w-8" />
               </div>
-
-              {/* Eigen Vastgoed Card */}
-              <div className="rounded-2xl bg-[#f4f4f4] p-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">Eigen vastgoed</h3>
-                  <p className="text-sm text-gray-600">Ideal voor particuliere vastgoedeigenaren die hun portefeuille zelf beheren.</p>
-                </div>
+              <h3 className="text-lg font-semibold text-[#002A1F] dark:text-white mb-1 transition-colors group-hover:text-[#002A1F]">Eigen vastgoed</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#002A1F] dark:group-hover:text-[#002A1F]">
+                Ideaal voor particuliere vastgoedeigenaren die hun portefeuille zelf beheren.
+              </p>
+            </div>
+            <div className="group cursor-default transition-colors">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#002A1F] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#002A1F]">
+                <Briefcase className="h-8 w-8" />
               </div>
-
-              {/* Beheerder Vastgoed Card */}
-              <div className="rounded-2xl bg-[#f4f4f4] p-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#002A1F] mb-1">Beheerder vastgoed</h3>
-                  <p className="text-sm text-gray-600">Gemaakt voor professionele vastgoedbeheerders die meerdere portefeuilles beheren.</p>
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold text-[#002A1F] dark:text-white mb-1 transition-colors group-hover:text-[#002A1F]">Beheerder vastgoed</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#002A1F] dark:group-hover:text-[#002A1F]">
+                Gemaakt voor professionele vastgoedbeheerders die meerdere portefeuilles beheren.
+              </p>
             </div>
           </div>
         </div>
@@ -489,7 +537,7 @@ export default function Home() {
             <GeometricShapes 
               variant="trapezoid" 
               className="right-0 bottom-0 w-[112px] h-[112px] lg:w-[144px] lg:h-[144px]"
-              color="#9AFF7C"
+              color="#9FE870"
               opacity={0.18}
               layers={2}
             />
@@ -516,7 +564,7 @@ export default function Home() {
               <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] lg:-mt-16">
                 <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
-                  Beheer je vastgoed <span className="text-[#9AFF7C]">waar je ook bent</span>
+                  Beheer je vastgoed <span className="text-[#9FE870]">waar je ook bent</span>
                 </h2>
                 <p className="text-lg text-white/90">
                   Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
@@ -585,7 +633,7 @@ export default function Home() {
                 <div className="max-w-xl">
                   {/* Small label */}
                   <div className="flex items-center gap-2 mb-4" style={{ width: 'fit-content' }}>
-                    <div className="w-4 h-4 text-[#9AFF7C] flex-shrink-0">
+                    <div className="w-4 h-4 text-[#9FE870] flex-shrink-0">
                       <svg viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0L10.5 5.5L16 8L10.5 10.5L8 16L5.5 10.5L0 8L5.5 5.5L8 0Z"/>
                       </svg>
@@ -608,7 +656,7 @@ export default function Home() {
                   {/* CTA Button */}
                   <Button
                     size="default"
-                    className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-2xl"
+                    className="w-fit bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border-[#9FE870] rounded-2xl"
                     onClick={() => {
                       setAuthModalMode('signup')
                       setAuthModalOpen(true)
@@ -622,12 +670,17 @@ export default function Home() {
           </div>
         </section>
 
-      {/* Contact Section */}
-        <Suspense fallback={<div className="min-h-[300px]" />}>
-      <ContactSection />
+      {/* Huur Section – beeld links, tekst en CTA rechts */}
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <HuurSection
+            onSignupClick={() => {
+              setAuthModalMode('signup')
+              setAuthModalOpen(true)
+            }}
+          />
         </Suspense>
 
-      {/* CTA Section - Overlapping Footer */}
+      {/* CTA Section - Eerst zien, dan geloven */}
       <section className="relative z-20 pt-24 pb-12">
         {/* Background that extends from middle of CTA into footer */}
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
@@ -637,13 +690,12 @@ export default function Home() {
             <GeometricShapes 
               variant="trapezoid" 
               className="right-0 bottom-0 translate-x-4 translate-y-4 lg:translate-x-0 lg:translate-y-0 w-56 h-56 lg:w-72 lg:h-72"
-              color="#9AFF7C"
+              color="#9FE870"
               opacity={0.18}
               layers={2}
             />
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between relative z-10">
-              {/* Left Side - Content */}
-              <div className="flex flex-col gap-6 lg:max-w-2xl">
+            <div className="flex flex-col gap-8 items-center justify-center relative z-10 text-center">
+              <div className="flex flex-col gap-6 max-w-2xl mx-auto">
                 <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Eerst zien, dan geloven?
@@ -651,10 +703,10 @@ export default function Home() {
                 <p className="text-base text-white/90 sm:text-lg leading-7">
                   Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
                 </p>
-                <div className="flex flex-row items-center gap-3 justify-start">
+                <div className="flex flex-row items-center justify-center gap-3">
                   <Button
                     size="default"
-                    className="w-fit bg-[#9AFF7C] text-[#002A1F] hover:bg-[#9AFF7C]/90 border-[#9AFF7C] rounded-2xl"
+                    className="w-fit bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border-[#9FE870] rounded-2xl"
                     onClick={() => {
                       setAuthModalMode('signup')
                       setAuthModalOpen(true)

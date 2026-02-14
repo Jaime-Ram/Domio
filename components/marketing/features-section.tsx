@@ -66,7 +66,7 @@ export function FeaturesSection() {
               key={categoryIndex}
               className="rounded-xl bg-gradient-to-br from-[#002A1F]/5 to-[#356258]/5 p-6 dark:from-[#002A1F]/10 dark:to-[#356258]/10"
             >
-              <h3 className="mb-6 text-xl font-bold text-[#002A1F] dark:text-[#9AFF7C]">
+              <h3 className="mb-6 text-xl font-bold text-[#002A1F] dark:text-[#9FE870]">
                 {category.title}
               </h3>
               <ul className="space-y-4">
@@ -77,8 +77,8 @@ export function FeaturesSection() {
                       key={featureIndex}
                       className="flex items-start gap-3 text-gray-700 dark:text-gray-300"
                     >
-                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#002A1F]/10 dark:bg-[#9AFF7C]/20">
-                        <Icon className="h-3.5 w-3.5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#002A1F]/10 dark:bg-[#9FE870]/20">
+                        <Icon className="h-3.5 w-3.5 text-[#002A1F] dark:text-[#9FE870]" />
                       </div>
                       <span className="text-sm font-medium leading-relaxed">
                         {feature.name}

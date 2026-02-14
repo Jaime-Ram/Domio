@@ -231,7 +231,7 @@ export function GlobalSearch() {
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-4 h-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-[#002A1F] dark:focus-visible:ring-[#9AFF7C]"
+          className="pl-10 pr-4 h-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-[#002A1F] dark:focus-visible:ring-[#9FE870]"
         />
       </div>
 
@@ -258,8 +258,8 @@ export function GlobalSearch() {
                       : 'hover:bg-gray-50 dark:hover:bg-neutral-800/70'
                   )}
                 >
-                  <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#002A1F]/10 dark:bg-[#9AFF7C]/10 flex items-center justify-center">
-                    <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9AFF7C]" />
+                  <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#002A1F]/10 dark:bg-[#9FE870]/10 flex items-center justify-center">
+                    <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9FE870]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">

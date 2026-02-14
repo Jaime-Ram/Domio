@@ -48,7 +48,7 @@ export default function MessagesPage() {
                 onClick={() => setSelectedId(c.id)}
                 className={cn(
                   'w-full text-left p-4 border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors',
-                  selectedId === c.id && 'bg-[#002A1F]/5 dark:bg-[#9AFF7C]/5 border-l-2 border-l-[#002A1F] dark:border-l-[#9AFF7C]'
+                  selectedId === c.id && 'bg-[#002A1F]/5 dark:bg-[#9FE870]/5 border-l-2 border-l-[#002A1F] dark:border-l-[#9FE870]'
                 )}
               >
                 <div className="flex justify-between items-start gap-2">
@@ -88,7 +88,7 @@ export default function MessagesPage() {
                       className={cn(
                         'max-w-[80%] rounded-2xl px-4 py-2',
                         m.sender === 'user'
-                          ? 'bg-[#002A1F] text-white dark:bg-[#9AFF7C] dark:text-[#002A1F]'
+                          ? 'bg-[#002A1F] text-white dark:bg-[#9FE870] dark:text-[#002A1F]'
                           : 'bg-gray-200 dark:bg-neutral-700 text-gray-900 dark:text-white'
                       )}
                     >

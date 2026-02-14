@@ -31,7 +31,7 @@ export const metadata: Metadata = {
       {
         rel: 'mask-icon',
         url: '/images/offerla.png',
-        color: '#9AFF7C',
+        color: '#9FE870',
       },
     ],
   },
@@ -53,7 +53,7 @@ export default function RootLayout({
         {/* Theme color for browser chrome */}
         <meta name="theme-color" content="#ffffff" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="mask-icon" href="/images/offerla.png" color="#9AFF7C" />
+        <link rel="mask-icon" href="/images/offerla.png" color="#9FE870" />
         <link rel="preconnect" href="https://consent.cookiebot.com" />
         <link rel="dns-prefetch" href="https://consent.cookiebot.com" />
         <Script

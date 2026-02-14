@@ -170,9 +170,9 @@ export default function PropertyDetailPage() {
                       <div className="p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700">
                         <div className="flex items-start gap-3 mb-4">
                           {property.registration.type === 'bedrijf' ? (
-                            <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                            <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870] mt-0.5" />
                           ) : (
-                            <UserCircle className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C] mt-0.5" />
+                            <UserCircle className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870] mt-0.5" />
                           )}
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tenaamstelling</p>
@@ -218,7 +218,7 @@ export default function PropertyDetailPage() {
                                     <Mail className="h-3 w-3 text-gray-400" />
                                     <a 
                                       href={`mailto:${property.registration.email}`}
-                                      className="text-sm text-[#002A1F] dark:text-[#9AFF7C] hover:underline"
+                                      className="text-sm text-[#002A1F] dark:text-[#9FE870] hover:underline"
                                     >
                                       {property.registration.email}
                                     </a>
@@ -232,7 +232,7 @@ export default function PropertyDetailPage() {
                                     <Phone className="h-3 w-3 text-gray-400" />
                                     <a 
                                       href={`tel:${property.registration.phone}`}
-                                      className="text-sm text-[#002A1F] dark:text-[#9AFF7C] hover:underline"
+                                      className="text-sm text-[#002A1F] dark:text-[#9FE870] hover:underline"
                                     >
                                       {property.registration.phone}
                                     </a>
@@ -356,7 +356,7 @@ export default function PropertyDetailPage() {
                             <div className="space-y-2">
                               <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-neutral-700 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                  <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                                  <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
                                   <div>
                                     <p className="text-sm font-medium text-gray-900 dark:text-white">Huurcontract.pdf</p>
                                     <p className="text-xs text-gray-500">245 KB</p>
@@ -368,7 +368,7 @@ export default function PropertyDetailPage() {
                               </div>
                               <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-neutral-700 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                  <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                                  <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
                                   <div>
                                     <p className="text-sm font-medium text-gray-900 dark:text-white">Plaatsbeschrijving.pdf</p>
                                     <p className="text-xs text-gray-500">1.2 MB</p>
@@ -430,7 +430,7 @@ export default function PropertyDetailPage() {
                             className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
                           >
                             <div className="flex items-center gap-3 flex-1">
-                              <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9AFF7C]" />
+                              <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                   {doc.name}
