@@ -73,7 +73,7 @@ export default function DocumentsPage() {
   })
 
   const getTypeIcon = (type: string) => {
-    return <FileText className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
+    return <FileText className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
   }
 
   const getTypeBadge = (type: string) => {
@@ -137,7 +137,7 @@ export default function DocumentsPage() {
               </div>
               <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                  <Button className="bg-[#163300] hover:bg-[#356258] text-white">
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Document
                   </Button>
@@ -152,7 +152,7 @@ export default function DocumentsPage() {
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="file">Selecteer bestand</Label>
-                      <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#002A1F] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
+                      <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
                         <Input
                           id="file"
                           type="file"
@@ -206,7 +206,7 @@ export default function DocumentsPage() {
                     <Button variant="outline" onClick={() => setShowUploadModal(false)}>
                       Annuleren
                     </Button>
-                    <Button onClick={handleUpload} className="bg-[#002A1F] hover:bg-[#356258]">
+                    <Button onClick={handleUpload} className="bg-[#163300] hover:bg-[#356258]">
                       Uploaden
                     </Button>
                   </DialogFooter>
@@ -340,7 +340,7 @@ export default function DocumentsPage() {
                             {doc.property ? (
                               <Button 
                                 variant="link" 
-                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9FE870]"
+                                className="p-0 h-auto font-medium text-[#163300] dark:text-[#9FE870]"
                                 onClick={() => router.push(`/dashboard/employer/portfolio/properties/${doc.property?.id}`)}
                               >
                                 {doc.property.address}

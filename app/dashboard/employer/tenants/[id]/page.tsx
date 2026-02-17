@@ -196,7 +196,7 @@ export default function TenantDetailPage() {
                               <Home className="h-4 w-4 text-gray-400" />
                               <Button 
                                 variant="link" 
-                                className="p-0 h-auto font-medium text-[#002A1F] dark:text-[#9FE870]"
+                                className="p-0 h-auto font-medium text-[#163300] dark:text-[#9FE870]"
                                 onClick={() => router.push(`/dashboard/employer/portfolio/properties/${tenant.property?.id}`)}
                               >
                                 {tenant.property?.address}
@@ -263,7 +263,7 @@ export default function TenantDetailPage() {
                         <CardDescription>Overzicht van alle huurbetalingen</CardDescription>
                       </div>
                       <Button 
-                        className="bg-[#002A1F] hover:bg-[#356258] text-white"
+                        className="bg-[#163300] hover:bg-[#356258] text-white"
                         onClick={() => setShowPaymentModal(true)}
                       >
                         <Euro className="h-4 w-4 mr-2" />

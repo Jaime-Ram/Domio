@@ -85,7 +85,7 @@ export function generateVerificationEmail(variables: EmailVariables): string {
             font-size: 14px;
         }
         .nav a:hover {
-            color: #002A1F;
+            color: #163300;
         }
         .content {
             padding: 40px 24px;
@@ -105,7 +105,7 @@ export function generateVerificationEmail(variables: EmailVariables): string {
             display: inline-block;
             margin: 24px 0;
             padding: 12px 24px;
-            background-color: #002A1F;
+            background-color: #163300;
             color: #FFFFFF;
             text-decoration: none;
             border-radius: 8px;
@@ -184,7 +184,7 @@ export function generateVerificationEmail(variables: EmailVariables): string {
             margin: 16px 0;
         }
         .footer-links a {
-            color: #002A1F;
+            color: #163300;
             text-decoration: underline;
         }
         .footer-bottom {

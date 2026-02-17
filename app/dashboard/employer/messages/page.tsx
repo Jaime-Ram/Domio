@@ -48,7 +48,7 @@ export default function MessagesPage() {
                 onClick={() => setSelectedId(c.id)}
                 className={cn(
                   'w-full text-left p-4 border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors',
-                  selectedId === c.id && 'bg-[#002A1F]/5 dark:bg-[#9FE870]/5 border-l-2 border-l-[#002A1F] dark:border-l-[#9FE870]'
+                  selectedId === c.id && 'bg-[#163300]/5 dark:bg-[#9FE870]/5 border-l-2 border-l-[#163300] dark:border-l-[#9FE870]'
                 )}
               >
                 <div className="flex justify-between items-start gap-2">
@@ -58,7 +58,7 @@ export default function MessagesPage() {
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{c.address}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300 truncate mt-1">{c.lastMessage}</p>
                 {c.unread > 0 && (
-                  <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full">
+                  <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full">
                     {c.unread}
                   </span>
                 )}
@@ -88,7 +88,7 @@ export default function MessagesPage() {
                       className={cn(
                         'max-w-[80%] rounded-2xl px-4 py-2',
                         m.sender === 'user'
-                          ? 'bg-[#002A1F] text-white dark:bg-[#9FE870] dark:text-[#002A1F]'
+                          ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
                           : 'bg-gray-200 dark:bg-neutral-700 text-gray-900 dark:text-white'
                       )}
                     >
@@ -101,7 +101,7 @@ export default function MessagesPage() {
               <div className="p-4 border-t border-gray-200 dark:border-neutral-700">
                 <div className="flex gap-2">
                   <Input placeholder="Typ een bericht..." className="flex-1" />
-                  <Button size="icon" className="bg-[#002A1F] hover:bg-[#002A1F]/90">
+                  <Button size="icon" className="bg-[#163300] hover:bg-[#163300]/90">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

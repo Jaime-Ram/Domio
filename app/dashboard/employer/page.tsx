@@ -108,7 +108,7 @@ export default function EmployerDashboardPage() {
         />
         <FunctieBlock
           icon={<CheckCircle2 className="h-4 w-4 text-white" />}
-          trend={<span className="text-lg font-bold text-[#002A1F] dark:text-[#9FE870]">{complianceSummary.score}%</span>}
+          trend={<span className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">{complianceSummary.score}%</span>}
           title="Compliance score"
           value={null}
           subtitle={`${complianceSummary.compliant} van ${complianceSummary.total} compliant`}
@@ -149,7 +149,7 @@ export default function EmployerDashboardPage() {
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
-                  stroke="#002A1F"
+                  stroke="#163300"
                   strokeWidth="2.5"
                   strokeDasharray={`${(complianceSummary.compliant / complianceSummary.total) * 100}, 100`}
                   className="transition-all"
@@ -179,7 +179,7 @@ export default function EmployerDashboardPage() {
             </div>
             <div className="flex flex-col gap-1.5 text-sm">
               <span className="flex items-center gap-2">
-                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#002A1F]" />
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#163300]" />
                 {complianceSummary.compliant} compliant
               </span>
               <span className="flex items-center gap-2">
@@ -207,7 +207,7 @@ export default function EmployerDashboardPage() {
       {/* Onderste rij: Financieel (met balken) | Aankomende taken */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Financieel deze maand – donkere kaart met balken (zoals homepage Maandelijkse inkomsten) */}
-        <div className={cn(CARD_CLASS, '!bg-[#002A1F] !border-[#002A1F]/20 p-6')}>
+        <div className={cn(CARD_CLASS, '!bg-[#163300] !border-[#163300]/20 p-6')}>
           <p className="text-white/80 text-sm font-medium mb-1">
             Financieel deze maand
           </p>
@@ -232,7 +232,7 @@ export default function EmployerDashboardPage() {
           </div>
           <Link
             href="/dashboard/employer/financial"
-            className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
           >
             Bekijk financieel
             <ChevronRight className="h-4 w-4" />

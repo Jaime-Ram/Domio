@@ -150,8 +150,8 @@ export default function AccountingPage() {
       <Card className={dashboardCardClass('mb-8')}>
         <CardHeader>
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-[#002A1F]/10 dark:bg-[#9FE870]/10 rounded-lg">
-              <Calculator className="h-6 w-6 text-[#002A1F] dark:text-[#9FE870]" />
+            <div className="p-3 bg-[#163300]/10 dark:bg-[#9FE870]/10 rounded-lg">
+              <Calculator className="h-6 w-6 text-[#163300] dark:text-[#9FE870]" />
             </div>
             <div className="flex-1">
               <CardTitle className="mb-2">Eigen Boekhouding</CardTitle>
@@ -217,7 +217,7 @@ export default function AccountingPage() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white dark:bg-neutral-800 rounded-lg">
-                        <Plug className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
+                        <Plug className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">{integration.name}</CardTitle>
@@ -271,7 +271,7 @@ export default function AccountingPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableIntegrations.map((integration) => (
-            <Card key={integration.id} className={dashboardCardClass('hover:border-[#002A1F] dark:hover:border-[#9FE870] transition-colors')}>
+            <Card key={integration.id} className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors')}>
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">
@@ -347,7 +347,7 @@ export default function AccountingPage() {
             </Button>
             <Button 
               onClick={confirmConnect}
-              className="bg-[#002A1F] hover:bg-[#356258] text-white"
+              className="bg-[#163300] hover:bg-[#356258] text-white"
             >
               <Link2 className="h-4 w-4 mr-2" />
               Start Koppeling

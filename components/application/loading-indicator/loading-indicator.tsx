@@ -42,7 +42,7 @@ export function LoadingIndicator({
                 <div className="relative w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                     <div 
                         className={cn(
-                            "rounded-full bg-[#002A1F] animate-[loading-line_1.5s_ease-in-out_infinite]",
+                            "rounded-full bg-[#163300] animate-[loading-line_1.5s_ease-in-out_infinite]",
                             sizes.line
                         )}
                     />
@@ -61,7 +61,7 @@ export function LoadingIndicator({
             <div className={cn("flex flex-col items-center justify-center gap-3", className)}>
                 <div 
                     className={cn(
-                        "animate-spin rounded-full border-2 border-gray-300 border-t-[#002A1F]",
+                        "animate-spin rounded-full border-2 border-gray-300 border-t-[#163300]",
                         sizes.spinner
                     )}
                 />
@@ -80,21 +80,21 @@ export function LoadingIndicator({
             <div className="flex gap-1">
                 <div 
                     className={cn(
-                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#002A1F]",
+                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#163300]",
                         sizes.spinner
                     )}
                     style={{ animationDelay: "0s" }}
                 />
                 <div 
                     className={cn(
-                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#002A1F]",
+                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#163300]",
                         sizes.spinner
                     )}
                     style={{ animationDelay: "0.2s" }}
                 />
                 <div 
                     className={cn(
-                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#002A1F]",
+                        "animate-[bounce_1.4s_ease-in-out_infinite] rounded-full bg-[#163300]",
                         sizes.spinner
                     )}
                     style={{ animationDelay: "0.4s" }}

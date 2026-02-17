@@ -54,7 +54,7 @@ export default function FAQPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-[#002A1F] hover:bg-gray-100 flex-shrink-0"
+              className="md:hidden text-[#163300] hover:bg-gray-100 flex-shrink-0"
               aria-label="Toggle menu"
             >
               <Menu className="h-6 w-6" />
@@ -69,7 +69,7 @@ export default function FAQPage() {
             <div className="hidden md:flex items-center ml-auto">
               <Link
                 href="/"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]"
+                className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]"
               >
                 Terug naar home
               </Link>
@@ -81,7 +81,7 @@ export default function FAQPage() {
         <main className="flex-1">
           <div className="mx-auto max-w-4xl px-6 sm:px-8 lg:px-12 py-16">
             <div className="text-center mb-12">
-              <h1 className="mb-4 text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl">
+              <h1 className="mb-4 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">
                 Veelgestelde vragen
               </h1>
               <p className="text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8">
@@ -93,7 +93,7 @@ export default function FAQPage() {
               {faqs.map((faq, index) => (
                 <details
                   key={index}
-                  className="group border border-gray-200 rounded-xl p-6 hover:border-[#002A1F]/50 transition-colors bg-white/90 backdrop-blur-sm"
+                  className="group border border-gray-200 rounded-xl p-6 hover:border-[#163300]/50 transition-colors bg-white/90 backdrop-blur-sm"
                 >
                   <summary className="flex items-center justify-between cursor-pointer list-none">
                     <h3 className="text-lg font-semibold text-gray-900 pr-4">
@@ -121,13 +121,13 @@ export default function FAQPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="mailto:contact@domiovastgoedbeheer.nl"
-                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl border border-[#002A1F] bg-[#002A1F] text-white hover:bg-[#356258] transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl border border-[#163300] bg-[#163300] text-white hover:bg-[#356258] transition-colors"
                 >
                   Stuur een email
                 </Link>
                 <Link
                   href="tel:+31646231696"
-                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl border border-[#002A1F] text-[#002A1F] hover:bg-[#002A1F]/10 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl border border-[#163300] text-[#163300] hover:bg-[#163300]/10 transition-colors"
                 >
                   Bel ons
                 </Link>

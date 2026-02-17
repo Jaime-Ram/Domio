@@ -61,7 +61,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-[#002A1F] hover:bg-gray-100 hover:text-[#002A1F] flex-shrink-0"
+            className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -77,7 +77,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
               className="relative"
               onMouseEnter={() => { setFunctionsMenuOpen(true); setSupportMenuOpen(false); setContactMenuOpen(false); }}
             >
-              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
                 Functies
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -86,19 +86,19 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
               className="relative"
               onMouseEnter={() => { setSupportMenuOpen(true); setFunctionsMenuOpen(false); setContactMenuOpen(false); }}
             >
-              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
                 Ondersteuning
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${supportMenuOpen ? 'rotate-180' : ''}`} />
               </button>
             </div>
-            <Link href="/#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]">
+            <Link href="/#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
               Prijzen
             </Link>
             <div
               className="relative"
               onMouseEnter={() => { setContactMenuOpen(true); setFunctionsMenuOpen(false); setSupportMenuOpen(false); }}
             >
-              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F] flex items-center gap-1 py-2">
+              <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
                 Contact
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${contactMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -107,13 +107,13 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
           <div className="hidden md:flex items-center gap-4 ml-auto">
             <Button
               variant="ghost"
-              className="text-gray-600 hover:bg-gray-100 hover:text-[#002A1F]"
+              className="text-gray-600 hover:bg-gray-100 hover:text-[#163300]"
               onClick={openLogin}
             >
               Inloggen
             </Button>
             <Button
-              className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border border-[#9FE870]/20 rounded-xl"
+              className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border border-[#9FE870]/20 rounded-xl"
               onClick={openSignup}
             >
               Registreren
@@ -122,7 +122,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-[#002A1F] hover:bg-gray-100 hover:text-[#002A1F] flex-shrink-0"
+            className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0"
             onClick={openLogin}
             aria-label="Account"
           >
@@ -162,9 +162,9 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                 { title: 'Scan & Herken Functie', desc: 'Documenten scannen en herkennen', icon: Scan },
               ].map((item, i) => (
                 <Link key={item.title} href="/#features" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
-                  <item.icon className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                  <item.icon className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#002A1F]">{item.title}</p>
+                    <p className="text-sm font-semibold text-[#163300]">{item.title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                   </div>
                 </Link>
@@ -181,16 +181,16 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                   { title: 'Vind je Expert', desc: 'Ondersteuning bij boekhouden', icon: Search },
                 ].map((item, i) => (
                   <div key={item.title} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start">
-                    <item.icon className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                    <item.icon className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#002A1F]">{item.title}</p>
+                      <p className="text-sm font-semibold text-[#163300]">{item.title}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]">
-                <div className="rounded-2xl bg-[#002A1F] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden">
+                <div className="rounded-2xl bg-[#163300] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden">
                   <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
                   <div className="relative z-10 flex flex-col items-start gap-4">
                     <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
@@ -209,16 +209,16 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
             <div className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 md:items-stretch">
               <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-4 place-content-start md:min-h-[200px]">
                 <a href="tel:+31646231696" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
-                  <Phone className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                  <Phone className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#002A1F]">Telefoon</p>
+                    <p className="text-sm font-semibold text-[#163300]">Telefoon</p>
                     <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
                   </div>
                 </a>
                 <a href="mailto:contact@domiovastgoedbeheer.nl" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
-                  <Mail className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                  <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#002A1F]">E-mail</p>
+                    <p className="text-sm font-semibold text-[#163300]">E-mail</p>
                     <p className="text-xs text-gray-500 mt-0.5">contact@domiovastgoedbeheer.nl</p>
                   </div>
                 </a>
@@ -227,9 +227,9 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                   onClick={() => handleCopy('92211542', 'kvk')}
                   className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
                 >
-                  <Copy className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                  <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#002A1F]">KVK</p>
+                    <p className="text-sm font-semibold text-[#163300]">KVK</p>
                     <p className="text-xs text-gray-500 mt-0.5 tabular-nums">{copiedField === 'kvk' ? 'Gekopieerd!' : '92211542'}</p>
                   </div>
                 </button>
@@ -238,15 +238,15 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                   onClick={() => handleCopy('NL003830384B29', 'btw')}
                   className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
                 >
-                  <Copy className="size-5 text-[#002A1F] shrink-0 mt-0.5" />
+                  <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#002A1F]">BTW</p>
+                    <p className="text-sm font-semibold text-[#163300]">BTW</p>
                     <p className="text-xs text-gray-500 mt-0.5 font-mono">{copiedField === 'btw' ? 'Gekopieerd!' : 'NL003830384B29'}</p>
                   </div>
                 </button>
               </div>
               <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]">
-                <Link href="/contact" className="rounded-2xl bg-[#002A1F] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                <Link href="/contact" className="rounded-2xl bg-[#163300] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
                   <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
                   <div className="relative z-10 flex flex-col items-start gap-4">
                     <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
@@ -274,30 +274,30 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
               </Button>
             </div>
             <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-              <div className="bg-[#002A1F] rounded-xl p-4 mb-4 relative overflow-hidden">
+              <div className="bg-[#163300] rounded-xl p-4 mb-4 relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-lg font-semibold text-white mb-1">Probeer Domio</h3>
                   <p className="text-base font-semibold text-white mb-2">30 dagen gratis</p>
                   <p className="text-xs text-white/90 mb-3">Geen creditcard nodig, op elk moment opzegbaar.</p>
-                  <Button className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm" onClick={() => { openSignup(); setMobileMenuOpen(false) }}>
+                  <Button className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm" onClick={() => { openSignup(); setMobileMenuOpen(false) }}>
                     Registreren
                   </Button>
                 </div>
                 <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.12} layers={2} />
               </div>
               <div className="space-y-1 mb-4">
-                <Link href="/#features" className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Functies</Link>
-                <Link href="/#pricing" className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Prijzen</Link>
-                <Link href="/contact" className="block py-3.5 px-4 text-base font-medium text-[#002A1F] transition-colors hover:bg-gray-50 rounded-lg !text-[#002A1F]" onClick={() => setMobileMenuOpen(false)}>Contact / Nog vragen</Link>
+                <Link href="/#features" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Functies</Link>
+                <Link href="/#pricing" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Prijzen</Link>
+                <Link href="/contact" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
               </div>
               <div className="pt-2 mb-4">
-                <Button variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#002A1F]" onClick={() => { openLogin(); setMobileMenuOpen(false) }}>Inloggen</Button>
+                <Button variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]" onClick={() => { openLogin(); setMobileMenuOpen(false) }}>Inloggen</Button>
               </div>
               <div className="pt-4 mt-auto pb-4 border-t border-gray-200">
                 <div className="flex flex-col gap-2 px-4">
-                  <Link href="/privacy" className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors" onClick={() => setMobileMenuOpen(false)}>Privacy</Link>
-                  <Link href="/terms" className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors" onClick={() => setMobileMenuOpen(false)}>Algemene voorwaarden</Link>
-                  <Link href="/faq" className="text-xs text-gray-500 hover:text-[#002A1F] transition-colors" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
+                  <Link href="/privacy" className="text-xs text-gray-500 hover:text-[#163300] transition-colors" onClick={() => setMobileMenuOpen(false)}>Privacy</Link>
+                  <Link href="/terms" className="text-xs text-gray-500 hover:text-[#163300] transition-colors" onClick={() => setMobileMenuOpen(false)}>Algemene voorwaarden</Link>
+                  <Link href="/faq" className="text-xs text-gray-500 hover:text-[#163300] transition-colors" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
                 </div>
               </div>
             </nav>

@@ -48,7 +48,7 @@ export function SidebarNavigationSectionsSubheadings({
                 className={cn(
                     "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active
-                        ? "bg-[#002A1F]/10 text-[#002A1F] dark:bg-[#002A1F]/20"
+                        ? "bg-[#163300]/10 text-[#163300] dark:bg-[#163300]/20"
                         : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 )}
             >

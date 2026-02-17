@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FAQItem {
@@ -34,7 +34,7 @@ const faqItems: FAQItem[] = [
   {
     id: 'access',
     question: 'Hoe krijg ik toegang tot een thema dat ik heb gekocht?',
-    answer: 'Als je de link voor een thema dat je hebt gekocht kwijtraakt, geen paniek! We hebben je gedekt. Je kunt inloggen op je account, tik op je avatar in de rechterbovenhoek en tik op Aankopen. Als je geen login hebt aangemaakt of de informatie niet meer weet, kun je onze handige Herdownload pagina gebruiken, vergeet niet hetzelfde e-mailadres te gebruiken waarmee je oorspronkelijk je aankopen hebt gedaan.',
+    answer: 'Als je de link voor een thema dat je hebt gekocht kwijtraakt, geen paniek! We hebben je gedekt. Je kunt inloggen op je account, tik op je avatar in de rechterbovenhoek en tik op Aankopen.',
   },
   {
     id: 'upgrade',
@@ -44,7 +44,7 @@ const faqItems: FAQItem[] = [
 ]
 
 export function FAQSection() {
-  const [openItems, setOpenItems] = useState<string[]>(['cancel'])
+  const [openItems, setOpenItems] = useState<string[]>([])
 
   const toggleItem = (id: string) => {
     setOpenItems((prev) =>
@@ -53,52 +53,43 @@ export function FAQSection() {
   }
 
   return (
-    <section id="faq" className="max-w-[85rem] px-6 py-10 md:px-8 lg:py-14 mx-auto bg-white">
-      <div className="grid md:grid-cols-5 gap-10">
-        {/* Left Side - Title */}
-        <div className="md:col-span-2">
-          <div className="max-w-xs">
-            <h2 className="text-2xl font-bold md:text-4xl md:leading-tight text-gray-900">
-              Veelgestelde<br />vragen
-            </h2>
-            <p className="mt-1 hidden md:block text-gray-600">
-              Antwoorden op de meest gestelde vragen.
-            </p>
-          </div>
-        </div>
+    <section id="faq" className="mx-auto max-w-4xl px-6 py-16 md:px-8 lg:py-20">
+      <h2 className="mb-8 text-4xl font-bold tracking-tight text-[#163300] sm:text-5xl md:text-6xl">
+        Veelgestelde vragen
+      </h2>
 
-        {/* Right Side - Accordion */}
-        <div className="md:col-span-3">
-          <div className="divide-y divide-gray-200">
-            {faqItems.map((item) => {
-              const isOpen = openItems.includes(item.id)
-              return (
-                <div key={item.id} className="py-3 first:pt-0">
-                  <button
-                    onClick={() => toggleItem(item.id)}
-                    className="group pb-3 inline-flex items-center justify-between gap-x-3 w-full md:text-lg font-semibold text-start text-gray-800 rounded-lg transition hover:text-gray-500 focus:outline-none focus:text-gray-500"
-                    aria-expanded={isOpen}
-                  >
-                    <span>{item.question}</span>
+      <div className="divide-y divide-gray-200">
+        {faqItems.map((item) => {
+            const isOpen = openItems.includes(item.id)
+            return (
+              <div key={item.id} className="py-5 first:pt-0">
+                <button
+                  onClick={() => toggleItem(item.id)}
+                  className="group flex w-full items-center justify-between gap-4 text-left focus:outline-none"
+                  aria-expanded={isOpen}
+                >
+                  <span className="text-base font-normal text-gray-900">
+                    {item.question}
+                  </span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-900 transition-colors group-hover:bg-gray-200">
                     {isOpen ? (
-                      <ChevronUp className="shrink-0 size-5 text-gray-600 group-hover:text-gray-500" />
+                      <Minus className="h-4 w-4" strokeWidth={2} />
                     ) : (
-                      <ChevronDown className="shrink-0 size-5 text-gray-600 group-hover:text-gray-500" />
+                      <Plus className="h-4 w-4" strokeWidth={2} />
                     )}
-                  </button>
-                  <div
-                    className={cn(
-                      'overflow-hidden transition-all duration-300',
-                      isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                    )}
-                  >
-                    <p className="text-gray-600 pb-3">{item.answer}</p>
-                  </div>
+                  </span>
+                </button>
+                <div
+                  className={cn(
+                    'overflow-hidden transition-all duration-300',
+                    isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  )}
+                >
+                  <p className="pt-3 text-base text-gray-600">{item.answer}</p>
                 </div>
-              )
-            })}
-          </div>
-        </div>
+              </div>
+          )
+        })}
       </div>
     </section>
   )

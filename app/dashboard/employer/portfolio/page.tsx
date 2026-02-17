@@ -101,7 +101,7 @@ export default function PortfolioPage() {
         </div>
         <Button 
           onClick={() => router.push('/dashboard/employer/portfolio/properties/new')}
-          className="bg-[#002A1F] hover:bg-[#356258] text-white"
+          className="bg-[#163300] hover:bg-[#356258] text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nieuw Pand
@@ -113,7 +113,7 @@ export default function PortfolioPage() {
         <Card className={dashboardCardClass('mb-6')}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870]" />
+              <Briefcase className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
               Vastgoedhouders & Tenaamstellingen
             </CardTitle>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -125,7 +125,7 @@ export default function PortfolioPage() {
               {ownerGroups.map((group, index) => (
                 <Card 
                   key={index}
-                  className={dashboardCardClass('hover:border-[#002A1F] dark:hover:border-[#9FE870] transition-colors cursor-pointer')}
+                  className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer')}
                   onClick={() => {
                     // Filter properties by this owner
                     const ownerProperties = group.properties
@@ -136,9 +136,9 @@ export default function PortfolioPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start gap-3">
                       {group.registration.type === 'bedrijf' ? (
-                        <Briefcase className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870] mt-0.5" />
+                        <Briefcase className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5" />
                       ) : (
-                        <UserCircle className="h-5 w-5 text-[#002A1F] dark:text-[#9FE870] mt-0.5" />
+                        <UserCircle className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5" />
                       )}
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
@@ -202,7 +202,7 @@ export default function PortfolioPage() {
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="icon"
                 onClick={() => setViewMode('grid')}
-                className={viewMode === 'grid' ? 'bg-[#002A1F] text-white hover:bg-[#356258]' : ''}
+                className={viewMode === 'grid' ? 'bg-[#163300] text-white hover:bg-[#356258]' : ''}
               >
                 <Grid3x3 className="h-4 w-4" />
               </Button>
@@ -210,7 +210,7 @@ export default function PortfolioPage() {
                 variant={viewMode === 'table' ? 'default' : 'ghost'}
                 size="icon"
                 onClick={() => setViewMode('table')}
-                className={viewMode === 'table' ? 'bg-[#002A1F] text-white hover:bg-[#356258]' : ''}
+                className={viewMode === 'table' ? 'bg-[#163300] text-white hover:bg-[#356258]' : ''}
               >
                 <Table2 className="h-4 w-4" />
               </Button>
@@ -230,8 +230,8 @@ export default function PortfolioPage() {
             >
               {/* Property Image */}
               <div className="relative h-48 bg-gray-200 dark:bg-neutral-800 overflow-hidden rounded-t-lg">
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#002A1F]/10 to-[#356258]/10">
-                  <Building2 className="h-16 w-16 text-[#002A1F]/50 dark:text-[#9FE870]/50" />
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#163300]/10 to-[#356258]/10">
+                  <Building2 className="h-16 w-16 text-[#163300]/50 dark:text-[#9FE870]/50" />
                 </div>
                 <div className="absolute top-3 right-3">
                   {getStatusBadge(property.status)}
@@ -318,7 +318,7 @@ export default function PortfolioPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-[#002A1F] hover:text-[#002A1F] hover:bg-[#002A1F]/10"
+                    className="text-[#163300] hover:text-[#163300] hover:bg-[#163300]/10"
                     onClick={(e) => {
                       e.stopPropagation()
                       router.push(`/dashboard/employer/portfolio/properties/${property.id}`)
@@ -366,8 +366,8 @@ export default function PortfolioPage() {
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
                           <div className="relative w-12 h-12 rounded-lg bg-gray-200 dark:bg-neutral-800 overflow-hidden flex-shrink-0">
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#002A1F]/10 to-[#356258]/10">
-                              <Building2 className="h-6 w-6 text-[#002A1F]/50 dark:text-[#9FE870]/50" />
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#163300]/10 to-[#356258]/10">
+                              <Building2 className="h-6 w-6 text-[#163300]/50 dark:text-[#9FE870]/50" />
                             </div>
                           </div>
                           <div>

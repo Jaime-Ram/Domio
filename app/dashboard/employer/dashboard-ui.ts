@@ -10,7 +10,7 @@ export const DASHBOARD_INNER_BLOCK_CLASS =
 
 /** Ronde donkere icooncirkel */
 export const DASHBOARD_ICON_CIRCLE_CLASS =
-  'h-10 w-10 rounded-full bg-[#002A1F] dark:bg-[#002A1F] flex items-center justify-center shrink-0'
+  'h-10 w-10 rounded-full bg-[#163300] dark:bg-[#163300] flex items-center justify-center shrink-0'
 
 export function dashboardCardClass(extra?: string) {
   return cn(DASHBOARD_CARD_CLASS, extra)

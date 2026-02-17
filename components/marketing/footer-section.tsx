@@ -26,12 +26,12 @@ export function FooterSection() {
               <GooglePlayButton
                 size="md"
                 href="https://play.google.com/store/apps/details?id=com.domio"
-                className="bg-transparent border-[#002A1F] text-[#002A1F] hover:bg-[#002A1F]/10"
+                className="bg-transparent border-[#163300] text-[#163300] hover:bg-[#163300]/10"
               />
               <AppStoreButton
                 size="md"
                 href="https://apps.apple.com/app/domio"
-                className="bg-transparent border-[#002A1F] text-[#002A1F] hover:bg-[#002A1F]/10"
+                className="bg-transparent border-[#163300] text-[#163300] hover:bg-[#163300]/10"
               />
             </div>
           </div>
@@ -47,7 +47,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="#features"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#002A1F] dark:text-gray-400 dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Functies
                   </Link>
@@ -55,7 +55,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="#pricing"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#002A1F] dark:text-gray-400 dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Prijzen
                   </Link>
@@ -63,7 +63,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#002A1F] dark:hover:text-[#002A1F] !text-gray-600"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300] !text-gray-600"
                   >
                     Contact
                   </Link>
@@ -78,7 +78,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/privacy"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#002A1F] dark:text-gray-400 dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Privacy
                   </Link>
@@ -86,7 +86,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/terms"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#002A1F] dark:text-gray-400 dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Voorwaarden
                   </Link>
@@ -94,7 +94,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/faq"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#002A1F] dark:hover:text-[#002A1F]"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
                   >
                     FAQ
                   </Link>

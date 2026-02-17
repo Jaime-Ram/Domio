@@ -6,7 +6,7 @@ Onze UI is geïnspireerd op het **Wise Design System** (wise.design): clean, fin
 
 | Token | Waarde | Gebruik |
 |-------|--------|--------|
-| **Primary** | `#002A1F` | Knoppen, iconen, links, focus |
+| **Primary** | `#163300` | Knoppen, iconen, links, focus |
 | **Accent** | `#9FE870` | Secundaire acties, highlights, dark mode accent |
 | **Primary hover** | `#356258` | Hover op primary knoppen |
 
@@ -16,7 +16,21 @@ Onze UI is geïnspireerd op het **Wise Design System** (wise.design): clean, fin
 - **CSS vars:** `var(--color-primary-500)`, `var(--color-accent-400)`
 - **Shadcn/HSL:** `bg-primary`, `text-accent` (zelfde kleuren, via theme)
 
-Gebruik waar mogelijk de Tailwind brand-tokens in plaats van hardcoded `#002A1F` / `#9FE870`.
+Gebruik waar mogelijk de Tailwind brand-tokens in plaats van hardcoded `#163300` / `#9FE870`.
+
+### Interactive tokens
+
+Voor interactieve elementen:
+
+| Token | HEX | Gebruik |
+|-------|-----|--------|
+| **Interactive Primary** | `#163300` | Neutrale interactie, actieve list items |
+| **Interactive Accent** | `#9FE870` | Spaarzaam: o.a. achtergrond primary buttons |
+| **Interactive Secondary** | `#868685` | Teruggetrokken interactie: randen inputs/checkboxes, clear-knop. Niet op tekst. |
+| **Interactive Control** | `#163300` | Tekst/iconen op Bright Green (bv. primary button tekst) |
+| **Interactive Contrast** | `#9FE870` | Tekst/iconen op Forest Green (zichtbaar in dark mode) |
+
+CSS: `var(--color-interactive-primary)` enz. Tailwind: `bg-interactive-accent`, `border-interactive-secondary`, `text-interactive-control`, `text-interactive-contrast`.
 
 ---
 
@@ -61,4 +75,4 @@ Tailwind: `rounded-card`, `rounded-block`, `rounded-pill`.
 - [Wise Design – Components](https://wise.design/components)
 - [Wise Design – Foundations](https://wise.design/foundations) (colour, spacing, radius)
 
-Onze tokens sluiten aan op hun semantic spacing (8/16/24/32) en radius-schaal; de kleuren blijven Domio (#002A1F, #9FE870).
+Onze tokens sluiten aan op hun semantic spacing (8/16/24/32) en radius-schaal; de kleuren blijven Domio (#163300, #9FE870).

@@ -15,13 +15,20 @@ const config: Config = {
       },
     },
     extend: {
-      /* Domio brand (Wise-inspired consistency): gebruik bg-brand-primary, text-brand-accent, etc. */
+      /* Domio brand + Interactive tokens */
       colors: {
         brand: {
-          primary: 'var(--color-primary-500)',   /* #002A1F */
+          primary: 'var(--color-primary-500)',
           'primary-hover': 'var(--color-primary-400)',
-          accent: 'var(--color-accent-400)',    /* #9FE870 */
+          accent: 'var(--color-accent-400)',
           'accent-hover': 'var(--color-accent-500)',
+        },
+        interactive: {
+          primary: 'var(--color-interactive-primary)',     /* #163300 – neutral interactive, active items */
+          accent: 'var(--color-interactive-accent)',       /* #9FE870 – primary buttons */
+          secondary: 'var(--color-interactive-secondary)', /* #868685 – input/checkbox borders, clear btn */
+          control: 'var(--color-interactive-control)',     /* #163300 – text/icons on Bright Green */
+          contrast: 'var(--color-interactive-contrast)',    /* #9FE870 – text/icons on Forest Green */
         },
         primary: {
           '50': 'var(--color-primary-50)',

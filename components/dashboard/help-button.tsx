@@ -21,7 +21,7 @@ export function HelpButton() {
           <Button
             variant="default"
             size="icon"
-            className="h-12 w-12 rounded-full shadow-lg bg-[#002A1F] hover:bg-[#356258]"
+            className="h-12 w-12 rounded-full shadow-lg bg-[#163300] hover:bg-[#356258]"
           >
             <HelpCircle className="h-5 w-5 text-white" />
             <span className="sr-only">Help</span>

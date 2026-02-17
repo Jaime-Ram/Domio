@@ -289,7 +289,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             type="button"
                             onClick={() => toggleItem(itemId)}
                             className={cn(
-                              "w-full flex items-center justify-start py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                              "w-full flex items-center justify-start py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                               hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                             )}
                             title={item.label}
@@ -310,7 +310,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           type="button"
                           onClick={() => toggleItem(itemId)}
                           className={cn(
-                            "w-full text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            "w-full text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                             hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                           )}
                         >
@@ -321,7 +321,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           )}>{item.label}</span>
                           {item.badge && (
                             <span className={cn(
-                              "px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full transition-all duration-300 ease-in-out",
+                              "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full transition-all duration-300 ease-in-out",
                               collapsed && "opacity-0 max-w-0 overflow-hidden"
                             )}>
                               {item.badge}
@@ -350,9 +350,9 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                   <Link
                                     href={child.href}
                                     className={cn(
-                                      "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                                      "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                                       active 
-                                        ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
+                                        ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                                         : "text-gray-800 dark:text-neutral-200"
                                     )}
                                   >
@@ -377,16 +377,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         <Link
                           href={item.href || '#'}
                           className={cn(
-                            "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                            "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                             active 
-                              ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
+                              ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                               : "text-gray-800 dark:text-neutral-200"
                           )}
                           title={item.label}
                         >
                           <Icon className="shrink-0 size-5 w-5 h-5" />
                           {item.badge && (
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#002A1F] rounded-full" />
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
                           )}
                         </Link>
                         {/* Tooltip */}
@@ -402,9 +402,9 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       <Link
                         href={item.href || '#'}
                         className={cn(
-                          "w-full flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#002A1F] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                          "w-full flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                           active 
-                            ? "bg-gray-200 text-[#002A1F] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
+                            ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
                       >
@@ -415,7 +415,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                         )}>{item.label}</span>
                         {item.badge && (
                           <span className={cn(
-                            "px-2 py-0.5 text-xs font-medium bg-[#002A1F] text-white rounded-full transition-all duration-300 ease-in-out",
+                            "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full transition-all duration-300 ease-in-out",
                             collapsed && "opacity-0 max-w-0 overflow-hidden"
                           )}>
                             {item.badge}
@@ -435,7 +435,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             showTrialBlock ? "opacity-100" : "opacity-0 pointer-events-none"
           )}>
             {showTrialBlock && (
-              <div className="bg-[#002A1F] rounded-xl p-4 relative overflow-hidden">
+              <div className="bg-[#163300] rounded-xl p-4 relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-sm font-semibold text-white mb-1">
                     Domio zelf ervaren?
@@ -444,7 +444,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                     Proberen 30 dagen gratis
                   </p>
                   <Button
-                    className="bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 rounded-lg w-full text-xs h-8"
+                    className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-lg w-full text-xs h-8"
                     onClick={() => router.push('/')}
                   >
                     Registreren

@@ -4,6 +4,6 @@
       <rect width="32" height="32" rx="8" ry="8" fill="white"/>
     </clipPath>
   </defs>
-  <rect width="32" height="32" rx="8" ry="8" fill="#002A1F"/>
+  <rect width="32" height="32" rx="8" ry="8" fill="#163300"/>
   <text x="16" y="22" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="white" text-anchor="middle">D</text>
 </svg>

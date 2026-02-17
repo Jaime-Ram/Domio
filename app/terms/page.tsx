@@ -18,7 +18,7 @@ export default function TermsPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-[#002A1F] hover:bg-gray-100 flex-shrink-0"
+              className="md:hidden text-[#163300] hover:bg-gray-100 flex-shrink-0"
               aria-label="Toggle menu"
             >
               <Menu className="h-6 w-6" />
@@ -33,7 +33,7 @@ export default function TermsPage() {
             <div className="hidden md:flex items-center ml-auto">
               <Link
                 href="/"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-[#002A1F]"
+                className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]"
               >
                 Terug naar home
               </Link>
@@ -45,7 +45,7 @@ export default function TermsPage() {
         <main className="flex-1">
           <div className="mx-auto max-w-4xl px-6 sm:px-8 lg:px-12 py-16">
             <div className="text-center mb-12">
-              <h1 className="mb-4 text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl">
+              <h1 className="mb-4 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">
                 Algemene Voorwaarden
               </h1>
               <p className="text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8">

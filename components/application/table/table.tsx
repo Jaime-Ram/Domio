@@ -108,7 +108,7 @@ const TableHead = ({
                             className={cn(
                                 "h-3 w-3 transition-colors",
                                 sortDirection === "ascending" 
-                                    ? "text-[#002A1F]" 
+                                    ? "text-[#163300]" 
                                     : "text-gray-400"
                             )}
                         />
@@ -116,7 +116,7 @@ const TableHead = ({
                             className={cn(
                                 "h-3 w-3 -mt-1 transition-colors",
                                 sortDirection === "descending" 
-                                    ? "text-[#002A1F]" 
+                                    ? "text-[#163300]" 
                                     : "text-gray-400"
                             )}
                         />

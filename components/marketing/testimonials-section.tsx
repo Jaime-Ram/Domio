@@ -133,7 +133,7 @@ export function TestimonialsSection() {
                     if (parent) {
                       parent.innerHTML = `
                         <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
-                          <div class="flex h-48 w-48 items-center justify-center rounded-full bg-white/80 text-5xl font-bold text-[#002A1F] shadow-lg dark:bg-gray-800/80">
+                          <div class="flex h-48 w-48 items-center justify-center rounded-full bg-white/80 text-5xl font-bold text-[#163300] shadow-lg dark:bg-gray-800/80">
                             ${currentTestimonial.name.split(' ').map((n) => n[0]).join('')}
                           </div>
                         </div>

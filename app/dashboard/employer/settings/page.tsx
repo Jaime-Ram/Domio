@@ -161,7 +161,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveAccount} className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveAccount} className="bg-[#163300] hover:bg-[#356258] text-white">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveCompany} className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveCompany} className="bg-[#163300] hover:bg-[#356258] text-white">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>
@@ -374,7 +374,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveNotifications} className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveNotifications} className="bg-[#163300] hover:bg-[#356258] text-white">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>

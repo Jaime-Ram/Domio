@@ -48,7 +48,7 @@ export function SidebarNavigationSimple({
                             className={cn(
                                 "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                                 active
-                                    ? "bg-[#002A1F]/10 text-[#002A1F] dark:bg-[#002A1F]/20"
+                                    ? "bg-[#163300]/10 text-[#163300] dark:bg-[#163300]/20"
                                     : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
                                 level > 0 && "pl-8"
                             )}
@@ -78,7 +78,7 @@ export function SidebarNavigationSimple({
                         className={cn(
                             "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             active
-                                ? "bg-[#002A1F]/10 text-[#002A1F] dark:bg-[#002A1F]/20"
+                                ? "bg-[#163300]/10 text-[#163300] dark:bg-[#163300]/20"
                                 : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
                             level > 0 && "pl-8"
                         )}
@@ -88,7 +88,7 @@ export function SidebarNavigationSimple({
                             <span>{item.label}</span>
                         </div>
                         {item.badge && (
-                            <span className="rounded-full bg-[#002A1F] px-2 py-0.5 text-xs font-medium text-white">
+                            <span className="rounded-full bg-[#163300] px-2 py-0.5 text-xs font-medium text-white">
                                 {typeof item.badge === "number" ? item.badge : item.badge}
                             </span>
                         )}
@@ -132,7 +132,7 @@ export function SidebarNavigationSimple({
                                 className={cn(
                                     "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                                     isActive(item.href)
-                                        ? "bg-[#002A1F]/10 text-[#002A1F] dark:bg-[#002A1F]/20"
+                                        ? "bg-[#163300]/10 text-[#163300] dark:bg-[#163300]/20"
                                         : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                                 )}
                             >
@@ -143,7 +143,7 @@ export function SidebarNavigationSimple({
                                 {item.badge && (
                                     <span className="shrink-0">
                                         {typeof item.badge === "number" ? (
-                                            <span className="rounded-full bg-[#002A1F] px-2 py-0.5 text-xs font-medium text-white">
+                                            <span className="rounded-full bg-[#163300] px-2 py-0.5 text-xs font-medium text-white">
                                                 {item.badge}
                                             </span>
                                         ) : (

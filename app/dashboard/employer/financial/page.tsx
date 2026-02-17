@@ -201,10 +201,10 @@ export default function FinancialPage() {
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Saldo
                   </CardTitle>
-                  <Euro className="h-4 w-4 text-[#002A1F] dark:text-[#9FE870]" />
+                  <Euro className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${balance >= 0 ? 'text-[#002A1F] dark:text-[#9FE870]' : 'text-red-600'}`}>
+                  <div className={`text-2xl font-bold ${balance >= 0 ? 'text-[#163300] dark:text-[#9FE870]' : 'text-red-600'}`}>
                     €{balance.toLocaleString('nl-NL')}
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -224,7 +224,7 @@ export default function FinancialPage() {
                   </div>
                   <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
                     <DialogTrigger asChild>
-                      <Button className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                      <Button className="bg-[#163300] hover:bg-[#356258] text-white">
                         <Plus className="h-4 w-4 mr-2" />
                         Registreer Betaling
                       </Button>
@@ -297,7 +297,7 @@ export default function FinancialPage() {
                         <Button variant="outline" onClick={() => setShowPaymentModal(false)}>
                           Annuleren
                         </Button>
-                        <Button onClick={handleRegisterPayment} className="bg-[#002A1F] hover:bg-[#356258]">
+                        <Button onClick={handleRegisterPayment} className="bg-[#163300] hover:bg-[#356258]">
                           Opslaan
                         </Button>
                       </DialogFooter>
@@ -360,7 +360,7 @@ export default function FinancialPage() {
                   </div>
                   <Dialog open={showExpenseModal} onOpenChange={setShowExpenseModal}>
                     <DialogTrigger asChild>
-                      <Button className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                      <Button className="bg-[#163300] hover:bg-[#356258] text-white">
                         <Plus className="h-4 w-4 mr-2" />
                         Voeg Uitgave Toe
                       </Button>
@@ -449,7 +449,7 @@ export default function FinancialPage() {
                         <Button variant="outline" onClick={() => setShowExpenseModal(false)}>
                           Annuleren
                         </Button>
-                        <Button onClick={handleAddExpense} className="bg-[#002A1F] hover:bg-[#356258]">
+                        <Button onClick={handleAddExpense} className="bg-[#163300] hover:bg-[#356258]">
                           Opslaan
                         </Button>
                       </DialogFooter>

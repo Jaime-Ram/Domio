@@ -51,7 +51,7 @@ export function FeaturedCardProgressBar({
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                         <div
-                            className="h-full bg-[#002A1F] transition-all"
+                            className="h-full bg-[#163300] transition-all"
                             style={{ width: `${progress}%` }}
                         />
                     </div>

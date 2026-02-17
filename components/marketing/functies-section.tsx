@@ -57,13 +57,13 @@ export function FunctiesSection() {
     >
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         <div className="mb-12 text-center md:mb-16">
-          <h2 className="text-base font-semibold leading-7 text-[#002A1F]">
+          <h2 className="text-base font-semibold leading-7 text-[#163300]">
             Functies
           </h2>
-          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl leading-tight text-[#002A1F]">
+          <h2 className="mt-2 text-[2.5rem] font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl leading-tight text-[#163300]">
             Alles wat je nodig hebt op één plek.
           </h2>
-          <p className="mt-4 text-lg sm:text-xl text-[#002A1F] text-balance max-w-2xl mx-auto">
+          <p className="mt-4 text-lg sm:text-xl text-[#163300] text-balance max-w-2xl mx-auto">
             Domio helpt jouw portefeuille zo efficiënt mogelijk te beheren.
           </p>
         </div>
@@ -71,7 +71,7 @@ export function FunctiesSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* 1. Maandelijkse inkomsten */}
           <div className="w-full">
-            <div className={cn(CARD_CLASS, '!bg-[#002A1F] !border-[#002A1F]/20 p-6')}>
+            <div className={cn(CARD_CLASS, '!bg-[#163300] !border-[#163300]/20 p-6')}>
               <p className="text-white/80 text-sm font-medium mb-1">
                 Maandelijkse inkomsten
               </p>
@@ -107,7 +107,7 @@ export function FunctiesSection() {
                 </button>
                 <button
                   type="button"
-                  className="flex-1 rounded-full py-2.5 px-4 bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
+                  className="flex-1 rounded-full py-2.5 px-4 bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
                 >
                   Rapport
                 </button>
@@ -141,7 +141,7 @@ export function FunctiesSection() {
               <div className="grid grid-cols-2 gap-3">
                 <div className={cn('rounded-2xl p-4 flex flex-col', INNER_BLOCK_CLASS)}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center">
                       <Euro className="h-3.5 w-3.5 text-white" />
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400">Inkomsten</span>
@@ -150,7 +150,7 @@ export function FunctiesSection() {
                 </div>
                 <div className={cn('rounded-2xl p-4 flex flex-col', INNER_BLOCK_CLASS)}>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="h-8 w-8 rounded-full bg-[#002A1F] flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center">
                       <ArrowUpRight className="h-3.5 w-3.5 text-white" />
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400">Uitgaven</span>
@@ -169,7 +169,7 @@ export function FunctiesSection() {
         <div className="mt-14 sm:mt-16 flex justify-center">
           <Link
             href="/#features"
-            className="inline-flex items-center justify-center px-10 py-3.5 rounded-full bg-[#002A1F] text-white font-semibold text-base shadow-lg shadow-[#002A1F]/20 hover:bg-[#002A1F]/90 transition-colors"
+            className="inline-flex items-center justify-center px-10 py-3.5 rounded-full bg-[#163300] text-white font-semibold text-base shadow-lg shadow-[#163300]/20 hover:bg-[#163300]/90 transition-colors"
           >
             Ontdek alle functies
           </Link>

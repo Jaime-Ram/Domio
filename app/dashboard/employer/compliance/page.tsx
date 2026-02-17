@@ -303,7 +303,7 @@ export default function CompliancePage() {
                       <Button variant="outline" onClick={() => setShowDetailModal(false)}>
                         Sluiten
                       </Button>
-                      <Button className="bg-[#002A1F] hover:bg-[#356258]">
+                      <Button className="bg-[#163300] hover:bg-[#356258]">
                         Opslaan
                       </Button>
                     </DialogFooter>
@@ -383,7 +383,7 @@ export default function CompliancePage() {
                                     )}
                                     {!step.completed && (
                                       <div className="flex gap-2 mt-3">
-                                        <Button size="sm" className="bg-[#002A1F] hover:bg-[#356258]">
+                                        <Button size="sm" className="bg-[#163300] hover:bg-[#356258]">
                                           <CheckCircle2 className="h-3 w-3 mr-2" />
                                           Markeer als voltooid
                                         </Button>
@@ -433,7 +433,7 @@ export default function CompliancePage() {
                           key={template.id}
                           className="border border-gray-200 dark:border-neutral-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
                         >
-                          <FileText className="h-8 w-8 text-[#002A1F] dark:text-[#9FE870] mb-3" />
+                          <FileText className="h-8 w-8 text-[#163300] dark:text-[#9FE870] mb-3" />
                           <h4 className="font-medium text-gray-900 dark:text-white mb-2">
                             {template.name}
                           </h4>
@@ -482,7 +482,7 @@ export default function CompliancePage() {
                       <Button variant="outline" onClick={() => setShowTemplateModal(false)}>
                         Sluiten
                       </Button>
-                      <Button className="bg-[#002A1F] hover:bg-[#356258]">
+                      <Button className="bg-[#163300] hover:bg-[#356258]">
                         <Download className="h-4 w-4 mr-2" />
                         Genereer PDF
                       </Button>

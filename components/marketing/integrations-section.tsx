@@ -62,8 +62,8 @@ export function IntegrationsSection() {
       <div className="container mx-auto w-full max-w-7xl px-4">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#002A1F]/10">
-              <Plug className="h-6 w-6 text-[#002A1F]" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#163300]/10">
+              <Plug className="h-6 w-6 text-[#163300]" />
             </div>
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -106,7 +106,7 @@ export function IntegrationsSection() {
             Gebruik je een ander systeem?{' '}
             <a
               href="mailto:integrations@domio.nl"
-              className="font-medium text-[#002A1F] hover:underline"
+              className="font-medium text-[#163300] hover:underline"
             >
               Neem contact op
             </a>

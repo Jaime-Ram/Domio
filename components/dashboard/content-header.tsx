@@ -31,7 +31,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
     'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden'
   const quickActionBtnClass =
     'flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors'
-  const quickActionIconClass = 'w-10 h-10 rounded-full bg-[#002A1F] flex items-center justify-center'
+  const quickActionIconClass = 'w-10 h-10 rounded-full bg-[#163300] flex items-center justify-center'
 
   return (
     <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
@@ -59,7 +59,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 px-4 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
+                  className="h-10 px-4 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#163300] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
                 >
                   <Zap className="h-4 w-4 shrink-0" />
                   <span>Snelle acties</span>
@@ -109,7 +109,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#002A1F] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
+                  className="h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#163300] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
                 >
                   <Zap className="h-4 w-4" />
                 </Button>
@@ -173,7 +173,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                     <DropdownMenuLabel className="p-0 font-semibold text-gray-900 dark:text-white">
                       Notificaties
                     </DropdownMenuLabel>
-                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#002A1F] dark:text-[#9FE870] font-medium">
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#163300] dark:text-[#9FE870] font-medium">
                       Alles gelezen
                     </Button>
                   </div>
@@ -190,8 +190,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                             : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
                         }`}
                       >
-                        <div className="h-9 w-9 rounded-2xl bg-[#002A1F]/10 dark:bg-[#9FE870]/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-4 w-4 text-[#002A1F] dark:text-[#9FE870]" />
+                        <div className="h-9 w-9 rounded-2xl bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{n.title}</p>
@@ -203,7 +203,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                   })}
                 </div>
                 <div className="px-4 py-2 border-t border-gray-200/80 dark:border-neutral-700">
-                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-[#002A1F] dark:text-[#9FE870] rounded-2xl">
+                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-[#163300] dark:text-[#9FE870] rounded-2xl">
                     Alle notificaties bekijken
                   </Button>
                 </div>
@@ -218,7 +218,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                   variant="ghost"
                   className="h-10 pl-2 pr-3 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm gap-2"
                 >
-                  <span className="h-7 w-7 rounded-full bg-[#002A1F] text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0">
+                  <span className="h-7 w-7 rounded-full bg-[#163300] text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0">
                     {currentUser.avatarInitials}
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
@@ -229,7 +229,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
               <DropdownMenuContent align="end" className={dropdownContentClass}>
                 <div className="px-4 py-4 border-b border-gray-200/80 dark:border-neutral-700">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-[#002A1F] text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
+                    <div className="h-11 w-11 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
                       {currentUser.avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">

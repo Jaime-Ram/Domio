@@ -31,7 +31,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#002A1F] to-[#004d3d] p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#163300] to-[#004d3d] p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Logo width={120} height={34} variant="white" />

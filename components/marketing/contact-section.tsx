@@ -40,7 +40,7 @@ export function ContactSection() {
     <section id="contact" className="max-w-[85rem] px-6 py-10 md:px-8 lg:py-14 mx-auto">
       <div className="max-w-2xl lg:max-w-5xl mx-auto">
         <div className="text-center">
-          <h1 className="text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl dark:text-white">
+          <h1 className="text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl dark:text-white">
             We helpen je graag
           </h1>
           <p className="mt-2 text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8 dark:text-gray-400">
@@ -69,7 +69,7 @@ export function ContactSection() {
                       id="hs-firstname-contacts-1"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#002A1F] focus:ring-[#002A1F] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
+                      className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#163300] focus:ring-[#163300] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
                       placeholder="Voornaam"
                     />
                   </div>
@@ -84,7 +84,7 @@ export function ContactSection() {
                       id="hs-lastname-contacts-1"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#002A1F] focus:ring-[#002A1F] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
+                      className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#163300] focus:ring-[#163300] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
                       placeholder="Achternaam"
                     />
                   </div>
@@ -102,7 +102,7 @@ export function ContactSection() {
                     autoComplete="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#002A1F] focus:ring-[#002A1F] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
+                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#163300] focus:ring-[#163300] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Email"
                   />
                 </div>
@@ -117,7 +117,7 @@ export function ContactSection() {
                     id="hs-phone-number-1"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#002A1F] focus:ring-[#002A1F] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
+                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#163300] focus:ring-[#163300] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Telefoonnummer"
                   />
                 </div>
@@ -132,7 +132,7 @@ export function ContactSection() {
                     rows={4}
                     value={formData.details}
                     onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#002A1F] focus:ring-[#002A1F] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
+                    className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm focus:border-[#163300] focus:ring-[#163300] disabled:opacity-50 disabled:pointer-events-none bg-white text-gray-900 placeholder-gray-500"
                     placeholder="Details"
                   ></textarea>
                 </div>
@@ -143,7 +143,7 @@ export function ContactSection() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-xl border border-transparent bg-[#002A1F] text-white hover:bg-[#356258] focus:outline-none focus:bg-[#356258] disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-xl border border-transparent bg-[#163300] text-white hover:bg-[#356258] focus:outline-none focus:bg-[#356258] disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {loading ? 'Verzenden...' : 'Verstuur bericht'}
                 </button>

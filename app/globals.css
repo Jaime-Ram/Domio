@@ -83,11 +83,11 @@
 @keyframes avatarCenterPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 42, 31, 0.15);
+    box-shadow: 0 0 0 0 rgba(22, 51, 0, 0.15);
   }
   50% {
     transform: scale(1.08);
-    box-shadow: 0 0 0 6px rgba(0, 42, 31, 0.08);
+    box-shadow: 0 0 0 6px rgba(22, 51, 0, 0.08);
   }
 }
 
@@ -173,17 +173,17 @@
     --color-background: #ffffff;
     --color-foreground: #0F172A;
 
-    /* Domio Brand Colors - Primary Green */
-    --color-primary-50: #E6F5F2;
-    --color-primary-100: #CCEBE5;
-    --color-primary-200: #99D7CB;
-    --color-primary-300: #66C3B1;
+    /* Domio Brand Colors - Forest Green & Bright Green */
+    --color-primary-50: #E8F0E6;
+    --color-primary-100: #D1E1CC;
+    --color-primary-200: #A3C399;
+    --color-primary-300: #75A566;
     --color-primary-400: #356258; /* Tertiary - Mid Green */
-    --color-primary-500: #002A1F; /* Main - Dark Green */
-    --color-primary-600: #002118;
-    --color-primary-700: #001912;
-    --color-primary-800: #00120C;
-    --color-primary-900: #000B06;
+    --color-primary-500: #163300; /* Forest Green - PMS 2411 */
+    --color-primary-600: #122900;
+    --color-primary-700: #0E2000;
+    --color-primary-800: #0A1600;
+    --color-primary-900: #050B00;
 
     /* Neutrals - Text & UI */
     --color-text-primary: #0F172A; /* Midnight */
@@ -209,17 +209,24 @@
     --color-warning: #F59E0B; /* Amber */
     --color-error: #EF4444; /* Red */
 
-    /* Accent colors (using secondary green) */
+    /* Accent colors - Bright Green */
     --color-accent-50: #F0FFEC;
     --color-accent-100: #E1FFD9;
     --color-accent-200: #C3FFB3;
     --color-accent-300: #A5FF8D;
-    --color-accent-400: #9FE870; /* Secondary - Light Green */
+    --color-accent-400: #9FE870; /* Bright Green - PMS 7487 */
     --color-accent-500: #7FE65F;
     --color-accent-600: #64CC4C;
     --color-accent-700: #4A9939;
     --color-accent-800: #2F6626;
     --color-accent-900: #153313;
+
+    /* Interactive tokens (use in components) */
+    --color-interactive-primary: #163300;   /* Forest Green – neutral interactive, active list items */
+    --color-interactive-accent: #9FE870;    /* Bright Green – primary buttons, pop of colour */
+    --color-interactive-secondary: #868685; /* De-emphasised: input/checkbox borders, clear button. Not on text. */
+    --color-interactive-control: #163300;   /* Text/icons on Bright Green surfaces (e.g. primary button text) */
+    --color-interactive-contrast: #9FE870;  /* Text/icons on Forest Green surfaces */
 
     /* Wise-style semantic spacing (use in components for consistency) */
     --space-x-small: 8px;
@@ -240,19 +247,19 @@
         --card-foreground: 222 47% 11%; /* Midnight */
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
-        --primary: 165 100% 8%; /* Domio Main Green #002A1F */
+        --primary: 104 100% 10%; /* Forest Green #163300 */
         --primary-foreground: 0 0% 100%; /* White */
         --secondary: 210 40% 98%; /* Off-White #F8FAFC */
         --secondary-foreground: 222 47% 11%; /* Midnight */
         --muted: 210 40% 96%;
         --muted-foreground: 215 16% 47%; /* Slate #475569 */
-        --accent: 102 72% 68%; /* Domio Secondary Green #9FE870 */
-        --accent-foreground: 165 100% 8%; /* Main Green for contrast */
+        --accent: 102 72% 68%; /* Bright Green #9FE870 */
+        --accent-foreground: 104 100% 10%; /* Forest Green for contrast */
         --destructive: 0 84% 60%; /* Error Red #EF4444 */
         --destructive-foreground: 0 0% 98%;
         --border: 214 32% 91%; /* Soft Gray #E2E8F0 */
         --input: 214 32% 91%;
-        --ring: 165 100% 8%; /* Domio Main Green */
+        --ring: 104 100% 10%; /* Forest Green */
         --radius: 0.5rem;
     }
   .dark {
@@ -262,19 +269,19 @@
         --card-foreground: 0 0% 98%;
         --popover: 222 47% 11%;
         --popover-foreground: 0 0% 98%;
-        --primary: 165 100% 8%; /* Domio Main Green #002A1F */
+        --primary: 104 100% 10%; /* Forest Green #163300 */
         --primary-foreground: 0 0% 100%;
         --secondary: 215 28% 17%;
         --secondary-foreground: 0 0% 98%;
         --muted: 215 28% 17%;
         --muted-foreground: 215 16% 47%;
-        --accent: 102 72% 68%; /* Domio Secondary Green #9FE870 */
-        --accent-foreground: 165 100% 8%; /* Main Green for contrast */
+        --accent: 102 72% 68%; /* Bright Green #9FE870 */
+        --accent-foreground: 104 100% 10%; /* Forest Green for contrast */
         --destructive: 0 62% 50%;
         --destructive-foreground: 0 0% 98%;
         --border: 215 28% 17%;
         --input: 215 28% 17%;
-        --ring: 165 100% 8%; /* Domio Main Green */
+        --ring: 104 100% 10%; /* Forest Green */
     }
 }
 
@@ -310,16 +317,6 @@
     font-weight: 600;
   }
   
-  /* Force all mobile menu links to have the same color */
-  a[href="/contact"],
-  a[href="#contact"] {
-    color: rgb(255 255 255 / 0.8) !important;
-  }
-  
-  a[href="/contact"]:visited,
-  a[href="#contact"]:visited {
-    color: rgb(255 255 255 / 0.8) !important;
-  }
 }
 
 @keyframes loading-line {

@@ -49,8 +49,8 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
   return (
     <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-6 lg:px-8">
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="text-base font-semibold leading-7 text-[#002A1F]">Pricing</h2>
-        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#002A1F] sm:text-6xl">
+        <h2 className="text-base font-semibold leading-7 text-[#163300]">Pricing</h2>
+        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">
           <span className="hidden sm:inline">Passende, simpele pricing</span>
           <span className="sm:hidden">Passende simpele pricing</span>
         </p>
@@ -86,7 +86,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
           <div
             key={tier.id}
             className={cn(
-              tier.featured ? 'relative bg-[#002A1F] shadow-2xl' : 'bg-white/60 sm:mx-8 lg:mx-0',
+              tier.featured ? 'relative bg-[#163300] shadow-2xl' : 'bg-white/60 sm:mx-8 lg:mx-0',
               tier.featured
                 ? ''
                 : tierIdx === 0
@@ -98,7 +98,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
             <h3
               id={tier.id}
               className={cn(
-                tier.featured ? 'text-[#9FE870]' : 'text-[#002A1F]',
+                tier.featured ? 'text-[#9FE870]' : 'text-[#163300]',
                 'text-base font-semibold leading-7',
               )}
             >
@@ -142,7 +142,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
                   <Check
                     aria-hidden="true"
                     className={cn(
-                      tier.featured ? 'text-[#9FE870]' : 'text-[#002A1F]',
+                      tier.featured ? 'text-[#9FE870]' : 'text-[#163300]',
                       'h-6 w-5 flex-none',
                     )}
                   />
@@ -156,8 +156,8 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
               aria-describedby={tier.id}
               className={cn(
                 tier.featured
-                  ? 'bg-[#9FE870] text-[#002A1F] shadow-sm hover:bg-[#9FE870]/90 focus-visible:outline-[#9FE870]'
-                  : 'bg-transparent text-[#002A1F] border-2 border-[#002A1F] hover:bg-[#002A1F]/5 focus-visible:outline-[#002A1F]',
+                  ? 'bg-[#9FE870] text-[#163300] shadow-sm hover:bg-[#9FE870]/90 focus-visible:outline-[#9FE870]'
+                  : 'bg-transparent text-[#163300] border-2 border-[#163300] hover:bg-[#163300]/5 focus-visible:outline-[#163300]',
                 'mt-8 w-full rounded-2xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
               )}
             >

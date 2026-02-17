@@ -63,7 +63,7 @@ export default function VvEPage() {
                   Streefbedrag €{vveData.targetReserve.toLocaleString('nl-NL')}
                 </p>
                 <div className="mt-3 h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700 overflow-hidden">
-                  <div className="h-full rounded-full bg-[#002A1F] dark:bg-[#9FE870]" style={{ width: `${reservePercent}%` }} />
+                  <div className="h-full rounded-full bg-[#163300] dark:bg-[#9FE870]" style={{ width: `${reservePercent}%` }} />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{Math.round(reservePercent)}% van streefbedrag</p>
               </CardContent>
@@ -123,7 +123,7 @@ export default function VvEPage() {
                 {vveMjop.map((item) => (
                   <li key={item.year} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-800 last:border-0">
                     <span className="font-medium">{item.year}: {item.description}</span>
-                    <span className="text-[#002A1F] dark:text-[#9FE870] font-medium">€{item.amount.toLocaleString('nl-NL')}</span>
+                    <span className="text-[#163300] dark:text-[#9FE870] font-medium">€{item.amount.toLocaleString('nl-NL')}</span>
                   </li>
                 ))}
               </ul>

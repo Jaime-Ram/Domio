@@ -75,7 +75,7 @@ export function HuurSection({ onSignupClick }: HuurSectionProps) {
               <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:min-w-[280px] flex items-center justify-between gap-4 rounded-full bg-white/95 backdrop-blur-sm px-5 py-4 shadow-xl border border-gray-100 z-20">
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#9FE870]">
-                    <ArrowDown className="h-5 w-5 text-[#002A1F]" strokeWidth={2.5} />
+                    <ArrowDown className="h-5 w-5 text-[#163300]" strokeWidth={2.5} />
                   </div>
                   <span className="text-base font-bold text-gray-900">Huur</span>
                 </div>
@@ -86,7 +86,7 @@ export function HuurSection({ onSignupClick }: HuurSectionProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className="text-base font-bold text-[#002A1F] whitespace-nowrap shrink-0"
+                    className="text-base font-bold text-[#163300] whitespace-nowrap shrink-0"
                   >
                     {HUUR_BEDRAGEN[activeIndex]}
                   </motion.span>
@@ -97,7 +97,7 @@ export function HuurSection({ onSignupClick }: HuurSectionProps) {
 
           {/* Right: Tekst en call-to-action */}
           <div className="lg:col-span-7 order-1 lg:order-2 flex flex-col justify-center">
-            <h2 className="text-4xl font-bold tracking-tight text-[#002A1F] sm:text-5xl md:text-6xl">
+            <h2 className="text-4xl font-bold tracking-tight text-[#163300] sm:text-5xl md:text-6xl">
               Huurinkomsten op één plek
             </h2>
             <p className="mt-5 text-lg text-gray-600 leading-7 max-w-2xl">
@@ -107,13 +107,13 @@ export function HuurSection({ onSignupClick }: HuurSectionProps) {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Button
                 onClick={onSignupClick}
-                className="rounded-full bg-[#9FE870] text-[#002A1F] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm"
+                className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm"
               >
                 Aan de slag
               </Button>
               <Link
                 href="/#features"
-                className="inline-flex items-center gap-1.5 text-base font-semibold text-[#002A1F] underline underline-offset-4 hover:text-[#002A1F]/80 transition-colors"
+                className="inline-flex items-center gap-1.5 text-base font-semibold text-[#163300] underline underline-offset-4 hover:text-[#163300]/80 transition-colors"
               >
                 Ontdek huurbeheer
                 <ArrowUpRight className="h-4 w-4 shrink-0" />

@@ -24,8 +24,8 @@ export function PricingTierCardIcon({
   return (
     <Card className={cn("flex flex-col", className)}>
       <CardHeader>
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#002A1F]/10">
-          <Icon className="h-6 w-6 text-[#002A1F]" />
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#163300]/10">
+          <Icon className="h-6 w-6 text-[#163300]" />
         </div>
         <CardTitle className="text-2xl">{title}</CardTitle>
         <div className="mt-2">

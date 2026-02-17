@@ -156,7 +156,7 @@ export default function MaintenancePage() {
               </div>
               <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#002A1F] hover:bg-[#356258] text-white">
+                  <Button className="bg-[#163300] hover:bg-[#356258] text-white">
                     <Plus className="h-4 w-4 mr-2" />
                     Nieuwe Melding
                   </Button>
@@ -236,7 +236,7 @@ export default function MaintenancePage() {
                     <Button variant="outline" onClick={() => setShowNewModal(false)}>
                       Annuleren
                     </Button>
-                    <Button onClick={handleNewMaintenance} className="bg-[#002A1F] hover:bg-[#356258]">
+                    <Button onClick={handleNewMaintenance} className="bg-[#163300] hover:bg-[#356258]">
                       Aanmaken
                     </Button>
                   </DialogFooter>
@@ -508,7 +508,7 @@ export default function MaintenancePage() {
                   <Button variant="outline" onClick={() => setShowDetailModal(false)}>
                     Annuleren
                   </Button>
-                  <Button onClick={handleSaveDetails} className="bg-[#002A1F] hover:bg-[#356258]">
+                  <Button onClick={handleSaveDetails} className="bg-[#163300] hover:bg-[#356258]">
                     Opslaan
                   </Button>
                 </DialogFooter>
