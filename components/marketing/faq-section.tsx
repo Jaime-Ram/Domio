@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, Minus } from 'lucide-react'
+import { motion, AnimatePresence } from 'motion/react'
 import { cn } from '@/lib/utils'
 
 interface FAQItem {
@@ -79,14 +80,19 @@ export function FAQSection() {
                     )}
                   </span>
                 </button>
-                <div
-                  className={cn(
-                    'overflow-hidden transition-all duration-300',
-                    isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <p className="pt-3 text-base text-gray-600">{item.answer}</p>
+                    </motion.div>
                   )}
-                >
-                  <p className="pt-3 text-base text-gray-600">{item.answer}</p>
-                </div>
+                </AnimatePresence>
               </div>
           )
         })}

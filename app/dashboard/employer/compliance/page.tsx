@@ -1,26 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { 
   Table,
   TableBody,
   TableCell,
@@ -28,472 +16,443 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { 
+import {
   ShieldCheck,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
-  Clock,
+  RefreshCw,
   FileText,
-  Upload,
   Download,
   Eye,
-  Bell,
+  ChevronUp,
+  ChevronDown,
+  Search,
 } from 'lucide-react'
-import { mockCompliance, mockRentArrearsProcedures, mockLetterTemplates, mockProperties, mockTenants } from '@/lib/mock-data/vastgoed'
+import {
+  mockWwsObjects,
+  mockWwsAlerts,
+  mockWwsSectorDistribution,
+  mockWwsVorigeJaarGemiddeld,
+  type WWSComplianceObject,
+  type WWSSector,
+} from '@/lib/mock-data/wws-compliance'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 
-export default function CompliancePage() {
-  const router = useRouter()
-  const [selectedProperty, setSelectedProperty] = useState<typeof mockProperties[0] | null>(null)
-  const [showDetailModal, setShowDetailModal] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<typeof mockLetterTemplates[0] | null>(null)
-  const [showTemplateModal, setShowTemplateModal] = useState(false)
+const SECTOR_LABELS: Record<WWSSector, string> = {
+  sociaal: 'Sociaal',
+  midden: 'Midden',
+  vrij: 'Vrij',
+}
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'green':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Compliant</Badge>
-      case 'orange':
-        return <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-500"><Clock className="h-3 w-3 mr-1" />Aandacht</Badge>
-      case 'red':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-500"><XCircle className="h-3 w-3 mr-1" />Niet compliant</Badge>
-      default:
-        return null
-    }
-  }
+const SECTOR_COLORS: Record<WWSSector, string> = {
+  sociaal: '#64748B',
+  midden: '#F59E0B',
+  vrij: '#10B981',
+}
 
-  const getCheckIcon = (valid: boolean | null) => {
-    if (valid === true) return <CheckCircle2 className="h-5 w-5 text-green-600" />
-    if (valid === false) return <XCircle className="h-5 w-5 text-red-600" />
-    return <Clock className="h-5 w-5 text-orange-600" />
-  }
+const STATUS_LABELS: Record<WWSComplianceObject['status'], string> = {
+  compliant: 'Compliant',
+  verlopen: 'Verlopen',
+  te_hoog: 'Te hoog',
+  pdf_mist: 'PDF mist',
+}
 
-  const handleViewDetails = (property: typeof mockProperties[0]) => {
-    setSelectedProperty(property)
-    setShowDetailModal(true)
-  }
+type SortKey = 'address' | 'punten' | 'sector' | 'maxHuur' | 'huidigeHuur' | 'verschil' | 'status' | 'laatsteCheck'
 
-  const handleGenerateLetter = (template: typeof mockLetterTemplates[0], procedure: typeof mockRentArrearsProcedures[0]) => {
-    setSelectedTemplate(template)
-    setShowTemplateModal(true)
-    // In real implementation, this would fill in merge fields
-  }
-
-  // Calculate stats
-  const compliantCount = mockCompliance.filter(c => c.overallStatus === 'green').length
-  const needsAttention = mockCompliance.filter(c => c.overallStatus === 'orange').length
-  const nonCompliant = mockCompliance.filter(c => c.overallStatus === 'red').length
-
+function SectorDonutChart({
+  data,
+}: {
+  data: { sector: string; count: number; color: string }[]
+}) {
+  const total = data.reduce((s, d) => s + d.count, 0)
+  const circ = 2 * Math.PI * 45
+  let offset = 0
   return (
-    <>
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Compliance
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Voldoe aan Nederlandse wetgeving en regelgeving
-              </p>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className={dashboardCardClass()}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Compliant</p>
-                      <p className="text-2xl font-bold text-green-600">{compliantCount}</p>
-                    </div>
-                    <CheckCircle2 className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className={dashboardCardClass()}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Aandacht vereist</p>
-                      <p className="text-2xl font-bold text-orange-600">{needsAttention}</p>
-                    </div>
-                    <Clock className="h-8 w-8 text-orange-600" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className={dashboardCardClass()}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Niet compliant</p>
-                      <p className="text-2xl font-bold text-red-600">{nonCompliant}</p>
-                    </div>
-                    <AlertTriangle className="h-8 w-8 text-red-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Tabs */}
-            <Tabs defaultValue="checklist" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="checklist">Compliance Checklist</TabsTrigger>
-                <TabsTrigger value="arrears">Huurachterstand Procedures</TabsTrigger>
-              </TabsList>
-
-              {/* Tab 1: Compliance Checklist */}
-              <TabsContent value="checklist">
-                <Card className={dashboardCardClass()}>
-                  <CardHeader>
-                    <CardTitle>Compliance per Pand</CardTitle>
-                    <CardDescription>Status van verplichte items per object</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-gray-50 dark:bg-neutral-800">
-                          <TableHead>Pand</TableHead>
-                          <TableHead className="text-center">Rookmelders</TableHead>
-                          <TableHead className="text-center">Elektra-keuring</TableHead>
-                          <TableHead className="text-center">Verzekering</TableHead>
-                          <TableHead>Overall Status</TableHead>
-                          <TableHead className="text-right">Acties</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockCompliance.map((item) => (
-                          <TableRow key={item.propertyId} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                            <TableCell>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                {item.property.address}
-                              </p>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {getCheckIcon(item.smokeDetectors)}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex flex-col items-center gap-1">
-                                {getCheckIcon(item.electricityInspection.valid)}
-                                {item.electricityInspection.expiryDate && (
-                                  <span className="text-xs text-gray-500">
-                                    t/m {format(new Date(item.electricityInspection.expiryDate), 'MM/yyyy')}
-                                  </span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex flex-col items-center gap-1">
-                                {getCheckIcon(item.insurance.valid)}
-                                {item.insurance.expiryDate && (
-                                  <span className="text-xs text-gray-500">
-                                    t/m {format(new Date(item.insurance.expiryDate), 'MM/yyyy')}
-                                  </span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(item.overallStatus)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleViewDetails(item.property)}
-                              >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Details
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-
-                {/* Detail Modal */}
-                <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>Compliance Details</DialogTitle>
-                      <DialogDescription>
-                        {selectedProperty?.address}
-                      </DialogDescription>
-                    </DialogHeader>
-                    {selectedProperty && (
-                      <div className="space-y-6 py-4">
-                        {/* Rookmelders */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Label>Rookmelders aanwezig?</Label>
-                            <Checkbox defaultChecked={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.smokeDetectors} />
-                          </div>
-                        </div>
-
-                        {/* Elektra-keuring */}
-                        <div className="space-y-3 border-t pt-4">
-                          <p className="font-medium text-gray-900 dark:text-white">Elektra-keuring geldig?</p>
-                          <div className="flex items-center gap-2">
-                            <Checkbox defaultChecked={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.electricityInspection.valid} />
-                            <span className="text-sm">Geldig</span>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="expiry-date">Vervaldatum</Label>
-                            <Input
-                              id="expiry-date"
-                              type="date"
-                              defaultValue={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.electricityInspection.expiryDate || ''}
-                            />
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload document
-                          </Button>
-                        </div>
-
-                        {/* Verzekering */}
-                        <div className="space-y-3 border-t pt-4">
-                          <p className="font-medium text-gray-900 dark:text-white">Verzekering actief?</p>
-                          <div className="flex items-center gap-2">
-                            <Checkbox defaultChecked={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.insurance.valid} />
-                            <span className="text-sm">Actief</span>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="insurance-expiry">Vervaldatum</Label>
-                            <Input
-                              id="insurance-expiry"
-                              type="date"
-                              defaultValue={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.insurance.expiryDate || ''}
-                            />
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload polis
-                          </Button>
-                        </div>
-
-                        {/* Huurdersverzekering */}
-                        <div className="space-y-2 border-t pt-4">
-                          <div className="flex items-center justify-between">
-                            <Label>Huurdersverzekering ontvangen?</Label>
-                            <Checkbox defaultChecked={mockCompliance.find(c => c.propertyId === selectedProperty.id)?.tenantInsurance} />
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload document
-                          </Button>
-                        </div>
-
-                        {/* Alerts */}
-                        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <Bell className="h-5 w-5 text-blue-600 mt-0.5" />
-                            <div>
-                              <p className="text-sm font-medium text-blue-900 dark:text-blue-400">Automatische herinneringen</p>
-                              <p className="text-xs text-blue-700 dark:text-blue-500 mt-1">
-                                Je ontvangt 30 dagen voor de vervaldatum een email notificatie.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setShowDetailModal(false)}>
-                        Sluiten
-                      </Button>
-                      <Button className="bg-[#163300] hover:bg-[#356258]">
-                        Opslaan
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </TabsContent>
-
-              {/* Tab 2: Huurachterstand Procedures */}
-              <TabsContent value="arrears">
-                <Card className={dashboardCardClass('mb-6')}>
-                  <CardHeader>
-                    <CardTitle>Actieve Huurachterstand Procedures</CardTitle>
-                    <CardDescription>Procedures voor huurders met achterstand</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {mockRentArrearsProcedures.length > 0 ? (
-                      <div className="space-y-6">
-                        {mockRentArrearsProcedures.map((procedure) => (
-                          <div key={procedure.id} className="border border-gray-200 dark:border-neutral-700 rounded-lg p-6">
-                            <div className="flex items-start justify-between mb-4">
-                              <div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                  {procedure.tenant.name}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {procedure.property.address}
-                                </p>
-                                <div className="flex items-center gap-4 mt-2">
-                                  <Badge className="bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-500">
-                                    Achterstand: €{procedure.totalArrears.toLocaleString('nl-NL')}
-                                  </Badge>
-                                  <span className="text-sm text-gray-500">
-                                    {procedure.daysPastDue} dagen achterstallig
-                                  </span>
-                                </div>
-                              </div>
-                              <Badge variant="outline">{procedure.status}</Badge>
-                            </div>
-
-                            {/* Procedure Steps */}
-                            <div className="space-y-3">
-                              {procedure.steps.map((step) => (
-                                <div 
-                                  key={step.step} 
-                                  className={`flex items-start gap-4 p-4 rounded-lg border ${
-                                    step.completed 
-                                      ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900' 
-                                      : 'bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700'
-                                  }`}
-                                >
-                                  <div className="flex-shrink-0">
-                                    {step.completed ? (
-                                      <CheckCircle2 className="h-6 w-6 text-green-600" />
-                                    ) : (
-                                      <div className="h-6 w-6 rounded-full border-2 border-gray-300 dark:border-gray-600" />
-                                    )}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <p className="font-medium text-gray-900 dark:text-white">
-                                        Stap {step.step}: {step.name}
-                                      </p>
-                                      {step.completedDate && (
-                                        <span className="text-xs text-gray-500">
-                                          {format(new Date(step.completedDate), 'd MMM yyyy', { locale: nl })}
-                                        </span>
-                                      )}
-                                    </div>
-                                    {step.notes && (
-                                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{step.notes}</p>
-                                    )}
-                                    {step.document && (
-                                      <Button size="sm" variant="outline" className="mt-2">
-                                        <Download className="h-3 w-3 mr-2" />
-                                        {step.document}
-                                      </Button>
-                                    )}
-                                    {!step.completed && (
-                                      <div className="flex gap-2 mt-3">
-                                        <Button size="sm" className="bg-[#163300] hover:bg-[#356258]">
-                                          <CheckCircle2 className="h-3 w-3 mr-2" />
-                                          Markeer als voltooid
-                                        </Button>
-                                        {step.step <= 3 && (
-                                          <Button 
-                                            size="sm" 
-                                            variant="outline"
-                                            onClick={() => {
-                                              const template = mockLetterTemplates[step.step - 1]
-                                              if (template) handleGenerateLetter(template, procedure)
-                                            }}
-                                          >
-                                            <FileText className="h-3 w-3 mr-2" />
-                                            Genereer brief
-                                          </Button>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400">
-                          Geen actieve huurachterstand procedures
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Brief Templates */}
-                <Card className={dashboardCardClass()}>
-                  <CardHeader>
-                    <CardTitle>Brief Templates</CardTitle>
-                    <CardDescription>Standaard templates voor huurachterstand communicatie</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {mockLetterTemplates.map((template) => (
-                        <div 
-                          key={template.id}
-                          className="border border-gray-200 dark:border-neutral-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
-                        >
-                          <FileText className="h-8 w-8 text-[#163300] dark:text-[#9FE870] mb-3" />
-                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-                            {template.name}
-                          </h4>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="w-full"
-                            onClick={() => {
-                              setSelectedTemplate(template)
-                              setShowTemplateModal(true)
-                            }}
-                          >
-                            <Eye className="h-3 w-3 mr-2" />
-                            Bekijk template
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Template Preview Modal */}
-                <Dialog open={showTemplateModal} onOpenChange={setShowTemplateModal}>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>{selectedTemplate?.name}</DialogTitle>
-                      <DialogDescription>
-                        Bekijk en genereer de brief met automatisch ingevulde gegevens
-                      </DialogDescription>
-                    </DialogHeader>
-                    {selectedTemplate && (
-                      <div className="space-y-4 py-4">
-                        <div className="bg-gray-50 dark:bg-neutral-800 p-4 rounded-lg">
-                          <pre className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap font-sans">
-                            {selectedTemplate.content}
-                          </pre>
-                        </div>
-                        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg p-3">
-                          <p className="text-xs text-blue-900 dark:text-blue-400">
-                            Merge velden zoals {`{{huurder_naam}}, {{bedrag}}, {{adres}}`} worden automatisch ingevuld bij genereren.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setShowTemplateModal(false)}>
-                        Sluiten
-                      </Button>
-                      <Button className="bg-[#163300] hover:bg-[#356258]">
-                        <Download className="h-4 w-4 mr-2" />
-                        Genereer PDF
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </TabsContent>
-            </Tabs>
-    </>
+    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+      {data.map((d) => {
+        const pct = d.count / total
+        const dash = pct * circ
+        const strokeDasharray = `${dash} ${circ - dash}`
+        const strokeDashoffset = -offset
+        offset += dash
+        return (
+          <circle
+            key={d.sector}
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke={d.color}
+            strokeWidth="12"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+          />
+        )
+      })}
+    </svg>
   )
 }
 
+export default function CompliancePage() {
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sectorFilter, setSectorFilter] = useState<WWSSector | 'all'>('all')
+  const [sortKey, setSortKey] = useState<SortKey>('address')
+  const [sortAsc, setSortAsc] = useState(true)
 
+  const compliantCount = mockWwsObjects.filter((o) => o.status === 'compliant').length
+  const totalCount = mockWwsObjects.length
+  const compliantPercent = Math.round((compliantCount / totalCount) * 100)
+  const actieVereist = mockWwsObjects.filter((o) => o.status !== 'compliant').length
+  const verlopenCount = mockWwsObjects.filter((o) => o.status === 'verlopen').length
+  const gemiddeldPunten = Math.round(
+    mockWwsObjects.filter((o) => o.punten > 0).reduce((s, o) => s + o.punten, 0) / mockWwsObjects.filter((o) => o.punten > 0).length
+  )
+  const trendDiff = gemiddeldPunten - mockWwsVorigeJaarGemiddeld
+  const vrijeSectorCount = mockWwsObjects.filter((o) => o.sector === 'vrij').length
 
+  const filteredAndSorted = useMemo(() => {
+    let list = mockWwsObjects.filter((o) => {
+      if (searchQuery && !o.address.toLowerCase().includes(searchQuery.toLowerCase())) return false
+      if (sectorFilter !== 'all' && o.sector !== sectorFilter) return false
+      return true
+    })
+    list = [...list].sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'address':
+          cmp = a.address.localeCompare(b.address)
+          break
+        case 'punten':
+          cmp = a.punten - b.punten
+          break
+        case 'sector':
+          cmp = a.sector.localeCompare(b.sector)
+          break
+        case 'maxHuur':
+          cmp = a.maxHuur - b.maxHuur
+          break
+        case 'huidigeHuur':
+          cmp = a.huidigeHuur - b.huidigeHuur
+          break
+        case 'verschil':
+          cmp = a.verschil - b.verschil
+          break
+        case 'status':
+          cmp = (STATUS_LABELS[a.status] ?? '').localeCompare(STATUS_LABELS[b.status] ?? '')
+          break
+        case 'laatsteCheck':
+          cmp = a.laatsteCheck.localeCompare(b.laatsteCheck)
+          break
+      }
+      return sortAsc ? cmp : -cmp
+    })
+    return list
+  }, [searchQuery, sectorFilter, sortKey, sortAsc])
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortAsc((v) => !v)
+    else {
+      setSortKey(key)
+      setSortAsc(true)
+    }
+  }
+
+  const Th = ({ keyName, label }: { keyName: SortKey; label: string }) => (
+    <TableHead>
+      <button
+        type="button"
+        className="flex items-center gap-1 hover:text-[#163300] transition-colors"
+        onClick={() => toggleSort(keyName)}
+      >
+        {label}
+        {sortKey === keyName ? sortAsc ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" /> : null}
+      </button>
+    </TableHead>
+  )
+
+  return (
+    <>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">WWS Compliance</h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Puntentelling en maximale huurprijs per woning. Sinds 1 januari 2025 verplicht bij elk nieuw contract.
+        </p>
+      </div>
+
+      {/* Statusbanner */}
+      <Card className={dashboardCardClass('mb-8')}>
+        <CardContent className="pt-6">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {compliantCount} van {totalCount} woningen compliant ({compliantPercent}%)
+          </p>
+          <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#10B981] rounded-full transition-all duration-500"
+              style={{ width: `${compliantPercent}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {actieVereist} woningen vereisen actie, {verlopenCount} puntentelling verlopen
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* KPI strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className={dashboardCardClass()}>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Gemiddeld puntenaantal</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {gemiddeldPunten}
+              {trendDiff !== 0 && (
+                <span className={`text-sm font-normal ml-2 ${trendDiff > 0 ? 'text-[#10B981]' : 'text-red-600'}`}>
+                  {trendDiff > 0 ? '↑' : '↓'}
+                  {Math.abs(trendDiff)} t.o.v. vorig jaar
+                </span>
+              )}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className={dashboardCardClass()}>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Vrije sector woningen</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {vrijeSectorCount} van {totalCount} ({Math.round((vrijeSectorCount / totalCount) * 100)}%)
+            </p>
+          </CardContent>
+        </Card>
+        <Card className={dashboardCardClass()}>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Actie vereist</p>
+            <p className="text-2xl font-bold text-amber-600">{actieVereist} woningen</p>
+          </CardContent>
+        </Card>
+        <Card className={dashboardCardClass()}>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Verlopen puntentellingen</p>
+            <p className="text-2xl font-bold text-red-600">{verlopenCount}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Alert sectie */}
+      {mockWwsAlerts.length > 0 && (
+        <Card className={dashboardCardClass('mb-8')}>
+          <CardHeader>
+            <CardTitle>Actie vereist</CardTitle>
+            <CardDescription>Woningen met WWS-compliance problemen</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {mockWwsAlerts.map((alert) => (
+              <div
+                key={alert.id}
+                className={`rounded-xl border-l-4 p-4 ${
+                  alert.urgency === 'hoog'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20 dark:border-red-600'
+                    : 'border-amber-500 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-600'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge
+                        variant={alert.urgency === 'hoog' ? 'destructive' : 'secondary'}
+                        className={alert.urgency === 'hoog' ? '' : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20'}
+                      >
+                        {alert.urgency === 'hoog' ? 'HOOG' : 'MIDDEN'}
+                      </Badge>
+                      <span className="font-semibold text-gray-900 dark:text-white">{alert.address}:</span>
+                      <span className="text-gray-700 dark:text-gray-300">{alert.title}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      {alert.description}
+                    </p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Actie: {alert.actie}</p>
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="outline" asChild>
+                        <Link href={`/dashboard/employer/portfolio/properties/${alert.objectId}`}>
+                          <Eye className="h-3 w-3 mr-1" />
+                          Bekijk object
+                        </Link>
+                      </Button>
+                      <Button size="sm" className="bg-[#163300] hover:bg-[#163300]/90">
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        Herbereken
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Overzichtstabel + Sectorverdeling */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <Card className={dashboardCardClass()}>
+            <CardHeader>
+              <CardTitle>Overzicht per woning</CardTitle>
+              <CardDescription>Sorteerbaar en filterbaar overzicht</CardDescription>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Zoek op adres..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  {(['all', 'sociaal', 'midden', 'vrij'] as const).map((s) => (
+                    <Button
+                      key={s}
+                      variant={sectorFilter === s ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSectorFilter(s)}
+                      className={sectorFilter === s ? 'bg-[#163300] hover:bg-[#163300]/90' : ''}
+                    >
+                      {s === 'all' ? 'Alle' : SECTOR_LABELS[s]}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 dark:bg-neutral-800">
+                    <Th keyName="address" label="Adres" />
+                    <Th keyName="punten" label="Punten" />
+                    <Th keyName="sector" label="Sector" />
+                    <Th keyName="maxHuur" label="Max huur" />
+                    <Th keyName="huidigeHuur" label="Huidige huur" />
+                    <Th keyName="verschil" label="Verschil" />
+                    <Th keyName="status" label="Status" />
+                    <Th keyName="laatsteCheck" label="Laatste check" />
+                    <TableHead className="text-right">Acties</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredAndSorted.map((obj) => (
+                    <TableRow key={obj.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
+                      <TableCell className="font-medium">{obj.address}</TableCell>
+                      <TableCell>{obj.punten}</TableCell>
+                      <TableCell>
+                        <span
+                          className="inline-flex items-center gap-1"
+                          title={SECTOR_LABELS[obj.sector]}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: SECTOR_COLORS[obj.sector] }}
+                          />
+                          {SECTOR_LABELS[obj.sector]}
+                        </span>
+                      </TableCell>
+                      <TableCell>€{obj.maxHuur.toLocaleString('nl-NL')}</TableCell>
+                      <TableCell>€{obj.huidigeHuur.toLocaleString('nl-NL')}</TableCell>
+                      <TableCell
+                        className={
+                          obj.verschil < 0
+                            ? 'text-red-600 font-medium'
+                            : obj.verschil > 0
+                              ? 'text-green-600'
+                              : ''
+                        }
+                      >
+                        {obj.verschil >= 0 ? '+' : ''}
+                        {obj.verschil !== 0 ? `€${obj.verschil}` : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {obj.status === 'compliant' ? (
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Compliant
+                          </Badge>
+                        ) : obj.status === 'te_hoog' ? (
+                          <Badge variant="destructive">Te hoog</Badge>
+                        ) : obj.status === 'verlopen' ? (
+                          <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-500/10">Verlopen</Badge>
+                        ) : (
+                          <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-500/10">PDF mist</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(obj.laatsteCheck), 'd MMM yyyy', { locale: nl })}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button size="sm" variant="ghost" title="Herbereken" asChild>
+                            <Link href={`/dashboard/employer/portfolio/properties/${obj.id}`}>
+                              <RefreshCw className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button size="sm" variant="ghost" title="PDF" asChild>
+                            <Link href={`/dashboard/employer/portfolio/properties/${obj.id}`}>
+                              <FileText className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sectorverdeling donut */}
+        <div>
+          <Card className={dashboardCardClass()}>
+            <CardHeader>
+              <CardTitle>Sectorverdeling</CardTitle>
+              <CardDescription>Woningen per WWS-sector</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="relative h-48 w-48 mx-auto mb-4">
+                <SectorDonutChart data={mockWwsSectorDistribution} />
+              </div>
+              <div className="space-y-2">
+                {mockWwsSectorDistribution.map((d) => (
+                  <div key={d.sector} className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: d.color }}
+                      />
+                      {d.label}
+                    </span>
+                    <span className="font-medium">{d.count} woningen</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Buttons onderaan */}
+      <div className="flex flex-wrap gap-3 mt-8">
+        <Button className="bg-[#163300] hover:bg-[#163300]/90">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Bulk herberekening
+        </Button>
+        <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Export compliance rapport
+        </Button>
+        <Button variant="outline">
+          <FileText className="h-4 w-4 mr-2" />
+          Download alle PDF&apos;s
+        </Button>
+      </div>
+    </>
+  )
+}

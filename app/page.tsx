@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useRef, lazy, Suspense } from 'react'
+import React, { useState, useRef, useEffect, lazy, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
@@ -10,7 +11,7 @@ import { HeroSection } from '@/components/marketing/hero-section'
 import { SupportSection } from '@/components/marketing/support-section'
 import { FAQSection } from '@/components/marketing/faq-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, BookOpen, Mail, Phone, Copy, Headphones, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
@@ -20,12 +21,12 @@ const FooterSection = lazy(() => import('@/components/marketing/footer-section')
 const FunctiesSection = lazy(() => import('@/components/marketing/functies-section').then(m => ({ default: m.FunctiesSection })))
 
 export default function Home() {
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
   const [functionsMenuOpen, setFunctionsMenuOpen] = useState(false)
-  const [supportMenuOpen, setSupportMenuOpen] = useState(false)
-  const [contactMenuOpen, setContactMenuOpen] = useState(false)
+  const [helpMenuOpen, setHelpMenuOpen] = useState(false)
   const [copiedField, setCopiedField] = useState<'kvk' | 'btw' | null>(null)
 
   const handleCopy = (text: string, field: 'kvk' | 'btw') => {
@@ -36,15 +37,34 @@ export default function Home() {
   const [isClosing, setIsClosing] = useState(false)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const [headerVisible, setHeaderVisible] = useState(true)
+  const lastScrollY = useRef(0)
+  const scrollThreshold = 80
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const y = window.scrollY
+      if (y <= scrollThreshold) {
+        setHeaderVisible(true)
+      } else if (y > lastScrollY.current) {
+        setHeaderVisible(false)
+      } else {
+        setHeaderVisible(true)
+      }
+      lastScrollY.current = y
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const handleHeaderMouseLeave = () => {
-    if (!functionsMenuOpen && !supportMenuOpen && !contactMenuOpen) return
+    if (!functionsMenuOpen && !helpMenuOpen) return
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
     setIsClosing(true)
     closeTimeoutRef.current = setTimeout(() => {
       setIsClosing(false)
       setFunctionsMenuOpen(false)
-      setSupportMenuOpen(false)
-      setContactMenuOpen(false)
+      setHelpMenuOpen(false)
       closeTimeoutRef.current = null
     }, 350) //zelfde duur als transition voor soepele inklap-animatie
   }
@@ -59,9 +79,12 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col">
-      {/* Header – fixed top */}
+      {/* Header – fixed top, verschijnt bij omhoog scrollen */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 w-full bg-white flex-shrink-0 shadow-sm"
+        className={cn(
+          'fixed top-0 left-0 right-0 z-50 w-full bg-white flex-shrink-0 shadow-sm transition-transform duration-300 ease-out',
+          !headerVisible && '-translate-y-full'
+        )}
         onMouseLeave={handleHeaderMouseLeave}
         onMouseEnter={handleHeaderMouseEnter}
       >
@@ -87,73 +110,44 @@ export default function Home() {
               {/* Functies - opent header naar beneden */}
               <div
                 className="relative"
-                onMouseEnter={() => { setFunctionsMenuOpen(true); setSupportMenuOpen(false); setContactMenuOpen(false); }}
+                onMouseEnter={() => { setFunctionsMenuOpen(true); setHelpMenuOpen(false); }}
               >
                 <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
                   Functies
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
               </div>
-              {/* Ondersteuning - mega menu */}
-              <div
-                className="relative"
-                onMouseEnter={() => { setSupportMenuOpen(true); setFunctionsMenuOpen(false); setContactMenuOpen(false); }}
-              >
-                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
-                  Ondersteuning
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${supportMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-              </div>
               <Link href="#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
                 Prijzen
               </Link>
-              {/* Contact - dropdown met Nog vragen */}
+              <Link href="/blog" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
+                Kennisbank
+              </Link>
+              {/* Hulp & Contact - ondersteuning + contact gegevens */}
               <div
                 className="relative"
-                onMouseEnter={() => { setContactMenuOpen(true); setFunctionsMenuOpen(false); setSupportMenuOpen(false); }}
+                onMouseEnter={() => { setHelpMenuOpen(true); setFunctionsMenuOpen(false); }}
               >
                 <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
-                  Contact
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${contactMenuOpen ? 'rotate-180' : ''}`} />
+                  Hulp & Contact
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${helpMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
               </div>
             </nav>
 
             {/* Desktop: Auth Buttons (Right) */}
-            <div className="hidden md:flex items-center gap-4 ml-auto">
-                <Button 
-                  variant="ghost" 
-                  className="text-gray-600 hover:bg-gray-100 hover:text-[#163300]"
-                  onClick={() => {
-                    setAuthModalMode('login')
-                    setAuthModalOpen(true)
-                  }}
-                >
-                  Inloggen
+            <div className="hidden md:flex items-center gap-3 ml-auto">
+                <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#163300] rounded-full px-4 py-2">
+                  <Link href="/login">Inloggen</Link>
                 </Button>
-                <Button
-                  className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border border-[#9FE870]/20 rounded-xl"
-                  onClick={() => {
-                    setAuthModalMode('signup')
-                    setAuthModalOpen(true)
-                  }}
-                >
-                  Registreren
+                <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
+                  <Link href="/registreren">Registreren</Link>
                 </Button>
           </div>
           
             {/* Mobile: Account Icon (Right) */}
-          <Button
-            variant="ghost"
-            size="icon"
-              className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0"
-              onClick={() => {
-                setAuthModalMode('login')
-                setAuthModalOpen(true)
-              }}
-              aria-label="Account"
-          >
-              <User className="h-6 w-6" />
+          <Button asChild variant="ghost" size="icon" className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0" aria-label="Account">
+              <Link href="/login"><User className="h-6 w-6" /></Link>
           </Button>
           </div>
 
@@ -161,7 +155,7 @@ export default function Home() {
           <div
             className={cn(
               'hidden md:block fixed top-16 left-0 right-0 bottom-0 z-40 pointer-events-none transition-opacity duration-350 backdrop-blur-sm bg-white/20',
-              (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'opacity-100' : 'opacity-0'
+              (functionsMenuOpen || helpMenuOpen) && !isClosing ? 'opacity-100' : 'opacity-0'
             )}
             aria-hidden="true"
           />
@@ -170,10 +164,10 @@ export default function Home() {
           <div
             className="hidden md:block absolute left-0 right-0 top-full z-50 overflow-hidden bg-white shadow-lg origin-top"
             style={{
-              height: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? (contactMenuOpen ? 260 : functionsMenuOpen ? 290 : 260) : 0,
-              opacity: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 1 : 0,
-              transform: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'translateY(0)' : 'translateY(-12px)',
-              pointerEvents: (functionsMenuOpen || supportMenuOpen || contactMenuOpen) && !isClosing ? 'auto' : 'none',
+              height: (functionsMenuOpen || helpMenuOpen) && !isClosing ? (functionsMenuOpen ? 290 : 260) : 0,
+              opacity: (functionsMenuOpen || helpMenuOpen) && !isClosing ? 1 : 0,
+              transform: (functionsMenuOpen || helpMenuOpen) && !isClosing ? 'translateY(0)' : 'translateY(-12px)',
+              pointerEvents: (functionsMenuOpen || helpMenuOpen) && !isClosing ? 'auto' : 'none',
               transition: 'height 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             }}
           >
@@ -213,90 +207,54 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            {/* Hulp & Contact – ondersteuning + contact gegevens + nog vragen */}
             <div
               className="absolute inset-x-0 top-0 bg-white"
               style={{
-                opacity: supportMenuOpen ? 1 : 0,
-                pointerEvents: supportMenuOpen ? 'auto' : 'none',
+                opacity: helpMenuOpen ? 1 : 0,
+                pointerEvents: helpMenuOpen ? 'auto' : 'none',
                 transition: 'opacity 200ms ease-out',
               }}
-              aria-hidden={!supportMenuOpen}
+              aria-hidden={!helpMenuOpen}
             >
-                <div key={supportMenuOpen ? 's-open' : 's-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 md:items-stretch">
-                  <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-4 place-content-start md:min-h-[200px]">
-                    {[
-                      { title: 'Kennisbank', desc: 'Antwoord op je vragen', icon: BookOpen },
-                      { title: 'Support', desc: 'Stel je vragen', icon: Mail },
-                      { title: 'Livesessies', desc: 'Leer meer over Domio', icon: Headphones },
-                      { title: 'Vind je Expert', desc: 'Ondersteuning bij boekhouden', icon: Search },
-                    ].map((item, i) => (
-                      <div key={item.title} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${i * 35}ms` }}>
-                        <item.icon className="size-5 text-[#163300] shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-[#163300] group-hover:text-[#163300]">{item.title}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '100ms' }}>
-                    <div className="rounded-2xl bg-[#163300] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden">
-                      <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
-                      <div className="relative z-10 flex flex-col items-start gap-4">
-                        <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
-                          Overstappen naar <span className="text-[#9FE870]">Domio</span>
-                        </h3>
-                        <p className="text-sm text-white/90 leading-6">Een nieuw platform? Geen gedoe, maar een slimme stap vooruit. Meer overzicht, minder gedoe.</p>
-                        <Button size="default" className="bg-transparent border border-white text-white hover:bg-white/10 rounded-2xl font-semibold">
-                          Bekijk hoe je snel overstapt
-                        </Button>
-                      </div>
+              <div key={helpMenuOpen ? 'h-open' : 'h-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4 place-content-start md:min-h-[200px]">
+                  <div className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '0ms' }}>
+                    <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#163300]">Support</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Stel je vragen</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            {/* Contact-inhoud – 2x2 links + nog vragen blok rechts */}
-            <div
-              className="absolute inset-x-0 top-0 bg-white"
-              style={{
-                opacity: contactMenuOpen ? 1 : 0,
-                pointerEvents: contactMenuOpen ? 'auto' : 'none',
-                transition: 'opacity 200ms ease-out',
-              }}
-              aria-hidden={!contactMenuOpen}
-            >
-              <div key={contactMenuOpen ? 'c-open' : 'c-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-12 gap-4 md:items-stretch">
-                <div className="md:col-span-5 grid grid-cols-2 gap-x-8 gap-y-4 place-content-start md:min-h-[200px]">
-                  <a href="tel:+31646231696" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                  <Link href="/faq" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '25ms' }}>
+                    <HelpCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#163300]">Veelgestelde vragen</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Antwoord op veelgestelde vragen</p>
+                    </div>
+                  </Link>
+                  <a href="tel:+31646231696" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '100ms' }}>
                     <Phone className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#163300]">Telefoon</p>
                       <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
                     </div>
                   </a>
-                  <a href="mailto:contact@domiovastgoedbeheer.nl" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                  <a href="mailto:contact@domiovastgoedbeheer.nl" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '125ms' }}>
                     <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#163300]">E-mail</p>
                       <p className="text-xs text-gray-500 mt-0.5">contact@domiovastgoedbeheer.nl</p>
                     </div>
                   </a>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy('92211542', 'kvk')}
-                    className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
-                  >
+                  <button type="button" onClick={() => handleCopy('92211542', 'kvk')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full" style={{ animationDelay: '150ms' }}>
                     <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#163300]">KVK</p>
                       <p className="text-xs text-gray-500 mt-0.5 tabular-nums">{copiedField === 'kvk' ? 'Gekopieerd!' : '92211542'}</p>
                     </div>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy('NL003830384B29', 'btw')}
-                    className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full"
-                  >
+                  <button type="button" onClick={() => handleCopy('NL003830384B29', 'btw')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full" style={{ animationDelay: '175ms' }}>
                     <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#163300]">BTW</p>
@@ -304,16 +262,14 @@ export default function Home() {
                     </div>
                   </button>
                 </div>
-                <div className="md:col-span-7 dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '25ms' }}>
-                  <Link href="/contact" className="rounded-2xl bg-[#163300] text-white px-7 py-6 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
-                    <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.18} layers={2} />
-                    <div className="relative z-10 flex flex-col items-start gap-4">
-                      <h3 className="text-3xl font-semibold tracking-tight leading-snug text-white">
-                        Nog vragen?
-                      </h3>
-                      <p className="text-sm text-white/90 leading-6">Stel je vraag via het contactformulier. We helpen je graag verder.</p>
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#9FE870] group-hover:gap-3 transition-all">
-                        Ga naar contactformulier
+                <div className="dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '150ms' }}>
+                  <Link href="/demo" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                    <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-32 h-32" color="#9FE870" opacity={0.18} layers={2} />
+                    <div className="relative z-10 flex flex-col items-start gap-3">
+                      <h3 className="text-2xl font-semibold tracking-tight leading-snug text-white">Overstappen binnen een uur</h3>
+                      <p className="text-sm text-white/90 leading-6">Met OCR lezen we je contracten en documenten in en zetten we alles in één keer over. Geen handmatig werk.</p>
+                      <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-4 py-2.5 text-sm font-semibold shadow-sm group-hover:bg-[#9FE870]/90 transition-colors">
+                        Bekijk hoe overstappen werkt
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </span>
                     </div>
@@ -365,15 +321,8 @@ export default function Home() {
                         <p className="text-xs text-white/90 mb-3">
                           Geen creditcard nodig, op elk moment opzegbaar.
                         </p>
-                        <Button
-                          className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm"
-                          onClick={() => {
-                            setAuthModalMode('signup')
-                            setAuthModalOpen(true)
-                            setMobileMenuOpen(false)
-                          }}
-                        >
-                          Registreren
+                        <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
+                          <Link href="/registreren" onClick={() => setMobileMenuOpen(false)}>Registreren</Link>
                         </Button>
                       </div>
                       {/* Geometric decorative element - same style as 30 dagen gratis section, subtle in quiet corner */}
@@ -403,26 +352,25 @@ export default function Home() {
               Prijzen
             </Link>
             <Link
+              href="/blog"
+                        className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Kennisbank
+            </Link>
+            <Link
               href="/contact"
               className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Contact
+              Hulp & Contact
             </Link>
                      </div>
 
                     {/* Inloggen Button */}
                     <div className="pt-2 mb-4">
-                <Button 
-                  variant="ghost" 
-                        className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]"
-                  onClick={() => {
-                    setAuthModalMode('login')
-                    setAuthModalOpen(true)
-                    setMobileMenuOpen(false)
-                  }}
-                >
-                    Inloggen
+                <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Inloggen</Link>
                 </Button>
                     </div>
 
@@ -460,12 +408,7 @@ export default function Home() {
 
       {/* Inhoud begint onder de vaste header (h-16 = 4rem) */}
       <div className="pt-16 flex flex-col flex-1">
-      <HeroSection
-        onSignupClick={() => {
-          setAuthModalMode('signup')
-          setAuthModalOpen(true)
-        }}
-      />
+      <HeroSection onSignupClick={() => router.push('/registreren')} />
 
       <div className="relative z-10 overflow-x-hidden">
       {/* Functies Section */}
@@ -485,47 +428,43 @@ export default function Home() {
             <p className="mt-4 text-lg text-gray-600 max-w-xl">
               Duizenden verhuurders en beheerders vertrouwen op Domio om hun vastgoedportefeuille te beheren. Of je nu een VvE, particuliere eigenaar of professioneel beheerder bent.
             </p>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setAuthModalMode('signup')
-                setAuthModalOpen(true)
-              }}
-              className="mt-6 rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm"
-            >
-              Bekijk hoe Domio jou ondersteunt
+            <Button asChild variant="secondary" className="mt-6 rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+              <Link href="/registreren">Bekijk hoe Domio jou ondersteunt</Link>
             </Button>
           </div>
 
-          {/* Drie componenten: grijs rond icoon + tekst eronder (zoals Wise) */}
+          {/* Drie componenten: link naar functies-pagina, icoon wordt pijl rechtsboven bij hover */}
           <div className="mt-16 grid grid-cols-1 gap-10 sm:gap-8 md:grid-cols-3">
-            <div className="group cursor-default transition-colors">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
-                <Building2 className="h-8 w-8" />
+            <Link href="/functies" className="group cursor-pointer transition-colors block">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+                <Building2 className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
+                <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
               <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">VvE&apos;s</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
                 Perfect voor verenigingen van eigenaren die hun gebouwen efficiënt willen beheren.
               </p>
-            </div>
-            <div className="group cursor-default transition-colors">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
-                <HomeIcon className="h-8 w-8" />
+            </Link>
+            <Link href="/functies" className="group cursor-pointer transition-colors block">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+                <HomeIcon className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
+                <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
               <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">Eigen vastgoed</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
                 Ideaal voor particuliere vastgoedeigenaren die hun portefeuille zelf beheren.
               </p>
-            </div>
-            <div className="group cursor-default transition-colors">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
-                <Briefcase className="h-8 w-8" />
+            </Link>
+            <Link href="/functies" className="group cursor-pointer transition-colors block">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+                <Briefcase className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
+                <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
-              <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">Beheerder vastgoed</h3>
+              <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">Vastgoedbeheerder</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
                 Gemaakt voor professionele vastgoedbeheerders die meerdere portefeuilles beheren.
               </p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -591,12 +530,7 @@ export default function Home() {
 
       {/* Pricing Section */}
         <Suspense fallback={<div className="min-h-[400px]" />}>
-      <PricingSection 
-        onSignupClick={() => {
-          setAuthModalMode('signup')
-          setAuthModalOpen(true)
-        }}
-      />
+      <PricingSection onSignupClick={() => router.push('/registreren')} />
         </Suspense>
 
         {/* Over Ons Section - Large section with building background and fade overlay */}
@@ -633,14 +567,7 @@ export default function Home() {
               <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-end md:justify-center min-h-[650px] md:min-h-[600px]">
                 <div className="max-w-xl">
                   {/* Small label */}
-                  <div className="flex items-center gap-2 mb-4" style={{ width: 'fit-content' }}>
-                    <div className="w-4 h-4 text-[#9FE870] flex-shrink-0">
-                      <svg viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0L10.5 5.5L16 8L10.5 10.5L8 16L5.5 10.5L0 8L5.5 5.5L8 0Z"/>
-                      </svg>
-                    </div>
-                    <h2 className="text-base font-semibold leading-7 text-[#163300] whitespace-nowrap">Over ons</h2>
-                  </div>
+                  <h2 className="text-base font-semibold leading-7 text-[#163300] whitespace-nowrap mb-4 w-fit">Over ons</h2>
                   
                   {/* Main heading */}
                   <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#163300] sm:text-5xl md:text-6xl mb-6 w-fit">
@@ -655,15 +582,8 @@ export default function Home() {
                   </p>
                   
                   {/* CTA Button */}
-                  <Button
-                    size="default"
-                    className="w-fit bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-[#9FE870] rounded-2xl"
-                    onClick={() => {
-                      setAuthModalMode('signup')
-                      setAuthModalOpen(true)
-                    }}
-                  >
-                    Meer over ons
+                  <Button asChild variant="secondary" className="w-fit rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+                    <Link href="/registreren">Meer over ons</Link>
                   </Button>
                 </div>
               </div>
@@ -688,8 +608,8 @@ export default function Home() {
               opacity={0.18}
               layers={2}
             />
-            <div className="flex flex-col gap-8 items-center justify-center relative z-10 text-center">
-              <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+            <div className="flex flex-col gap-8 items-start justify-start relative z-10 text-left">
+              <div className="flex flex-col gap-6 max-w-2xl">
                 <h2 className="text-base font-semibold leading-7 text-white/90">Proefperiode</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
                   Eerst zien, dan geloven?
@@ -697,15 +617,9 @@ export default function Home() {
                 <p className="text-base text-white/90 sm:text-lg leading-7">
                   Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
                 </p>
-                <div className="flex flex-row flex-wrap items-center justify-center gap-4">
-                  <Button
-                    onClick={() => {
-                      setAuthModalMode('signup')
-                      setAuthModalOpen(true)
-                    }}
-                    className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm"
-                  >
-                    Registreren
+                <div className="flex flex-row flex-wrap items-center justify-start gap-4">
+                  <Button asChild className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+                    <Link href="/registreren">Registreren</Link>
                   </Button>
                   <Link
                     href="/demo"

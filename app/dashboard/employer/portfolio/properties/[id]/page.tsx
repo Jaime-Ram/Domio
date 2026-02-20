@@ -28,8 +28,200 @@ import {
   Briefcase,
   Building,
   Edit,
+  ShieldCheck,
+  RefreshCw,
+  CheckCircle2,
+  Lightbulb,
 } from 'lucide-react'
 import { mockProperties, mockDocuments } from '@/lib/mock-data/vastgoed'
+import {
+  mockWwsObjects,
+  mockWwsBreakdown,
+  mockWwsOptimalisatieAdviezen,
+  type WWSSector,
+} from '@/lib/mock-data/wws-compliance'
+import { format } from 'date-fns'
+import { nl } from 'date-fns/locale'
+
+const SECTOR_LABELS: Record<WWSSector, string> = {
+  sociaal: 'Sociaal',
+  midden: 'Midden',
+  vrij: 'Vrij',
+}
+
+function ComplianceTabContent({
+  propertyId,
+  propertyAddress,
+}: {
+  propertyId: string
+  propertyAddress: string
+}) {
+  const wws = mockWwsObjects.find((o) => o.id === propertyId) ?? mockWwsObjects[0]
+  const totaalPunten = mockWwsBreakdown.reduce((s, b) => s + b.punten, 0)
+
+  return (
+    <div className="space-y-6">
+      {/* Status banner */}
+      <Card className={dashboardCardClass()}>
+        <CardContent className="pt-6">
+          <div
+            className={`rounded-xl border-l-4 p-4 ${
+              wws.status === 'compliant'
+                ? 'border-green-500 bg-green-50 dark:bg-green-950/20'
+                : 'border-amber-500 bg-amber-50 dark:bg-amber-950/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              {wws.status === 'compliant' ? (
+                <CheckCircle2 className="h-6 w-6 text-green-600" />
+              ) : (
+                <ShieldCheck className="h-6 w-6 text-amber-600" />
+              )}
+              <span className="text-lg font-semibold">
+                {wws.status === 'compliant' ? 'COMPLIANT' : 'ACTIE VEREIST'} — {SECTOR_LABELS[wws.sector]} ({wws.punten >= 187 ? '≥187 punten' : wws.punten <= 143 ? '≤143 punten' : '144-186 punten'})
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Laatste berekening: {format(new Date(wws.laatsteCheck), 'd MMMM yyyy', { locale: nl })}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* WWS Breakdown tabel */}
+      <Card className={dashboardCardClass()}>
+        <CardHeader>
+          <CardTitle>WWS Puntentelling Breakdown</CardTitle>
+          <CardDescription>Gedetailleerde puntentoekenning per categorie</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-neutral-700">
+                  <th className="text-left py-3 font-medium">Categorie</th>
+                  <th className="text-right py-3 font-medium">Punten</th>
+                  <th className="text-left py-3 font-medium">Toelichting</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockWwsBreakdown.map((row) => (
+                  <tr key={row.category} className="border-b border-gray-100 dark:border-neutral-800">
+                    <td className="py-2">{row.category}</td>
+                    <td className="text-right py-2">{row.punten}</td>
+                    <td className="py-2 text-gray-600 dark:text-gray-400">{row.toelichting}</td>
+                  </tr>
+                ))}
+                <tr className="font-semibold bg-gray-50 dark:bg-neutral-800">
+                  <td className="py-3">TOTAAL</td>
+                  <td className="text-right py-3">{totaalPunten}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-400">
+                    {wws.sector === 'vrij' ? 'VRIJE SECTOR (≥187)' : wws.sector === 'sociaal' ? 'SOCIALE SECTOR (≤143)' : 'MIDDEN SECTOR (144-186)'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Huurprijs analyse */}
+      <Card className={dashboardCardClass()}>
+        <CardHeader>
+          <CardTitle>Huurprijs analyse</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Maximale huur (WWS)</span>
+            <span className="font-medium">€{wws.maxHuur.toLocaleString('nl-NL')}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Huidige huur</span>
+            <span className="font-medium">€{wws.huidigeHuur.toLocaleString('nl-NL')}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">Verschil</span>
+            <span className={wws.verschil >= 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+              {wws.verschil >= 0 ? '+' : ''}€{wws.verschil}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            Huurprijs status: {wws.verschil >= 0 ? '✅ Onder maximum' : '🔴 Boven maximum'}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Optimalisatie adviezen */}
+      <Card className={dashboardCardClass()}>
+        <CardHeader>
+          <CardTitle>Optimalisatie advies</CardTitle>
+          <CardDescription>Mogelijkheden om meer punten te behalen</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {mockWwsOptimalisatieAdviezen.map((advies) => (
+            <div
+              key={advies.id}
+              className="rounded-xl border border-gray-200 dark:border-neutral-700 p-4 flex items-start gap-4"
+            >
+              <Lightbulb className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-medium mb-2">{advies.titel}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  Investering: ~€{advies.investering.toLocaleString('nl-NL')} | Extra punten: ~{advies.extraPunten} | Extra huur: ~€{advies.extraHuur}/mnd
+                </p>
+                <p className="text-sm text-gray-500">Terugverdientijd: ~{advies.terugverdientijd} jaar</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Huidige situatie: {advies.huidig} → Na: {advies.na}
+                </p>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Compliance checklist */}
+      <Card className={dashboardCardClass()}>
+        <CardHeader>
+          <CardTitle>Compliance checklist</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm">
+            {[
+              { done: true, label: 'Puntentelling actueel (< 12 maanden oud)' },
+              { done: true, label: 'PDF bij huurcontract gevoegd' },
+              { done: wws.verschil >= 0, label: 'Huurprijs onder WWS-maximum' },
+              { done: true, label: 'Energielabel geldig' },
+              { done: true, label: 'Sector correct geclassificeerd' },
+              { done: false, label: 'Huurverhogingsbrief verstuurd dit jaar' },
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-2">
+                {item.done ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+                ) : (
+                  <div className="h-4 w-4 rounded-full border-2 border-gray-300 shrink-0" />
+                )}
+                {item.label}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
+      {/* Actie buttons */}
+      <div className="flex flex-wrap gap-3">
+        <Button className="bg-[#163300] hover:bg-[#163300]/90">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Herbereken punten
+        </Button>
+        <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Download PDF
+        </Button>
+        <Button variant="outline">Bekijk geschiedenis</Button>
+      </div>
+    </div>
+  )
+}
 
 export default function PropertyDetailPage() {
   const router = useRouter()
@@ -116,9 +308,10 @@ export default function PropertyDetailPage() {
 
             {/* Tabs */}
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="basic">Basisinfo</TabsTrigger>
                 <TabsTrigger value="contract">Huurcontract & Huurder</TabsTrigger>
+                <TabsTrigger value="compliance">Compliance</TabsTrigger>
                 <TabsTrigger value="documents">Documenten</TabsTrigger>
               </TabsList>
 
@@ -406,7 +599,12 @@ export default function PropertyDetailPage() {
                 </div>
               </TabsContent>
 
-              {/* Tab 3: Documenten */}
+              {/* Tab 3: Compliance (WWS) */}
+              <TabsContent value="compliance">
+                <ComplianceTabContent propertyId={propertyId} propertyAddress={property.address} />
+              </TabsContent>
+
+              {/* Tab 4: Documenten */}
               <TabsContent value="documents">
                 <Card className={dashboardCardClass()}>
                   <CardHeader>

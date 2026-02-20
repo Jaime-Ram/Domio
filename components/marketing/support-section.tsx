@@ -40,7 +40,7 @@ export function SupportSection() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="group flex items-center gap-3 transition-colors"
+                className="group flex w-full sm:w-auto items-center justify-center sm:justify-start gap-3 transition-colors"
               >
                 <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
                   <Icon className="h-6 w-6" strokeWidth={1.8} />

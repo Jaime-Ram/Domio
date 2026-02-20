@@ -62,6 +62,14 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
+                    href="/tools/wws-calculator"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                  >
+                    WWS Calculator
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/contact"
                     className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300] !text-gray-600"
                   >

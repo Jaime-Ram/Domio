@@ -149,7 +149,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         {/* Titel – tweede op mobiel (onder carousel); lg:order-1 = links op desktop */}
         <div className="flex-shrink-0 max-w-2xl order-2 lg:order-1">
           <div className="mb-6 md:mb-8">
-            <h1 className="md:hidden flex flex-col text-[3.25rem] font-bold tracking-tight text-[#163300] leading-none text-left">
+            <h1 className="md:hidden flex flex-col text-[2.5rem] font-bold tracking-tight text-[#163300] leading-none text-left">
               <span className="block h-[1em] min-h-[1em] overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -201,6 +201,31 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               Bekijk demo
               <ArrowUpRight className="h-4 w-4 shrink-0" />
             </Link>
+          </div>
+          <div className="mt-5 flex items-center gap-2">
+            <div className="flex -space-x-1.5">
+              {[
+                'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=96&h=96&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=96&h=96&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=face',
+              ].map((src, i) => (
+                <div
+                  key={i}
+                  className="relative h-7 w-7 sm:h-8 sm:w-8 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-sm ring-2 ring-white"
+                >
+                  <Image
+                    src={src}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            <p className="text-sm font-medium text-gray-600">
+              meer dan 12.000 huurders worden beheerd via Domio
+            </p>
           </div>
         </div>
       </div>
