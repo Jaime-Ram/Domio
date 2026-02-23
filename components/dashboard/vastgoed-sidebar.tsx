@@ -40,7 +40,8 @@ import {
   Euro,
   BookOpen,
   AlertTriangle,
-  ClipboardCheck
+  ClipboardCheck,
+  HardDrive
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -75,7 +76,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       { id: 'compliance-accordion', paths: ['/dashboard/employer/compliance'] },
       { id: 'financieel-accordion', paths: ['/dashboard/employer/financial'] },
       { id: 'onderhoud-accordion', paths: ['/dashboard/employer/maintenance'] },
-      { id: 'communicatie-accordion', paths: ['/dashboard/employer/messages', '/dashboard/employer/documents'] },
     ]
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
@@ -152,11 +152,13 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     },
     {
       label: 'Communicatie',
+      href: '/dashboard/employer/messages',
       icon: MessageSquare,
-      children: [
-        { label: 'Berichten', href: '/dashboard/employer/messages', icon: MessageSquare },
-        { label: 'Documenten', href: '/dashboard/employer/documents', icon: FolderOpen },
-      ],
+    },
+    {
+      label: 'Documenten',
+      href: '/dashboard/employer/documents',
+      icon: HardDrive,
     },
     {
       label: 'VvE',
@@ -209,7 +211,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       )}
       <div
         className={cn(
-          "fixed top-0 md:top-9 bottom-0 start-0 z-[110] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
+          "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",

@@ -132,7 +132,7 @@ export default function DocumentsPage() {
                   Documenten
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Centraal overzicht van alle documenten
+                  Al je documenten
                 </p>
               </div>
               <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
