@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ExtractionPreview } from '@/components/documents/extraction-preview'
+import { fileToBase64, getMimeType } from '@/lib/ai/file-utils'
 import {
   Dialog,
   DialogContent,
@@ -66,6 +68,33 @@ export default function DocumentsPage() {
     propertyId: '',
   })
 
+  // AI extraction state
+  const [isExtracting, setIsExtracting] = useState(false)
+  const [extractionError, setExtractionError] = useState<string | null>(null)
+  const [extractedData, setExtractedData] = useState<Record<string, any> | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [matchedPropertyIds, setMatchedPropertyIds] = useState<string[]>([])
+  const [selectedPropertyId, setSelectedPropertyId] = useState('')
+
+  const normalizeAddress = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ')
+  const extractStreetCity = (value: string) => {
+    const normalized = normalizeAddress(value)
+    const parts = normalized.split(',').map((part) => part.trim()).filter(Boolean)
+    const street = parts[0] || ''
+    const city = parts[parts.length - 1] || ''
+    return { street, city }
+  }
+  const getAddressScore = (haystack: string, needle: string) => {
+    if (!needle) return 0
+    if (haystack === needle) return 3
+    const { street: needleStreet, city: needleCity } = extractStreetCity(needle)
+    if (!needleStreet || !needleCity) return 0
+    const { street: haystackStreet, city: haystackCity } = extractStreetCity(haystack)
+    const streetMatch = haystackStreet.includes(needleStreet) || needleStreet.includes(haystackStreet)
+    const cityMatch = haystackCity.includes(needleCity) || needleCity.includes(haystackCity)
+    return streetMatch && cityMatch ? 2 : 0
+  }
+
   const filteredDocuments = mockDocuments.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesType = typeFilter === 'all' || doc.type === typeFilter
@@ -91,15 +120,95 @@ export default function DocumentsPage() {
     )
   }
 
-  const handleUpload = () => {
-    console.log('Upload document:', uploadForm)
+  const handleUpload = async (fileOverride?: File, typeOverride?: string) => {
+    const file = fileOverride ?? uploadForm.file
+    const documentType = typeOverride ?? uploadForm.type
+    if (!file || !documentType) return
+
+    setIsExtracting(true)
+    setExtractionError(null)
+    setExtractedData(null)
+    setMatchedPropertyIds([])
+    setSelectedPropertyId('new')
+    setShowPreview(true)
+
+    try {
+      // Convert file to base64
+      const base64 = await fileToBase64(file)
+      const mimeType = getMimeType(file)
+
+      // Call extraction API
+      const response = await fetch('/api/documents/extract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          base64Content: base64,
+          mimeType,
+          documentType,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Extraction failed')
+      }
+
+      const result = await response.json()
+      const data = result.data || {}
+      setExtractedData(data)
+
+      const extractedAddress = typeof data.propertyAddress === 'string' ? normalizeAddress(data.propertyAddress) : ''
+      if (extractedAddress) {
+        const scored = mockProperties
+          .map((property) => ({
+            id: property.id,
+            score: getAddressScore(normalizeAddress(property.address), extractedAddress),
+          }))
+          .filter((item) => item.score > 0)
+          .sort((a, b) => b.score - a.score)
+        const matchIds = scored.map((item) => item.id)
+        setMatchedPropertyIds(matchIds)
+        setSelectedPropertyId(matchIds[0] || 'new')
+      } else {
+        setMatchedPropertyIds([])
+        setSelectedPropertyId('new')
+      }
+      setShowPreview(true)
+    } catch (error) {
+      setExtractionError(error instanceof Error ? error.message : 'Extraction failed')
+    } finally {
+      setIsExtracting(false)
+    }
+  }
+
+  const handleConfirmExtraction = (data: Record<string, any>) => {
+    console.log('Document upload with extracted data:', {
+      file: uploadForm.file?.name,
+      type: uploadForm.type,
+      propertyId: selectedPropertyId && selectedPropertyId !== 'new' ? selectedPropertyId : null,
+      extractedData: data,
+    })
+
+    // TODO: Save document and extracted data to the system
     setShowUploadModal(false)
-    // Reset form
+    setShowPreview(false)
+    setExtractedData(null)
+    
     setUploadForm({
       file: null,
       type: '',
       propertyId: '',
     })
+  }
+
+  const handleEditExtraction = () => {
+    setShowPreview(false)
+    setExtractedData(null)
+    setExtractionError(null)
+    setMatchedPropertyIds([])
+    setSelectedPropertyId('new')
   }
 
   const handleDownload = (doc: typeof mockDocuments[0]) => {
@@ -142,74 +251,114 @@ export default function DocumentsPage() {
                     Upload Document
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Upload Document</DialogTitle>
+                    <DialogTitle>{showPreview ? 'Controleer gegevens' : 'Upload Document'}</DialogTitle>
                     <DialogDescription>
-                      Upload een nieuw document naar het systeem
+                      {showPreview
+                        ? 'Controleer en corrigeer de geëxtraheerde gegevens'
+                        : uploadForm.file
+                          ? 'Document klaar voor upload'
+                          : uploadForm.type
+                            ? 'Selecteer het bestand'
+                            : 'Kies eerst het documenttype'}
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="file">Selecteer bestand</Label>
-                      <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
-                        <Input
-                          id="file"
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => setUploadForm({...uploadForm, file: e.target.files?.[0] || null})}
-                        />
-                        <label htmlFor="file" className="cursor-pointer">
-                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {uploadForm.file ? uploadForm.file.name : 'Klik om een bestand te selecteren of sleep het hier'}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                            PDF, JPG, PNG tot 10MB
-                          </p>
-                        </label>
+
+                  {showPreview ? (
+                    <div className="py-4">
+                      <ExtractionPreview
+                        documentType={uploadForm.type}
+                        extractedData={extractedData || {}}
+                        isLoading={isExtracting}
+                        error={extractionError}
+                        properties={mockProperties.map((property) => ({
+                          id: property.id,
+                          name: property.name,
+                          address: property.address,
+                        }))}
+                        matchedPropertyIds={matchedPropertyIds}
+                        selectedPropertyId={selectedPropertyId}
+                        onSelectProperty={setSelectedPropertyId}
+                        onConfirm={handleConfirmExtraction}
+                        onEdit={handleEditExtraction}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="doc-type">Selecteer type</Label>
+                        <Select
+                          value={uploadForm.type}
+                          onValueChange={(value) => {
+                            setUploadForm({ ...uploadForm, type: value })
+                            if (uploadForm.file) {
+                              void handleUpload(uploadForm.file, value)
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Kies een type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Contract">Contract</SelectItem>
+                            <SelectItem value="Keuring">Keuring</SelectItem>
+                            <SelectItem value="Factuur">Factuur</SelectItem>
+                            <SelectItem value="Verzekering">Verzekering</SelectItem>
+                            <SelectItem value="Overig">Overig</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
+                      {uploadForm.type && (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="file">Selecteer bestand</Label>
+                            <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
+                              <Input
+                                id="file"
+                                type="file"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0] || null
+                                  setUploadForm({ ...uploadForm, file })
+                                  if (file && uploadForm.type) {
+                                    void handleUpload(file, uploadForm.type)
+                                  }
+                                }}
+                              />
+                              <label htmlFor="file" className="cursor-pointer">
+                                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {uploadForm.file ? uploadForm.file.name : 'Klik om een bestand te selecteren of sleep het hier'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                  PDF, JPG, PNG tot 10MB
+                                </p>
+                              </label>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="doc-type">Selecteer type</Label>
-                      <Select value={uploadForm.type} onValueChange={(value) => setUploadForm({...uploadForm, type: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Kies een type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Contract">Contract</SelectItem>
-                          <SelectItem value="Keuring">Keuring</SelectItem>
-                          <SelectItem value="Factuur">Factuur</SelectItem>
-                          <SelectItem value="Verzekering">Verzekering</SelectItem>
-                          <SelectItem value="Overig">Overig</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="doc-property">Koppel aan pand (optioneel)</Label>
-                      <Select value={uploadForm.propertyId} onValueChange={(value) => setUploadForm({...uploadForm, propertyId: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Kies een pand" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="algemeen">Algemeen</SelectItem>
-                          {mockProperties.map((property) => (
-                            <SelectItem key={property.id} value={property.id}>
-                              {property.address}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowUploadModal(false)}>
-                      Annuleren
-                    </Button>
-                    <Button onClick={handleUpload} className="bg-[#163300] hover:bg-[#356258]">
-                      Uploaden
-                    </Button>
-                  </DialogFooter>
+                  )}
+
+                  {!showPreview && (
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowUploadModal(false)
+                          setUploadForm({
+                            file: null,
+                            type: '',
+                            propertyId: '',
+                          })
+                        }}
+                      >
+                        Annuleren
+                      </Button>
+                    </DialogFooter>
+                  )}
                 </DialogContent>
               </Dialog>
             </div>
