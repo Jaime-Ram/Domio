@@ -32,7 +32,6 @@ import {
   PanelLeftClose,
   PanelRightClose,
   X,
-  Home,
   Briefcase,
   MessageSquare,
   Archive,
@@ -159,11 +158,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Documenten',
       href: '/dashboard/employer/documents',
       icon: HardDrive,
-    },
-    {
-      label: 'VvE',
-      href: '/dashboard/employer/vve',
-      icon: Home,
     },
     {
       label: 'Rapportages',
