@@ -21,6 +21,8 @@ export async function fileToBase64(file: File): Promise<string> {
 export function getMimeType(file: File): string {
   const typeMap: Record<string, string> = {
     'pdf': 'application/pdf',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'doc': 'application/msword',
     'jpeg': 'image/jpeg',
     'jpg': 'image/jpeg',
     'png': 'image/png',

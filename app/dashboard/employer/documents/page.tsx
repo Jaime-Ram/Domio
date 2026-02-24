@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -44,6 +44,9 @@ import {
   Search,
   Filter,
   File,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react'
 import { mockDocuments, mockProperties } from '@/lib/mock-data/vastgoed'
 import { format } from 'date-fns'
@@ -61,12 +64,21 @@ export default function DocumentsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
 
-  // Upload form state
+  // Upload form state: meerdere bestanden, verwerken alleen op klik
   const [uploadForm, setUploadForm] = useState({
-    file: null as File | null,
+    files: [] as File[],
     type: '',
     propertyId: '',
   })
+  const [previewFile, setPreviewFile] = useState<File | null>(null)
+
+  // Per-file progress: status, 0-100 progress, error message
+  const [fileStatus, setFileStatus] = useState<Record<string, 'pending' | 'processing' | 'done' | 'error'>>({})
+  const [fileProgress, setFileProgress] = useState<Record<string, number>>({})
+  const [fileError, setFileError] = useState<Record<string, string>>({})
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const fileKey = useCallback((file: File) => `${file.name}-${file.size}-${file.lastModified}`, [])
 
   // AI extraction state
   const [isExtracting, setIsExtracting] = useState(false)
@@ -75,6 +87,7 @@ export default function DocumentsPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [matchedPropertyIds, setMatchedPropertyIds] = useState<string[]>([])
   const [selectedPropertyId, setSelectedPropertyId] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
 
   const normalizeAddress = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ')
   const extractStreetCity = (value: string) => {
@@ -120,39 +133,47 @@ export default function DocumentsPage() {
     )
   }
 
-  const handleUpload = async (fileOverride?: File, typeOverride?: string) => {
-    const file = fileOverride ?? uploadForm.file
-    const documentType = typeOverride ?? uploadForm.type
-    if (!file || !documentType) return
+  const handleProcessFile = async (file: File) => {
+    const documentType = uploadForm.type
+    if (!documentType) return
 
+    const key = fileKey(file)
+    setPreviewFile(file)
     setIsExtracting(true)
     setExtractionError(null)
     setExtractedData(null)
     setMatchedPropertyIds([])
     setSelectedPropertyId('new')
     setShowPreview(true)
+    setFileStatus((s) => ({ ...s, [key]: 'processing' }))
+    setFileProgress((p) => ({ ...p, [key]: 0 }))
+    setFileError((e) => ({ ...e, [key]: '' }))
+
+    // Simulated progress (0 → 85%) zodat de gebruiker ziet dat er iets gebeurt
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+    let progress = 0
+    progressIntervalRef.current = setInterval(() => {
+      progress = Math.min(85, progress + 4 + Math.random() * 4)
+      setFileProgress((p) => ({ ...p, [key]: Math.round(progress) }))
+      if (progress >= 85 && progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+        progressIntervalRef.current = null
+      }
+    }, 280)
 
     try {
-      // Convert file to base64
       const base64 = await fileToBase64(file)
       const mimeType = getMimeType(file)
 
-      // Call extraction API
       const response = await fetch('/api/documents/extract', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          base64Content: base64,
-          mimeType,
-          documentType,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64Content: base64, mimeType, documentType }),
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Extraction failed')
+        const err = await response.json()
+        throw new Error(err.error || 'Extraction failed')
       }
 
       const result = await response.json()
@@ -176,31 +197,62 @@ export default function DocumentsPage() {
         setSelectedPropertyId('new')
       }
       setShowPreview(true)
+      setFileProgress((p) => ({ ...p, [key]: 100 }))
+      setFileStatus((s) => ({ ...s, [key]: 'done' }))
     } catch (error) {
-      setExtractionError(error instanceof Error ? error.message : 'Extraction failed')
+      const message = error instanceof Error ? error.message : 'Extraction failed'
+      setExtractionError(message)
+      setFileError((e) => ({ ...e, [key]: message }))
+      setFileProgress((p) => ({ ...p, [key]: 100 }))
+      setFileStatus((s) => ({ ...s, [key]: 'error' }))
     } finally {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+        progressIntervalRef.current = null
+      }
       setIsExtracting(false)
     }
   }
 
   const handleConfirmExtraction = (data: Record<string, any>) => {
     console.log('Document upload with extracted data:', {
-      file: uploadForm.file?.name,
+      file: previewFile?.name,
       type: uploadForm.type,
       propertyId: selectedPropertyId && selectedPropertyId !== 'new' ? selectedPropertyId : null,
       extractedData: data,
     })
 
     // TODO: Save document and extracted data to the system
-    setShowUploadModal(false)
+    const fileToRemove = previewFile
     setShowPreview(false)
     setExtractedData(null)
-    
-    setUploadForm({
-      file: null,
-      type: '',
-      propertyId: '',
-    })
+    setPreviewFile(null)
+
+    const newFiles = uploadForm.files.filter((f) => f !== fileToRemove)
+    const keyToRemove = fileToRemove ? fileKey(fileToRemove) : ''
+    setUploadForm((prev) => ({
+      ...prev,
+      files: newFiles,
+      ...(newFiles.length === 0 ? { type: '', propertyId: '' } : {}),
+    }))
+    if (keyToRemove) {
+      setFileStatus((s) => {
+        const next = { ...s }
+        delete next[keyToRemove]
+        return next
+      })
+      setFileProgress((p) => {
+        const next = { ...p }
+        delete next[keyToRemove]
+        return next
+      })
+      setFileError((e) => {
+        const next = { ...e }
+        delete next[keyToRemove]
+        return next
+      })
+    }
+    if (newFiles.length === 0) setShowUploadModal(false)
   }
 
   const handleEditExtraction = () => {
@@ -209,6 +261,48 @@ export default function DocumentsPage() {
     setExtractionError(null)
     setMatchedPropertyIds([])
     setSelectedPropertyId('new')
+    setPreviewFile(null)
+  }
+
+  const addFiles = (newFiles: FileList | File[]) => {
+    const list = Array.from(newFiles)
+    setUploadForm((prev) => ({ ...prev, files: [...prev.files, ...list] }))
+    setFileStatus((s) => {
+      const next = { ...s }
+      list.forEach((file) => { next[fileKey(file)] = 'pending' })
+      return next
+    })
+    setFileProgress((p) => {
+      const next = { ...p }
+      list.forEach((file) => { next[fileKey(file)] = 0 })
+      return next
+    })
+  }
+
+  const removeFile = (file: File) => {
+    const key = fileKey(file)
+    setUploadForm((prev) => ({ ...prev, files: prev.files.filter((f) => f !== file) }))
+    setFileStatus((s) => {
+      const next = { ...s }
+      delete next[key]
+      return next
+    })
+    setFileProgress((p) => {
+      const next = { ...p }
+      delete next[key]
+      return next
+    })
+    setFileError((e) => {
+      const next = { ...e }
+      delete next[key]
+      return next
+    })
+    if (previewFile === file) {
+      setShowPreview(false)
+      setPreviewFile(null)
+      setExtractedData(null)
+      setExtractionError(null)
+    }
   }
 
   const handleDownload = (doc: typeof mockDocuments[0]) => {
@@ -257,11 +351,11 @@ export default function DocumentsPage() {
                     <DialogDescription>
                       {showPreview
                         ? 'Controleer en corrigeer de geëxtraheerde gegevens'
-                        : uploadForm.file
-                          ? 'Document klaar voor upload'
+                        : uploadForm.files.length > 0
+                          ? `${uploadForm.files.length} bestand(en) geladen. Kies een type en klik op Verwerken.`
                           : uploadForm.type
-                            ? 'Selecteer het bestand'
-                            : 'Kies eerst het documenttype'}
+                            ? 'Voeg bestanden toe (klik of sleep), kies type en klik Verwerken'
+                            : 'Kies eerst het documenttype en voeg daarna bestanden toe'}
                     </DialogDescription>
                   </DialogHeader>
 
@@ -290,12 +384,7 @@ export default function DocumentsPage() {
                         <Label htmlFor="doc-type">Selecteer type</Label>
                         <Select
                           value={uploadForm.type}
-                          onValueChange={(value) => {
-                            setUploadForm({ ...uploadForm, type: value })
-                            if (uploadForm.file) {
-                              void handleUpload(uploadForm.file, value)
-                            }
-                          }}
+                          onValueChange={(value) => setUploadForm({ ...uploadForm, type: value })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Kies een type" />
@@ -313,29 +402,166 @@ export default function DocumentsPage() {
                         <>
                           <div className="space-y-2">
                             <Label htmlFor="file">Selecteer bestand</Label>
-                            <div className="border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded-lg p-6 text-center hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer">
+                            <div
+                              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                                isDragging
+                                  ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300]/5 dark:bg-[#9FE870]/10'
+                                  : 'border-gray-300 dark:border-neutral-700 hover:border-[#163300] dark:hover:border-[#9FE870]'
+                              }`}
+                              onDragOver={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setIsDragging(true)
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setIsDragging(false)
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setIsDragging(false)
+                                const list = e.dataTransfer.files
+                                if (list?.length) addFiles(list)
+                              }}
+                            >
                               <Input
                                 id="file"
                                 type="file"
                                 className="hidden"
+                                accept=".pdf,.docx,.doc,image/jpeg,image/png,image/gif,image/webp"
+                                multiple
                                 onChange={(e) => {
-                                  const file = e.target.files?.[0] || null
-                                  setUploadForm({ ...uploadForm, file })
-                                  if (file && uploadForm.type) {
-                                    void handleUpload(file, uploadForm.type)
-                                  }
+                                  const list = e.target.files
+                                  if (list?.length) addFiles(list)
+                                  e.target.value = ''
                                 }}
                               />
-                              <label htmlFor="file" className="cursor-pointer">
+                              <label htmlFor="file" className="cursor-pointer block">
                                 <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {uploadForm.file ? uploadForm.file.name : 'Klik om een bestand te selecteren of sleep het hier'}
+                                  Klik om bestanden te selecteren of sleep ze hier
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                  PDF, JPG, PNG tot 10MB
+                                  PDF, Word (.docx), JPG, PNG. Meerdere bestanden mogelijk.
                                 </p>
                               </label>
                             </div>
+                            {uploadForm.files.length > 0 && (
+                              <div className="space-y-2">
+                                {(() => {
+                                  const keys = uploadForm.files.map(fileKey)
+                                  const done = keys.filter((k) => fileStatus[k] === 'done').length
+                                  const processing = keys.filter((k) => fileStatus[k] === 'processing').length
+                                  const pending = keys.filter((k) => fileStatus[k] === 'pending' || !fileStatus[k]).length
+                                  const errors = keys.filter((k) => fileStatus[k] === 'error').length
+                                  const parts = []
+                                  if (done) parts.push(`${done} klaar`)
+                                  if (processing) parts.push(`${processing} bezig`)
+                                  if (pending) parts.push(`${pending} wachtrij`)
+                                  if (errors) parts.push(`${errors} fout`)
+                                  return (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                      Voortgang: {parts.length ? parts.join(', ') : '—'}
+                                    </p>
+                                  )
+                                })()}
+                                <Label>Geladen bestanden ({uploadForm.files.length})</Label>
+                                <ul className="space-y-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 dark:border-neutral-700 p-2">
+                                  {uploadForm.files.map((file) => {
+                                    const key = fileKey(file)
+                                    const status = fileStatus[key] || 'pending'
+                                    const progress = fileProgress[key] ?? 0
+                                    const errorMsg = fileError[key]
+                                    return (
+                                      <li
+                                        key={key}
+                                        className="rounded-md border border-gray-100 dark:border-neutral-700 p-2 space-y-1.5"
+                                      >
+                                        <div className="flex items-center justify-between gap-2">
+                                          <span className="truncate flex-1 text-sm font-medium" title={file.name}>
+                                            {file.name}
+                                          </span>
+                                          <div className="flex items-center gap-1 shrink-0">
+                                            {status === 'pending' && (
+                                              <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="default"
+                                                className="h-7 px-2 text-xs bg-[#163300] hover:bg-[#356258]"
+                                                onClick={() => void handleProcessFile(file)}
+                                                disabled={!uploadForm.type || isExtracting}
+                                              >
+                                                Verwerken
+                                              </Button>
+                                            )}
+                                            {status === 'processing' && (
+                                              <span className="flex items-center gap-1 text-xs text-[#163300] dark:text-[#9FE870]">
+                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                {progress}%
+                                              </span>
+                                            )}
+                                            {status === 'done' && (
+                                              <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                Klaar
+                                              </span>
+                                            )}
+                                            {status === 'error' && (
+                                              <>
+                                                <span className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400" title={errorMsg}>
+                                                  <AlertCircle className="h-3.5 w-3.5" />
+                                                  Fout
+                                                </span>
+                                                <Button
+                                                  type="button"
+                                                  size="sm"
+                                                  variant="outline"
+                                                  className="h-7 px-2 text-xs"
+                                                  onClick={() => {
+                                                    setFileStatus((s) => ({ ...s, [key]: 'pending' }))
+                                                    setFileProgress((p) => ({ ...p, [key]: 0 }))
+                                                    setFileError((e) => ({ ...e, [key]: '' }))
+                                                    void handleProcessFile(file)
+                                                  }}
+                                                  disabled={!uploadForm.type || isExtracting}
+                                                >
+                                                  Opnieuw
+                                                </Button>
+                                              </>
+                                            )}
+                                            <Button
+                                              type="button"
+                                              size="sm"
+                                              variant="ghost"
+                                              className="h-7 w-7 p-0 text-gray-500 hover:text-red-600"
+                                              onClick={() => removeFile(file)}
+                                              title="Verwijderen"
+                                            >
+                                              <Trash2 className="h-3.5 w-3.5" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                        {status === 'processing' && (
+                                          <div className="w-full bg-gray-200 dark:bg-neutral-700 rounded-full h-1.5 overflow-hidden">
+                                            <div
+                                              className="h-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-300 ease-out"
+                                              style={{ width: `${progress}%` }}
+                                            />
+                                          </div>
+                                        )}
+                                        {status === 'error' && errorMsg && (
+                                          <p className="text-xs text-red-600 dark:text-red-400 truncate" title={errorMsg}>
+                                            {errorMsg}
+                                          </p>
+                                        )}
+                                      </li>
+                                    )
+                                  })}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         </>
                       )}
@@ -348,11 +574,10 @@ export default function DocumentsPage() {
                         variant="outline"
                         onClick={() => {
                           setShowUploadModal(false)
-                          setUploadForm({
-                            file: null,
-                            type: '',
-                            propertyId: '',
-                          })
+                          setUploadForm({ files: [], type: '', propertyId: '' })
+                          setFileStatus({})
+                          setFileProgress({})
+                          setFileError({})
                         }}
                       >
                         Annuleren
