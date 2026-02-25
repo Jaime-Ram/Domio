@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' })
+    const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GEMINI_MODEL_ID || 'gemini-3-pro-preview' })
     const prompt = getExtractionPrompt(documentType)
 
     let result: Awaited<ReturnType<typeof model.generateContent>>
