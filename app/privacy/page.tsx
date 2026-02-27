@@ -5,6 +5,7 @@ import { Logo } from '@/components/Logo'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 export default function PrivacyPage() {
   return (
@@ -140,7 +141,7 @@ export default function PrivacyPage() {
                     <li>Uw toestemming in te trekken voor gegevensverwerking</li>
                   </ul>
                   <p>
-                    Om gebruik te maken van deze rechten, kunt u contact met ons opnemen via contact@domiovastgoedbeheer.nl.
+                    Om gebruik te maken van deze rechten, kunt u contact met ons opnemen via {CONTACT_EMAIL}.
                   </p>
                 </div>
               </section>
@@ -170,7 +171,7 @@ export default function PrivacyPage() {
                     Als u vragen heeft over deze privacyverklaring of over hoe wij uw gegevens verwerken, kunt u contact met ons opnemen:
                   </p>
                   <p>
-                    <strong>Email:</strong> contact@domiovastgoedbeheer.nl<br />
+                    <strong>Email:</strong> {CONTACT_EMAIL}<br />
                     <strong>Telefoon:</strong> +31 6 46 23 16 96
                   </p>
                 </div>

@@ -6,6 +6,7 @@ import { FooterSection } from '@/components/marketing/footer-section'
 import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 export default function FAQPage() {
   const faqs = [
@@ -39,7 +40,7 @@ export default function FAQPage() {
     },
     {
       question: 'Hoe kan ik contact opnemen met support?',
-      answer: 'Je kunt contact met ons opnemen via email (contact@domiovastgoedbeheer.nl), telefoon (+31 6 46 23 16 96), of via het contactformulier op onze website. We reageren meestal binnen 1-2 werkdagen.',
+      answer: `Je kunt contact met ons opnemen via email (${CONTACT_EMAIL}), telefoon (+31 6 46 23 16 96), of via het contactformulier op onze website. We reageren meestal binnen 1-2 werkdagen.`,
     },
   ]
 
@@ -120,7 +121,7 @@ export default function FAQPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="mailto:contact@domiovastgoedbeheer.nl"
+                  href={`mailto:${CONTACT_EMAIL}`}
                   className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl border border-[#163300] bg-[#163300] text-white hover:bg-[#356258] transition-colors"
                 >
                   Stuur een email

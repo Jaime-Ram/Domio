@@ -9,6 +9,7 @@ import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Logo } from '@/components/Logo'
 import { X } from 'lucide-react'
+import { signUp, signInWithGoogle } from '@/lib/supabase/auth'
 
 export default function RegistrerenPage() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export default function RegistrerenPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,10 +53,13 @@ export default function RegistrerenPage() {
         setLoading(false)
         return
       }
-      await new Promise((r) => setTimeout(r, 1000))
-      router.push('/dashboard/employer')
+      const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
+      const { error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
+      if (authError) throw authError
+      setSuccess(true)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+    } finally {
       setLoading(false)
     }
   }
@@ -63,8 +68,8 @@ export default function RegistrerenPage() {
     setLoading(true)
     setError(null)
     try {
-      await new Promise((r) => setTimeout(r, 1000))
-      router.push('/dashboard/employer')
+      const { error: authError } = await signInWithGoogle()
+      if (authError) throw authError
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Registreren mislukt')
       setLoading(false)
@@ -111,7 +116,23 @@ export default function RegistrerenPage() {
             </Alert>
           )}
 
-          {step === 1 ? (
+          {success ? (
+            <div className="mt-8 space-y-4">
+              <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-6 text-center">
+                <p className="text-lg font-semibold text-emerald-800">Verificatie-e-mail verstuurd!</p>
+                <p className="text-sm text-emerald-700 mt-2">
+                  We hebben een e-mail gestuurd naar <strong>{email}</strong>.
+                  Klik op de link in de e-mail om je account te activeren.
+                </p>
+              </div>
+              <Button
+                onClick={() => router.push('/login')}
+                className="w-full h-12 rounded-full bg-[#163300] text-white hover:bg-[#356258] font-semibold"
+              >
+                Naar inloggen
+              </Button>
+            </div>
+          ) : step === 1 ? (
             <form onSubmit={handleStep1} className="mt-8 space-y-6">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium text-gray-700">

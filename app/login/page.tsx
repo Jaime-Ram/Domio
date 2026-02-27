@@ -9,6 +9,7 @@ import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Logo } from '@/components/Logo'
 import { X, KeyRound } from 'lucide-react'
+import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -22,10 +23,11 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const { error: authError } = await signIn(email, password)
+      if (authError) throw authError
       router.push('/dashboard/employer')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Inloggen mislukt')
+      setError(err instanceof Error ? err.message : 'Inloggen mislukt. Controleer je gegevens.')
       setLoading(false)
     }
   }
@@ -34,10 +36,10 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     try {
-      await new Promise((r) => setTimeout(r, 1000))
-      router.push('/dashboard/employer')
+      const { error: authError } = await signInWithGoogle()
+      if (authError) throw authError
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Inloggen mislukt')
+      setError(err instanceof Error ? err.message : 'Inloggen met Google mislukt')
       setLoading(false)
     }
   }

@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { Mail, MessageCircle, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 const OPTIONS = [
   {
     icon: Mail,
     label: 'E-mail',
-    href: 'mailto:contact@domiovastgoedbeheer.nl',
+    href: `mailto:${CONTACT_EMAIL}`,
   },
   {
     icon: MessageCircle,

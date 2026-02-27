@@ -9,21 +9,27 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Logo } from '@/components/Logo'
 import { AlertCircle, CheckCircle } from 'lucide-react'
+import { resetPassword } from '@/lib/supabase/auth'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
-    // Demo mode - simulate loading
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setSubmitted(true)
-    setLoading(false)
+    setError(null)
+    try {
+      const { error: authError } = await resetPassword(email)
+      if (authError) throw authError
+      setSubmitted(true)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Fout bij het versturen van de reset link')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -46,7 +52,7 @@ export default function ForgotPasswordPage() {
               <Alert className="bg-green-50 border-green-200">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription className="text-green-800">
-                  ✓ Demo: Reset link zou verstuurd zijn naar {email}
+                  Reset link verstuurd naar {email}. Check je inbox.
                 </AlertDescription>
               </Alert>
             ) : (

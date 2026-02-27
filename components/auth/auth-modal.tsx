@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Logo } from '@/components/Logo'
 import { AlertCircle } from 'lucide-react'
+import { signIn, signUp, signInWithGoogle } from '@/lib/supabase/auth'
 
 interface AuthModalProps {
   open: boolean
@@ -95,37 +96,26 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
 
     try {
       if (mode === 'login') {
-        // Demo mode - simulate loading
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Show demo message and redirect
+        const { error: authError } = await signIn(email, password)
+        if (authError) throw authError
         onOpenChange(false)
         router.push('/dashboard/employer')
-        
       } else {
-        // Signup logic - validate passwords match
         if (password !== confirmPassword) {
           setError('Wachtwoorden komen niet overeen')
           setLoading(false)
           return
         }
-
         if (password.length < 6) {
           setError('Wachtwoord moet minimaal 6 tekens lang zijn')
           setLoading(false)
           return
         }
-
-        // Demo mode - simulate loading
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Show demo message and redirect based on role
+        const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
+        const { error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
+        if (authError) throw authError
         onOpenChange(false)
-        if (role === 'employer') {
-          router.push('/dashboard/employer')
-        } else {
-          router.push('/dashboard/employer') // Demo: both go to employer dashboard
-        }
+        router.push('/dashboard/employer')
       }
     } catch (err: any) {
       setError(err.message || 'Er is een fout opgetreden')
@@ -136,15 +126,9 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   const handleGoogleLogin = async () => {
     setLoading(true)
     setError(null)
-
     try {
-      // Demo mode - simulate loading
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      alert('🎯 Demo Modus\n\nGoogle OAuth is uitgeschakeld.\nJe wordt doorgestuurd naar het demo dashboard.')
-      
-      onOpenChange(false)
-      router.push('/dashboard/employer')
+      const { error: authError } = await signInWithGoogle()
+      if (authError) throw authError
     } catch (err: any) {
       setError(err.message || 'Google inloggen mislukt')
       setLoading(false)

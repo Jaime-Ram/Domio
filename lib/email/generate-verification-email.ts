@@ -27,16 +27,16 @@ export function generateVerificationEmail(variables: EmailVariables): string {
     userName,
     userEmail,
     verificationUrl,
-    logoUrl = 'https://your-domain.com/images/DomioLogo.png',
-    phoneMockupUrl = 'https://your-domain.com/images/phone-mockup.png',
+    logoUrl = 'https://domiovastgoedbeheer.nl/images/DomioLogo.png',
+    phoneMockupUrl = 'https://domiovastgoedbeheer.nl/images/phone-mockup.png',
     appStoreUrl = 'https://apps.apple.com/app/domio',
     googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.domio',
-    homeUrl = 'https://your-domain.com',
-    blogUrl = 'https://your-domain.com/blog',
-    tutorialUrl = 'https://your-domain.com/tutorial',
-    supportUrl = 'https://your-domain.com/support',
-    unsubscribeUrl = 'https://your-domain.com/unsubscribe',
-    managePreferencesUrl = 'https://your-domain.com/preferences',
+    homeUrl = 'https://domiovastgoedbeheer.nl',
+    blogUrl = 'https://domiovastgoedbeheer.nl/blog',
+    tutorialUrl = 'https://domiovastgoedbeheer.nl/functies',
+    supportUrl = 'https://domiovastgoedbeheer.nl/contact',
+    unsubscribeUrl = 'https://domiovastgoedbeheer.nl/unsubscribe',
+    managePreferencesUrl = 'https://domiovastgoedbeheer.nl/preferences',
     twitterUrl = 'https://twitter.com/domio',
     facebookUrl = 'https://facebook.com/domio',
     instagramUrl = 'https://instagram.com/domio',
@@ -258,24 +258,24 @@ export function generateVerificationEmail(variables: EmailVariables): string {
             <div class="greeting">Hi ${userName},</div>
             
             <div class="message">
-                We're glad to have you onboard! You're already on your way to managing your payments and team more efficiently.
+                Welkom bij Domio! Je bent al bijna klaar om je vastgoedportefeuille efficiënt te beheren.
             </div>
             
             <div class="message">
-                To get started, please verify your email address by clicking the button below. Once verified, you'll have full access to all Domio features.
+                Verifieer je e-mailadres door op onderstaande knop te klikken. Daarna heb je direct toegang tot alle functies van Domio.
             </div>
 
-            <a href="${verificationUrl}" class="cta-button">Verify Email Address</a>
+            <a href="${verificationUrl}" class="cta-button">E-mailadres verifiëren</a>
 
             <div class="closing">
-                Thanks,<br>
-                The Domio Team
+                Met vriendelijke groet,<br>
+                Het Domio Team
             </div>
 
             <div class="app-promo">
-                <div class="app-promo-title">We hebben ook een mobiele app!</div>
+                <div class="app-promo-title">Binnenkort ook mobiel!</div>
                 <div class="app-promo-text">
-                    Download de Domio app voor iOS en Android en beheer je betalingen en team onderweg.
+                    De Domio app voor iOS en Android is in ontwikkeling. Beheer je vastgoed straks ook onderweg.
                 </div>
                 
                 <div class="phone-mockup">
@@ -301,7 +301,7 @@ export function generateVerificationEmail(variables: EmailVariables): string {
             </div>
             
             <div style="margin-top: 16px; color: #475569;">
-                © ${currentYear} Domio, 100 Smith Street, Melbourne VIC 3000
+                © ${currentYear} Domio Vastgoedbeheer — KVK 92211542
             </div>
 
             <div class="footer-bottom">

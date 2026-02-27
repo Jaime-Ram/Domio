@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 import { ArrowUpRight, Menu, X, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, HelpCircle } from 'lucide-react'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 interface MarketingLayoutProps {
   children: React.ReactNode
@@ -170,11 +171,11 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                     <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
                   </div>
                 </a>
-                <a href="mailto:contact@domiovastgoedbeheer.nl" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
                   <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-[#163300]">E-mail</p>
-                    <p className="text-xs text-gray-500 mt-0.5">contact@domiovastgoedbeheer.nl</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{CONTACT_EMAIL}</p>
                   </div>
                 </a>
                 <button type="button" onClick={() => handleCopy('92211542', 'kvk')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full">

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Phone, MessageSquare, Mail, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -207,9 +208,9 @@ export function ContactSection() {
                 </p>
                 <Link
                   className="mt-2 inline-flex items-center gap-x-2 text-sm font-medium text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800 dark:text-neutral-400 dark:hover:text-neutral-200 dark:focus:text-neutral-200"
-                  href="mailto:contact@domiovastgoedbeheer.nl"
+                  href={`mailto:${CONTACT_EMAIL}`}
                 >
-                  contact@domiovastgoedbeheer.nl
+                  {CONTACT_EMAIL}
                 </Link>
               </div>
             </div>

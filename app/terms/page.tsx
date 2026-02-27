@@ -5,6 +5,7 @@ import { Logo } from '@/components/Logo'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
+import { CONTACT_EMAIL } from '@/lib/site-config'
 
 export default function TermsPage() {
   return (
@@ -145,7 +146,7 @@ export default function TermsPage() {
                     Als u vragen heeft over deze algemene voorwaarden, kunt u contact met ons opnemen:
                   </p>
                   <p>
-                    <strong>Email:</strong> contact@domiovastgoedbeheer.nl<br />
+                    <strong>Email:</strong> {CONTACT_EMAIL}<br />
                     <strong>Telefoon:</strong> +31 6 46 23 16 96
                   </p>
                 </div>

@@ -43,6 +43,7 @@ import {
   type WWResult,
 } from '@/lib/wws-calculator'
 import { mockWwsObjects, mockWwsOptimalisatieAdviezen } from '@/lib/mock-data/wws-compliance'
+import { downloadWWSPDF } from '@/lib/pdf/generate-wws-pdf'
 
 interface PropertyWWSInput extends WWInput {
   propertyId: string
@@ -282,7 +283,19 @@ export default function PuntentellingPage() {
             WWS-punten berekenen per pand, jaarlijks herberekenen en optimaliseren
           </p>
         </div>
-        <Button className="bg-[#163300] hover:bg-[#356258] text-white gap-2">
+        <Button
+          className="bg-[#163300] hover:bg-[#356258] text-white gap-2"
+          onClick={() => {
+            if (result && input) {
+              downloadWWSPDF({
+                propertyAddress: propertyLabel,
+                result,
+                input,
+                currentRent: wwsObj?.huidigeHuur,
+              })
+            }
+          }}
+        >
           <Download className="h-4 w-4" />
           Download PDF
         </Button>
