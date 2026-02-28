@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Logo } from '@/components/Logo'
 import { X, KeyRound } from 'lucide-react'
 import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
+import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [transitioning, setTransitioning] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,7 +27,10 @@ export default function LoginPage() {
     try {
       const { error: authError } = await signIn(email, password)
       if (authError) throw authError
-      router.push('/dashboard/employer')
+      setTransitioning(true)
+      setTimeout(() => {
+        router.push('/dashboard/employer')
+      }, 900)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Inloggen mislukt. Controleer je gegevens.')
       setLoading(false)
@@ -80,6 +85,10 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (transitioning) {
+    return <AuthLoadingScreen />
   }
 
   return (

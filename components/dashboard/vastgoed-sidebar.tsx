@@ -221,7 +221,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
             "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
-            collapsed ? "px-2.5 justify-start" : "px-6 justify-between"
+            collapsed ? "px-3 justify-end" : "px-6 justify-between"
           )}>
             {/* Logo - Disappears when collapsed */}
             <div className={cn(
@@ -263,7 +263,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             collapsed && "overflow-x-hidden"
           )}>
             <nav
-              className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "p-2" : "p-3")}
+              className={cn("w-full flex flex-col flex-wrap transition-[padding] duration-300 ease-in-out", collapsed ? "pl-3 pr-2 py-2" : "p-3")}
               onClick={(e) => {
                 const link = (e.target as HTMLElement).closest('a[href]')
                 if (link && onClose) onClose()
@@ -277,47 +277,26 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   const Icon = item.icon
 
                   if (item.children) {
-                    if (collapsed) {
-                      // Collapsed mode: show only icon with tooltip
-                      return (
-                        <li key={item.label} id={itemId} className="relative group">
-                          <button
-                            type="button"
-                            onClick={() => toggleItem(itemId)}
-                            className={cn(
-                              "w-full flex items-center justify-start py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
-                              hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
-                            )}
-                            title={item.label}
-                          >
-                            <Icon className="shrink-0 size-5 w-5 h-5" />
-                          </button>
-                          {/* Tooltip */}
-                          <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                            {item.label}
-                          </div>
-                        </li>
-                      )
-                    }
-                    
                     return (
-                      <li key={item.label} id={itemId}>
+                      <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
                         <button
                           type="button"
                           onClick={() => toggleItem(itemId)}
                           className={cn(
-                            "w-full text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
                             hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
                           )}
+                          title={collapsed ? item.label : undefined}
                         >
                           <Icon className="shrink-0 size-5 w-5 h-5" />
                           <span className={cn(
-                            "flex-1 ml-3.5 transition-all duration-300 ease-in-out",
+                            "flex-1 ml-3.5 min-w-0 transition-all duration-300 ease-in-out",
                             collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
                           )}>{item.label}</span>
                           {item.badge && (
                             <span className={cn(
-                              "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full transition-all duration-300 ease-in-out",
+                              "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
                               collapsed && "opacity-0 max-w-0 overflow-hidden"
                             )}>
                               {item.badge}
@@ -327,14 +306,20 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             className={cn(
                               "ms-auto shrink-0 size-5 w-5 h-5 transition-all duration-300 ease-in-out",
                               isOpen && "rotate-180",
-                              collapsed && "opacity-0 max-w-0 overflow-hidden"
+                              collapsed && "opacity-0 max-w-0 overflow-hidden w-0 ms-0"
                             )}
                           />
                         </button>
+                        {/* Tooltip wanneer ingeklapt */}
+                        {collapsed && (
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                            {item.label}
+                          </div>
+                        )}
                         <div 
                           className={cn(
                             "w-full overflow-hidden transition-all duration-300 ease-in-out",
-                            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                            isOpen && !collapsed ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                           )}
                         >
                           <ul className="ps-8 pt-1 space-y-1">
@@ -365,59 +350,42 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   }
 
                   const active = isActive(item.href)
-                  
-                  if (collapsed) {
-                    // Collapsed mode: show only icon with tooltip
-                    return (
-                      <li key={item.label} className="relative group">
-                        <Link
-                          href={item.href || '#'}
-                          className={cn(
-                            "w-full flex items-center justify-start py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
-                            active 
-                              ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
-                              : "text-gray-800 dark:text-neutral-200"
-                          )}
-                          title={item.label}
-                        >
-                          <Icon className="shrink-0 size-5 w-5 h-5" />
-                          {item.badge && (
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
-                          )}
-                        </Link>
-                        {/* Tooltip */}
-                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                          {item.label}
-                        </div>
-                      </li>
-                    )
-                  }
-                  
                   return (
-                    <li key={item.label}>
+                    <li key={item.label} className={cn("relative group", collapsed && "flex")}>
                       <Link
                         href={item.href || '#'}
                         className={cn(
-                          "w-full flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                          "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                          collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
                           active 
                             ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
                             : "text-gray-800 dark:text-neutral-200"
                         )}
+                        title={collapsed ? item.label : undefined}
                       >
                         <Icon className="shrink-0 size-5 w-5 h-5" />
                         <span className={cn(
-                          "flex-1 ml-3.5 transition-all duration-300 ease-in-out",
+                          "flex-1 ml-3.5 min-w-0 transition-all duration-300 ease-in-out",
                           collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
                         )}>{item.label}</span>
                         {item.badge && (
                           <span className={cn(
-                            "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full transition-all duration-300 ease-in-out",
+                            "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
                             collapsed && "opacity-0 max-w-0 overflow-hidden"
                           )}>
                             {item.badge}
                           </span>
                         )}
+                        {item.badge && collapsed && (
+                          <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
+                        )}
                       </Link>
+                      {/* Tooltip wanneer ingeklapt */}
+                      {collapsed && (
+                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                          {item.label}
+                        </div>
+                      )}
                     </li>
                   )
                 })}
