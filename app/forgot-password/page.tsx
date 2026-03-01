@@ -11,7 +11,7 @@ import { resetPassword } from '@/lib/supabase/auth'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
-const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }
+const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
 
 const RESEND_COOLDOWN_SEC = 20
 
