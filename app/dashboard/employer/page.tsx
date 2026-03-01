@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
   portfolioTotals,
   recentActivities,
@@ -7,7 +8,6 @@ import {
   complianceAlerts,
   monthlyFinancials,
   upcomingTasks,
-  currentUser,
   openInvoicesTotal,
 } from '@/lib/mock-data/domio-dashboard'
 import {
@@ -23,11 +23,15 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
+  Plus,
 } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { FunctieBlock } from '@/components/ui/functie-block'
 import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { supabase } from '@/lib/supabase/client'
 
 const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
 const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
@@ -66,6 +70,10 @@ function AlertIcon({ type }: { type: string }) {
 }
 
 export default function EmployerDashboardPage() {
+  const { profile, user, isDemo } = useDashboardUser()
+  const [propertyCount, setPropertyCount] = useState<number | null>(null)
+
+  const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'daar'
   const greeting = (() => {
     const h = new Date().getHours()
     if (h < 12) return 'Goedemorgen'
@@ -73,15 +81,68 @@ export default function EmployerDashboardPage() {
     return 'Goedenavond'
   })()
 
+  useEffect(() => {
+    if (isDemo) {
+      setPropertyCount(24) // mock data: altijd vol dashboard
+      return
+    }
+    if (!user?.id) return
+    supabase
+      .from('properties')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', user.id)
+      .then(({ count }) => setPropertyCount(count ?? 0))
+  }, [user?.id, isDemo])
+
+  const isBlank = !isDemo && propertyCount !== null && propertyCount === 0
+
+  if (isBlank) {
+    return (
+      <>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {greeting}, {firstName}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Welkom bij Domio. Begin met het toevoegen van je eerste pand.
+          </p>
+        </div>
+        <div className="rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden p-8 sm:p-12">
+          <div className="max-w-md mx-auto text-center">
+            <div className="h-16 w-16 rounded-2xl bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center mx-auto mb-6">
+              <Building2 className="h-8 w-8 text-[#163300] dark:text-[#9FE870]" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Nog geen panden toegevoegd
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
+              Voeg je eerste verhuurobject toe om te beginnen met beheer, huurders en facturatie.
+            </p>
+            <Button asChild className="bg-[#163300] hover:bg-[#356258] text-white rounded-full px-6">
+              <Link href="/dashboard/employer/portfolio/properties/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Eerste pand toevoegen
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       {/* Welkomstbanner */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          {greeting}, {currentUser.name.split(' ')[0]}
+          {greeting}, {firstName}
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Je hebt 3 actiepunten vandaag
+          {propertyCount !== null ? (
+            <>Overzicht van je portefeuille</>
+          ) : (
+            <>Laden...</>
+          )}
         </p>
       </div>
 

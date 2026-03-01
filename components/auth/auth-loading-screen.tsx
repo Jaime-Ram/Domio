@@ -84,13 +84,13 @@ export function AuthLoadingScreen({ onAnimationComplete }: AuthLoadingScreenProp
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-[#9FE870] px-6"
+      className="min-h-screen flex items-center justify-center bg-[#9FE870] px-4 sm:px-6 overflow-hidden"
       style={{
         opacity: fadeOut ? 0 : 1,
         transition: `opacity ${FADEOUT_DURATION_MS}ms ${EASE_CURVE}`,
       }}
     >
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full min-w-0 max-w-full overflow-hidden">
         <LogoReveal
           phase={phase}
           revealPctValue={revealPctValue}
@@ -118,7 +118,7 @@ function LogoReveal({ phase, revealPctValue, fadeZone, moveDurationMs }: LogoRev
     phase === 0 ? 'scale(0.97)' : phase === 1 ? 'scale(1.18)' : 'scale(1)'
   return (
     <div
-      className="flex items-baseline shrink-0 text-[#163300] text-4xl sm:text-5xl tracking-tight pb-[0.15em]"
+      className="flex items-baseline min-w-0 max-w-full text-[#163300] text-2xl sm:text-4xl md:text-5xl tracking-tight pb-[0.15em]"
       style={{
         fontFamily: 'var(--font-body)',
         transform: scale,
@@ -127,7 +127,7 @@ function LogoReveal({ phase, revealPctValue, fadeZone, moveDurationMs }: LogoRev
       }}
     >
       <span
-        className="font-bold"
+        className="font-bold shrink-0"
         style={{
           fontFamily: "'Codec Pro', sans-serif",
           opacity: phase === 0 ? 0 : 1,
@@ -137,9 +137,9 @@ function LogoReveal({ phase, revealPctValue, fadeZone, moveDurationMs }: LogoRev
         Domio
       </span>
       <span
-        className="pl-2 sm:pl-3 font-normal whitespace-nowrap pb-[0.2em]"
+        className="pl-1.5 sm:pl-3 font-normal min-w-0 pb-[0.2em]"
         style={{
-          maxWidth: subtitleCollapsed ? 0 : '28rem',
+          maxWidth: subtitleCollapsed ? 0 : 'min(28rem, calc(100vw - 7rem))',
           overflowX: 'hidden',
           overflowY: 'visible',
           transition: transitionWidth,

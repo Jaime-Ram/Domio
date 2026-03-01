@@ -1,13 +1,21 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, BarChart3, Calculator } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const COMPLIANCE_NAV = [
+  { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
+  { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
+  { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+]
 
 export default function ComplianceAlertsPage() {
   return (
     <div className="space-y-6">
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Compliance alerts</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Waarschuwingen en actiepunten.</p>

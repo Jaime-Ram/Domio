@@ -32,6 +32,7 @@ import {
   Euro,
   Maximize2,
   Trees,
+  AlertTriangle,
 } from 'lucide-react'
 import {
   berekenWWS,
@@ -44,6 +45,13 @@ import {
 } from '@/lib/wws-calculator'
 import { mockWwsObjects, mockWwsOptimalisatieAdviezen } from '@/lib/mock-data/wws-compliance'
 import { downloadWWSPDF } from '@/lib/pdf/generate-wws-pdf'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const COMPLIANCE_NAV = [
+  { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
+  { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
+  { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+]
 
 interface PropertyWWSInput extends WWInput {
   propertyId: string
@@ -275,6 +283,7 @@ export default function PuntentellingPage() {
 
   return (
     <div className="space-y-6">
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

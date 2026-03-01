@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Logo } from '@/components/Logo'
-import { X, KeyRound } from 'lucide-react'
+import { KeyRound } from 'lucide-react'
 import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
+import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -92,29 +92,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* Header: zelfde container en logo-positie als hoofdpagina */}
-      <header className="flex-shrink-0 w-full bg-white shadow-sm">
-        <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
-          {/* Placeholder voor uitlijning met hoofdpagina (hamburgerruimte op mobiel) */}
-          <div className="w-10 flex-shrink-0 md:w-0 md:min-w-0 md:overflow-hidden" aria-hidden />
-          <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
-            <Logo width={100} height={28} />
-          </div>
-          <div className="hidden md:block flex-1" aria-hidden />
-          <Link
-            href="/"
-            className="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex-shrink-0"
-            aria-label="Sluiten"
-          >
-            <X className="h-5 w-5" />
-          </Link>
-        </div>
-      </header>
-
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-[400px]">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#163300]">
+    <AuthPageShell>
+          <h1 className="text-4xl font-bold text-[#163300]">
             Welkom terug!
           </h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -133,7 +112,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                E-mailadres
+                E{'\u2011'}mailadres
               </label>
               <Input
                 id="email"
@@ -141,7 +120,7 @@ export default function LoginPage() {
                 placeholder="naam@voorbeeld.nl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+                className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
                 required
               />
             </div>
@@ -164,7 +143,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-12 rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+                className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
                 required
               />
             </div>
@@ -182,7 +161,7 @@ export default function LoginPage() {
                 <span className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-white px-3 text-sm text-gray-500">Of log in met</span>
+                <span className="bg-white dark:bg-gray-900 px-3 text-sm text-gray-500">Of log in met</span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -232,8 +211,6 @@ export default function LoginPage() {
               </SocialButton>
             </div>
           </form>
-        </div>
-      </main>
-    </div>
+    </AuthPageShell>
   )
 }

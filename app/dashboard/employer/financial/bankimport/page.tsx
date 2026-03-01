@@ -1,13 +1,22 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Scan } from 'lucide-react'
+import { Scan, Receipt, CreditCard, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const FINANCIAL_NAV = [
+  { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
+  { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
+  { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
+  { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
+]
 
 export default function BankimportPage() {
   return (
     <div className="space-y-6">
+      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} />
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Bankimport</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Banktransacties importeren en matchen.</p>

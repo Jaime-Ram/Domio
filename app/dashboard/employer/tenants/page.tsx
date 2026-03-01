@@ -27,6 +27,8 @@ import {
   MoreVertical,
   CheckCircle2,
   AlertCircle,
+  Building2,
+  FileText,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import {
@@ -36,6 +38,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const PORTFOLIO_NAV = [
+  { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
+  { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
+  { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
+]
 
 export default function TenantsPage() {
   const router = useRouter()
@@ -59,6 +68,7 @@ export default function TenantsPage() {
 
   return (
     <>
+            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>

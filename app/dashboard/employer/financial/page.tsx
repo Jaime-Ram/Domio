@@ -43,11 +43,22 @@ import {
   AlertCircle,
   Calendar as CalendarIcon,
   Upload,
+  Receipt,
+  CreditCard,
+  Scan,
 } from 'lucide-react'
 import { mockPayments, mockExpenses, mockTenants, mockProperties } from '@/lib/mock-data/vastgoed'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const FINANCIAL_NAV = [
+  { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
+  { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
+  { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
+  { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
+]
 
 export default function FinancialPage() {
   const router = useRouter()
@@ -141,6 +152,7 @@ export default function FinancialPage() {
 
   return (
     <>
+            <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} />
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>

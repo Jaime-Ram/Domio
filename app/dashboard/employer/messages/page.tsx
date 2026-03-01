@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MessageSquare, Search, Send } from 'lucide-react'
 import { conversations } from '@/lib/mock-data/domio-dashboard'
 import { cn } from '@/lib/utils'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function MessagesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(conversations[0]?.id ?? null)
@@ -21,44 +21,49 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] min-h-[500px]">
-      <div className="mb-4">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Berichten</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Communicatie met huurders en partijen.</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Berichten</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Communicatie met huurders en partijen.</p>
       </div>
 
-      <div className="flex flex-1 min-h-0 border border-gray-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900 overflow-hidden">
+      <div className={cn('flex flex-1 min-h-0 overflow-hidden', dashboardCardClass())}>
         {/* Conversation list */}
         <div className="w-80 sm:w-96 border-e border-gray-200 dark:border-neutral-700 flex flex-col flex-shrink-0">
-          <div className="p-3 border-b border-gray-200 dark:border-neutral-700">
+          <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Zoek conversaties..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-gray-50 dark:bg-neutral-800"
+                className="pl-10 h-11 rounded-full bg-gray-100 dark:bg-neutral-800 border-gray-200 dark:border-neutral-600"
               />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto p-2">
             {filtered.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => setSelectedId(c.id)}
                 className={cn(
-                  'w-full text-left p-4 border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors',
-                  selectedId === c.id && 'bg-[#163300]/5 dark:bg-[#9FE870]/5 border-l-2 border-l-[#163300] dark:border-l-[#9FE870]'
+                  'w-full text-left p-4 rounded-2xl transition-all mx-1 mb-1',
+                  selectedId === c.id
+                    ? 'bg-[#9FE870] text-[#163300]'
+                    : 'hover:bg-gray-100 dark:hover:bg-neutral-800/80 text-gray-900 dark:text-white'
                 )}
               >
                 <div className="flex justify-between items-start gap-2">
-                  <span className="font-medium text-gray-900 dark:text-white truncate">{c.tenantName}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{c.lastTime}</span>
+                  <span className="font-medium truncate">{c.tenantName}</span>
+                  <span className={cn('text-xs flex-shrink-0', selectedId === c.id ? 'text-[#163300]/80' : 'text-gray-500 dark:text-gray-400')}>{c.lastTime}</span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{c.address}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300 truncate mt-1">{c.lastMessage}</p>
+                <p className={cn('text-xs truncate mt-0.5', selectedId === c.id ? 'text-[#163300]/70' : 'text-gray-500 dark:text-gray-400')}>{c.address}</p>
+                <p className={cn('text-sm truncate mt-1', selectedId === c.id ? 'text-[#163300]/90' : 'text-gray-600 dark:text-gray-300')}>{c.lastMessage}</p>
                 {c.unread > 0 && (
-                  <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full">
+                  <span className={cn(
+                    'inline-block mt-2 px-2 py-0.5 text-xs font-medium rounded-full',
+                    selectedId === c.id ? 'bg-[#163300]/20 text-[#163300]' : 'bg-[#163300] text-white'
+                  )}>
                     {c.unread}
                   </span>
                 )}
@@ -71,11 +76,11 @@ export default function MessagesPage() {
         <div className="flex-1 flex flex-col min-w-0">
           {selected ? (
             <>
-              <div className="p-4 border-b border-gray-200 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30">
+              <div className="p-4 border-b border-gray-200 dark:border-neutral-700 rounded-tr-[1.75rem] bg-gray-100 dark:bg-neutral-800">
                 <h2 className="font-semibold text-gray-900 dark:text-white">{selected.tenantName}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{selected.address}</p>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {selected.messages.map((m) => (
                   <div
                     key={m.id}
@@ -86,10 +91,10 @@ export default function MessagesPage() {
                   >
                     <div
                       className={cn(
-                        'max-w-[80%] rounded-2xl px-4 py-2',
+                        'max-w-[80%] rounded-2xl px-4 py-2.5',
                         m.sender === 'user'
-                          ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
-                          : 'bg-gray-200 dark:bg-neutral-700 text-gray-900 dark:text-white'
+                          ? 'bg-[#9FE870] text-[#163300]'
+                          : 'rounded-2xl bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white border border-gray-200/80 dark:border-neutral-700'
                       )}
                     >
                       <p className="text-sm">{m.text}</p>
@@ -100,18 +105,27 @@ export default function MessagesPage() {
               </div>
               <div className="p-4 border-t border-gray-200 dark:border-neutral-700">
                 <div className="flex gap-2">
-                  <Input placeholder="Typ een bericht..." className="flex-1" />
-                  <Button size="icon" className="bg-[#163300] hover:bg-[#163300]/90">
-                    <Send className="h-4 w-4" />
+                  <Input
+                    placeholder="Typ een bericht..."
+                    className="flex-1 rounded-full h-12 px-5 border-gray-200 dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800"
+                  />
+                  <Button
+                    size="icon"
+                    className="h-12 w-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 shrink-0"
+                  >
+                    <Send className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="flex-1 flex items-center justify-center p-8">
               <div className="text-center">
-                <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Selecteer een conversatie</p>
+                <div className="h-16 w-16 rounded-full bg-[#9FE870]/20 flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-[#163300] dark:text-[#9FE870]" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">Selecteer een conversatie</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Of start een nieuw gesprek met een huurder</p>
               </div>
             </div>
           )}

@@ -13,7 +13,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { currentUser, notifications, unreadNotificationsCount } from '@/lib/mock-data/domio-dashboard'
+import { notifications } from '@/lib/mock-data/domio-dashboard'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { signOut } from '@/lib/supabase/auth'
 
 interface ContentHeaderProps {
   onMenuClick?: () => void
@@ -21,11 +23,28 @@ interface ContentHeaderProps {
   stickyOffsetClassName?: string
 }
 
+function getInitials(name: string | null, email: string): string {
+  if (name?.trim()) {
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+  return email.slice(0, 2).toUpperCase()
+}
+
+function clearDemoCookie() {
+  document.cookie = 'domio_demo=; path=/; max-age=0'
+}
+
 export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHeaderProps) {
-  const userName = currentUser.name
-  const userEmail = currentUser.email
-  const userRole = 'Admin'
-  const unreadCount = unreadNotificationsCount
+  const { profile, user, isDemo } = useDashboardUser()
+  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Gebruiker'
+  const userEmail = user?.email || profile?.email || ''
+  const userRole = profile?.role === 'verhuurder' ? 'Beheerder' : profile?.role === 'huurder' ? 'Bewoner' : 'Admin'
+  const avatarInitials = getInitials(profile?.full_name ?? null, userEmail || '')
+  const unreadCount = 0
 
   const dropdownContentClass =
     'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden'
@@ -219,7 +238,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                   className="h-10 pl-2 pr-3 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm gap-2"
                 >
                   <span className="h-7 w-7 rounded-full bg-[#163300] text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0">
-                    {currentUser.avatarInitials}
+                    {avatarInitials}
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
                     {userName}
@@ -230,7 +249,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 <div className="px-4 py-4 border-b border-gray-200/80 dark:border-neutral-700">
                   <div className="flex items-center gap-3">
                     <div className="h-11 w-11 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
-                      {currentUser.avatarInitials}
+                      {avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-xl">
@@ -274,9 +293,20 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 </div>
                 <DropdownMenuSeparator className="my-1" />
                 <div className="py-2">
-                  <DropdownMenuItem className="mx-2 rounded-2xl py-2 text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                  <DropdownMenuItem
+                    className="mx-2 rounded-2xl py-2 text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                    onSelect={async () => {
+                      if (isDemo) {
+                        clearDemoCookie()
+                        window.location.href = '/'
+                      } else {
+                        await signOut()
+                        window.location.href = '/'
+                      }
+                    }}
+                  >
                     <LogOut className="mr-3 h-4 w-4" />
-                    Uitloggen
+                    {isDemo ? 'Demo verlaten' : 'Uitloggen'}
                   </DropdownMenuItem>
                 </div>
               </DropdownMenuContent>

@@ -22,10 +22,18 @@ import {
   DoorOpen,
   UserCircle,
   Briefcase,
+  FileText,
 } from 'lucide-react'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
 import Link from 'next/link'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const PORTFOLIO_NAV = [
+  { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
+  { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
+  { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
+]
 
 export default function PortfolioPage() {
   const router = useRouter()
@@ -89,6 +97,7 @@ export default function PortfolioPage() {
 
   return (
     <>
+      <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>

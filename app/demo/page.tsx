@@ -16,6 +16,9 @@ export default function DemoPage() {
   }, [router])
 
   const handleAnimationComplete = () => {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'domio_demo=1; path=/; max-age=3600'
+    }
     timeoutRef.current = setTimeout(() => {
       router.push('/dashboard/employer')
     }, 80)

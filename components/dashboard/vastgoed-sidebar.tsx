@@ -204,6 +204,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         />
       )}
       <div
+        data-vastgoed-sidebar
         className={cn(
           "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
           "transition-[width,transform] duration-300 ease-in-out",
@@ -281,7 +282,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
                         <button
                           type="button"
-                          onClick={() => toggleItem(itemId)}
+                          onClick={() => collapsed ? router.push(item.children![0].href) : toggleItem(itemId)}
                           className={cn(
                             "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                             collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",

@@ -27,6 +27,8 @@ import {
   ChevronUp,
   ChevronDown,
   Search,
+  BarChart3,
+  Calculator,
 } from 'lucide-react'
 import {
   mockWwsObjects,
@@ -38,6 +40,13 @@ import {
 } from '@/lib/mock-data/wws-compliance'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const COMPLIANCE_NAV = [
+  { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
+  { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
+  { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+]
 
 const SECTOR_LABELS: Record<WWSSector, string> = {
   sociaal: 'Sociaal',
@@ -174,6 +183,7 @@ export default function CompliancePage() {
 
   return (
     <>
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">WWS Compliance</h1>

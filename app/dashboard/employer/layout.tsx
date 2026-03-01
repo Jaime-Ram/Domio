@@ -5,6 +5,10 @@ import { VastgoedSidebar } from "@/components/dashboard/vastgoed-sidebar"
 import { ContentHeader } from "@/components/dashboard/content-header"
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
+import { DashboardUserProvider } from '@/providers/dashboard-user-provider'
+
+const ENTER_DURATION_MS = 420
+const ENTER_EASE = 'cubic-bezier(0.4, 0, 0.08, 1)'
 
 export default function EmployerDashboardLayout({
   children,
@@ -13,6 +17,15 @@ export default function EmployerDashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [enterDone, setEnterDone] = useState(false)
+
+  // Soepele fade-in na laden (o.a. na demo-loading)
+  useEffect(() => {
+    const t = requestAnimationFrame(() => {
+      setTimeout(() => setEnterDone(true), 20)
+    })
+    return () => cancelAnimationFrame(t)
+  }, [])
 
   // Op mobiel: body scroll vergrendelen wanneer sidebar open is
   useEffect(() => {
@@ -27,7 +40,25 @@ export default function EmployerDashboardLayout({
   }, [sidebarOpen])
 
   return (
-    <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 flex-col">
+    <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
+      {/* Groene overlay: zelfde kleur als laadscherm, fadet weg voor soepele overgang */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10 bg-[#9FE870] transition-opacity"
+        style={{
+          opacity: enterDone ? 0 : 1,
+          transitionDuration: `${ENTER_DURATION_MS}ms`,
+          transitionTimingFunction: ENTER_EASE,
+        }}
+        aria-hidden
+      />
+      <div
+        className="relative z-20 flex flex-1 min-h-0 w-full transition-opacity"
+        style={{
+          opacity: enterDone ? 1 : 0,
+          transitionDuration: `${ENTER_DURATION_MS}ms`,
+          transitionTimingFunction: ENTER_EASE,
+        }}
+      >
       <div className="flex flex-1 min-h-0 w-full">
         <VastgoedSidebar 
           isOpen={sidebarOpen} 
@@ -48,10 +79,11 @@ export default function EmployerDashboardLayout({
             willChange: 'margin-left'
           }}
         >
+          <DashboardUserProvider>
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16">
-          {children}
+              {children}
               {/* Subtle Domio logo at bottom center - light gray, small, subtle */}
               <div className="flex justify-center items-center mt-16 pt-8">
                 <Logo 
@@ -63,8 +95,10 @@ export default function EmployerDashboardLayout({
                 />
               </div>
             </div>
-        </main>
+          </main>
+          </DashboardUserProvider>
         </div>
+      </div>
       </div>
     </div>
   )

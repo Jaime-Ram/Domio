@@ -42,6 +42,8 @@ import {
   Image as ImageIcon,
   Upload,
   Eye,
+  ClipboardCheck,
+  Calendar,
 } from 'lucide-react'
 import { mockMaintenanceRequests, mockProperties } from '@/lib/mock-data/vastgoed'
 import { format } from 'date-fns'
@@ -53,6 +55,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
+const MAINTENANCE_NAV = [
+  { label: 'Tickets', href: '/dashboard/employer/maintenance', icon: Wrench },
+  { label: 'Inspecties', href: '/dashboard/employer/maintenance/inspecties', icon: ClipboardCheck },
+  { label: 'Planning', href: '/dashboard/employer/maintenance/planning', icon: Calendar },
+]
 
 export default function MaintenancePage() {
   const router = useRouter()
@@ -144,6 +153,7 @@ export default function MaintenancePage() {
 
   return (
     <>
+            <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} />
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
