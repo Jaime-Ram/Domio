@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SocialButton } from '@/components/ui/social-button'
@@ -14,11 +14,18 @@ import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [transitioning, setTransitioning] = useState(false)
+
+  // Toon fout van auth callback (o.a. OAuth)
+  useEffect(() => {
+    const err = searchParams.get('error')
+    if (err) setError(decodeURIComponent(err))
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +39,10 @@ export default function LoginPage() {
         router.push('/dashboard/employer')
       }, 900)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Inloggen mislukt. Controleer je gegevens.')
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(msg === 'Load failed' || msg === 'Failed to fetch'
+        ? 'Kan geen verbinding maken met de server. Controleer je internetverbinding of probeer het later opnieuw.'
+        : msg)
       setLoading(false)
     }
   }
