@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,7 @@ import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
@@ -102,7 +102,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthPageShell>
+    <>
           <h1 className="text-4xl font-bold text-[#163300]">
             Welkom terug!
           </h1>
@@ -221,6 +221,16 @@ export default function LoginPage() {
               </SocialButton>
             </div>
           </form>
+    </>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <AuthPageShell>
+      <Suspense fallback={null}>
+        <LoginContent />
+      </Suspense>
     </AuthPageShell>
   )
 }
