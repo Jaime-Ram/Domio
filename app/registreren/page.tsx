@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Mail } from 'lucide-react'
+import { Mail, AlertCircle } from 'lucide-react'
 import { signUp, signInWithGoogle } from '@/lib/supabase/auth'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
@@ -26,6 +26,7 @@ export default function RegistrerenPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [emailExists, setEmailExists] = useState(false)
 
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,6 +40,7 @@ export default function RegistrerenPage() {
 
   const handleBack = () => {
     setError(null)
+    setEmailExists(false)
     setStep(1)
   }
 
@@ -46,6 +48,7 @@ export default function RegistrerenPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setEmailExists(false)
     try {
       if (password !== confirmPassword) {
         setError('Wachtwoorden komen niet overeen')
@@ -58,7 +61,18 @@ export default function RegistrerenPage() {
         return
       }
       const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
-      const { error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
+      const { data, error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
+
+      // Supabase: lege identities = e-mail bestaat al (bij email confirmation aan)
+      const isDuplicateEmail =
+        (authError && /already|exists|registered|eerder/i.test(authError.message)) ||
+        (data?.user && (!data.user.identities || data.user.identities.length === 0))
+
+      if (isDuplicateEmail) {
+        setEmailExists(true)
+        setLoading(false)
+        return
+      }
       if (authError) throw authError
       setSuccess(true)
     } catch (err: unknown) {
@@ -99,7 +113,28 @@ export default function RegistrerenPage() {
           )}
 
           <AnimatePresence mode="wait" initial={false}>
-            {success ? (
+            {emailExists ? (
+              <motion.div
+                key="emailExists"
+                initial={{ opacity: 0, x: 32 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -32 }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
+                className="mt-8"
+              >
+                <ConfirmationBlock
+                  icon={AlertCircle}
+                  title="Dit e{'\u2011'}mailadres bestaat al"
+                  description={
+                    <>
+                      Er is al een account gekoppeld aan <strong className="text-gray-900">{email}</strong>. Log in met je wachtwoord of vraag een nieuw wachtwoord aan.
+                    </>
+                  }
+                  primaryButton={{ label: 'Ga naar inloggen', href: '/login' }}
+                  secondaryButton={{ label: 'Wachtwoord vergeten', href: '/forgot-password' }}
+                />
+              </motion.div>
+            ) : success ? (
               <motion.div
                 key="success"
                 initial={{ opacity: 0, x: 32 }}

@@ -28,7 +28,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Building2,
-  FileText,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import {
@@ -43,7 +42,6 @@ import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboar
 const PORTFOLIO_NAV = [
   { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
   { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-  { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
 ]
 
 export default function TenantsPage() {

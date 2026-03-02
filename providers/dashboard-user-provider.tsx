@@ -68,6 +68,22 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
   const [isDemo, setIsDemo] = useState(false)
 
   const fetchUserAndProfile = async () => {
+    const { data: { user: u } } = await supabase.auth.getUser()
+
+    // Echte gebruiker: altijd echte data tonen, demo-cookie wissen
+    if (u) {
+      if (typeof document !== 'undefined') {
+        document.cookie = 'domio_demo=; path=/; max-age=0'
+      }
+      setUser(u)
+      setIsDemo(false)
+      const p = await getProfile(u.id)
+      setProfile(p)
+      setLoading(false)
+      return
+    }
+
+    // Geen echte sessie: demo-modus als cookie aanwezig
     if (isDemoMode()) {
       setUser(getDemoUser())
       setProfile(getDemoProfile())
@@ -76,18 +92,8 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
       return
     }
 
-    const { data: { user: u } } = await supabase.auth.getUser()
-    setUser(u)
-    setIsDemo(false)
-
-    if (!u) {
-      setProfile(null)
-      setLoading(false)
-      return
-    }
-
-    const p = await getProfile(u.id)
-    setProfile(p)
+    setUser(null)
+    setProfile(null)
     setLoading(false)
   }
 

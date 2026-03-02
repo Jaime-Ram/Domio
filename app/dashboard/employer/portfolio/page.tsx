@@ -22,7 +22,6 @@ import {
   DoorOpen,
   UserCircle,
   Briefcase,
-  FileText,
 } from 'lucide-react'
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
@@ -33,7 +32,6 @@ import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboar
 const PORTFOLIO_NAV = [
   { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
   { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-  { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
 ]
 
 export default function PortfolioPage() {

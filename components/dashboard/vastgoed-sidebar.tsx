@@ -71,7 +71,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   // Auto-expand alleen de sectie van de actieve route; maximaal één accordion open
   useEffect(() => {
     const menuItemsWithChildren = [
-      { id: 'portefeuille-accordion', paths: ['/dashboard/employer/portfolio', '/dashboard/employer/tenants', '/dashboard/employer/contracts'] },
+      { id: 'portefeuille-accordion', paths: ['/dashboard/employer/portfolio', '/dashboard/employer/tenants'] },
       { id: 'compliance-accordion', paths: ['/dashboard/employer/compliance'] },
       { id: 'financieel-accordion', paths: ['/dashboard/employer/financial'] },
       { id: 'onderhoud-accordion', paths: ['/dashboard/employer/maintenance'] },
@@ -118,7 +118,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       children: [
         { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
         { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-        { label: 'Contracten', href: '/dashboard/employer/contracts/leases', icon: FileText },
       ],
     },
     {
