@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -33,7 +33,9 @@ import {
   CheckCircle2,
   Lightbulb,
 } from 'lucide-react'
-import { mockProperties, mockDocuments } from '@/lib/mock-data/vastgoed'
+import { propertyQueries } from '@/lib/supabase/queries'
+import { getUser } from '@/lib/supabase/auth'
+import { mockDocuments } from '@/lib/mock-data/vastgoed'
 import {
   mockWwsObjects,
   mockWwsBreakdown,
@@ -227,9 +229,37 @@ export default function PropertyDetailPage() {
   const router = useRouter()
   const params = useParams()
   const propertyId = params.id as string
+  const [property, setProperty] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Find property
-  const property = mockProperties.find(p => p.id === propertyId)
+  useEffect(() => {
+    const loadProperty = async () => {
+      try {
+        const { user } = await getUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
+        const data = await propertyQueries.getWithUnits(propertyId)
+        setProperty(data)
+      } catch (error) {
+        console.error('Failed to load property:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProperty()
+  }, [propertyId, router])
+
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="h-12 bg-gray-200 dark:bg-neutral-700 rounded w-1/3" />
+        <div className="h-64 bg-gray-200 dark:bg-neutral-700 rounded" />
+        <div className="h-96 bg-gray-200 dark:bg-neutral-700 rounded" />
+      </div>
+    )
+  }
   
   if (!property) {
     return (
@@ -238,7 +268,7 @@ export default function PropertyDetailPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Object niet gevonden
           </h2>
-          <Button onClick={() => router.push('/dashboard/employer/portfolio/properties')}>
+          <Button onClick={() => router.push('/dashboard/employer/portfolio')}>
             Terug naar overzicht
           </Button>
         </div>
@@ -277,7 +307,7 @@ export default function PropertyDetailPage() {
             <div className="mb-8">
               <Button 
                 variant="ghost" 
-                onClick={() => router.push('/dashboard/employer/portfolio/properties')}
+                onClick={() => router.push('/dashboard/employer/portfolio')}
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -309,8 +339,8 @@ export default function PropertyDetailPage() {
             {/* Tabs */}
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="basic">Basisinfo</TabsTrigger>
-                <TabsTrigger value="contract">Huurcontract & Huurder</TabsTrigger>
+                <TabsTrigger value="basic">Info</TabsTrigger>
+                <TabsTrigger value="contract">Huurder</TabsTrigger>
                 <TabsTrigger value="compliance">Compliance</TabsTrigger>
                 <TabsTrigger value="documents">Documenten</TabsTrigger>
               </TabsList>
@@ -333,21 +363,21 @@ export default function PropertyDetailPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
                         <div className="flex items-center gap-1">
                           <Ruler className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">{property.size} m²</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.size_m2 || '-'} m²</p>
                         </div>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal kamers</p>
                         <div className="flex items-center gap-1">
                           <DoorOpen className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">{property.rooms}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.rooms || '-'}</p>
                         </div>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
                         <div className="flex items-center gap-1">
                           <Euro className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">€{property.monthlyRent}/mnd</p>
+                          <p className="font-medium text-gray-900 dark:text-white">€{property.monthly_rent || '-'}/mnd</p>
                         </div>
                       </div>
                     </div>
@@ -358,8 +388,42 @@ export default function PropertyDetailPage() {
                       {getStatusBadge(property.status)}
                     </div>
 
-                    {/* Tenaamstelling / Vastgoedhouder */}
-                    {property.registration && (
+                    {/* Additional fields from database */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {property.postcode && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Postcode</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.postcode}</p>
+                        </div>
+                      )}
+                      {property.city && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Stad</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.city}</p>
+                        </div>
+                      )}
+                      {property.build_year && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bouwjaar</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.build_year}</p>
+                        </div>
+                      )}
+                      {property.energy_label && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Energielabel</p>
+                          <Badge variant="outline">{property.energy_label}</Badge>
+                        </div>
+                      )}
+                      {property.woz_value && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
+                          <p className="font-medium text-gray-900 dark:text-white">€{property.woz_value.toLocaleString('nl-NL')}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tenaamstelling / Vastgoedhouder - TODO: Add to database schema */}
+                    {false && property.registration && (
                       <div className="p-4 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700">
                         <div className="flex items-start gap-3 mb-4">
                           {property.registration.type === 'bedrijf' ? (
@@ -481,7 +545,7 @@ export default function PropertyDetailPage() {
               {/* Tab 2: Huurcontract & Huurder */}
               <TabsContent value="contract">
                 <div className="space-y-6">
-                  {property.tenant && property.lease ? (
+                  {false && property.tenant && property.lease ? (
                     <>
                       {/* Huurder Info */}
                       <Card className={dashboardCardClass()}>
