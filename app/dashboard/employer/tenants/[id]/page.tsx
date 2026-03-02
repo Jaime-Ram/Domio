@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -30,17 +30,54 @@ import {
   AlertCircle,
   FileText,
 } from 'lucide-react'
-import { mockTenants, mockPayments } from '@/lib/mock-data/vastgoed'
+import { mockPayments } from '@/lib/mock-data/vastgoed'
+import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
+import { getUser } from '@/lib/supabase/auth'
 
 export default function TenantDetailPage() {
   const router = useRouter()
   const params = useParams()
   const tenantId = params.id as string
-
-  // Find tenant
-  const tenant = mockTenants.find(t => t.id === tenantId)
+  
+  const [tenant, setTenant] = useState<any>(null)
+  const [leases, setLeases] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState('Betrouwbare huurder, betaalt altijd op tijd.')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+
+  useEffect(() => {
+    const loadTenant = async () => {
+      try {
+        const { user } = await getUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
+        const tenantData = await tenantQueries.getById(tenantId)
+        setTenant(tenantData)
+        
+        // Load leases for this tenant
+        const tenantLeases = await leaseQueries.getByOwner(user.id)
+        const filteredLeases = tenantLeases?.filter((l: any) => l.tenant_id === tenantId) || []
+        setLeases(filteredLeases)
+      } catch (error) {
+        console.error('Failed to load tenant:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadTenant()
+  }, [tenantId, router])
+
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="h-12 bg-gray-200 dark:bg-neutral-700 rounded w-1/3" />
+        <div className="h-64 bg-gray-200 dark:bg-neutral-700 rounded" />
+        <div className="h-96 bg-gray-200 dark:bg-neutral-700 rounded" />
+      </div>
+    )
+  }
   
   if (!tenant) {
     return (
@@ -57,13 +94,16 @@ export default function TenantDetailPage() {
     )
   }
 
-  // Generate payment history (mock data)
+  // Get current lease info
+  const activeLease = leases?.find((l: any) => l.status === 'actief')
+  
+  // Generate payment history (mock data - will be replaced with real data)
   const paymentHistory = [
-    { id: '1', month: 'Januari 2024', year: 2024, amount: tenant.lease?.monthlyRent || 0, paidOn: '2024-01-01', status: 'Betaald' },
-    { id: '2', month: 'December 2023', year: 2023, amount: tenant.lease?.monthlyRent || 0, paidOn: '2023-12-01', status: 'Betaald' },
-    { id: '3', month: 'November 2023', year: 2023, amount: tenant.lease?.monthlyRent || 0, paidOn: '2023-11-03', status: 'Te laat' },
-    { id: '4', month: 'Oktober 2023', year: 2023, amount: tenant.lease?.monthlyRent || 0, paidOn: '2023-10-01', status: 'Betaald' },
-    { id: '5', month: 'September 2023', year: 2023, amount: tenant.lease?.monthlyRent || 0, paidOn: null, status: 'Openstaand' },
+    { id: '1', month: 'Januari 2024', year: 2024, amount: activeLease?.monthly_rent || 0, paidOn: '2024-01-01', status: 'Betaald' },
+    { id: '2', month: 'December 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-12-01', status: 'Betaald' },
+    { id: '3', month: 'November 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-11-03', status: 'Te laat' },
+    { id: '4', month: 'Oktober 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-10-01', status: 'Betaald' },
+    { id: '5', month: 'September 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: null, status: 'Openstaand' },
   ]
 
   const totalArrears = paymentHistory
@@ -112,12 +152,14 @@ export default function TenantDetailPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {tenant.name}
+                    {tenant.full_name}
                   </h1>
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                    <Home className="h-4 w-4" />
-                    {tenant.property?.address}
-                  </div>
+                  {activeLease && (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                      <Home className="h-4 w-4" />
+                      Unit {activeLease.unit_id}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   {totalArrears > 0 ? (
@@ -161,28 +203,28 @@ export default function TenantDetailPage() {
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Naam</p>
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-gray-400" />
-                            <p className="font-medium text-gray-900 dark:text-white">{tenant.name}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{tenant.full_name}</p>
                           </div>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Telefoon</p>
                           <div className="flex items-center gap-2">
                             <Phone className="h-4 w-4 text-gray-400" />
-                            <p className="font-medium text-gray-900 dark:text-white">{tenant.phone}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{tenant.phone || '-'}</p>
                           </div>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p>
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4 text-gray-400" />
-                            <p className="font-medium text-gray-900 dark:text-white">{tenant.email}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{tenant.email || '-'}</p>
                           </div>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Geboortedatum</p>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-gray-400" />
-                            <p className="font-medium text-gray-900 dark:text-white">15-03-1985</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{tenant.date_of_birth || '-'}</p>
                           </div>
                         </div>
                       </div>

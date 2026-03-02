@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
@@ -33,7 +34,7 @@ import {
   CheckCircle2,
   Lightbulb,
 } from 'lucide-react'
-import { propertyQueries } from '@/lib/supabase/queries'
+import { propertyQueries, unitQueries, leaseQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { mockDocuments } from '@/lib/mock-data/vastgoed'
 import {
@@ -231,6 +232,7 @@ export default function PropertyDetailPage() {
   const propertyId = params.id as string
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [unitLeases, setUnitLeases] = useState<Record<string, any>>({})
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -250,6 +252,24 @@ export default function PropertyDetailPage() {
     }
     loadProperty()
   }, [propertyId, router])
+
+  // Load lease data for each unit
+  useEffect(() => {
+    const loadUnitLeases = async () => {
+      if (!property?.units || property.units.length === 0) return
+
+      try {
+        const leaseData: Record<string, any[]> = {}
+        for (const unit of property.units) {
+          const unitLeases = await leaseQueries.getUnitHistory(unit.id)
+          leaseData[unit.id] = unitLeases || []
+        }
+        setUnitLeases(leaseData)
+      } catch (error) {
+      }
+    }
+    loadUnitLeases()
+  }, [property?.units])
 
   if (loading) {
     return (
@@ -340,7 +360,7 @@ export default function PropertyDetailPage() {
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="basic">Info</TabsTrigger>
-                <TabsTrigger value="contract">Huurder</TabsTrigger>
+                <TabsTrigger value="units">Units</TabsTrigger>
                 <TabsTrigger value="compliance">Compliance</TabsTrigger>
                 <TabsTrigger value="documents">Documenten</TabsTrigger>
               </TabsList>
@@ -353,73 +373,66 @@ export default function PropertyDetailPage() {
                     <CardDescription>Algemene informatie over het object</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Kenmerken */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
-                        <p className="font-medium text-gray-900 dark:text-white">{property.type}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
-                        <div className="flex items-center gap-1">
-                          <Ruler className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">{property.size_m2 || '-'} m²</p>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal kamers</p>
-                        <div className="flex items-center gap-1">
-                          <DoorOpen className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">{property.rooms || '-'}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
-                        <div className="flex items-center gap-1">
-                          <Euro className="h-4 w-4 text-gray-400" />
-                          <p className="font-medium text-gray-900 dark:text-white">€{property.monthly_rent || '-'}/mnd</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Status */}
+                    {/* Locatie Info */}
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</p>
-                      {getStatusBadge(property.status)}
-                    </div>
-
-                    {/* Additional fields from database */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {property.postcode && (
+                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Locatie</p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Adres</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.address}</p>
+                        </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Postcode</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.postcode}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.postcode || '-'}</p>
                         </div>
-                      )}
-                      {property.city && (
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Stad</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.city}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.city || '-'}</p>
                         </div>
-                      )}
-                      {property.build_year && (
+                      </div>
+                    </div>
+
+                    {/* Kenmerken */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Kenmerken</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                          <p className="font-medium text-gray-900 dark:text-white capitalize">{property.type}</p>
+                        </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bouwjaar</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.build_year}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">{property.build_year || '-'}</p>
                         </div>
-                      )}
-                      {property.energy_label && (
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Energielabel</p>
-                          <Badge variant="outline">{property.energy_label}</Badge>
+                          {property.energy_label ? (
+                            <Badge variant="outline">{property.energy_label}</Badge>
+                          ) : (
+                            <p className="font-medium text-gray-900 dark:text-white">-</p>
+                          )}
                         </div>
-                      )}
-                      {property.woz_value && (
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal units</p>
+                          <div className="flex items-center gap-1">
+                            <DoorOpen className="h-4 w-4 text-gray-400" />
+                            <p className="font-medium text-gray-900 dark:text-white">{property.units?.length || 0}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Financiële Gegevens */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Financiële Gegevens</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
-                          <p className="font-medium text-gray-900 dark:text-white">€{property.woz_value.toLocaleString('nl-NL')}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '-'}
+                          </p>
                         </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Tenaamstelling / Vastgoedhouder - TODO: Add to database schema */}
@@ -542,125 +555,131 @@ export default function PropertyDetailPage() {
                 </Card>
               </TabsContent>
 
-              {/* Tab 2: Huurcontract & Huurder */}
-              <TabsContent value="contract">
-                <div className="space-y-6">
-                  {false && property.tenant && property.lease ? (
-                    <>
-                      {/* Huurder Info */}
-                      <Card className={dashboardCardClass()}>
-                        <CardHeader>
-                          <CardTitle>Huurder Gegevens</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-900 dark:text-white font-medium">{property.tenant.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-600 dark:text-gray-400">+31 6 12345678</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-gray-400" />
-                            <span className="text-gray-600 dark:text-gray-400">{property.tenant.email}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Contract Info */}
-                      <Card className={dashboardCardClass()}>
-                        <CardHeader>
-                          <CardTitle>Contract Details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Contracttype</p>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                {property.lease.endDate ? 'Tijdelijk' : 'Vast'}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Startdatum</p>
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4 text-gray-400" />
-                                <p className="font-medium text-gray-900 dark:text-white">
-                                  {new Date(property.lease.startDate).toLocaleDateString('nl-NL')}
-                                </p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
-                              <div className="flex items-center gap-1">
-                                <Euro className="h-4 w-4 text-gray-400" />
-                                <p className="font-medium text-gray-900 dark:text-white">
-                                  €{property.lease.monthlyRent.toLocaleString('nl-NL')}
-                                </p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Borgsom</p>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                €{(property.lease.monthlyRent * 2).toLocaleString('nl-NL')}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Contract documenten */}
-                          <div className="border-t pt-4">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Documenten</p>
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-neutral-700 rounded-lg">
+              {/* Tab 2: Units */}
+              <TabsContent value="units">
+                <Card className={dashboardCardClass()}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Units</CardTitle>
+                        <CardDescription>Alle units in dit object</CardDescription>
+                      </div>
+                      <Button className="bg-[#163300] hover:bg-[#356258] text-white">
+                        <DoorOpen className="h-4 w-4 mr-2" />
+                        Unit Toevoegen
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {property.units && property.units.length > 0 ? (
+                      <div className="space-y-4">
+                        {property.units.map((unit: any) => {
+                          const leases = unitLeases[unit.id] || []
+                          const tenantMap = new Map<string, { id: string; full_name: string }>()
+                          for (const lease of leases) {
+                            if (lease?.tenants?.id && lease?.tenants?.full_name) {
+                              tenantMap.set(lease.tenants.id, {
+                                id: lease.tenants.id,
+                                full_name: lease.tenants.full_name,
+                              })
+                            }
+                          }
+                          const tenants = Array.from(tenantMap.values())
+                          return (
+                            <div key={unit.id} className="border border-gray-200 dark:border-neutral-700 rounded-lg p-6 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
+                              {/* Unit Header */}
+                              <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                  <FileText className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+                                  <DoorOpen className="h-5 w-5 text-gray-400" />
                                   <div>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Huurcontract.pdf</p>
-                                    <p className="text-xs text-gray-500">245 KB</p>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white">{unit.unit_number}</h3>
                                   </div>
                                 </div>
-                                <Button size="icon" variant="ghost">
-                                  <Download className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-neutral-700 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                  <FileText className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Plaatsbeschrijving.pdf</p>
-                                    <p className="text-xs text-gray-500">1.2 MB</p>
-                                  </div>
+                                <div className="flex items-center gap-2">
+                                  {unit.status === 'verhuurd' && (
+                                    <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">Verhuurd</Badge>
+                                  )}
+                                  {unit.status === 'leegstand' && (
+                                    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-500">Leegstand</Badge>
+                                  )}
+                                  {unit.status === 'onderhoud' && (
+                                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-500">Onderhoud</Badge>
+                                  )}
+                                  {unit.status === 'te_verhuren' && (
+                                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-500">Te verhuren</Badge>
+                                  )}
                                 </div>
-                                <Button size="icon" variant="ghost">
-                                  <Download className="h-4 w-4" />
+                              </div>
+
+                              {/* Unit Details Grid */}
+                              <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-neutral-700">
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Kamers</p>
+                                  <p className="font-medium text-gray-900 dark:text-white">{unit.rooms ? `${unit.rooms}` : '-'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
+                                  <p className="font-medium text-gray-900 dark:text-white">{unit.size_m2 ? `${unit.size_m2} m²` : '-'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
+                                  <p className="font-medium text-gray-900 dark:text-white">{unit.monthly_rent ? `€${unit.monthly_rent.toLocaleString('nl-NL')}` : '-'}</p>
+                                </div>
+                              </div>
+
+                              {/* Tenants Section */}
+                              <div className="mb-4">
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
+                                {tenants.length > 0 ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {tenants.map((tenant) => (
+                                      <Link
+                                        key={tenant.id}
+                                        href={`/dashboard/employer/tenants/${tenant.id}`}
+                                        className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                                      >
+                                        <span className="font-medium text-sm text-gray-900 dark:text-white">
+                                          {tenant.full_name}
+                                        </span>
+                                        <Eye className="h-4 w-4 text-gray-400" />
+                                      </Link>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-2 justify-end">
+                                <Button size="sm" variant="outline">
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Bewerken
                                 </Button>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm" className="w-full mt-3">
-                              <Upload className="h-4 w-4 mr-2" />
-                              Upload Document
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </>
-                  ) : (
-                    <Card className={dashboardCardClass()}>
-                      <CardContent className="py-12 text-center">
-                        <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className="py-12 text-center">
+                        <DoorOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                          Geen actieve huurder
+                          Geen units beschikbaar
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                          Dit object is momenteel niet verhuurd
+                          Voeg units toe aan dit object
                         </p>
                         <Button className="bg-[#163300] hover:bg-[#356258] text-white">
-                          Huurder Toevoegen
+                          <DoorOpen className="h-4 w-4 mr-2" />
+                          Eerste Unit Toevoegen
                         </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* Tab 3: Compliance (WWS) */}
