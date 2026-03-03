@@ -246,6 +246,19 @@ revoke execute on function public.handle_new_user() from public;
 revoke execute on function public.handle_new_user() from anon;
 revoke execute on function public.handle_new_user() from authenticated;
 
+-- Function: check if email exists in auth.users (case-insensitive)
+create or replace function public.check_email_exists(p_email text)
+returns boolean
+language sql
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from auth.users where lower(email) = lower(trim(p_email))
+  );
+$$;
+grant execute on function public.check_email_exists(text) to service_role;
+
 -- Trigger for auth.users
 create or replace trigger on_auth_user_created 
 after insert on auth.users 

@@ -20,10 +20,19 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
+
+    // 1. Probeer auth.users via RPC (case-insensitive, meest betrouwbaar)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcExists, error: rpcError } = await (supabase as any).rpc('check_email_exists', { p_email: email })
+    if (!rpcError && rpcExists === true) {
+      return NextResponse.json({ exists: true }, { status: 200 })
+    }
+
+    // 2. Fallback: profiles-tabel (als RPC nog niet in DB staat)
     const { count } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('email', email)
+      .ilike('email', email)
 
     return NextResponse.json({ exists: (count ?? 0) > 0 }, { status: 200 })
   } catch {

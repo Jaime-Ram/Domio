@@ -63,16 +63,22 @@ export default function RegistrerenPage() {
       }
 
       // Proactief controleren of e-mail al bestaat (voorkomt registratie met bestaand account)
-      const checkRes = await fetch('/api/auth/check-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
-      })
-      const { exists } = (await checkRes.json()) as { exists?: boolean }
-      if (exists) {
-        setEmailExists(true)
-        setLoading(false)
-        return
+      try {
+        const checkRes = await fetch('/api/auth/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        })
+        if (checkRes.ok) {
+          const json = await checkRes.json() as { exists?: boolean }
+          if (json.exists) {
+            setEmailExists(true)
+            setLoading(false)
+            return
+          }
+        }
+      } catch {
+        // Bij netwerkfout (Load failed etc.) doorgaan met signup – Supabase vangt duplicaat
       }
 
       const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
