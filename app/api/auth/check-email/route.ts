@@ -20,14 +20,12 @@ export async function POST(request: NextRequest) {
     if (!supabase) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
-    const { data } = await supabase
+    const { count } = await supabase
       .from('profiles')
-      .select('id')
+      .select('*', { count: 'exact', head: true })
       .eq('email', email)
-      .limit(1)
-      .maybeSingle()
 
-    return NextResponse.json({ exists: !!data?.id }, { status: 200 })
+    return NextResponse.json({ exists: (count ?? 0) > 0 }, { status: 200 })
   } catch {
     return NextResponse.json({ exists: false }, { status: 200 })
   }
