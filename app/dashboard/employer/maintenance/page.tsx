@@ -46,6 +46,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import { mockMaintenanceRequests, mockProperties } from '@/lib/mock-data/vastgoed'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import {
@@ -65,9 +66,13 @@ const MAINTENANCE_NAV = [
 
 export default function MaintenancePage() {
   const router = useRouter()
+  const { isDemo } = useDashboardUser()
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showNewModal, setShowNewModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<typeof mockMaintenanceRequests[0] | null>(null)
+
+  const maintenanceRequests = isDemo ? mockMaintenanceRequests : []
+  const properties = isDemo ? mockProperties : []
   const [showDetailModal, setShowDetailModal] = useState(false)
 
   // New maintenance form state
@@ -86,7 +91,7 @@ export default function MaintenancePage() {
     resolvedDate: '',
   })
 
-  const filteredRequests = mockMaintenanceRequests.filter(request => {
+  const filteredRequests = maintenanceRequests.filter((request: typeof mockMaintenanceRequests[0]) => {
     if (statusFilter === 'all') return true
     return request.status === statusFilter
   })
@@ -186,7 +191,7 @@ export default function MaintenancePage() {
                           <SelectValue placeholder="Kies een pand" />
                         </SelectTrigger>
                         <SelectContent>
-                          {mockProperties.map((property) => (
+                          {properties.map((property: typeof mockProperties[0]) => (
                             <SelectItem key={property.id} value={property.id}>
                               {property.address}
                             </SelectItem>
@@ -262,7 +267,7 @@ export default function MaintenancePage() {
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Open</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {mockMaintenanceRequests.filter(r => r.status === 'open').length}
+                        {maintenanceRequests.filter((r: any) => r.status === 'open').length}
                       </p>
                     </div>
                     <Clock className="h-8 w-8 text-yellow-600" />
@@ -275,7 +280,7 @@ export default function MaintenancePage() {
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">In behandeling</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {mockMaintenanceRequests.filter(r => r.status === 'in_behandeling').length}
+                        {maintenanceRequests.filter((r: any) => r.status === 'in_behandeling').length}
                       </p>
                     </div>
                     <Wrench className="h-8 w-8 text-blue-600" />
@@ -288,7 +293,7 @@ export default function MaintenancePage() {
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Spoed</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {mockMaintenanceRequests.filter(r => r.priority === 'urgent' || r.priority === 'spoed').length}
+                        {maintenanceRequests.filter((r: any) => r.priority === 'urgent' || r.priority === 'spoed').length}
                       </p>
                     </div>
                     <AlertCircle className="h-8 w-8 text-red-600" />
@@ -301,7 +306,7 @@ export default function MaintenancePage() {
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Afgerond</p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {mockMaintenanceRequests.filter(r => r.status === 'afgerond').length}
+                        {maintenanceRequests.filter((r: any) => r.status === 'afgerond').length}
                       </p>
                     </div>
                     <CheckCircle2 className="h-8 w-8 text-green-600" />

@@ -48,6 +48,7 @@ import {
   Scan,
 } from 'lucide-react'
 import { mockPayments, mockExpenses, mockTenants, mockProperties } from '@/lib/mock-data/vastgoed'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -62,6 +63,7 @@ const FINANCIAL_NAV = [
 
 export default function FinancialPage() {
   const router = useRouter()
+  const { isDemo } = useDashboardUser()
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
 
@@ -88,22 +90,27 @@ export default function FinancialPage() {
   const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
 
-  const monthlyIncome = mockPayments
-    .filter(p => {
+  const payments = isDemo ? mockPayments : []
+  const expenses = isDemo ? mockExpenses : []
+  const tenants = isDemo ? mockTenants : []
+  const properties = isDemo ? mockProperties : []
+
+  const monthlyIncome = payments
+    .filter((p: any) => {
       const paymentDate = p.paidDate ? new Date(p.paidDate) : new Date(p.dueDate)
       return paymentDate.getMonth() === currentMonth && 
              paymentDate.getFullYear() === currentYear &&
              p.status === 'betaald'
     })
-    .reduce((sum, p) => sum + p.amount, 0)
+    .reduce((sum: number, p: any) => sum + p.amount, 0)
 
-  const monthlyExpenses = mockExpenses
-    .filter(e => {
+  const monthlyExpenses = expenses
+    .filter((e: any) => {
       const expenseDate = new Date(e.date)
       return expenseDate.getMonth() === currentMonth && 
              expenseDate.getFullYear() === currentYear
     })
-    .reduce((sum, e) => sum + e.amount, 0)
+    .reduce((sum: number, e: any) => sum + e.amount, 0)
 
   const balance = monthlyIncome - monthlyExpenses
 
@@ -256,7 +263,7 @@ export default function FinancialPage() {
                               <SelectValue placeholder="Kies een huurder" />
                             </SelectTrigger>
                             <SelectContent>
-                              {mockTenants.map((tenant) => (
+                              {tenants.map((tenant: any) => (
                                 <SelectItem key={tenant.id} value={tenant.id}>
                                   {tenant.name} - {tenant.property?.address}
                                 </SelectItem>
@@ -328,7 +335,7 @@ export default function FinancialPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockPayments
+                    {payments
                       .filter(p => {
                         const paymentDate = p.paidDate ? new Date(p.paidDate) : new Date(p.dueDate)
                         return paymentDate.getMonth() === currentMonth && 
@@ -436,7 +443,7 @@ export default function FinancialPage() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="general">Algemeen</SelectItem>
-                              {mockProperties.map((property) => (
+                              {properties.map((property: any) => (
                                 <SelectItem key={property.id} value={property.id}>
                                   {property.address}
                                 </SelectItem>
@@ -480,7 +487,7 @@ export default function FinancialPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockExpenses
+                    {expenses
                       .filter(e => {
                         const expenseDate = new Date(e.date)
                         return expenseDate.getMonth() === currentMonth && 

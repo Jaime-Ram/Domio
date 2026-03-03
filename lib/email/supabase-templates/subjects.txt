@@ -1,0 +1,9 @@
+# Supabase Email Template Subjects (copy-paste naar Dashboard)
+# Authentication → Email Templates → Subject field per template
+# Links = Supabase-template naam in het dashboard
+
+Confirm signup:        Bevestig je e-mailadres
+Magic Link:            Log in op Domio
+Recovery:              Wachtwoord opnieuw instellen
+Change Email Address:  Bevestig je nieuwe e-mailadres
+Invite user:           Je bent uitgenodigd voor Domio

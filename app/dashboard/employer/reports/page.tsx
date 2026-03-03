@@ -46,7 +46,7 @@ export default function ReportsPage() {
       </div>
 
       {toastMessage && (
-        <div className="rounded-lg bg-[#163300] dark:bg-[#9FE870]/20 text-white dark:text-[#163300] px-4 py-3 text-sm font-medium flex items-center gap-2">
+        <div className="rounded-block bg-brand-primary dark:bg-brand-accent/30 text-white dark:text-brand-primary px-4 py-3 text-sm font-medium flex items-center gap-2">
           <FileText className="h-4 w-4 flex-shrink-0" />
           {toastMessage}
         </div>
@@ -56,17 +56,17 @@ export default function ReportsPage() {
         {reportTemplates.map((r) => {
           const Icon = r.icon
           return (
-            <Card key={r.id} className="flex flex-col">
-              <CardHeader>
-                <div className="h-10 w-10 rounded-lg bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center mb-2">
-                  <Icon className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+            <Card key={r.id} className="flex flex-col rounded-card border border-gray-200/80 dark:border-neutral-700 shadow-lg">
+              <CardHeader className="p-wise-md pb-0">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 mb-wise-xs">
+                  <Icon className="h-5 w-5 text-brand-primary dark:text-brand-accent" />
                 </div>
-                <CardTitle className="text-base">{r.title}</CardTitle>
-                <CardDescription className="text-sm">{r.description}</CardDescription>
+                <CardTitle className="text-base font-semibold">{r.title}</CardTitle>
+                <CardDescription className="text-sm text-gray-500 dark:text-gray-400">{r.description}</CardDescription>
               </CardHeader>
-              <CardContent className="mt-auto pt-2">
+              <CardContent className="mt-auto pt-wise-sm p-wise-md">
                 <Button
-                  className="w-full bg-[#163300] hover:bg-[#163300]/90 dark:bg-[#9FE870] dark:text-[#163300] dark:hover:bg-[#9FE870]/90"
+                  className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white dark:bg-brand-accent dark:text-brand-primary dark:hover:bg-brand-accent/90 focus-visible:ring-brand-primary"
                   onClick={() => handleGenerate(r.id, r.title)}
                   disabled={generatingId !== null}
                 >

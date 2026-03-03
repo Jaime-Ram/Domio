@@ -44,6 +44,7 @@ import {
   type WWResult,
 } from '@/lib/wws-calculator'
 import { mockWwsObjects, mockWwsOptimalisatieAdviezen } from '@/lib/mock-data/wws-compliance'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { downloadWWSPDF } from '@/lib/pdf/generate-wws-pdf'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
@@ -233,10 +234,15 @@ const SECTOR_COLORS = {
 }
 
 export default function PuntentellingPage() {
-  const [selectedPropertyId, setSelectedPropertyId] = useState(mockPropertyInputs[0].propertyId)
+  const { isDemo } = useDashboardUser()
+  const propertyInputs = isDemo ? mockPropertyInputs : []
+  const wwsObjects = isDemo ? mockWwsObjects : []
+  const optimalisatieAdviezen = isDemo ? mockWwsOptimalisatieAdviezen : []
+  const historyData = isDemo ? mockHistory : {} as Record<string, HistoryEntry[]>
+  const [selectedPropertyId, setSelectedPropertyId] = useState(propertyInputs[0]?.propertyId ?? '')
   const [formData, setFormData] = useState<Record<string, WWInput>>(() => {
     const map: Record<string, WWInput> = {}
-    mockPropertyInputs.forEach((p) => {
+    propertyInputs.forEach((p: PropertyWWSInput) => {
       const { propertyId, propertyLabel, ...input } = p
       map[propertyId] = input
     })
@@ -246,9 +252,9 @@ export default function PuntentellingPage() {
 
   const input = formData[selectedPropertyId]
   const result = useMemo(() => (input ? berekenWWS(input) : null), [input])
-  const propertyLabel = mockPropertyInputs.find(p => p.propertyId === selectedPropertyId)?.propertyLabel ?? ''
-  const wwsObj = mockWwsObjects.find(o => o.id === selectedPropertyId)
-  const history = mockHistory[selectedPropertyId] ?? []
+  const propertyLabel = propertyInputs.find(p => p.propertyId === selectedPropertyId)?.propertyLabel ?? ''
+  const wwsObj = wwsObjects.find((o: { id: string }) => o.id === selectedPropertyId)
+  const history = historyData[selectedPropertyId] ?? []
   const optimisationAdvice = useMemo(() => (result && input ? getOptimisationAdvice(result, input) : []), [result, input])
 
   const updateField = <K extends keyof WWInput>(field: K, value: WWInput[K]) => {
@@ -264,6 +270,28 @@ export default function PuntentellingPage() {
     updateField(field, next)
   }
 
+  if (!isDemo && propertyInputs.length === 0) {
+    return (
+      <>
+        <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Puntentelling</h1>
+            <p className="text-gray-600 dark:text-gray-400">Bereken WWS-punten voor je panden</p>
+          </div>
+          <Card className={dashboardCardClass()}>
+            <CardContent className="py-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400">Nog geen objecten voor puntentelling.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Voeg eerst panden toe aan je portefeuille.</p>
+              <Button className="mt-4" onClick={() => window.location.href = '/dashboard/employer/portfolio/properties/new'}>
+                Pand toevoegen
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    )
+  }
   if (!input || !result) return null
 
   const sectorStyle = SECTOR_COLORS[result.sector]
@@ -321,8 +349,8 @@ export default function PuntentellingPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockPropertyInputs.map((p) => {
-                    const obj = mockWwsObjects.find(o => o.id === p.propertyId)
+                  {propertyInputs.map((p: PropertyWWSInput) => {
+                    const obj = wwsObjects.find((o: { id: string }) => o.id === p.propertyId)
                     return (
                       <SelectItem key={p.propertyId} value={p.propertyId}>
                         <span className="flex items-center gap-2">

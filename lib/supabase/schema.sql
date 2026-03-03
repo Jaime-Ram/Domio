@@ -223,18 +223,23 @@ create policy "Payments: delete own" on public.payments for delete to authentica
 
 -- Function to handle new user registration
 create or replace function public.handle_new_user() 
-returns trigger as $$ 
+returns trigger 
+language plpgsql 
+security definer 
+set search_path = ''
+as $$ 
 begin 
-    insert into public.profiles (id, email, full_name, role) 
+    insert into public.profiles (id, email, full_name, role, phone) 
     values ( 
         new.id, 
         new.email, 
         coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)), 
-        coalesce(nullif(new.raw_user_meta_data->>'role', ''), 'verhuurder') 
+        coalesce(nullif(new.raw_user_meta_data->>'role', ''), 'verhuurder'),
+        nullif(trim(coalesce(new.raw_user_meta_data->>'phone', '')), '')
     ); 
     return new; 
 end; 
-$$ language plpgsql security definer;
+$$;
 
 -- Restrict execution permissions
 revoke execute on function public.handle_new_user() from public;
@@ -248,7 +253,11 @@ for each row execute procedure public.handle_new_user();
 
 -- Universal function to update 'updated_at' timestamp
 create or replace function public.update_updated_at() 
-returns trigger language plpgsql security definer as $$ 
+returns trigger 
+language plpgsql 
+security definer 
+set search_path = ''
+as $$ 
 begin 
     NEW.updated_at := now(); 
     return NEW; 

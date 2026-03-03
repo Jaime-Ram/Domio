@@ -1,11 +1,17 @@
 import { supabase } from './client'
 
-export async function signUp(email: string, password: string, fullName: string, role: 'verhuurder' | 'huurder') {
+export async function signUp(
+  email: string,
+  password: string,
+  fullName: string,
+  role: 'verhuurder' | 'huurder',
+  phone?: string
+) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName, role },
+      data: { full_name: fullName, role, phone: phone || null },
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   })

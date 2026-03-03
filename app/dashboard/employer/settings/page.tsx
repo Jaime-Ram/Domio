@@ -63,27 +63,27 @@ export default function SettingsPage() {
   return (
     <>
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="mb-wise-lg">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
                 Instellingen
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
                 Beheer je account en voorkeuren
               </p>
             </div>
 
             {/* Tabs */}
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="account">
+              <TabsList className="grid w-full grid-cols-3 mb-wise-md rounded-block bg-gray-100 dark:bg-neutral-800 p-wise-xs gap-wise-xs h-auto">
+                <TabsTrigger value="account" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
                   <User className="h-4 w-4 mr-2" />
                   Mijn Account
                 </TabsTrigger>
-                <TabsTrigger value="company">
+                <TabsTrigger value="company" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
                   <Building2 className="h-4 w-4 mr-2" />
                   Bedrijfsgegevens
                 </TabsTrigger>
-                <TabsTrigger value="notifications">
+                <TabsTrigger value="notifications" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
                   <Bell className="h-4 w-4 mr-2" />
                   Notificaties
                 </TabsTrigger>
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveAccount} className="bg-[#163300] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveAccount} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveCompany} className="bg-[#163300] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveCompany} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>
@@ -374,7 +374,7 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveNotifications} className="bg-[#163300] hover:bg-[#356258] text-white">
+                      <Button onClick={handleSaveNotifications} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
                         <Save className="h-4 w-4 mr-2" />
                         Opslaan
                       </Button>

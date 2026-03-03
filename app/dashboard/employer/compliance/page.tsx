@@ -38,6 +38,7 @@ import {
   type WWSComplianceObject,
   type WWSSector,
 } from '@/lib/mock-data/wws-compliance'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
@@ -105,29 +106,34 @@ function SectorDonutChart({
 
 export default function CompliancePage() {
   const router = useRouter()
+  const { isDemo } = useDashboardUser()
   const [searchQuery, setSearchQuery] = useState('')
   const [sectorFilter, setSectorFilter] = useState<WWSSector | 'all'>('all')
   const [sortKey, setSortKey] = useState<SortKey>('address')
   const [sortAsc, setSortAsc] = useState(true)
 
-  const compliantCount = mockWwsObjects.filter((o) => o.status === 'compliant').length
-  const totalCount = mockWwsObjects.length
-  const compliantPercent = Math.round((compliantCount / totalCount) * 100)
-  const actieVereist = mockWwsObjects.filter((o) => o.status !== 'compliant').length
-  const verlopenCount = mockWwsObjects.filter((o) => o.status === 'verlopen').length
-  const gemiddeldPunten = Math.round(
-    mockWwsObjects.filter((o) => o.punten > 0).reduce((s, o) => s + o.punten, 0) / mockWwsObjects.filter((o) => o.punten > 0).length
-  )
-  const trendDiff = gemiddeldPunten - mockWwsVorigeJaarGemiddeld
-  const vrijeSectorCount = mockWwsObjects.filter((o) => o.sector === 'vrij').length
+  const wwsObjects = isDemo ? mockWwsObjects : []
+  const wwsAlerts = isDemo ? mockWwsAlerts : []
+  const sectorDistribution = isDemo ? mockWwsSectorDistribution : []
+  const vorigeJaarGemiddeld = isDemo ? mockWwsVorigeJaarGemiddeld : 0
+
+  const compliantCount = wwsObjects.filter((o) => o.status === 'compliant').length
+  const totalCount = wwsObjects.length
+  const compliantPercent = totalCount > 0 ? Math.round((compliantCount / totalCount) * 100) : 0
+  const actieVereist = wwsObjects.filter((o) => o.status !== 'compliant').length
+  const verlopenCount = wwsObjects.filter((o) => o.status === 'verlopen').length
+  const withPunten = wwsObjects.filter((o) => o.punten > 0)
+  const gemiddeldPunten = withPunten.length > 0 ? Math.round(withPunten.reduce((s, o) => s + o.punten, 0) / withPunten.length) : 0
+  const trendDiff = gemiddeldPunten - vorigeJaarGemiddeld
+  const vrijeSectorCount = wwsObjects.filter((o) => o.sector === 'vrij').length
 
   const filteredAndSorted = useMemo(() => {
-    let list = mockWwsObjects.filter((o) => {
+    let list = wwsObjects.filter((o: WWSComplianceObject) => {
       if (searchQuery && !o.address.toLowerCase().includes(searchQuery.toLowerCase())) return false
       if (sectorFilter !== 'all' && o.sector !== sectorFilter) return false
       return true
     })
-    list = [...list].sort((a, b) => {
+    list = [...list].sort((a: WWSComplianceObject, b: WWSComplianceObject) => {
       let cmp = 0
       switch (sortKey) {
         case 'address':
@@ -158,7 +164,7 @@ export default function CompliancePage() {
       return sortAsc ? cmp : -cmp
     })
     return list
-  }, [searchQuery, sectorFilter, sortKey, sortAsc])
+  }, [searchQuery, sectorFilter, sortKey, sortAsc, wwsObjects])
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortAsc((v) => !v)
@@ -249,14 +255,14 @@ export default function CompliancePage() {
       </div>
 
       {/* Alert sectie */}
-      {mockWwsAlerts.length > 0 && (
+      {wwsAlerts.length > 0 && (
         <Card className={dashboardCardClass('mb-8')}>
           <CardHeader>
             <CardTitle>Actie vereist</CardTitle>
             <CardDescription>Woningen met WWS-compliance problemen</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mockWwsAlerts.map((alert) => (
+            {wwsAlerts.map((alert) => (
               <div
                 key={alert.id}
                 className={`rounded-xl border-l-4 p-4 ${
@@ -427,10 +433,10 @@ export default function CompliancePage() {
             </CardHeader>
             <CardContent>
               <div className="relative h-48 w-48 mx-auto mb-4">
-                <SectorDonutChart data={mockWwsSectorDistribution} />
+                <SectorDonutChart data={sectorDistribution} />
               </div>
               <div className="space-y-2">
-                {mockWwsSectorDistribution.map((d) => (
+                {sectorDistribution.map((d) => (
                   <div key={d.sector} className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2">
                       <span

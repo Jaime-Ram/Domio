@@ -3,16 +3,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { vveData, vveMjop } from '@/lib/mock-data/domio-dashboard'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Home, Users, Euro, Calendar, ClipboardList } from 'lucide-react'
 
 export default function VvEPage() {
-  const reservePercent = Math.min(100, (vveData.reserveFund / vveData.targetReserve) * 100)
+  const { isDemo } = useDashboardUser()
+  const data = isDemo ? vveData : { name: 'Geen VvE', address: '—', units: 0, reserveFund: 0, targetReserve: 0, monthlyContributionPerUnit: 0 }
+  const mjop = isDemo ? vveMjop : []
+  const reservePercent = data.targetReserve > 0 ? Math.min(100, (data.reserveFund / data.targetReserve) * 100) : 0
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{vveData.name}</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">{vveData.address}</p>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{data.name}</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">{data.address}</p>
       </div>
 
       <Tabs defaultValue="overzicht" className="space-y-4">
@@ -46,9 +50,9 @@ export default function VvEPage() {
                 <CardTitle className="text-base">Gebouwinfo</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <p><span className="text-gray-500 dark:text-gray-400">Adres:</span> {vveData.address}</p>
-                <p><span className="text-gray-500 dark:text-gray-400">Aantal eenheden:</span> {vveData.units}</p>
-                <p><span className="text-gray-500 dark:text-gray-400">Maandelijkse bijdrage per appartement:</span> €{vveData.monthlyContributionPerUnit}</p>
+                <p><span className="text-gray-500 dark:text-gray-400">Adres:</span> {data.address}</p>
+                <p><span className="text-gray-500 dark:text-gray-400">Aantal eenheden:</span> {data.units}</p>
+                <p><span className="text-gray-500 dark:text-gray-400">Maandelijkse bijdrage per appartement:</span> €{data.monthlyContributionPerUnit}</p>
               </CardContent>
             </Card>
             <Card>
@@ -57,10 +61,10 @@ export default function VvEPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  €{vveData.reserveFund.toLocaleString('nl-NL')}
+                  €{data.reserveFund.toLocaleString('nl-NL')}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Streefbedrag €{vveData.targetReserve.toLocaleString('nl-NL')}
+                  Streefbedrag €{data.targetReserve.toLocaleString('nl-NL')}
                 </p>
                 <div className="mt-3 h-2 w-full rounded-full bg-gray-200 dark:bg-neutral-700 overflow-hidden">
                   <div className="h-full rounded-full bg-[#163300] dark:bg-[#9FE870]" style={{ width: `${reservePercent}%` }} />
@@ -82,7 +86,7 @@ export default function VvEPage() {
         <TabsContent value="leden">
           <Card>
             <CardHeader>
-              <CardTitle>Leden ({vveData.units} appartementen)</CardTitle>
+              <CardTitle>Leden ({data.units} appartementen)</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 dark:text-gray-400">Lijst van VvE-leden en eigenaren. (Mock: 6 leden)</p>
@@ -120,7 +124,7 @@ export default function VvEPage() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
-                {vveMjop.map((item) => (
+                {mjop.map((item: typeof vveMjop[0]) => (
                   <li key={item.year} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-neutral-800 last:border-0">
                     <span className="font-medium">{item.year}: {item.description}</span>
                     <span className="text-[#163300] dark:text-[#9FE870] font-medium">€{item.amount.toLocaleString('nl-NL')}</span>

@@ -40,7 +40,8 @@ import {
   BookOpen,
   AlertTriangle,
   ClipboardCheck,
-  HardDrive
+  HardDrive,
+  HelpCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -281,7 +282,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
                         <button
                           type="button"
-                          onClick={() => collapsed ? router.push(item.children![0].href) : toggleItem(itemId)}
+                          onClick={() => router.push(item.children![0].href)}
                           className={cn(
                             "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                             collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
@@ -391,6 +392,31 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                 })}
               </ul>
             </nav>
+          </div>
+
+          {/* Hulp - subtiel onderaan, geen apart blok */}
+          <div className={cn(
+            "flex-shrink-0 transition-all duration-300",
+            collapsed ? "p-2" : "px-3 py-2"
+          )}>
+            <Link
+              href="/contact"
+              className={cn(
+                "flex items-center gap-2 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors text-gray-800 dark:text-neutral-200",
+                collapsed && "w-10 h-10 min-w-0 justify-center p-2.5"
+              )}
+              title={collapsed ? "Hulp nodig?" : undefined}
+            >
+              <HelpCircle className="shrink-0 size-5 w-5 h-5" />
+              {!collapsed && <span className="text-sm flex-1">Hulp nodig?</span>}
+              {!collapsed && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-normal shrink-0">Live</span>
+              )}
+              <span className="relative shrink-0">
+                <span className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-brand-accent animate-ping opacity-60" aria-hidden />
+                <span className="relative block w-1.5 h-1.5 rounded-full bg-brand-accent" />
+              </span>
+            </Link>
           </div>
           
           {/* 30 dagen gratis blokje - Only visible after sidebar animation completes */}

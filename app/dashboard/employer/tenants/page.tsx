@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -30,6 +30,8 @@ import {
   Building2,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { leaseQueries } from '@/lib/supabase/queries'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,14 +46,67 @@ const PORTFOLIO_NAV = [
   { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
 ]
 
+type TenantRow = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  propertyName: string
+  monthlyRent: number
+  endDate: string | null
+  status: string
+  balance?: number
+}
+
 export default function TenantsPage() {
   const router = useRouter()
+  const { user, isDemo } = useDashboardUser()
   const [searchQuery, setSearchQuery] = useState('')
+  const [tenants, setTenants] = useState<TenantRow[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredTenants = mockTenants.filter(tenant =>
+  useEffect(() => {
+    if (isDemo) {
+      setTenants(mockTenants.map(t => ({
+        id: t.id,
+        name: t.name,
+        email: t.email,
+        phone: t.phone ?? '',
+        propertyName: t.property?.name ?? '',
+        monthlyRent: t.lease?.monthlyRent ?? 0,
+        endDate: t.lease?.endDate ?? null,
+        status: t.status ?? 'actief',
+        balance: t.balance ?? 0,
+      })))
+      setLoading(false)
+      return
+    }
+    if (!user?.id) {
+      setLoading(false)
+      return
+    }
+    leaseQueries.getByOwner(user.id).then((leases) => {
+      const rows: TenantRow[] = (leases || [])
+        .filter((l: any) => l.status === 'actief' && l.tenants)
+        .map((l: any) => ({
+          id: l.tenants?.id ?? l.id,
+          name: l.tenants?.full_name ?? '',
+          email: l.tenants?.email ?? '',
+          phone: l.tenants?.phone ?? '',
+          propertyName: l.units?.properties?.name ?? '',
+          monthlyRent: l.monthly_rent ?? 0,
+          endDate: l.end_date ?? null,
+          status: l.status ?? 'actief',
+        }))
+      setTenants(rows)
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [user?.id, isDemo])
+
+  const filteredTenants = tenants.filter(tenant =>
     tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tenant.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tenant.property.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (tenant.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.propertyName.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const getBalanceBadge = (balance: number) => {
@@ -62,6 +117,17 @@ export default function TenantsPage() {
     } else {
       return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-500">Teveel betaald</Badge>
     }
+  }
+
+  if (loading) {
+    return (
+      <>
+        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
+        <div className="flex items-center justify-center min-h-[200px]">
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -152,17 +218,17 @@ export default function TenantsPage() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Home className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm">{tenant.property.name}</span>
+                            <span className="text-sm">{tenant.propertyName}</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">€{tenant.lease?.monthlyRent?.toLocaleString('nl-NL') || '0'}/maand</div>
-                            <div className="text-gray-500">Tot {tenant.lease?.endDate ? new Date(tenant.lease.endDate).toLocaleDateString('nl-NL') : 'N/A'}</div>
+                            <div className="font-medium">€{tenant.monthlyRent?.toLocaleString('nl-NL') || '0'}/maand</div>
+                            <div className="text-gray-500">Tot {tenant.endDate ? new Date(tenant.endDate).toLocaleDateString('nl-NL') : 'N/A'}</div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {tenant.balance !== 0 && (
+                          {tenant.balance !== 0 && tenant.balance !== undefined && (
                             <div className="flex items-center gap-1">
                               <Euro className="h-4 w-4 text-gray-400" />
                               <span className={`font-medium ${tenant.balance < 0 ? 'text-red-600' : 'text-green-600'}`}>
@@ -170,7 +236,7 @@ export default function TenantsPage() {
                               </span>
                             </div>
                           )}
-                          {getBalanceBadge(tenant.balance)}
+                          {getBalanceBadge(tenant.balance ?? 0)}
                         </TableCell>
                         <TableCell>
                           <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">

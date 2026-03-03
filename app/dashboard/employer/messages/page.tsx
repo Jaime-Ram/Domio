@@ -5,19 +5,22 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MessageSquare, Search, Send } from 'lucide-react'
 import { conversations } from '@/lib/mock-data/domio-dashboard'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 export default function MessagesPage() {
-  const [selectedId, setSelectedId] = useState<string | null>(conversations[0]?.id ?? null)
+  const { isDemo } = useDashboardUser()
+  const convos = isDemo ? conversations : []
+  const [selectedId, setSelectedId] = useState<string | null>(convos[0]?.id ?? null)
   const [search, setSearch] = useState('')
 
-  const filtered = conversations.filter(
+  const filtered = convos.filter(
     (c) =>
       c.tenantName.toLowerCase().includes(search.toLowerCase()) ||
       c.address.toLowerCase().includes(search.toLowerCase())
   )
-  const selected = conversations.find((c) => c.id === selectedId)
+  const selected = convos.find((c) => c.id === selectedId)
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] min-h-[500px]">

@@ -49,6 +49,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { mockDocuments, mockProperties } from '@/lib/mock-data/vastgoed'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import {
@@ -60,7 +61,11 @@ import {
 
 export default function DocumentsPage() {
   const router = useRouter()
+  const { isDemo } = useDashboardUser()
   const [searchQuery, setSearchQuery] = useState('')
+
+  const documents = isDemo ? mockDocuments : []
+  const properties = isDemo ? mockProperties : []
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
 
@@ -108,7 +113,7 @@ export default function DocumentsPage() {
     return streetMatch && cityMatch ? 2 : 0
   }
 
-  const filteredDocuments = mockDocuments.filter(doc => {
+  const filteredDocuments = documents.filter((doc: typeof mockDocuments[0]) => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesType = typeFilter === 'all' || doc.type === typeFilter
     return matchesSearch && matchesType
@@ -182,7 +187,7 @@ export default function DocumentsPage() {
 
       const extractedAddress = typeof data.propertyAddress === 'string' ? normalizeAddress(data.propertyAddress) : ''
       if (extractedAddress) {
-        const scored = mockProperties
+        const scored = properties
           .map((property) => ({
             id: property.id,
             score: getAddressScore(normalizeAddress(property.address), extractedAddress),
@@ -321,7 +326,7 @@ export default function DocumentsPage() {
   }
 
   // Calculate stats
-  const docsByType = mockDocuments.reduce((acc, doc) => {
+  const docsByType = documents.reduce((acc, doc) => {
     acc[doc.type] = (acc[doc.type] || 0) + 1
     return acc
   }, {} as Record<string, number>)
@@ -366,7 +371,7 @@ export default function DocumentsPage() {
                         extractedData={extractedData || {}}
                         isLoading={isExtracting}
                         error={extractionError}
-                        properties={mockProperties.map((property) => ({
+                        properties={properties.map((property: typeof mockProperties[0]) => ({
                           id: property.id,
                           name: property.name,
                           address: property.address,
@@ -594,7 +599,7 @@ export default function DocumentsPage() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Totaal</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{mockDocuments.length}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{documents.length}</p>
                   </div>
                 </CardContent>
               </Card>

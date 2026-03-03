@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Menu, Bell, User, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
+import { Menu, Bell, User, Zap, Building2, Users, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, ChevronRight } from 'lucide-react'
 import { GlobalSearch } from './global-search'
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { notifications } from '@/lib/mock-data/domio-dashboard'
+import { notifications as mockNotifications } from '@/lib/mock-data/domio-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { signOut } from '@/lib/supabase/auth'
 
@@ -39,18 +39,27 @@ function clearDemoCookie() {
 }
 
 export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHeaderProps) {
-  const { profile, user, isDemo } = useDashboardUser()
-  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Gebruiker'
+  const { profile, user, isDemo, loading } = useDashboardUser()
+  const notifications = isDemo ? mockNotifications : []
+  const userName = profile?.full_name || user?.email?.split('@')[0] || (loading ? 'Laden...' : 'Gebruiker')
   const userEmail = user?.email || profile?.email || ''
   const userRole = profile?.role === 'verhuurder' ? 'Beheerder' : profile?.role === 'huurder' ? 'Bewoner' : 'Admin'
   const avatarInitials = getInitials(profile?.full_name ?? null, userEmail || '')
   const unreadCount = 0
 
   const dropdownContentClass =
-    'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden'
-  const quickActionBtnClass =
-    'flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors'
-  const quickActionIconClass = 'w-10 h-10 rounded-full bg-[#163300] flex items-center justify-center'
+    'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden min-w-[260px]'
+  const quickActionItemClass =
+    'flex w-full items-center gap-3 py-3 px-4 text-left cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/80 active:bg-gray-100 dark:active:bg-neutral-700 transition-colors rounded-block focus:bg-gray-50 dark:focus:bg-neutral-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2'
+  const quickActionIconWrap = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800'
+  const quickActionIconClass = 'h-5 w-5 text-brand-primary dark:text-brand-accent'
+
+  const quickActions = [
+    { label: 'Nieuw pand', desc: 'Voeg pand toe aan portefeuille', icon: Building2, href: '/dashboard/employer/portfolio/properties/new' },
+    { label: 'Huurders', desc: 'Bekijk en beheer huurders', icon: Users, href: '/dashboard/employer/tenants' },
+    { label: 'Facturatie', desc: 'Facturen en betalingen', icon: FileText, href: '/dashboard/employer/financial' },
+    { label: 'Onderhoud', desc: 'Tickets en meldingen', icon: Wrench, href: '/dashboard/employer/maintenance' },
+  ]
 
   return (
     <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
@@ -78,40 +87,33 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 px-4 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#163300] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
+                  className="h-10 px-4 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
                 >
                   <Zap className="h-4 w-4 shrink-0" />
                   <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className={dropdownContentClass}>
-                <div className="p-4">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">Snelle acties</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Building2 className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Nieuw pand</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Huurder</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Factuur</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Wrench className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Onderhoud</span>
-                    </button>
+                <div className="p-wise-sm">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-wise-xs px-1">Snelle acties</p>
+                  <div className="space-y-0.5">
+                    {quickActions.map((a) => {
+                      const Icon = a.icon
+                      return (
+                        <DropdownMenuItem key={a.href} asChild>
+                          <Link href={a.href} className={quickActionItemClass}>
+                            <div className={quickActionIconWrap}>
+                              <Icon className={quickActionIconClass} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{a.label}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{a.desc}</div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" aria-hidden />
+                          </Link>
+                        </DropdownMenuItem>
+                      )
+                    })}
                   </div>
                 </div>
               </DropdownMenuContent>
@@ -128,39 +130,32 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-[#163300] dark:text-[#9FE870] hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
+                  className="h-10 w-10 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
                 >
                   <Zap className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className={dropdownContentClass}>
-                <div className="p-4">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">Snelle acties</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Building2 className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Nieuw pand</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Huurder</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Factuur</span>
-                    </button>
-                    <button className={quickActionBtnClass}>
-                      <div className={quickActionIconClass}>
-                        <Wrench className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">Onderhoud</span>
-                    </button>
+                <div className="p-wise-sm">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-wise-xs px-1">Snelle acties</p>
+                  <div className="space-y-0.5">
+                    {quickActions.map((a) => {
+                      const Icon = a.icon
+                      return (
+                        <DropdownMenuItem key={a.href} asChild>
+                          <Link href={a.href} className={quickActionItemClass}>
+                            <div className={quickActionIconWrap}>
+                              <Icon className={quickActionIconClass} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{a.label}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{a.desc}</div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" aria-hidden />
+                          </Link>
+                        </DropdownMenuItem>
+                      )
+                    })}
                   </div>
                 </div>
               </DropdownMenuContent>
@@ -187,12 +182,12 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className={dropdownContentClass}>
-                <div className="px-4 py-3 border-b border-gray-200/80 dark:border-neutral-700">
+                <div className="px-wise-sm py-wise-sm border-b border-gray-200/80 dark:border-neutral-700">
                   <div className="flex items-center justify-between gap-2">
                     <DropdownMenuLabel className="p-0 font-semibold text-gray-900 dark:text-white">
                       Notificaties
                     </DropdownMenuLabel>
-                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#163300] dark:text-[#9FE870] font-medium">
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-brand-primary dark:text-brand-accent font-medium rounded-block">
                       Alles gelezen
                     </Button>
                   </div>
@@ -203,14 +198,14 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                     return (
                       <div
                         key={n.id}
-                        className={`px-4 py-3 flex items-start gap-3 cursor-pointer transition-colors ${
+                        className={`px-wise-sm py-3 flex items-start gap-3 cursor-pointer transition-colors rounded-block mx-wise-xs my-0.5 ${
                           n.read === false
                             ? 'bg-gray-50/80 dark:bg-neutral-800/50 hover:bg-gray-100 dark:hover:bg-neutral-800'
                             : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
                         }`}
                       >
-                        <div className="h-9 w-9 rounded-2xl bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                        <div className="h-9 w-9 rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-4 w-4 text-brand-primary dark:text-brand-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">{n.title}</p>
@@ -221,8 +216,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                     )
                   })}
                 </div>
-                <div className="px-4 py-2 border-t border-gray-200/80 dark:border-neutral-700">
-                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-[#163300] dark:text-[#9FE870] rounded-2xl">
+                <div className="px-wise-sm py-wise-xs border-t border-gray-200/80 dark:border-neutral-700">
+                  <Button variant="ghost" size="sm" className="w-full justify-center text-sm font-medium text-brand-primary dark:text-brand-accent rounded-block">
                     Alle notificaties bekijken
                   </Button>
                 </div>
@@ -237,8 +232,11 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                   variant="ghost"
                   className="h-10 pl-2 pr-3 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm gap-2"
                 >
-                  <span className="h-7 w-7 rounded-full bg-[#163300] text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0">
-                    {avatarInitials}
+                  <span className={cn(
+                    "h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0",
+                    loading ? "bg-gray-300 dark:bg-neutral-600 animate-pulse" : "bg-brand-primary dark:bg-brand-primary"
+                  )}>
+                    {loading ? '' : avatarInitials}
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
                     {userName}
@@ -246,13 +244,13 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className={dropdownContentClass}>
-                <div className="px-4 py-4 border-b border-gray-200/80 dark:border-neutral-700">
+                <div className="px-wise-sm py-wise-sm border-b border-gray-200/80 dark:border-neutral-700">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
+                    <div className="h-11 w-11 rounded-full bg-brand-primary text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
                       {avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-xl">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-block">
                         {userRole}
                       </span>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate mt-1">{userName}</p>
@@ -260,41 +258,41 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                     </div>
                   </div>
                 </div>
-                <div className="py-2">
+                <div className="py-wise-xs">
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/employer/settings" className="flex items-center mx-2 rounded-2xl py-2">
-                      <User className="mr-3 h-4 w-4" />
+                    <Link href="/dashboard/employer/settings" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                      <User className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
                       Profiel
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="mx-2 rounded-2xl py-2">
-                    <Bell className="mr-3 h-4 w-4" />
+                  <DropdownMenuItem className="mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 focus:bg-gray-50 dark:focus:bg-neutral-800">
+                    <Bell className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
                     Notificaties
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="mx-2 rounded-2xl py-2">
-                    <Shield className="mr-3 h-4 w-4" />
+                  <DropdownMenuItem className="mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 focus:bg-gray-50 dark:focus:bg-neutral-800">
+                    <Shield className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
                     Beveiliging
                   </DropdownMenuItem>
                 </div>
-                <DropdownMenuSeparator className="my-1" />
-                <div className="py-2">
+                <DropdownMenuSeparator className="my-wise-xs bg-gray-200/80 dark:bg-neutral-700" />
+                <div className="py-wise-xs">
                   <DropdownMenuItem asChild>
-                    <Link href="/privacy" className="flex items-center mx-2 rounded-2xl py-2">
+                    <Link href="/privacy" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
                       Privacy
-                      <ExternalLink className="ml-auto h-3 w-3" />
+                      <ExternalLink className="ml-auto h-3 w-3 text-gray-400" />
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/terms" className="flex items-center mx-2 rounded-2xl py-2">
+                    <Link href="/terms" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
                       Algemene voorwaarden
-                      <ExternalLink className="ml-auto h-3 w-3" />
+                      <ExternalLink className="ml-auto h-3 w-3 text-gray-400" />
                     </Link>
                   </DropdownMenuItem>
                 </div>
-                <DropdownMenuSeparator className="my-1" />
-                <div className="py-2">
+                <DropdownMenuSeparator className="my-wise-xs bg-gray-200/80 dark:bg-neutral-700" />
+                <div className="py-wise-xs">
                   <DropdownMenuItem
-                    className="mx-2 rounded-2xl py-2 text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                    className="mx-wise-sm rounded-block py-2.5 px-wise-sm text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20"
                     onSelect={async () => {
                       if (isDemo) {
                         clearDemoCookie()

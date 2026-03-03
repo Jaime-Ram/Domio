@@ -43,6 +43,8 @@ import {
   mockWwsOptimalisatieAdviezen,
   type WWSSector,
 } from '@/lib/mock-data/wws-compliance'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { documentQueries } from '@/lib/supabase/queries'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 
@@ -55,10 +57,24 @@ const SECTOR_LABELS: Record<WWSSector, string> = {
 function ComplianceTabContent({
   propertyId,
   propertyAddress,
+  isDemo,
 }: {
   propertyId: string
   propertyAddress: string
+  isDemo: boolean
 }) {
+  if (!isDemo) {
+    return (
+      <div className="space-y-6">
+        <Card className={dashboardCardClass()}>
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-500 dark:text-gray-400">Nog geen WWS-compliance gegevens.</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Voeg een puntentelling toe om te beginnen.</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
   const wws = mockWwsObjects.find((o) => o.id === propertyId) ?? mockWwsObjects[0]
   const totaalPunten = mockWwsBreakdown.reduce((s, b) => s + b.punten, 0)
 
@@ -229,10 +245,12 @@ function ComplianceTabContent({
 export default function PropertyDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const { isDemo } = useDashboardUser()
   const propertyId = params.id as string
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [unitLeases, setUnitLeases] = useState<Record<string, any>>({})
+  const [propertyDocuments, setPropertyDocuments] = useState<any[]>([])
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -252,6 +270,15 @@ export default function PropertyDetailPage() {
     }
     loadProperty()
   }, [propertyId, router])
+
+  // Load documents for this property (real accounts only)
+  useEffect(() => {
+    if (isDemo) {
+      setPropertyDocuments(mockDocuments.filter((doc: any) => doc.property?.id === propertyId))
+      return
+    }
+    documentQueries.getByProperty(propertyId).then(setPropertyDocuments).catch(() => setPropertyDocuments([]))
+  }, [propertyId, isDemo])
 
   // Load lease data for each unit
   useEffect(() => {
@@ -304,9 +331,6 @@ export default function PropertyDetailPage() {
     { id: '4', url: '/images/property-4.jpg', alt: 'Badkamer' },
     { id: '5', url: '/images/property-5.jpg', alt: 'Buitenaanzicht' },
   ]
-
-  // Filter documents for this property
-  const propertyDocuments = mockDocuments.filter(doc => doc.property?.id === propertyId)
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -684,7 +708,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 3: Compliance (WWS) */}
               <TabsContent value="compliance">
-                <ComplianceTabContent propertyId={propertyId} propertyAddress={property.address} />
+                <ComplianceTabContent propertyId={propertyId} propertyAddress={property.address} isDemo={isDemo} />
               </TabsContent>
 
               {/* Tab 4: Documenten */}

@@ -32,11 +32,13 @@ import {
 } from 'lucide-react'
 import { mockPayments } from '@/lib/mock-data/vastgoed'
 import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { getUser } from '@/lib/supabase/auth'
 
 export default function TenantDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const { isDemo } = useDashboardUser()
   const tenantId = params.id as string
   
   const [tenant, setTenant] = useState<any>(null)
@@ -97,14 +99,16 @@ export default function TenantDetailPage() {
   // Get current lease info
   const activeLease = leases?.find((l: any) => l.status === 'actief')
   
-  // Generate payment history (mock data - will be replaced with real data)
-  const paymentHistory = [
-    { id: '1', month: 'Januari 2024', year: 2024, amount: activeLease?.monthly_rent || 0, paidOn: '2024-01-01', status: 'Betaald' },
-    { id: '2', month: 'December 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-12-01', status: 'Betaald' },
-    { id: '3', month: 'November 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-11-03', status: 'Te laat' },
-    { id: '4', month: 'Oktober 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-10-01', status: 'Betaald' },
-    { id: '5', month: 'September 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: null, status: 'Openstaand' },
-  ]
+  // Payment history: mock in demo, empty for real accounts (would use paymentQueries by tenant)
+  const paymentHistory = isDemo
+    ? [
+        { id: '1', month: 'Januari 2024', year: 2024, amount: activeLease?.monthly_rent || 0, paidOn: '2024-01-01', status: 'Betaald' },
+        { id: '2', month: 'December 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-12-01', status: 'Betaald' },
+        { id: '3', month: 'November 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-11-03', status: 'Te laat' },
+        { id: '4', month: 'Oktober 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: '2023-10-01', status: 'Betaald' },
+        { id: '5', month: 'September 2023', year: 2023, amount: activeLease?.monthly_rent || 0, paidOn: null, status: 'Openstaand' },
+      ]
+    : []
 
   const totalArrears = paymentHistory
     .filter(p => p.status === 'Openstaand')

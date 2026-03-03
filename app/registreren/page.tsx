@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Mail, AlertCircle } from 'lucide-react'
+import { Mail, AlertCircle, Building2, Home, ChevronRight, ArrowLeft } from 'lucide-react'
 import { signUp, signInWithGoogle } from '@/lib/supabase/auth'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
@@ -17,12 +17,12 @@ const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
 
 export default function RegistrerenPage() {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [role, setRole] = useState<'employee' | 'employer'>('employer')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -38,10 +38,16 @@ export default function RegistrerenPage() {
     setStep(2)
   }
 
+  const handleStep2 = () => {
+    setError(null)
+    setStep(3)
+  }
+
   const handleBack = () => {
     setError(null)
     setEmailExists(false)
-    setStep(1)
+    if (step === 2) setStep(1)
+    else setStep(2)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,20 +56,35 @@ export default function RegistrerenPage() {
     setError(null)
     setEmailExists(false)
     try {
-      if (password !== confirmPassword) {
-        setError('Wachtwoorden komen niet overeen')
-        setLoading(false)
-        return
-      }
       if (password.length < 6) {
         setError('Wachtwoord moet minimaal 6 tekens lang zijn')
         setLoading(false)
         return
       }
-      const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
-      const { data, error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
 
-      // Supabase: lege identities = e-mail bestaat al (bij email confirmation aan)
+      // Proactief controleren of e-mail al bestaat (voorkomt registratie met bestaand account)
+      const checkRes = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      })
+      const { exists } = (await checkRes.json()) as { exists?: boolean }
+      if (exists) {
+        setEmailExists(true)
+        setLoading(false)
+        return
+      }
+
+      const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
+      const { data, error: authError } = await signUp(
+        email,
+        password,
+        name,
+        supaRole as 'verhuurder' | 'huurder',
+        phone.trim() || undefined
+      )
+
+      // Fallback: Supabase retourneert soms succes met lege identities bij bestaand e-mail
       const isDuplicateEmail =
         (authError && /already|exists|registered|eerder/i.test(authError.message)) ||
         (data?.user && (!data.user.identities || data.user.identities.length === 0))
@@ -96,15 +117,33 @@ export default function RegistrerenPage() {
 
   return (
     <AuthPageShell>
-          <h1 className="text-4xl font-bold text-[#163300]">
-            Maak je Domio{'\u2011'}account
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Al een account?{' '}
-            <Link href="/login" className="font-medium text-[#163300] underline underline-offset-2 hover:no-underline">
-              Inloggen
-            </Link>
-          </p>
+          {(step === 2 || step === 3) && !emailExists && !success && (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="mb-4 p-2 -ml-2 rounded-full bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors"
+              aria-label="Terug"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          )}
+          {!emailExists && !success && (
+            <h1 className="text-4xl font-bold text-[#163300]">
+              {step === 1
+                ? "Maak je Domio\u2011account"
+                : step === 2
+                  ? 'Wat voor account wil je aanmaken?'
+                  : 'Vul je gegevens in'}
+            </h1>
+          )}
+          {step === 1 && (
+            <p className="mt-2 text-sm text-gray-600">
+              Al een account?{' '}
+              <Link href="/login" className="font-medium text-[#163300] underline underline-offset-2 hover:no-underline">
+                Inloggen
+              </Link>
+            </p>
+          )}
 
           {error && (
             <Alert variant="destructive" className="mt-4">
@@ -240,9 +279,57 @@ export default function RegistrerenPage() {
                 </SocialButton>
               </div>
               </motion.form>
+            ) : step === 2 ? (
+              <motion.div
+                key="step2"
+                className="mt-8 space-y-6"
+                initial={{ opacity: 0, x: 32 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -32 }}
+                transition={transition}
+              >
+                <p className="text-sm text-gray-500 -mt-2">
+                  Je kunt je rol later nog wijzigen in de instellingen.
+                </p>
+
+                <div className="space-y-0 divide-y divide-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => { setRole('employer'); handleStep2() }}
+                    className="flex w-full items-center gap-4 py-4 pr-2 text-left hover:bg-gray-50/80 active:bg-gray-100 transition-colors -mx-1 px-1 rounded-block"
+                  >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
+                      <Building2 className="h-5 w-5 text-brand-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900">Beheerder</div>
+                      <div className="text-sm text-gray-500 mt-0.5">
+                        Ik beheer panden en huurders
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setRole('employee'); handleStep2() }}
+                    className="flex w-full items-center gap-4 py-4 pr-2 text-left hover:bg-gray-50/80 active:bg-gray-100 transition-colors -mx-1 px-1 rounded-block"
+                  >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
+                      <Home className="h-5 w-5 text-brand-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900">Bewoner</div>
+                      <div className="text-sm text-gray-500 mt-0.5">
+                        Ik woon in een pand
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" aria-hidden />
+                  </button>
+                </div>
+              </motion.div>
             ) : (
               <motion.form
-                key="step2"
+                key="step3"
                 onSubmit={handleSubmit}
                 className="mt-8 space-y-5"
                 initial={{ opacity: 0, x: 32 }}
@@ -250,43 +337,6 @@ export default function RegistrerenPage() {
                 exit={{ opacity: 0, x: -32 }}
                 transition={transition}
               >
-              <button
-                type="button"
-                onClick={handleBack}
-                className="text-sm text-gray-600 hover:text-[#163300] font-medium"
-              >
-                ← Terug
-              </button>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Ik ben een</label>
-                <div className="relative inline-flex w-full rounded-xl border border-gray-300 bg-gray-50 p-1">
-                  <div
-                    className={`absolute top-1 bottom-1 rounded-lg bg-[#163300] transition-all duration-200 ${
-                      role === 'employer' ? 'left-1 right-1/2' : 'left-1/2 right-1'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setRole('employer')}
-                    className={`relative z-10 flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                      role === 'employer' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Beheerder
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('employee')}
-                    className={`relative z-10 flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                      role === 'employee' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Bewoner
-                  </button>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium text-gray-700">Naam</label>
                 <Input
@@ -295,8 +345,20 @@ export default function RegistrerenPage() {
                   placeholder="Je volledige naam"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-12 text-base rounded-xl border-gray-300"
+                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
                   required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="phone" className="text-sm font-medium text-gray-700">Telefoon</label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+31 6 12345678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
                 />
               </div>
 
@@ -308,19 +370,7 @@ export default function RegistrerenPage() {
                   placeholder="Minimaal 6 tekens"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 text-base rounded-xl border-gray-300"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Bevestig wachtwoord</label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Herhaal wachtwoord"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="h-12 text-base rounded-xl border-gray-300"
+                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
                   required
                 />
               </div>
@@ -328,7 +378,7 @@ export default function RegistrerenPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0"
+                className="w-full h-12 rounded-full bg-brand-accent text-brand-primary hover:bg-brand-accent/90 font-semibold text-base border-0"
               >
                 {loading ? 'Bezig...' : 'Registreren'}
               </Button>
