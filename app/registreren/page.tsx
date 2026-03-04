@@ -112,7 +112,7 @@ export default function RegistrerenPage() {
 
       // Fallback: Supabase retourneert soms succes met lege identities bij bestaand e-mail
       const isDuplicateEmail =
-        (authError && /already|exists|registered|eerder/i.test(authError.message)) ||
+        (authError && /already|exists|registered|eerder|duplicate/i.test(authError.message)) ||
         (data?.user && (!data.user.identities || data.user.identities.length === 0))
 
       if (isDuplicateEmail) {

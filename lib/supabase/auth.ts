@@ -15,6 +15,10 @@ export async function signUp(
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   })
+  if (error && (error.message === 'Failed to fetch' || error.message === 'Load failed')) {
+    error.message =
+      'Geen verbinding met de auth-server. Controleer: (1) .env.local heeft NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY, (2) Supabase-project is actief (niet gepauzeerd), (3) internetverbinding.'
+  }
   return { data, error }
 }
 
