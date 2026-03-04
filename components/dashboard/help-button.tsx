@@ -30,7 +30,7 @@ export function HelpButton() {
         <DropdownMenuContent align="end" side="top" className="w-56 mb-2">
           <DropdownMenuItem asChild>
             <Link 
-              href="/dashboard/employer#support" 
+              href="/dashboard/employer/hulp" 
               className="flex items-center gap-2 cursor-pointer"
               onClick={() => setIsOpen(false)}
             >

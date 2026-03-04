@@ -14,7 +14,7 @@ const OPTIONS = [
   {
     icon: MessageCircle,
     label: 'Live chat',
-    href: '/contact',
+    href: '/hulp',
   },
   {
     icon: Phone,
@@ -60,7 +60,7 @@ export function SupportSection() {
             variant="secondary"
             className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm"
           >
-            <Link href="/contact">Neem contact op</Link>
+            <Link href="/hulp">Naar klantenservice</Link>
           </Button>
         </div>
       </div>

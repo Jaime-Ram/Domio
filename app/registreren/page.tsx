@@ -28,13 +28,33 @@ export default function RegistrerenPage() {
   const [success, setSuccess] = useState(false)
   const [emailExists, setEmailExists] = useState(false)
 
-  const handleStep1 = (e: React.FormEvent) => {
+  const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setEmailExists(false)
     if (!email.trim()) {
       setError('Vul je e-mailadres in')
       return
     }
+    setLoading(true)
+    try {
+      const checkRes = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      })
+      if (checkRes.ok) {
+        const json = (await checkRes.json()) as { exists?: boolean }
+        if (json.exists) {
+          setEmailExists(true)
+          setLoading(false)
+          return
+        }
+      }
+    } catch {
+      /* Netwerkfout – ga door naar stap 2, Supabase vangt duplicaat bij submit */
+    }
+    setLoading(false)
     setStep(2)
   }
 
@@ -142,15 +162,6 @@ export default function RegistrerenPage() {
                   : 'Vul je gegevens in'}
             </h1>
           )}
-          {step === 1 && (
-            <p className="mt-2 text-sm text-gray-600">
-              Al een account?{' '}
-              <Link href="/login" className="font-medium text-[#163300] underline underline-offset-2 hover:no-underline">
-                Inloggen
-              </Link>
-            </p>
-          )}
-
           {error && (
             <Alert variant="destructive" className="mt-4">
               <AlertDescription>{error}</AlertDescription>
@@ -169,7 +180,7 @@ export default function RegistrerenPage() {
               >
                 <ConfirmationBlock
                   icon={AlertCircle}
-                  title="Dit e{'\u2011'}mailadres bestaat al"
+                  title="Dit e-mailadres is al bij ons bekend"
                   description={
                     <>
                       Er is al een account gekoppeld aan <strong className="text-gray-900">{email}</strong>. Log in met je wachtwoord of vraag een nieuw wachtwoord aan.
@@ -226,9 +237,10 @@ export default function RegistrerenPage() {
               </div>
               <Button
                 type="submit"
+                disabled={loading}
                 className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
               >
-                Volgende
+                {loading ? 'Bezig...' : 'Volgende'}
               </Button>
 
               <div className="relative pt-2">

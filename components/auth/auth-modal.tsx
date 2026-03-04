@@ -35,7 +35,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [role, setRole] = useState<'employee' | 'employer'>('employer')
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

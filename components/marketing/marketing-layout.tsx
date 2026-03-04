@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
-import { ArrowUpRight, Menu, X, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, HelpCircle } from 'lucide-react'
+import { ArrowUpRight, Menu, X, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, HelpCircle, MessageCircle } from 'lucide-react'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 
@@ -150,13 +150,13 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
           <div className="absolute inset-x-0 top-0 bg-white" style={{ opacity: helpMenuOpen ? 1 : 0, pointerEvents: helpMenuOpen ? 'auto' : 'none', transition: 'opacity 200ms ease-out' }} aria-hidden={!helpMenuOpen}>
             <div className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4 place-content-start md:min-h-[200px]">
-                <div className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start">
-                  <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                <Link href="/hulp" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start">
+                  <MessageCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#163300]">Support</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Stel je vragen</p>
+                    <p className="text-sm font-semibold text-[#163300]">Klantenservice</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Live chat, telefoon &amp; e-mail</p>
                   </div>
-                </div>
+                </Link>
                 <Link href="/faq" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
                   <HelpCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
                   <div className="min-w-0">
@@ -235,7 +235,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                 <Link href="/#features" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Functies</Link>
                 <Link href="/#pricing" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Prijzen</Link>
                 <Link href="/blog" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Kennisbank</Link>
-                <Link href="/contact" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]" onClick={() => setMobileMenuOpen(false)}>Hulp & Contact</Link>
+                <Link href="/hulp" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]" onClick={() => setMobileMenuOpen(false)}>Hulp & Contact</Link>
               </div>
               <div className="pt-2 mb-4">
                 <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">

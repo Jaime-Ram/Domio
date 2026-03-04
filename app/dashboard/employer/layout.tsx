@@ -19,7 +19,7 @@ export default function EmployerDashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [enterDone, setEnterDone] = useState(false)
 
-  // Soepele fade-in na laden (o.a. na demo-loading)
+  // Soepele fade-in na laden (demo én normaal inloggen)
   useEffect(() => {
     const t = requestAnimationFrame(() => {
       setTimeout(() => setEnterDone(true), 20)
@@ -41,9 +41,9 @@ export default function EmployerDashboardLayout({
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
-      {/* Groene overlay: zelfde kleur als laadscherm, fadet weg voor soepele overgang */}
+      {/* Groene overlay: fixed = altijd vol scherm, ook bij inloggen */}
       <div
-        className="pointer-events-none absolute inset-0 z-10 bg-[#9FE870] transition-opacity"
+        className="pointer-events-none fixed inset-0 z-[100] bg-[#9FE870] transition-opacity"
         style={{
           opacity: enterDone ? 0 : 1,
           transitionDuration: `${ENTER_DURATION_MS}ms`,

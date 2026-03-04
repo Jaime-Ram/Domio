@@ -11,10 +11,12 @@ import { HeroSection } from '@/components/marketing/hero-section'
 import { SupportSection } from '@/components/marketing/support-section'
 import { FAQSection } from '@/components/marketing/faq-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle, MessageCircle } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CONTACT_EMAIL } from '@/lib/site-config'
+import { supabase } from '@/lib/supabase/client'
+import { getProfile } from '@/lib/supabase/profile'
 
 // Lazy load heavy sections for better initial load
 const PricingSection = lazy(() => import('@/components/marketing/pricing-section').then(m => ({ default: m.PricingSection })))
@@ -41,6 +43,27 @@ export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(true)
   const lastScrollY = useRef(0)
   const scrollThreshold = 80
+  const [userName, setUserName] = useState<string | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const profile = await getProfile(user.id)
+        const name = profile?.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? user.email?.split('@')[0] ?? 'daar'
+        setUserName(name)
+      } else {
+        setUserName(null)
+      }
+      setAuthLoading(false)
+    }
+    void fetchUser()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      void fetchUser()
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -136,20 +159,37 @@ export default function Home() {
               </div>
             </nav>
 
-            {/* Desktop: Auth Buttons (Right) */}
+            {/* Desktop: Auth / User (Right) */}
             <div className="hidden md:flex items-center gap-3 ml-auto">
-                <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#163300] rounded-full px-4 py-2">
-                  <Link href="/login">Inloggen</Link>
-                </Button>
-                <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
-                  <Link href="/registreren">Registreren</Link>
-                </Button>
+              {!authLoading && userName ? (
+                <>
+                  <span className="text-sm font-medium text-gray-700">Hallo, {userName}</span>
+                  <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
+                    <Link href="/mijn-domio">Mijn Domio</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#163300] rounded-full px-4 py-2">
+                    <Link href="/login">Inloggen</Link>
+                  </Button>
+                  <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
+                    <Link href="/registreren">Registreren</Link>
+                  </Button>
+                </>
+              )}
           </div>
           
-            {/* Mobile: Account Icon (Right) */}
-          <Button asChild variant="ghost" size="icon" className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0" aria-label="Account">
+            {/* Mobile: Account / User (Right) */}
+          {!authLoading && userName ? (
+            <Button asChild variant="secondary" size="sm" className="md:hidden rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold">
+              <Link href="/mijn-domio">Mijn Domio</Link>
+            </Button>
+          ) : (
+            <Button asChild variant="ghost" size="icon" className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0" aria-label="Account">
               <Link href="/login"><User className="h-6 w-6" /></Link>
-          </Button>
+            </Button>
+          )}
           </div>
 
           {/* Blur backdrop wanneer dropdown open – alleen onder de header, lichte blur */}
@@ -219,14 +259,14 @@ export default function Home() {
               aria-hidden={!helpMenuOpen}
             >
               <div key={helpMenuOpen ? 'h-open' : 'h-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4 place-content-start md:min-h-[200px]">
-                  <div className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '0ms' }}>
-                    <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                <div className="grid grid-cols-2 gap-x-8 gap-y-1 place-content-start md:min-h-[200px]">
+                  <Link href="/hulp" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '0ms' }}>
+                    <MessageCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#163300]">Support</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Stel je vragen</p>
+                      <p className="text-sm font-semibold text-[#163300]">Klantenservice</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Live chat, telefoon &amp; e-mail</p>
                     </div>
-                  </div>
+                  </Link>
                   <Link href="/faq" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '25ms' }}>
                     <HelpCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
                     <div className="min-w-0">
@@ -310,21 +350,27 @@ export default function Home() {
 
                   {/* Sidebar Navigation */}
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-                    {/* Proefperiode Card - Smaller */}
+                    {/* Proefperiode Card of Welkom - Smaller */}
                     <div className="bg-[#163300] rounded-xl p-4 mb-4 relative overflow-hidden">
                       <div className="relative z-10">
-                        <h3 className="text-lg font-semibold text-white mb-1">
-                          Probeer Domio
-                        </h3>
-                        <p className="text-base font-semibold text-white mb-2">
-                          30 dagen gratis
-                        </p>
-                        <p className="text-xs text-white/90 mb-3">
-                          Geen creditcard nodig, op elk moment opzegbaar.
-                        </p>
-                        <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
-                          <Link href="/registreren" onClick={() => setMobileMenuOpen(false)}>Registreren</Link>
-                        </Button>
+                        {userName ? (
+                          <>
+                            <h3 className="text-lg font-semibold text-white mb-1">Hallo, {userName}</h3>
+                            <p className="text-xs text-white/90 mb-3">Ga direct naar je dashboard</p>
+                            <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
+                              <Link href="/mijn-domio" onClick={() => setMobileMenuOpen(false)}>Mijn Domio</Link>
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="text-lg font-semibold text-white mb-1">Probeer Domio</h3>
+                            <p className="text-base font-semibold text-white mb-2">30 dagen gratis</p>
+                            <p className="text-xs text-white/90 mb-3">Geen creditcard nodig, op elk moment opzegbaar.</p>
+                            <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
+                              <Link href="/registreren" onClick={() => setMobileMenuOpen(false)}>Registreren</Link>
+                            </Button>
+                          </>
+                        )}
                       </div>
                       {/* Geometric decorative element - same style as 30 dagen gratis section, subtle in quiet corner */}
                       <GeometricShapes 
@@ -368,11 +414,17 @@ export default function Home() {
             </Link>
                      </div>
 
-                    {/* Inloggen Button */}
+                    {/* Inloggen / Mijn Domio Button */}
                     <div className="pt-2 mb-4">
-                <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Inloggen</Link>
-                </Button>
+                      {userName ? (
+                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
+                          <Link href="/mijn-domio" onClick={() => setMobileMenuOpen(false)}>Mijn Domio</Link>
+                        </Button>
+                      ) : (
+                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
+                          <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Inloggen</Link>
+                        </Button>
+                      )}
                     </div>
 
                     {/* Footer Links - Light gray */}

@@ -155,7 +155,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       icon: MessageSquare,
     },
     {
-      label: 'Documenten',
+      label: 'Drive',
       href: '/dashboard/employer/documents',
       icon: HardDrive,
     },
@@ -400,7 +400,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             collapsed ? "p-2" : "px-3 py-2"
           )}>
             <Link
-              href="/contact"
+              href="/dashboard/employer/hulp"
               className={cn(
                 "flex items-center gap-2 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors text-gray-800 dark:text-neutral-200",
                 collapsed && "w-10 h-10 min-w-0 justify-center p-2.5"

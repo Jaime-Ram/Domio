@@ -337,7 +337,7 @@ export default function DocumentsPage() {
             <div className="mb-8 flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  Documenten
+                  Drive
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400">
                   Al je documenten
@@ -685,7 +685,7 @@ export default function DocumentsPage() {
             {/* Documents Table */}
             <Card className={dashboardCardClass()}>
               <CardHeader>
-                <CardTitle>Alle Documenten ({filteredDocuments.length})</CardTitle>
+                <CardTitle>Alle documenten ({filteredDocuments.length})</CardTitle>
                 <CardDescription>Bekijk, download of verwijder documenten</CardDescription>
               </CardHeader>
               <CardContent>

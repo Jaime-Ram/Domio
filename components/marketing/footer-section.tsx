@@ -70,8 +70,16 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
+                    href="/hulp"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                  >
+                    Hulp
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/contact"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300] !text-gray-600"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
                   >
                     Contact
                   </Link>

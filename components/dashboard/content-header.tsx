@@ -87,9 +87,9 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 px-4 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
+                  className="group h-10 px-4 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
                 >
-                  <Zap className="h-4 w-4 shrink-0" />
+                  <Zap className="h-4 w-4 shrink-0 transition-colors group-hover:text-[#9FE870] group-hover:stroke-[#9FE870] group-hover:fill-[#9FE870] dark:group-hover:text-[#9FE870] dark:group-hover:stroke-[#9FE870] dark:group-hover:fill-[#9FE870]" />
                   <span>Snelle acties</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -130,9 +130,9 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
+                  className="group h-10 w-10 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
                 >
-                  <Zap className="h-4 w-4" />
+                  <Zap className="h-4 w-4 transition-colors group-hover:text-[#9FE870] group-hover:stroke-[#9FE870] group-hover:fill-[#9FE870] dark:group-hover:text-[#9FE870] dark:group-hover:stroke-[#9FE870] dark:group-hover:fill-[#9FE870]" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className={dropdownContentClass}>
@@ -244,55 +244,60 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className={dropdownContentClass}>
-                <div className="px-wise-sm py-wise-sm border-b border-gray-200/80 dark:border-neutral-700">
+                {/* User header – clean, Wise-achtige hiërarchie */}
+                <div className="p-wise-sm">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 w-11 rounded-full bg-brand-primary text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">
+                    <div className="h-11 w-11 shrink-0 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center">
                       {avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 rounded-block">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{userEmail}</p>
+                      <span className="inline-block mt-1.5 text-[11px] font-medium text-[#163300] dark:text-[#9FE870]">
                         {userRole}
                       </span>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate mt-1">{userName}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>
                     </div>
                   </div>
                 </div>
-                <div className="py-wise-xs">
+                <DropdownMenuSeparator className="bg-gray-100 dark:bg-neutral-800" />
+                {/* Navigatie – icon + label, consistente padding */}
+                <div className="p-wise-xs">
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/employer/settings" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                      <User className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
+                    <Link href="/dashboard/employer/settings" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
+                      <User className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
                       Profiel
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 focus:bg-gray-50 dark:focus:bg-neutral-800">
-                    <Bell className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
-                    Notificaties
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/employer/settings" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
+                      <Bell className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
+                      Notificaties
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 focus:bg-gray-50 dark:focus:bg-neutral-800">
-                    <Shield className="mr-3 h-4 w-4 text-brand-primary dark:text-brand-accent" />
+                  <DropdownMenuItem className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 focus:bg-gray-50 dark:focus:bg-neutral-800/80">
+                    <Shield className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
                     Beveiliging
                   </DropdownMenuItem>
                 </div>
-                <DropdownMenuSeparator className="my-wise-xs bg-gray-200/80 dark:bg-neutral-700" />
-                <div className="py-wise-xs">
+                <DropdownMenuSeparator className="bg-gray-100 dark:bg-neutral-800" />
+                <div className="p-wise-xs">
                   <DropdownMenuItem asChild>
-                    <Link href="/privacy" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                    <Link href="/privacy" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-gray-900 dark:hover:text-white">
+                      <ExternalLink className="h-4 w-4 shrink-0 text-gray-400" />
                       Privacy
-                      <ExternalLink className="ml-auto h-3 w-3 text-gray-400" />
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/terms" className="flex items-center w-full mx-wise-sm rounded-block py-2.5 px-wise-sm hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                    <Link href="/terms" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-gray-900 dark:hover:text-white">
+                      <ExternalLink className="h-4 w-4 shrink-0 text-gray-400" />
                       Algemene voorwaarden
-                      <ExternalLink className="ml-auto h-3 w-3 text-gray-400" />
                     </Link>
                   </DropdownMenuItem>
                 </div>
-                <DropdownMenuSeparator className="my-wise-xs bg-gray-200/80 dark:bg-neutral-700" />
-                <div className="py-wise-xs">
+                <DropdownMenuSeparator className="bg-gray-100 dark:bg-neutral-800" />
+                <div className="p-wise-xs">
                   <DropdownMenuItem
-                    className="mx-wise-sm rounded-block py-2.5 px-wise-sm text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20"
+                    className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50/80 dark:hover:bg-red-950/30 focus:bg-red-50/80 dark:focus:bg-red-950/30"
                     onSelect={async () => {
                       if (isDemo) {
                         clearDemoCookie()
@@ -303,7 +308,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                       }
                     }}
                   >
-                    <LogOut className="mr-3 h-4 w-4" />
+                    <LogOut className="h-4 w-4 shrink-0" />
                     {isDemo ? 'Demo verlaten' : 'Uitloggen'}
                   </DropdownMenuItem>
                 </div>

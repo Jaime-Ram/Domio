@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { KeyRound } from 'lucide-react'
@@ -17,6 +18,7 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [transitioning, setTransitioning] = useState(false)
@@ -156,6 +158,20 @@ function LoginContent() {
                 className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
                 required
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+              >
+                Onthoud mij
+              </label>
             </div>
 
             <Button

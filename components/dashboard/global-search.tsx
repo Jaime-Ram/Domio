@@ -53,11 +53,11 @@ export function GlobalSearch() {
     { id: 'payment-view', label: 'Betalingen bekijken', category: 'Financieel', keywords: ['betaling', 'payment', 'bekijken', 'transacties'], icon: CreditCard, action: () => router.push('/dashboard/employer/financial/payments'), description: 'Bekijk alle betalingen' },
     { id: 'financial-reports', label: 'Financiële rapporten', category: 'Financieel', keywords: ['rapport', 'report', 'financieel', 'overzicht', 'stats'], icon: BarChart3, action: () => router.push('/dashboard/employer/financial/reports'), description: 'Bekijk financiële rapporten en statistieken' },
     
-    // Documenten
-    { id: 'document-upload', label: 'Document uploaden', category: 'Documenten', keywords: ['document', 'uploaden', 'upload', 'bestand', 'toevoegen'], icon: Plus, action: () => router.push('/dashboard/employer/documents'), description: 'Upload een nieuw document' },
-    { id: 'document-view', label: 'Documenten bekijken', category: 'Documenten', keywords: ['document', 'bekijken', 'bestanden', 'files'], icon: FolderOpen, action: () => router.push('/dashboard/employer/documents'), description: 'Bekijk alle documenten' },
-    { id: 'document-download', label: 'Document downloaden', category: 'Documenten', keywords: ['document', 'downloaden', 'download', 'pdf'], icon: Download, action: () => router.push('/dashboard/employer/documents'), description: 'Download documenten' },
-    { id: 'document-send', label: 'Document verzenden', category: 'Documenten', keywords: ['document', 'verzenden', 'send', 'email', 'sturen'], icon: Send, action: () => router.push('/dashboard/employer/documents'), description: 'Verstuur document via email' },
+    // Drive
+    { id: 'document-upload', label: 'Document uploaden', category: 'Drive', keywords: ['document', 'uploaden', 'upload', 'bestand', 'toevoegen', 'drive'], icon: Plus, action: () => router.push('/dashboard/employer/documents'), description: 'Upload een nieuw document' },
+    { id: 'document-view', label: 'Drive bekijken', category: 'Drive', keywords: ['document', 'bekijken', 'bestanden', 'files', 'drive'], icon: FolderOpen, action: () => router.push('/dashboard/employer/documents'), description: 'Bekijk alle documenten' },
+    { id: 'document-download', label: 'Document downloaden', category: 'Drive', keywords: ['document', 'downloaden', 'download', 'pdf', 'drive'], icon: Download, action: () => router.push('/dashboard/employer/documents'), description: 'Download documenten' },
+    { id: 'document-send', label: 'Document verzenden', category: 'Drive', keywords: ['document', 'verzenden', 'send', 'email', 'sturen', 'drive'], icon: Send, action: () => router.push('/dashboard/employer/documents'), description: 'Verstuur document via email' },
     
     // Onderhoud acties
     { id: 'maintenance-assign', label: 'Onderhoud toewijzen', category: 'Onderhoud', keywords: ['onderhoud', 'toewijzen', 'assign', 'leverancier', 'supplier'], icon: Edit, action: () => router.push('/dashboard/employer/maintenance'), description: 'Wijs onderhoud toe aan leverancier' },
@@ -97,7 +97,7 @@ export function GlobalSearch() {
     { id: 'page-maintenance', label: 'Onderhoud', category: 'Pagina\'s', keywords: ['onderhoud', 'maintenance', 'tickets'], icon: Wrench, action: () => router.push('/dashboard/employer/maintenance'), description: 'Bekijk onderhoud' },
     { id: 'page-financial', label: 'Financieel', category: 'Pagina\'s', keywords: ['financieel', 'financial', 'geld', 'facturen'], icon: Euro, action: () => router.push('/dashboard/employer/financial'), description: 'Bekijk financiën' },
     { id: 'page-accounting', label: 'Boekhouden', category: 'Pagina\'s', keywords: ['boekhouden', 'accounting', 'boekhouding'], icon: BookOpen, action: () => router.push('/dashboard/employer/accounting'), description: 'Bekijk boekhouden' },
-    { id: 'page-documents', label: 'Documenten', category: 'Pagina\'s', keywords: ['documenten', 'documents', 'bestanden'], icon: FolderOpen, action: () => router.push('/dashboard/employer/documents'), description: 'Bekijk documenten' },
+    { id: 'page-documents', label: 'Drive', category: 'Pagina\'s', keywords: ['drive', 'documenten', 'documents', 'bestanden'], icon: FolderOpen, action: () => router.push('/dashboard/employer/documents'), description: 'Bekijk alle documenten' },
     { id: 'page-compliance', label: 'Compliance', category: 'Pagina\'s', keywords: ['compliance', 'naleving'], icon: ShieldCheck, action: () => router.push('/dashboard/employer/compliance'), description: 'Bekijk compliance' },
     { id: 'page-settings', label: 'Instellingen', category: 'Pagina\'s', keywords: ['instellingen', 'settings', 'configuratie'], icon: Settings, action: () => router.push('/dashboard/employer/settings'), description: 'Bekijk instellingen' },
   ]

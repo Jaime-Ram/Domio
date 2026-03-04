@@ -70,24 +70,21 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
   const fetchUserAndProfile = async () => {
     const { data: { user: u } } = await supabase.auth.getUser()
 
-    // Echte gebruiker: altijd echte data tonen, demo-cookie wissen
-    if (u) {
-      if (typeof document !== 'undefined') {
-        document.cookie = 'domio_demo=; path=/; max-age=0'
-      }
-      setUser(u)
-      setIsDemo(false)
-      const p = await getProfile(u.id)
-      setProfile(p)
-      setLoading(false)
-      return
-    }
-
-    // Geen echte sessie: demo-modus als cookie aanwezig
+    // Demo-modus heeft voorrang: als gebruiker via /demo kwam, toon demo (ook als ingelogd)
     if (isDemoMode()) {
       setUser(getDemoUser())
       setProfile(getDemoProfile())
       setIsDemo(true)
+      setLoading(false)
+      return
+    }
+
+    // Echte gebruiker, geen demo: toon eigen data
+    if (u) {
+      setUser(u)
+      setIsDemo(false)
+      const p = await getProfile(u.id)
+      setProfile(p)
       setLoading(false)
       return
     }
