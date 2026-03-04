@@ -21,6 +21,8 @@ interface ContentHeaderProps {
   onMenuClick?: () => void
   /** Sticky offset (e.g. md:top-12 when demo bar is above) */
   stickyOffsetClassName?: string
+  /** Base path voor links (default: /dashboard/employer). Voor demo: /demo/app */
+  basePath?: string
 }
 
 function getInitials(name: string | null, email: string): string {
@@ -38,7 +40,7 @@ function clearDemoCookie() {
   document.cookie = 'domio_demo=; path=/; max-age=0'
 }
 
-export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHeaderProps) {
+export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/employer' }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const notifications = isDemo ? mockNotifications : []
   const userName = profile?.full_name || user?.email?.split('@')[0] || (loading ? 'Laden...' : 'Gebruiker')
@@ -55,10 +57,10 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
   const quickActionIconClass = 'h-5 w-5 text-brand-primary dark:text-brand-accent'
 
   const quickActions = [
-    { label: 'Nieuw pand', desc: 'Voeg pand toe aan portefeuille', icon: Building2, href: '/dashboard/employer/portfolio/properties/new' },
-    { label: 'Huurders', desc: 'Bekijk en beheer huurders', icon: Users, href: '/dashboard/employer/tenants' },
-    { label: 'Facturatie', desc: 'Facturen en betalingen', icon: FileText, href: '/dashboard/employer/financial' },
-    { label: 'Onderhoud', desc: 'Tickets en meldingen', icon: Wrench, href: '/dashboard/employer/maintenance' },
+    { label: 'Nieuw pand', desc: 'Voeg pand toe aan portefeuille', icon: Building2, href: `${basePath}/portfolio/properties/new` },
+    { label: 'Huurders', desc: 'Bekijk en beheer huurders', icon: Users, href: `${basePath}/tenants` },
+    { label: 'Facturatie', desc: 'Facturen en betalingen', icon: FileText, href: `${basePath}/financial` },
+    { label: 'Onderhoud', desc: 'Tickets en meldingen', icon: Wrench, href: `${basePath}/maintenance` },
   ]
 
   return (
@@ -81,7 +83,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
 
         {/* Search + Snelle acties - Desktop */}
         <div className="hidden md:flex flex-1 max-w-2xl items-center gap-3">
-          <GlobalSearch />
+          <GlobalSearch basePath={basePath} />
           <div suppressHydrationWarning>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -123,7 +125,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
 
         {/* Search + Snelle acties - Mobile */}
         <div className="flex md:hidden items-center gap-2 flex-1 min-w-0">
-          <GlobalSearch />
+          <GlobalSearch basePath={basePath} />
           <div suppressHydrationWarning>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -263,13 +265,13 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName }: ContentHea
                 {/* Navigatie – icon + label, consistente padding */}
                 <div className="p-wise-xs">
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/employer/settings" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
+                    <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
                       <User className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
                       Profiel
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard/employer/settings" className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
+                    <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full py-2.5 px-wise-sm rounded-block text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/80 hover:text-[#163300] dark:hover:text-[#9FE870]">
                       <Bell className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
                       Notificaties
                     </Link>

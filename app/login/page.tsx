@@ -42,9 +42,7 @@ function LoginContent() {
       }, 900)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
-      setError(msg === 'Load failed' || msg === 'Failed to fetch'
-        ? 'Kan geen verbinding maken met de server. Controleer je internetverbinding of probeer het later opnieuw.'
-        : msg)
+      setError(msg)
       setLoading(false)
     }
   }

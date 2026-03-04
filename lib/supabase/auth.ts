@@ -21,9 +21,15 @@ export async function signUp(
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-  // Vertaal veelvoorkomende foutmelding naar duidelijk Nederlands
-  if (error && error.message === 'Invalid login credentials') {
-    error.message = 'Onjuist e-mailadres of wachtwoord'
+  if (error) {
+    if (error.message === 'Invalid login credentials') {
+      error.message = 'Onjuist e-mailadres of wachtwoord'
+    }
+    if (error.message === 'Failed to fetch' || error.message === 'Load failed') {
+      error.message =
+        'Geen verbinding met de auth-server. Controleer: (1) .env.local heeft NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY, (2) Supabase-project is actief (niet gepauzeerd), (3) internetverbinding. Fout: ' +
+        error.message
+    }
   }
 
   return { data, error }

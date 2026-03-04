@@ -45,7 +45,7 @@ interface DashboardUserContextValue {
   refetch: () => Promise<void>
 }
 
-const DashboardUserContext = createContext<DashboardUserContextValue>({
+export const DashboardUserContext = createContext<DashboardUserContextValue>({
   user: null,
   profile: null,
   loading: true,
@@ -68,9 +68,8 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
   const [isDemo, setIsDemo] = useState(false)
 
   const fetchUserAndProfile = async () => {
-    const { data: { user: u } } = await supabase.auth.getUser()
+    const { data: { user: u }, error } = await supabase.auth.getUser()
 
-    // Demo-modus heeft voorrang: als gebruiker via /demo kwam, toon demo (ook als ingelogd)
     if (isDemoMode()) {
       setUser(getDemoUser())
       setProfile(getDemoProfile())
@@ -79,7 +78,13 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
       return
     }
 
-    // Echte gebruiker, geen demo: toon eigen data
+    if (error) {
+      setUser(null)
+      setProfile(null)
+      setLoading(false)
+      return
+    }
+
     if (u) {
       setUser(u)
       setIsDemo(false)

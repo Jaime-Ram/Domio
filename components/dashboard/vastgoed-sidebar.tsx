@@ -61,9 +61,11 @@ interface VastgoedSidebarProps {
   onClose?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
+  /** Base path voor links (default: /dashboard/employer). Voor demo: /demo/app */
+  basePath?: string
 }
 
-export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse }: VastgoedSidebarProps) {
+export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/employer' }: VastgoedSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
@@ -72,16 +74,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   // Auto-expand alleen de sectie van de actieve route; maximaal één accordion open
   useEffect(() => {
     const menuItemsWithChildren = [
-      { id: 'portefeuille-accordion', paths: ['/dashboard/employer/portfolio', '/dashboard/employer/tenants'] },
-      { id: 'compliance-accordion', paths: ['/dashboard/employer/compliance'] },
-      { id: 'financieel-accordion', paths: ['/dashboard/employer/financial'] },
-      { id: 'onderhoud-accordion', paths: ['/dashboard/employer/maintenance'] },
+      { id: 'portefeuille-accordion', paths: [`${basePath}/portfolio`, `${basePath}/tenants`] },
+      { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
+      { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
+      { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`] },
     ]
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
       .map(({ id }) => id)
     setOpenItems(toOpen)
-  }, [pathname])
+  }, [pathname, basePath])
 
   // Only show trial block after sidebar animation completes (300ms)
   useEffect(() => {
@@ -110,73 +112,70 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const menuItems: SidebarItem[] = [
     {
       label: 'Dashboard',
-      href: '/dashboard/employer',
+      href: basePath,
       icon: LayoutDashboard,
     },
     {
       label: 'Portefeuille',
       icon: Building2,
       children: [
-        { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
-        { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
+        { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
+        { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
       ],
     },
     {
       label: 'Compliance',
       icon: ShieldCheck,
       children: [
-        { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
-        { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
-        { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+        { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
+        { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
+        { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
       ],
     },
     {
       label: 'Financieel',
       icon: Euro,
       children: [
-        { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
-        { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
-        { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
-        { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
+        { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
+        { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
+        { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
+        { label: 'Bankimport', href: `${basePath}/financial/bankimport`, icon: Scan },
       ],
     },
     {
       label: 'Onderhoud',
       icon: Wrench,
       children: [
-        { label: 'Tickets', href: '/dashboard/employer/maintenance', icon: Wrench },
-        { label: 'Inspecties', href: '/dashboard/employer/maintenance/inspecties', icon: ClipboardCheck },
-        { label: 'Planning', href: '/dashboard/employer/maintenance/planning', icon: Calendar },
+        { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+        { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
+        { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
       ],
     },
     {
       label: 'Communicatie',
-      href: '/dashboard/employer/messages',
+      href: `${basePath}/messages`,
       icon: MessageSquare,
     },
     {
       label: 'Drive',
-      href: '/dashboard/employer/documents',
+      href: `${basePath}/documents`,
       icon: HardDrive,
     },
     {
       label: 'Rapportages',
-      href: '/dashboard/employer/reports',
+      href: `${basePath}/reports`,
       icon: FileCheck,
     },
     {
       label: 'Instellingen',
-      href: '/dashboard/employer/settings',
+      href: `${basePath}/settings`,
       icon: Settings,
     },
   ]
 
   const isActive = (href?: string) => {
     if (!href) return false
-    // Special case: dashboard should only be active on exact match
-    if (href === '/dashboard/employer') {
-      return pathname === href
-    }
+    if (href === basePath) return pathname === href
     return pathname === href || pathname?.startsWith(href + '/')
   }
 
@@ -229,7 +228,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               "flex items-center transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              <Logo width={100} height={28} href="/dashboard/employer" />
+              <Logo width={100} height={28} href={basePath} />
             </div>
             {/* Toggle button and mobile close - Same position as icons when collapsed */}
             <div className={cn(
@@ -400,7 +399,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             collapsed ? "p-2" : "px-3 py-2"
           )}>
             <Link
-              href="/dashboard/employer/hulp"
+              href={`${basePath}/hulp`}
               className={cn(
                 "flex items-center gap-2 py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors text-gray-800 dark:text-neutral-200",
                 collapsed && "w-10 h-10 min-w-0 justify-center p-2.5"

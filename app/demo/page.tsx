@@ -9,18 +9,15 @@ export default function DemoPage() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    router.prefetch('/dashboard/employer')
+    router.prefetch('/demo/app')
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [router])
 
   const handleAnimationComplete = () => {
-    if (typeof document !== 'undefined') {
-      document.cookie = 'domio_demo=1; path=/; max-age=3600'
-    }
     timeoutRef.current = setTimeout(() => {
-      router.replace('/dashboard/employer')
+      router.replace('/demo/app')
     }, 80)
   }
 
