@@ -36,7 +36,7 @@ import {
 } from 'lucide-react'
 import { propertyQueries, unitQueries, leaseQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
-import { mockDocuments } from '@/lib/mock-data/vastgoed'
+import { mockDocuments, mockProperties } from '@/lib/mock-data/vastgoed'
 import {
   mockWwsObjects,
   mockWwsBreakdown,
@@ -245,7 +245,7 @@ function ComplianceTabContent({
 export default function PropertyDetailPage() {
   const router = useRouter()
   const params = useParams()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
   const propertyId = params.id as string
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -255,6 +255,21 @@ export default function PropertyDetailPage() {
   useEffect(() => {
     const loadProperty = async () => {
       try {
+        if (isDemo) {
+          const mock = mockProperties.find((p: any) => p.id === propertyId) ?? mockProperties[0]
+          setProperty({
+            id: mock.id,
+            name: mock.name,
+            address: mock.address,
+            type: mock.type,
+            status: mock.status,
+            postcode: null,
+            city: null,
+            units: [],
+          })
+          setLoading(false)
+          return
+        }
         const { user } = await getUser()
         if (!user) {
           router.push('/login')
@@ -269,7 +284,7 @@ export default function PropertyDetailPage() {
       }
     }
     loadProperty()
-  }, [propertyId, router])
+  }, [propertyId, router, isDemo])
 
   // Load documents for this property (real accounts only)
   useEffect(() => {
@@ -315,7 +330,7 @@ export default function PropertyDetailPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Object niet gevonden
           </h2>
-          <Button onClick={() => router.push('/dashboard/employer/portfolio')}>
+          <Button onClick={() => router.push(`${basePath}/portfolio`)}>
             Terug naar overzicht
           </Button>
         </div>
@@ -351,7 +366,7 @@ export default function PropertyDetailPage() {
             <div className="mb-8">
               <Button 
                 variant="ghost" 
-                onClick={() => router.push('/dashboard/employer/portfolio')}
+                onClick={() => router.push(`${basePath}/portfolio`)}
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -372,7 +387,7 @@ export default function PropertyDetailPage() {
                   {getStatusBadge(property.status)}
                   <Button 
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/edit`)}
+                    onClick={() => router.push(`${basePath}/portfolio/properties/${propertyId}/edit`)}
                   >
                     Bewerken
                   </Button>
@@ -659,7 +674,7 @@ export default function PropertyDetailPage() {
                                     {tenants.map((tenant) => (
                                       <Link
                                         key={tenant.id}
-                                        href={`/dashboard/employer/tenants/${tenant.id}`}
+                                        href={`${basePath}/tenants/${tenant.id}`}
                                         className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
                                       >
                                         <span className="font-medium text-sm text-gray-900 dark:text-white">

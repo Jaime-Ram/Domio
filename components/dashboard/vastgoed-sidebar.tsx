@@ -63,9 +63,11 @@ interface VastgoedSidebarProps {
   onToggleCollapse?: () => void
   /** Base path voor links (default: /dashboard/employer). Voor demo: /demo/app */
   basePath?: string
+  /** Demo-modus: cleaner look, nav grijs zonder rand */
+  demoMode?: boolean
 }
 
-export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/employer' }: VastgoedSidebarProps) {
+export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/employer', demoMode = false }: VastgoedSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
@@ -205,7 +207,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       <div
         data-vastgoed-sidebar
         className={cn(
-          "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] border-e border-gray-200 transform dark:bg-neutral-800 dark:border-neutral-700 rounded-tr-3xl rounded-br-3xl",
+          "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] dark:bg-neutral-800 transform rounded-tr-3xl rounded-br-3xl",
+          !demoMode && "border-e border-gray-200 dark:border-neutral-700",
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
@@ -281,7 +284,13 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                       <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
                         <button
                           type="button"
-                          onClick={() => router.push(item.children![0].href)}
+                          onClick={() => {
+                            if (isOpen) {
+                              toggleItem(itemId)
+                            } else {
+                              router.push(item.children![0].href)
+                            }
+                          }}
                           className={cn(
                             "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
                             collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",

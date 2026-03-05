@@ -25,17 +25,20 @@ import {
 } from 'lucide-react'
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
+import { mockProperties } from '@/lib/mock-data/vastgoed'
 import Link from 'next/link'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-
-const PORTFOLIO_NAV = [
-  { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
-  { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-]
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 export default function PortfolioPage() {
   const router = useRouter()
+  const { basePath, isDemo } = useDashboardUser()
+
+  const PORTFOLIO_NAV = [
+    { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
+    { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
+  ]
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [properties, setProperties] = useState<any[]>([])
@@ -44,6 +47,20 @@ export default function PortfolioPage() {
   useEffect(() => {
     const loadProperties = async () => {
       try {
+        if (isDemo) {
+          setProperties(mockProperties.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            address: p.address,
+            type: p.type,
+            status: p.status,
+            monthly_rent: p.monthlyRent,
+            size_m2: p.size,
+            rooms: p.rooms,
+          })))
+          setLoading(false)
+          return
+        }
         const { user } = await getUser()
         if (!user) {
           router.push('/login')
@@ -58,7 +75,7 @@ export default function PortfolioPage() {
       }
     }
     loadProperties()
-  }, [router])
+  }, [router, isDemo])
 
   const filteredProperties = properties.filter(property =>
     property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -123,7 +140,7 @@ export default function PortfolioPage() {
           </p>
         </div>
         <Button 
-          onClick={() => router.push('/dashboard/employer/portfolio/properties/new')}
+          onClick={() => router.push(`${basePath}/portfolio/properties/new`)}
           className="bg-[#163300] hover:bg-[#356258] text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -248,7 +265,7 @@ export default function PortfolioPage() {
                 <Card 
                   key={property.id} 
                   className="border border-gray-200 dark:border-neutral-700 hover:shadow-lg transition-shadow cursor-pointer group"
-                  onClick={() => router.push(`/dashboard/employer/portfolio/properties/${property.id}`)}
+                  onClick={() => router.push(`${basePath}/portfolio/properties/${property.id}`)}
                 >
                   {/* Property Image */}
                   <div className="relative h-48 bg-gray-200 dark:bg-neutral-800 overflow-hidden rounded-t-lg">
@@ -319,7 +336,7 @@ export default function PortfolioPage() {
                         className="text-[#163300] hover:text-[#163300] hover:bg-[#163300]/10"
                         onClick={(e) => {
                           e.stopPropagation()
-                          router.push(`/dashboard/employer/portfolio/properties/${property.id}`)
+                          router.push(`${basePath}/portfolio/properties/${property.id}`)
                         }}
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -366,7 +383,7 @@ export default function PortfolioPage() {
                       <tr 
                         key={property.id} 
                         className="border-b border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-                        onClick={() => router.push(`/dashboard/employer/portfolio/properties/${property.id}`)}
+                        onClick={() => router.push(`${basePath}/portfolio/properties/${property.id}`)}
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3">
@@ -405,7 +422,7 @@ export default function PortfolioPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              router.push(`/dashboard/employer/portfolio/properties/${property.id}`)
+                              router.push(`${basePath}/portfolio/properties/${property.id}`)
                             }}
                           >
                             <Eye className="h-4 w-4" />

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail } from 'lucide-react'
 import { resetPassword } from '@/lib/supabase/auth'
+import { translateAuthError } from '@/lib/auth-errors'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
@@ -38,7 +39,7 @@ export default function ForgotPasswordPage() {
       setSubmitted(true)
       setResendCooldown(RESEND_COOLDOWN_SEC)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Fout bij het versturen van de reset link')
+      setError(translateAuthError(err instanceof Error ? err.message : 'Fout bij het versturen van de reset link'))
     } finally {
       setLoading(false)
     }
@@ -95,7 +96,7 @@ export default function ForgotPasswordPage() {
                         if (authError) throw authError
                         setResendCooldown(RESEND_COOLDOWN_SEC)
                       } catch (err) {
-                        setError(err instanceof Error ? err.message : 'Fout bij het versturen')
+                        setError(translateAuthError(err instanceof Error ? err.message : 'Fout bij het versturen'))
                       } finally {
                         setLoading(false)
                       }

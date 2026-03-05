@@ -10,6 +10,7 @@ import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, AlertCircle, Building2, Home, ChevronRight, ArrowLeft } from 'lucide-react'
 import { signUp, signInWithGoogle } from '@/lib/supabase/auth'
+import { translateAuthError } from '@/lib/auth-errors'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
@@ -123,7 +124,7 @@ export default function RegistrerenPage() {
       if (authError) throw authError
       setSuccess(true)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+      setError(translateAuthError(err instanceof Error ? err.message : 'Er is een fout opgetreden'))
     } finally {
       setLoading(false)
     }
@@ -136,7 +137,7 @@ export default function RegistrerenPage() {
       const { error: authError } = await signInWithGoogle()
       if (authError) throw authError
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Registreren mislukt')
+      setError(translateAuthError(err instanceof Error ? err.message : 'Registreren mislukt'))
       setLoading(false)
     }
   }

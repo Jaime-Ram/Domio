@@ -34,7 +34,9 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 
 const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
+const CARD_CLASS_DEMO = 'rounded-[1.75rem] bg-[#f4f4f4] dark:bg-neutral-800 overflow-hidden shadow-none'
 const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
+const INNER_BLOCK_CLASS_DEMO = 'rounded-2xl border border-gray-200 dark:border-neutral-600 overflow-hidden'
 
 // Bar heights voor weergave (relatief)
 const FINANCIAL_BARS = [
@@ -70,7 +72,7 @@ function AlertIcon({ type }: { type: string }) {
 }
 
 export default function EmployerDashboardPage() {
-  const { profile, user, isDemo, loading } = useDashboardUser()
+  const { profile, user, isDemo, loading, basePath } = useDashboardUser()
   const [propertyCount, setPropertyCount] = useState<number | null>(null)
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'daar'
@@ -154,7 +156,7 @@ export default function EmployerDashboardPage() {
               Voeg je eerste verhuurobject toe om te beginnen met beheer, huurders en facturatie.
             </p>
             <Button asChild className="bg-[#163300] hover:bg-[#356258] text-white rounded-full px-6">
-              <Link href="/dashboard/employer/portfolio/properties/new">
+              <Link href={`${basePath}/portfolio/properties/new`}>
                 <Plus className="h-4 w-4 mr-2" />
                 Je panden toevoegen
               </Link>
@@ -181,21 +183,24 @@ export default function EmployerDashboardPage() {
         </p>
       </div>
 
-      {/* KPI strip – gevarieerde stijlen */}
+      {/* KPI strip – demo: wit + alleen rand; anders normaal */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
         <FunctieBlock
+          demoStyle={isDemo ? 'borderOnly' : false}
           icon={<Building2 className="h-4 w-4 text-white" />}
           title="Totaal objecten"
           value={String(portfolioTotals.totalObjects)}
           subtitle={`↑${portfolioTotals.objectsThisMonth} deze maand`}
         />
         <FunctieBlock
+          demoStyle={isDemo ? 'borderOnly' : false}
           icon={<Users className="h-4 w-4 text-white" />}
           title="Bezettingsgraad"
           value={`${portfolioTotals.occupancyPercent}%`}
           subtitle="Portefeuille"
         />
         <FunctieBlock
+          demoStyle={isDemo ? 'borderOnly' : false}
           icon={<Euro className="h-4 w-4 text-white" />}
           iconBgClassName="bg-amber-500"
           title="Openstaande facturen"
@@ -203,6 +208,7 @@ export default function EmployerDashboardPage() {
           subtitle="Te innen"
         />
         <FunctieBlock
+          demoStyle={isDemo ? 'borderOnly' : false}
           icon={<CheckCircle2 className="h-4 w-4 text-white" />}
           trend={<span className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">{complianceSummary.score}%</span>}
           title="Compliance score"
@@ -215,8 +221,9 @@ export default function EmployerDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
         {/* Recente activiteit – SaaS transactie-widget */}
         <TransactionListWidget
+          demoStyle={isDemo}
           title="Recente activiteit"
-          seeAllHref="/dashboard/employer/portfolio"
+          seeAllHref={`${basePath}/portfolio`}
           seeAllLabel="Alles"
           items={recentActivities.slice(0, 5).map((item, i) => ({
             icon: <ActivityIcon type={item.type} />,
@@ -228,7 +235,7 @@ export default function EmployerDashboardPage() {
         />
 
         {/* Compliance status – donut-achtig + alerts */}
-        <div className={cn(CARD_CLASS, 'p-5')}>
+        <div className={cn(isDemo ? CARD_CLASS_DEMO : CARD_CLASS, 'p-5')}>
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
             Compliance status
           </h3>
@@ -288,7 +295,7 @@ export default function EmployerDashboardPage() {
               </span>
             </div>
           </div>
-          <div className={cn('rounded-2xl p-3 space-y-2', INNER_BLOCK_CLASS)}>
+          <div className={cn('rounded-2xl p-3 space-y-2', isDemo ? INNER_BLOCK_CLASS_DEMO : INNER_BLOCK_CLASS)}>
             {complianceAlerts.map((alert, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
                 <AlertIcon type={alert.type} />
@@ -303,7 +310,7 @@ export default function EmployerDashboardPage() {
       {/* Onderste rij: Financieel (met balken) | Aankomende taken */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Financieel deze maand – donkere kaart met balken (zoals homepage Maandelijkse inkomsten) */}
-        <div className={cn(CARD_CLASS, '!bg-[#163300] !border-[#163300]/20 p-6')}>
+        <div className={cn(isDemo ? CARD_CLASS_DEMO : CARD_CLASS, '!bg-[#163300] !border-[#163300]/20 p-6')}>
           <p className="text-white/80 text-sm font-medium mb-1">
             Financieel deze maand
           </p>
@@ -327,7 +334,7 @@ export default function EmployerDashboardPage() {
             ))}
           </div>
           <Link
-            href="/dashboard/employer/financial"
+            href={`${basePath}/financial`}
             className="inline-flex items-center justify-center gap-2 w-full rounded-full py-2.5 px-4 bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 text-sm font-semibold transition-colors"
           >
             Bekijk financieel
@@ -336,7 +343,7 @@ export default function EmployerDashboardPage() {
         </div>
 
         {/* Aankomende taken – witte kaart, grijze rijen */}
-        <div className={cn(CARD_CLASS, 'p-5')}>
+        <div className={cn(isDemo ? CARD_CLASS_DEMO : CARD_CLASS, 'p-5')}>
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
             Aankomende taken
           </h3>
@@ -346,7 +353,7 @@ export default function EmployerDashboardPage() {
                 key={task.id}
                 className={cn(
                   'flex items-center gap-3 py-3 px-4',
-                  INNER_BLOCK_CLASS
+                  isDemo ? INNER_BLOCK_CLASS_DEMO : INNER_BLOCK_CLASS
                 )}
               >
                 <div className="h-10 w-10 rounded-full bg-amber-500/20 dark:bg-amber-500/30 flex items-center justify-center shrink-0">

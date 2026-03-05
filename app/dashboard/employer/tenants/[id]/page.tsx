@@ -38,7 +38,7 @@ import { getUser } from '@/lib/supabase/auth'
 export default function TenantDetailPage() {
   const router = useRouter()
   const params = useParams()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
   const tenantId = params.id as string
   
   const [tenant, setTenant] = useState<any>(null)
@@ -88,7 +88,7 @@ export default function TenantDetailPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Huurder niet gevonden
           </h2>
-          <Button onClick={() => router.push('/dashboard/employer/tenants')}>
+          <Button onClick={() => router.push(`${basePath}/tenants`)}>
             Terug naar overzicht
           </Button>
         </div>
@@ -146,7 +146,7 @@ export default function TenantDetailPage() {
             <div className="mb-8">
               <Button 
                 variant="ghost" 
-                onClick={() => router.push('/dashboard/employer/tenants')}
+                onClick={() => router.push(`${basePath}/tenants`)}
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -177,7 +177,7 @@ export default function TenantDetailPage() {
                   )}
                   <Button 
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/employer/tenants/${tenantId}/edit`)}
+                    onClick={() => router.push(`${basePath}/tenants/${tenantId}/edit`)}
                   >
                     Bewerken
                   </Button>
@@ -243,7 +243,7 @@ export default function TenantDetailPage() {
                               <Button 
                                 variant="link" 
                                 className="p-0 h-auto font-medium text-[#163300] dark:text-[#9FE870]"
-                                onClick={() => router.push(`/dashboard/employer/portfolio/properties/${tenant.property?.id}`)}
+                                onClick={() => router.push(`${basePath}/portfolio/properties/${tenant.property?.id}`)}
                               >
                                 {tenant.property?.address}
                               </Button>

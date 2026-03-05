@@ -29,7 +29,7 @@ const PROPERTY_TYPES = [
 
 export default function NewPropertyPage() {
   const router = useRouter()
-  const { user } = useDashboardUser()
+  const { user, basePath } = useDashboardUser()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
@@ -57,7 +57,7 @@ export default function NewPropertyPage() {
         status: form.status,
       } as never)
       if (err) throw err
-      router.push('/dashboard/employer/portfolio')
+      router.push(`${basePath}/portfolio`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
     } finally {
@@ -68,7 +68,7 @@ export default function NewPropertyPage() {
   return (
     <div className="max-w-xl">
       <Link
-        href="/dashboard/employer/portfolio"
+        href={`${basePath}/portfolio`}
         className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870] mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -147,7 +147,7 @@ export default function NewPropertyPage() {
                 {loading ? 'Bezig...' : 'Pand toevoegen'}
               </Button>
               <Button type="button" variant="outline" asChild>
-                <Link href="/dashboard/employer/portfolio">Annuleren</Link>
+                <Link href={`${basePath}/portfolio`}>Annuleren</Link>
               </Button>
             </div>
           </form>

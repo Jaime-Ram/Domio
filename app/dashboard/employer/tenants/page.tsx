@@ -41,10 +41,6 @@ import {
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
-const PORTFOLIO_NAV = [
-  { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
-  { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-]
 
 type TenantRow = {
   id: string
@@ -58,9 +54,16 @@ type TenantRow = {
   balance?: number
 }
 
+const getPortfolioNav = (basePath: string) => [
+  { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
+  { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
+]
+
 export default function TenantsPage() {
   const router = useRouter()
-  const { user, isDemo } = useDashboardUser()
+  const { user, isDemo, basePath } = useDashboardUser()
+
+  const PORTFOLIO_NAV = getPortfolioNav(basePath)
   const [searchQuery, setSearchQuery] = useState('')
   const [tenants, setTenants] = useState<TenantRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,7 +147,7 @@ export default function TenantsPage() {
                 </p>
               </div>
               <Button 
-                onClick={() => router.push('/dashboard/employer/tenants/new')}
+                onClick={() => router.push(`${basePath}/tenants/new`)}
                 className="bg-[#163300] hover:bg-[#356258] text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -252,11 +255,11 @@ export default function TenantsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push(`/dashboard/employer/tenants/${tenant.id}`)}>
+                              <DropdownMenuItem onClick={() => router.push(`${basePath}/tenants/${tenant.id}`)}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 Bekijken
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => router.push(`/dashboard/employer/tenants/${tenant.id}/edit`)}>
+                              <DropdownMenuItem onClick={() => router.push(`${basePath}/tenants/${tenant.id}/edit`)}>
                                 <Edit className="h-4 w-4 mr-2" />
                                 Bewerken
                               </DropdownMenuItem>

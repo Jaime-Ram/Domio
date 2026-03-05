@@ -10,6 +10,7 @@ import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { KeyRound } from 'lucide-react'
 import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
+import { translateAuthError } from '@/lib/auth-errors'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
@@ -26,7 +27,7 @@ function LoginContent() {
   // Toon fout van auth callback (o.a. OAuth)
   useEffect(() => {
     const err = searchParams.get('error')
-    if (err) setError(decodeURIComponent(err))
+    if (err) setError(translateAuthError(decodeURIComponent(err)))
   }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,12 +38,9 @@ function LoginContent() {
       const { error: authError } = await signIn(email, password)
       if (authError) throw authError
       setTransitioning(true)
-      setTimeout(() => {
-        router.push('/dashboard/employer')
-      }, 900)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
-      setError(msg)
+      setError(translateAuthError(msg))
       setLoading(false)
     }
   }
@@ -54,7 +52,7 @@ function LoginContent() {
       const { error: authError } = await signInWithGoogle()
       if (authError) throw authError
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Inloggen met Google mislukt')
+      setError(translateAuthError(err instanceof Error ? err.message : 'Inloggen met Google mislukt'))
       setLoading(false)
     }
   }
@@ -86,7 +84,7 @@ function LoginContent() {
         setError('Geen passkey geselecteerd. Probeer opnieuw of log in met e-mail.')
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Passkey-inloggen mislukt'
+      const msg = translateAuthError(err instanceof Error ? err.message : 'Passkey-inloggen mislukt')
       if (String(msg).includes('cancel') || String(msg).includes('NotAllowed')) {
         setError(null)
       } else {
@@ -98,7 +96,11 @@ function LoginContent() {
   }
 
   if (transitioning) {
-    return <AuthLoadingScreen />
+    return (
+      <AuthLoadingScreen
+        onAnimationComplete={() => router.push('/dashboard/employer')}
+      />
+    )
   }
 
   return (

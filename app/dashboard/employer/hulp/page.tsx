@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { MessageCircle, Phone, Mail, HelpCircle, ArrowRight, Clock } from 'lucide-react'
+import { MessageCircle, Phone, Mail, HelpCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
@@ -124,19 +124,8 @@ export default function DashboardHulpPage() {
         </Link>
       </div>
 
-      {/* Beschikbaarheid */}
-      <div className={dashboardCardClass('mt-8 p-6 flex items-center gap-4')}>
-        <Clock className="h-6 w-6 shrink-0 text-[#163300] dark:text-[#9FE870]" />
-        <div>
-          <p className="font-medium text-gray-900 dark:text-white">Beschikbaarheid</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            WhatsApp: meestal binnen minuten. Telefoon: ma–vr 09:00–17:00.
-          </p>
-        </div>
-      </div>
-
       <div className="mt-8">
-        <Button asChild variant="outline" className="rounded-full border-[#163300]/30 text-[#163300] dark:text-[#9FE870] hover:bg-[#163300]/5 dark:hover:bg-[#9FE870]/10 hover:border-[#163300] dark:hover:border-[#9FE870]">
+        <Button asChild className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
           <Link href="/contact">Uitgebreid contactformulier →</Link>
         </Button>
       </div>

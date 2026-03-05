@@ -38,7 +38,7 @@ export function ConfirmationBlock({
         {primaryButton.href ? (
           <Button
             asChild
-            className="w-full h-14 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
           >
             {primaryButton.href.startsWith('http') ? (
               <a href={primaryButton.href} target="_blank" rel="noopener noreferrer">
@@ -51,7 +51,7 @@ export function ConfirmationBlock({
         ) : (
           <Button
             onClick={primaryButton.onClick}
-            className="w-full h-14 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
           >
             {primaryButton.label}
           </Button>
@@ -61,7 +61,7 @@ export function ConfirmationBlock({
             <Button
               asChild
               variant="outline"
-              className="w-full h-14 rounded-full bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 font-semibold text-base"
+              className="w-full h-12 rounded-full bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 font-semibold text-base"
             >
               {secondaryButton.href.startsWith('http') ? (
                 <a href={secondaryButton.href} target="_blank" rel="noopener noreferrer">{secondaryButton.label}</a>
@@ -74,7 +74,7 @@ export function ConfirmationBlock({
               onClick={secondaryButton.onClick}
               disabled={secondaryButton.disabled}
               variant="outline"
-              className="w-full h-14 rounded-full bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 font-semibold text-base"
+              className="w-full h-12 rounded-full bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 font-semibold text-base"
             >
               {secondaryButton.loading ? 'Bezig...' : secondaryButton.label}
             </Button>

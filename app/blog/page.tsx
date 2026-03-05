@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Image from 'next/image'
 import { MarketingLayout } from '@/components/marketing/marketing-layout'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { ArticleCard } from '@/components/blog/article-card'
@@ -48,12 +49,29 @@ export default function BlogPage() {
   return (
     <MarketingLayout>
       <div className="min-h-screen bg-white">
-        <section className="border-b border-gray-100 bg-gray-50/30 py-12 md:py-16">
-          <div className="container mx-auto max-w-7xl px-4 md:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-[#163300] sm:text-4xl md:text-5xl">
+        <section className="relative border-b border-gray-100 overflow-hidden py-12 md:py-16">
+          {/* Achtergrond alleen bij bovenste deel */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/Achtergrond5.jpg"
+              alt=""
+              fill
+              className="object-cover object-center"
+              quality={85}
+              sizes="100vw"
+              priority
+            />
+            {/* Zeer lichte overgangsfade naar wit */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.18) 100%)' }}
+            />
+          </div>
+          <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
               Kennisbank
             </h1>
-            <p className="mt-3 max-w-2xl text-lg text-gray-600">
+            <p className="mt-3 max-w-2xl text-lg text-white/90">
               Uitgebreide artikelen over wetgeving, financieel beheer, verduurzaming en meer. Voor verhuurders en vastgoedbeheerders in Nederland.
             </p>
           </div>

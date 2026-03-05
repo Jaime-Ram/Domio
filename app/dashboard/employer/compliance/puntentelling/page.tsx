@@ -48,10 +48,10 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { downloadWWSPDF } from '@/lib/pdf/generate-wws-pdf'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
-const COMPLIANCE_NAV = [
-  { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
-  { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
-  { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
+const getComplianceNav = (basePath: string) => [
+  { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
+  { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
+  { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
 ]
 
 interface PropertyWWSInput extends WWInput {
@@ -234,7 +234,8 @@ const SECTOR_COLORS = {
 }
 
 export default function PuntentellingPage() {
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
+  const COMPLIANCE_NAV = getComplianceNav(basePath)
   const propertyInputs = isDemo ? mockPropertyInputs : []
   const wwsObjects = isDemo ? mockWwsObjects : []
   const optimalisatieAdviezen = isDemo ? mockWwsOptimalisatieAdviezen : []
@@ -283,7 +284,7 @@ export default function PuntentellingPage() {
             <CardContent className="py-12 text-center">
               <p className="text-gray-500 dark:text-gray-400">Nog geen objecten voor puntentelling.</p>
               <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Voeg eerst panden toe aan je portefeuille.</p>
-              <Button className="mt-4" onClick={() => window.location.href = '/dashboard/employer/portfolio/properties/new'}>
+              <Button className="mt-4" onClick={() => window.location.href = `${basePath}/portfolio/properties/new`}>
                 Pand toevoegen
               </Button>
             </CardContent>

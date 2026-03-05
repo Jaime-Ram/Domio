@@ -66,6 +66,7 @@ export default function DemoAppLayout({
               collapsed={sidebarCollapsed}
               onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
               basePath={DEMO_BASE_PATH}
+              demoMode
             />
             <div
               className={cn(
@@ -82,10 +83,6 @@ export default function DemoAppLayout({
             >
               <ContentHeader onMenuClick={() => setSidebarOpen(true)} basePath={DEMO_BASE_PATH} />
               <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
-                {/* Demo-banner */}
-                <div className="bg-amber-500/90 dark:bg-amber-600/90 text-amber-950 dark:text-amber-100 text-center py-1.5 text-sm font-medium">
-                  Demo-omgeving — alleen demodata, geen inlog vereist
-                </div>
                 <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16">
                   {children}
                   <div className="flex justify-center items-center mt-16 pt-8">

@@ -173,7 +173,12 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative h-10 w-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-600 dark:text-gray-400 shadow-sm"
+                  className={cn(
+                    "relative h-10 w-10 rounded-full text-gray-600 dark:text-gray-400",
+                    isDemo
+                      ? "bg-[#f4f4f4] dark:bg-neutral-800 hover:bg-[#e8e8e8] dark:hover:bg-neutral-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      : "border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm"
+                  )}
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -232,11 +237,16 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 pl-2 pr-3 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm gap-2"
+                  className={cn(
+                    "h-10 pl-2 pr-3 rounded-full gap-2",
+                    isDemo
+                      ? "bg-[#f4f4f4] dark:bg-neutral-800 hover:bg-[#e8e8e8] dark:hover:bg-neutral-700 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      : "border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm"
+                  )}
                 >
                   <span className={cn(
                     "h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0",
-                    loading ? "bg-gray-300 dark:bg-neutral-600 animate-pulse" : "bg-brand-primary dark:bg-brand-primary"
+                    loading ? "bg-gray-300 dark:bg-neutral-600 animate-pulse" : isDemo ? "bg-gray-400 dark:bg-neutral-600" : "bg-brand-primary dark:bg-brand-primary"
                   )}>
                     {loading ? '' : avatarInitials}
                   </span>

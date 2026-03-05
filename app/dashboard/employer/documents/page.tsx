@@ -61,7 +61,7 @@ import {
 
 export default function DocumentsPage() {
   const router = useRouter()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
   const [searchQuery, setSearchQuery] = useState('')
 
   const documents = isDemo ? mockDocuments : []
@@ -720,7 +720,7 @@ export default function DocumentsPage() {
                               <Button 
                                 variant="link" 
                                 className="p-0 h-auto font-medium text-[#163300] dark:text-[#9FE870]"
-                                onClick={() => router.push(`/dashboard/employer/portfolio/properties/${doc.property?.id}`)}
+                                onClick={() => router.push(`${basePath}/portfolio/properties/${doc.property?.id}`)}
                               >
                                 {doc.property.address}
                               </Button>

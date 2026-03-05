@@ -5,15 +5,18 @@ import { CreditCard, Receipt, TrendingUp, Scan } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
-const FINANCIAL_NAV = [
-  { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
-  { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
-  { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
-  { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
+const getFinancialNav = (basePath: string) => [
+  { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
+  { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
+  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
+  { label: 'Bankimport', href: `${basePath}/financial/bankimport`, icon: Scan },
 ]
 
 export default function BetalingenPage() {
+  const { basePath } = useDashboardUser()
+  const FINANCIAL_NAV = getFinancialNav(basePath)
   return (
     <div className="space-y-6">
       <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} />
@@ -33,7 +36,7 @@ export default function BetalingenPage() {
             Betalingen worden getoond in het financiële dashboard.
           </p>
           <Button asChild variant="default">
-            <Link href="/dashboard/employer/financial">Naar Financieel</Link>
+            <Link href={`${basePath}/financial`}>Naar Financieel</Link>
           </Button>
         </CardContent>
       </Card>

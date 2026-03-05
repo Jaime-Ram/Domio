@@ -84,7 +84,7 @@ export function AuthLoadingScreen({ onAnimationComplete }: AuthLoadingScreenProp
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-[#9FE870] px-4 sm:px-6 overflow-hidden"
+      className="fixed inset-0 z-[9999] min-h-screen flex items-center justify-center bg-[#9FE870] px-4 sm:px-6 overflow-hidden"
       style={{
         opacity: fadeOut ? 0 : 1,
         transition: `opacity ${FADEOUT_DURATION_MS}ms ${EASE_CURVE}`,

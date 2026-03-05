@@ -237,14 +237,23 @@ export default function Home() {
                     { title: 'Inspectiemodule', desc: 'Inspecties vastleggen en rapporteren', icon: ClipboardCheck },
                     { title: 'Scan & Herken Functie', desc: 'Documenten scannen en herkennen', icon: Scan },
                   ].map((item, i) => (
-                    <div key={item.title} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${25 + i * 35}ms` }}>
+                    <Link key={item.title} href="/functies" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${25 + i * 35}ms` }}>
                       <item.icon className="size-5 text-[#163300] shrink-0 mt-0.5" />
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-[#163300] group-hover:text-[#163300]">{item.title}</p>
                         <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
+                  <Link
+                    href="/functies"
+                    className="col-start-3 row-start-4 py-2.5 px-3 flex items-center justify-end dropdown-item-in"
+                  >
+                    <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-5 py-2 text-sm font-semibold shadow-sm hover:bg-[#9FE870]/90 transition-colors">
+                      Meer info
+                      <ArrowUpRight className="h-4 w-4 shrink-0" />
+                    </span>
+                  </Link>
                 </div>
               </div>
             </div>

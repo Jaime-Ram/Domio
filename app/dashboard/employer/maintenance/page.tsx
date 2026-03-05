@@ -58,15 +58,16 @@ import {
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
-const MAINTENANCE_NAV = [
-  { label: 'Tickets', href: '/dashboard/employer/maintenance', icon: Wrench },
-  { label: 'Inspecties', href: '/dashboard/employer/maintenance/inspecties', icon: ClipboardCheck },
-  { label: 'Planning', href: '/dashboard/employer/maintenance/planning', icon: Calendar },
+const getMaintenanceNav = (basePath: string) => [
+  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+  { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
+  { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
 ]
 
 export default function MaintenancePage() {
   const router = useRouter()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
+  const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showNewModal, setShowNewModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<typeof mockMaintenanceRequests[0] | null>(null)
