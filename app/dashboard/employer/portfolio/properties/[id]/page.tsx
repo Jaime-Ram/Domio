@@ -7,7 +7,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { 
   ArrowLeft,
   MapPin,
@@ -18,10 +38,31 @@ import {
   Trash2,
   Upload,
   Edit,
+  X,
 } from 'lucide-react'
-import { propertyQueries, leaseQueries, documentQueries } from '@/lib/supabase/queries'
+import { propertyQueries, unitQueries, leaseQueries, documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { supabase } from '@/lib/supabase/client'
+
+const UNIT_STATUSES = [
+  { value: 'leegstand', label: 'Leegstand' },
+  { value: 'verhuurd', label: 'Verhuurd' },
+  { value: 'onderhoud', label: 'Onderhoud' },
+  { value: 'te_verhuren', label: 'Te verhuren' },
+]
+
+const PROPERTY_TYPES = [
+  { value: 'appartement', label: 'Appartement' },
+  { value: 'eengezinswoning', label: 'Eengezinswoning' },
+  { value: 'bovenwoning', label: 'Bovenwoning' },
+  { value: 'benedenwoning', label: 'Benedenwoning' },
+  { value: 'maisonnette', label: 'Maisonnette' },
+  { value: 'studio', label: 'Studio' },
+  { value: 'complex', label: 'Complex' },
+]
+
+const ENERGY_LABELS = ['A+++++', 'A++++', 'A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
 
 export default function PropertyDetailPage() {
   const router = useRouter()
@@ -36,6 +77,53 @@ export default function PropertyDetailPage() {
   const [unitLeases, setUnitLeases] = useState<Record<string, any>>({})
   const [propertyDocuments, setPropertyDocuments] = useState<any[]>([])
 
+  // Inline edit state
+  const [isNewProperty, setIsNewProperty] = useState(searchParams.get('new') === 'true')
+  const [isEditing, setIsEditing] = useState(searchParams.get('edit') === 'true')
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({
+    name: '',
+    address: '',
+    postcode: '',
+    city: '',
+    type: 'appartement',
+    build_year: '',
+    woz_value: '',
+    energy_label: '',
+  })
+
+  // Unit inline edit state
+  const [editingUnits, setEditingUnits] = useState<Set<string>>(new Set())
+  const [unitForms, setUnitForms] = useState<Record<string, { unit_number: string; rooms: string; size_m2: string; monthly_rent: string; status: string }>>({})
+  const [savingUnits, setSavingUnits] = useState<Set<string>>(new Set())
+  const [deletingUnits, setDeletingUnits] = useState<Set<string>>(new Set())
+  const [unitErrors, setUnitErrors] = useState<Record<string, string>>({})
+  const [newUnitDraft, setNewUnitDraft] = useState<{ unit_number: string; rooms: string; size_m2: string; monthly_rent: string; status: string } | null>(null)
+  const [savingNewUnit, setSavingNewUnit] = useState(false)
+  const [newUnitError, setNewUnitError] = useState<string | null>(null)
+
+  const initEditForm = (p: any) => {
+    setEditForm({
+      name: p.name || '',
+      address: p.address || '',
+      postcode: p.postcode || '',
+      city: p.city || '',
+      type: p.type || 'appartement',
+      build_year: p.build_year ? String(p.build_year) : '',
+      woz_value: p.woz_value ? String(p.woz_value) : '',
+      energy_label: p.energy_label || '',
+    })
+  }
+
+  const initUnitForm = (unit: any) => ({
+    unit_number: unit.unit_number || '',
+    rooms: unit.rooms ? String(unit.rooms) : '',
+    size_m2: unit.size_m2 ? String(unit.size_m2) : '',
+    monthly_rent: unit.monthly_rent ? String(unit.monthly_rent) : '',
+    status: unit.status || 'leegstand',
+  })
   useEffect(() => {
     const loadProperty = async () => {
       try {
@@ -46,6 +134,7 @@ export default function PropertyDetailPage() {
         }
         const data = await propertyQueries.getWithUnits(propertyId)
         setProperty(data)
+        initEditForm(data)
       } catch (error) {
         console.error('Failed to load property:', error)
       } finally {
@@ -87,22 +176,162 @@ export default function PropertyDetailPage() {
       </div>
     )
   }
-  
+
   if (!property) {
     return (
-      <>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Object niet gevonden
-          </h2>
-          <Button onClick={() => router.push(`${basePath}/portfolio`)}>
-            Terug naar overzicht
-          </Button>
-        </div>
-      </>
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Object niet gevonden
+        </h2>
+        <Button onClick={() => router.push(`${basePath}/portfolio`)}>
+          Terug naar overzicht
+        </Button>
+      </div>
     )
   }
 
+  const handleSave = async () => {
+    setSaving(true)
+    setEditError(null)
+    try {
+      const updates: any = {
+        name: editForm.name,
+        address: editForm.address,
+        postcode: editForm.postcode || null,
+        city: editForm.city || null,
+        type: editForm.type,
+        build_year: editForm.build_year ? parseInt(editForm.build_year) : null,
+        woz_value: editForm.woz_value ? parseFloat(editForm.woz_value) : null,
+        energy_label: editForm.energy_label || null,
+      }
+      const updated = await propertyQueries.update(propertyId, updates)
+      setProperty({ ...property, ...updated })
+      setIsEditing(false)
+      setIsNewProperty(false)
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    setEditError(null)
+    try {
+      await propertyQueries.delete(propertyId)
+      router.push(`${basePath}/portfolio`)
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+      setDeleting(false)
+    }
+  }
+
+  const handleCancelEdit = async () => {
+    if (isNewProperty) {
+      // Delete the freshly created property and go back
+      try {
+        await propertyQueries.delete(propertyId)
+      } catch {}
+      router.push(`${basePath}/portfolio`)
+      return
+    }
+    initEditForm(property)
+    setIsEditing(false)
+    setEditError(null)
+  }
+
+  // --- Unit handlers ---
+  const handleStartEditUnit = (unit: any) => {
+    setEditingUnits((prev) => new Set(prev).add(unit.id))
+    setUnitForms((prev) => ({ ...prev, [unit.id]: initUnitForm(unit) }))
+    setUnitErrors((prev) => { const n = { ...prev }; delete n[unit.id]; return n })
+  }
+
+  const handleCancelEditUnit = (unitId: string) => {
+    setEditingUnits((prev) => { const n = new Set(prev); n.delete(unitId); return n })
+    setUnitForms((prev) => { const n = { ...prev }; delete n[unitId]; return n })
+    setUnitErrors((prev) => { const n = { ...prev }; delete n[unitId]; return n })
+  }
+
+  const handleSaveUnit = async (unitId: string) => {
+    const form = unitForms[unitId]
+    if (!form || !form.unit_number) return
+    setSavingUnits((prev) => new Set(prev).add(unitId))
+    setUnitErrors((prev) => { const n = { ...prev }; delete n[unitId]; return n })
+    try {
+      const updates: any = {
+        unit_number: form.unit_number,
+        rooms: form.rooms ? parseInt(form.rooms) : null,
+        size_m2: form.size_m2 ? parseFloat(form.size_m2) : null,
+        monthly_rent: form.monthly_rent ? parseFloat(form.monthly_rent) : null,
+        status: form.status,
+      }
+      const updated = await unitQueries.update(unitId, updates)
+      setProperty((prev: any) => ({
+        ...prev,
+        units: prev.units.map((u: any) => u.id === unitId ? { ...u, ...updated } : u),
+      }))
+      handleCancelEditUnit(unitId)
+    } catch (err) {
+      setUnitErrors((prev) => ({ ...prev, [unitId]: err instanceof Error ? err.message : 'Er is een fout opgetreden' }))
+    } finally {
+      setSavingUnits((prev) => { const n = new Set(prev); n.delete(unitId); return n })
+    }
+  }
+
+  const handleDeleteUnit = async (unitId: string) => {
+    setDeletingUnits((prev) => new Set(prev).add(unitId))
+    try {
+      await unitQueries.delete(unitId)
+      setProperty((prev: any) => ({
+        ...prev,
+        units: prev.units.filter((u: any) => u.id !== unitId),
+      }))
+      handleCancelEditUnit(unitId)
+    } catch (err) {
+      setUnitErrors((prev) => ({ ...prev, [unitId]: err instanceof Error ? err.message : 'Er is een fout opgetreden' }))
+    } finally {
+      setDeletingUnits((prev) => { const n = new Set(prev); n.delete(unitId); return n })
+    }
+  }
+
+  const handleAddUnit = () => {
+    setNewUnitDraft({ unit_number: '', rooms: '', size_m2: '', monthly_rent: '', status: 'leegstand' })
+    setNewUnitError(null)
+  }
+
+  const handleCancelNewUnit = () => {
+    setNewUnitDraft(null)
+    setNewUnitError(null)
+  }
+
+  const handleSaveNewUnit = async () => {
+    if (!newUnitDraft || !newUnitDraft.unit_number) return
+    setSavingNewUnit(true)
+    setNewUnitError(null)
+    try {
+      const unitData: any = {
+        property_id: propertyId,
+        unit_number: newUnitDraft.unit_number,
+        rooms: newUnitDraft.rooms ? parseInt(newUnitDraft.rooms) : null,
+        size_m2: newUnitDraft.size_m2 ? parseFloat(newUnitDraft.size_m2) : null,
+        monthly_rent: newUnitDraft.monthly_rent ? parseFloat(newUnitDraft.monthly_rent) : null,
+        status: newUnitDraft.status,
+      }
+      const created = await unitQueries.create(unitData)
+      setProperty((prev: any) => ({
+        ...prev,
+        units: [...(prev.units || []), created],
+      }))
+      setNewUnitDraft(null)
+    } catch (err) {
+      setNewUnitError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+    } finally {
+      setSavingNewUnit(false)
+    }
+  }
+  
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'verhuurd':
@@ -132,21 +361,52 @@ export default function PropertyDetailPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {property.name}
+                    {isEditing ? (editForm.name || 'Nieuw pand') : property.name}
                   </h1>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                     <MapPin className="h-4 w-4" />
-                    {property.address}
+                    {isEditing ? (editForm.address || 'Geen adres') : property.address}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Button 
-                    variant="outline"
-                    onClick={() => router.push(`${basePath}/portfolio/properties/${propertyId}/edit`)}
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Bewerken
-                  </Button>
+                  {isEditing ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline">
+                          <X className="h-4 w-4 mr-2" />
+                          Annuleren
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{isNewProperty ? 'Nieuw pand annuleren?' : 'Wijzigingen annuleren?'}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {isNewProperty
+                              ? 'Weet je zeker dat je dit nieuwe pand wilt annuleren? Het pand wordt niet opgeslagen.'
+                              : 'Weet je zeker dat je de wijzigingen wilt annuleren? Niet-opgeslagen wijzigingen gaan verloren.'}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Terug</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleCancelEdit}>
+                            Ja, annuleren
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        initEditForm(property)
+                        setIsEditing(true)
+                        setActiveTab('basic')
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Bewerken
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -167,65 +427,171 @@ export default function PropertyDetailPage() {
                     <CardDescription>Algemene informatie over het object</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    {editError && (
+                      <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 p-3 rounded-lg">
+                        {editError}
+                      </p>
+                    )}
+
                     {/* Locatie Info */}
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Locatie</p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Adres</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.address}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Postcode</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.postcode || '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Stad</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.city || '-'}</p>
-                        </div>
+                        {isEditing ? (
+                          <>
+                            <div className="space-y-2">
+                              <Label htmlFor="address">Adres *</Label>
+                              <Input
+                                id="address"
+                                value={editForm.address}
+                                onChange={(e) => setEditForm((f) => ({ ...f, address: e.target.value }))}
+                                placeholder="Bijv. Keizersgracht 100"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="postcode">Postcode</Label>
+                              <Input
+                                id="postcode"
+                                value={editForm.postcode}
+                                onChange={(e) => setEditForm((f) => ({ ...f, postcode: e.target.value }))}
+                                placeholder="Bijv. 1015 AA"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="city">Stad</Label>
+                              <Input
+                                id="city"
+                                value={editForm.city}
+                                onChange={(e) => setEditForm((f) => ({ ...f, city: e.target.value }))}
+                                placeholder="Bijv. Amsterdam"
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Adres</p>
+                              <p className="font-medium text-gray-900 dark:text-white">{property.address}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Postcode</p>
+                              <p className="font-medium text-gray-900 dark:text-white">{property.postcode || '-'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Stad</p>
+                              <p className="font-medium text-gray-900 dark:text-white">{property.city || '-'}</p>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
-                    {/* Kenmerken */}
+                    {/* Naam + Kenmerken */}
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Kenmerken</p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
-                          <p className="font-medium text-gray-900 dark:text-white capitalize">{property.type}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bouwjaar</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{property.build_year || '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Energielabel</p>
-                          {property.energy_label ? (
-                            <Badge variant="outline">{property.energy_label}</Badge>
-                          ) : (
-                            <p className="font-medium text-gray-900 dark:text-white">-</p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal units</p>
-                          <div className="flex items-center gap-1">
-                            <DoorOpen className="h-4 w-4 text-gray-400" />
-                            <p className="font-medium text-gray-900 dark:text-white">{property.units?.length || 0}</p>
+                      {isEditing ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Naam *</Label>
+                            <Input
+                              id="name"
+                              value={editForm.name}
+                              onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                              placeholder="Bijv. Herenhuis Centrum"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="type">Type *</Label>
+                            <Select value={editForm.type} onValueChange={(v) => setEditForm((f) => ({ ...f, type: v }))}>
+                              <SelectTrigger id="type">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {PROPERTY_TYPES.map((t) => (
+                                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="build_year">Bouwjaar</Label>
+                            <Input
+                              id="build_year"
+                              type="number"
+                              value={editForm.build_year}
+                              onChange={(e) => setEditForm((f) => ({ ...f, build_year: e.target.value }))}
+                              placeholder="Bijv. 1920"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="energy_label">Energielabel</Label>
+                            <Select value={editForm.energy_label || 'none'} onValueChange={(v) => setEditForm((f) => ({ ...f, energy_label: v === 'none' ? '' : v }))}>
+                              <SelectTrigger id="energy_label">
+                                <SelectValue placeholder="Selecteer" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Geen</SelectItem>
+                                {ENERGY_LABELS.map((l) => (
+                                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
+                            <p className="font-medium text-gray-900 dark:text-white capitalize">{property.type}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bouwjaar</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{property.build_year || '-'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Energielabel</p>
+                            {property.energy_label ? (
+                              <Badge variant="outline">{property.energy_label}</Badge>
+                            ) : (
+                              <p className="font-medium text-gray-900 dark:text-white">-</p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal units</p>
+                            <div className="flex items-center gap-1">
+                              <DoorOpen className="h-4 w-4 text-gray-400" />
+                              <p className="font-medium text-gray-900 dark:text-white">{property.units?.length || 0}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Financiële Gegevens */}
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Financiële Gegevens</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '-'}
-                          </p>
-                        </div>
+                        {isEditing ? (
+                          <div className="space-y-2">
+                            <Label htmlFor="woz_value">WOZ-waarde (€)</Label>
+                            <Input
+                              id="woz_value"
+                              type="number"
+                              value={editForm.woz_value}
+                              onChange={(e) => setEditForm((f) => ({ ...f, woz_value: e.target.value }))}
+                              placeholder="Bijv. 350000"
+                            />
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '-'}
+                            </p>
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Totale maandhuur</p>
                           <p className="font-medium text-gray-900 dark:text-white">
@@ -234,6 +600,44 @@ export default function PropertyDetailPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Save/Delete buttons in edit mode */}
+                    {isEditing && (
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" disabled={deleting}>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {deleting ? 'Verwijderen...' : 'Verwijderen'}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Pand verwijderen?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Weet je zeker dat je dit pand wilt verwijderen? Alle bijbehorende units, huurcontracten en documenten worden ook verwijderd. Dit kan niet ongedaan worden gemaakt.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleDelete}
+                                className="bg-[#DC2626] hover:bg-[#B91C1C] text-white"
+                              >
+                                Ja, verwijderen
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                        <Button
+                          onClick={handleSave}
+                          disabled={saving || !editForm.name || !editForm.address}
+                          className="bg-[#163300] hover:bg-[#356258] text-white"
+                        >
+                          {saving ? 'Opslaan...' : 'Opslaan'}
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -249,7 +653,8 @@ export default function PropertyDetailPage() {
                       </div>
                       <Button 
                         className="bg-[#163300] hover:bg-[#356258] text-white"
-                        onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/new`)}
+                        onClick={handleAddUnit}
+                        disabled={newUnitDraft !== null}
                       >
                         <DoorOpen className="h-4 w-4 mr-2" />
                         Unit Toevoegen
@@ -257,9 +662,97 @@ export default function PropertyDetailPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {property.units && property.units.length > 0 ? (
-                      <div className="space-y-4">
-                        {property.units.map((unit: any) => {
+                    <div className="space-y-4">
+                      {/* New unit draft card */}
+                      {newUnitDraft && (
+                        <div className="border-2 border-dashed border-[#163300]/40 dark:border-[#9FE870]/40 rounded-lg p-6">
+                          <div className="flex items-center gap-3 mb-4">
+                            <DoorOpen className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+                            <h3 className="font-semibold text-gray-900 dark:text-white">Nieuwe unit</h3>
+                          </div>
+
+                          {newUnitError && (
+                            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 p-3 rounded-lg mb-4">
+                              {newUnitError}
+                            </p>
+                          )}
+
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="new-unit-number">Naam / Nummer *</Label>
+                              <Input
+                                id="new-unit-number"
+                                value={newUnitDraft.unit_number}
+                                onChange={(e) => setNewUnitDraft((f) => f ? { ...f, unit_number: e.target.value } : f)}
+                                placeholder="Bijv. Suite A"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="new-rooms">Kamers</Label>
+                              <Input
+                                id="new-rooms"
+                                type="number"
+                                value={newUnitDraft.rooms}
+                                onChange={(e) => setNewUnitDraft((f) => f ? { ...f, rooms: e.target.value } : f)}
+                                placeholder="0"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="new-size">Oppervlakte (m²)</Label>
+                              <Input
+                                id="new-size"
+                                type="number"
+                                value={newUnitDraft.size_m2}
+                                onChange={(e) => setNewUnitDraft((f) => f ? { ...f, size_m2: e.target.value } : f)}
+                                placeholder="0"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="new-rent">Huurprijs (€)</Label>
+                              <Input
+                                id="new-rent"
+                                type="number"
+                                value={newUnitDraft.monthly_rent}
+                                onChange={(e) => setNewUnitDraft((f) => f ? { ...f, monthly_rent: e.target.value } : f)}
+                                placeholder="0"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="new-status">Status</Label>
+                              <Select value={newUnitDraft.status} onValueChange={(v) => setNewUnitDraft((f) => f ? { ...f, status: v } : f)}>
+                                <SelectTrigger id="new-status">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {UNIT_STATUSES.map((s) => (
+                                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                            <Button variant="outline" onClick={handleCancelNewUnit} disabled={savingNewUnit}>
+                              <X className="h-4 w-4 mr-2" />
+                              Annuleren
+                            </Button>
+                            <Button
+                              onClick={handleSaveNewUnit}
+                              disabled={savingNewUnit || !newUnitDraft.unit_number}
+                              className="bg-[#163300] hover:bg-[#356258] text-white"
+                            >
+                              {savingNewUnit ? 'Opslaan...' : 'Opslaan'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Existing unit cards */}
+                      {property.units && property.units.length > 0 ? (
+                        property.units.map((unit: any) => {
+                          const isUnitEditing = editingUnits.has(unit.id)
+                          const unitForm = unitForms[unit.id]
                           const leases = unitLeases[unit.id] || []
                           const tenantMap = new Map<string, { id: string; full_name: string }>()
                           for (const lease of leases) {
@@ -273,104 +766,240 @@ export default function PropertyDetailPage() {
                           const tenants = Array.from(tenantMap.values())
                           return (
                             <div key={unit.id} className="border border-gray-200 dark:border-neutral-700 rounded-lg p-6 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
-                              {/* Unit Header */}
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                  <DoorOpen className="h-5 w-5 text-gray-400" />
-                                  <div>
-                                    <h3 className="font-semibold text-gray-900 dark:text-white">{unit.unit_number}</h3>
+                              {isUnitEditing && unitForm ? (
+                                <>
+                                  {/* Edit mode */}
+                                  <div className="flex items-center gap-3 mb-4">
+                                    <DoorOpen className="h-5 w-5 text-gray-400" />
+                                    <h3 className="font-semibold text-gray-900 dark:text-white">{unitForm.unit_number || unit.unit_number}</h3>
                                   </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {unit.status === 'verhuurd' && (
-                                    <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">Verhuurd</Badge>
-                                  )}
-                                  {unit.status === 'leegstand' && (
-                                    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-500">Leegstand</Badge>
-                                  )}
-                                  {unit.status === 'onderhoud' && (
-                                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-500">Onderhoud</Badge>
-                                  )}
-                                  {unit.status === 'te_verhuren' && (
-                                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-500">Te verhuren</Badge>
-                                  )}
-                                </div>
-                              </div>
 
-                              {/* Unit Details Grid */}
-                              <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-neutral-700">
-                                <div>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Kamers</p>
-                                  <p className="font-medium text-gray-900 dark:text-white">{unit.rooms ? `${unit.rooms}` : '-'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
-                                  <p className="font-medium text-gray-900 dark:text-white">{unit.size_m2 ? `${unit.size_m2} m²` : '-'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
-                                  <p className="font-medium text-gray-900 dark:text-white">{unit.monthly_rent ? `€${unit.monthly_rent.toLocaleString('nl-NL')}` : '-'}</p>
-                                </div>
-                              </div>
+                                  {unitErrors[unit.id] && (
+                                    <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 p-3 rounded-lg mb-4">
+                                      {unitErrors[unit.id]}
+                                    </p>
+                                  )}
 
-                              {/* Tenants Section */}
-                              <div className="mb-4">
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
-                                {tenants.length > 0 ? (
-                                  <div className="flex flex-wrap gap-2">
-                                    {tenants.map((tenant) => (
-                                      <Link
-                                        key={tenant.id}
-                                        href={`${basePath}/tenants/${tenant.id}`}
-                                        className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
-                                      >
-                                        <span className="font-medium text-sm text-gray-900 dark:text-white">
-                                          {tenant.full_name}
-                                        </span>
-                                        <Eye className="h-4 w-4 text-gray-400" />
-                                      </Link>
-                                    ))}
+                                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                                    <div className="space-y-2">
+                                      <Label>Naam / Nummer *</Label>
+                                      <Input
+                                        value={unitForm.unit_number}
+                                        onChange={(e) => setUnitForms((prev) => ({ ...prev, [unit.id]: { ...prev[unit.id], unit_number: e.target.value } }))}
+                                        placeholder="Bijv. Suite A"
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Kamers</Label>
+                                      <Input
+                                        type="number"
+                                        value={unitForm.rooms}
+                                        onChange={(e) => setUnitForms((prev) => ({ ...prev, [unit.id]: { ...prev[unit.id], rooms: e.target.value } }))}
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Oppervlakte (m²)</Label>
+                                      <Input
+                                        type="number"
+                                        value={unitForm.size_m2}
+                                        onChange={(e) => setUnitForms((prev) => ({ ...prev, [unit.id]: { ...prev[unit.id], size_m2: e.target.value } }))}
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Huurprijs (€)</Label>
+                                      <Input
+                                        type="number"
+                                        value={unitForm.monthly_rent}
+                                        onChange={(e) => setUnitForms((prev) => ({ ...prev, [unit.id]: { ...prev[unit.id], monthly_rent: e.target.value } }))}
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Status</Label>
+                                      <Select value={unitForm.status} onValueChange={(v) => setUnitForms((prev) => ({ ...prev, [unit.id]: { ...prev[unit.id], status: v } }))}>
+                                        <SelectTrigger>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {UNIT_STATUSES.map((s) => (
+                                            <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
                                   </div>
-                                ) : (
-                                  <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
-                                  </div>
-                                )}
-                              </div>
 
-                              {/* Actions */}
-                              <div className="flex items-center gap-2 justify-end">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/${unit.id}/edit`)}
-                                >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Bewerken
-                                </Button>
-                              </div>
+                                  {/* Tenants (read-only in edit mode) */}
+                                  <div className="mb-4">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
+                                    {tenants.length > 0 ? (
+                                      <div className="flex flex-wrap gap-2">
+                                        {tenants.map((tenant) => (
+                                          <Link
+                                            key={tenant.id}
+                                            href={`${basePath}/tenants/${tenant.id}`}
+                                            className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                                          >
+                                            <span className="font-medium text-sm text-gray-900 dark:text-white">{tenant.full_name}</span>
+                                            <Eye className="h-4 w-4 text-gray-400" />
+                                          </Link>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Edit action buttons */}
+                                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                                    <div className="flex items-center gap-2">
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant="destructive" size="sm" disabled={deletingUnits.has(unit.id)}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            {deletingUnits.has(unit.id) ? 'Verwijderen...' : 'Verwijderen'}
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Unit verwijderen?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Weet je zeker dat je &apos;{unit.unit_number}&apos; wilt verwijderen? Alle bijbehorende huurcontracten worden ook verwijderd. Dit kan niet ongedaan worden gemaakt.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => handleDeleteUnit(unit.id)}
+                                              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white"
+                                            >
+                                              Ja, verwijderen
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                      <Button variant="outline" size="sm" onClick={() => handleCancelEditUnit(unit.id)}>
+                                        <X className="h-4 w-4 mr-2" />
+                                        Annuleren
+                                      </Button>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleSaveUnit(unit.id)}
+                                      disabled={savingUnits.has(unit.id) || !unitForm.unit_number}
+                                      className="bg-[#163300] hover:bg-[#356258] text-white"
+                                    >
+                                      {savingUnits.has(unit.id) ? 'Opslaan...' : 'Opslaan'}
+                                    </Button>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  {/* Read mode */}
+                                  {/* Unit Header */}
+                                  <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                      <DoorOpen className="h-5 w-5 text-gray-400" />
+                                      <div>
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">{unit.unit_number}</h3>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      {unit.status === 'verhuurd' && (
+                                        <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">Verhuurd</Badge>
+                                      )}
+                                      {unit.status === 'leegstand' && (
+                                        <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-500">Leegstand</Badge>
+                                      )}
+                                      {unit.status === 'onderhoud' && (
+                                        <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-500">Onderhoud</Badge>
+                                      )}
+                                      {unit.status === 'te_verhuren' && (
+                                        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-500">Te verhuren</Badge>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Unit Details Grid */}
+                                  <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-neutral-700">
+                                    <div>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Kamers</p>
+                                      <p className="font-medium text-gray-900 dark:text-white">{unit.rooms ? `${unit.rooms}` : '-'}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
+                                      <p className="font-medium text-gray-900 dark:text-white">{unit.size_m2 ? `${unit.size_m2} m²` : '-'}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
+                                      <p className="font-medium text-gray-900 dark:text-white">{unit.monthly_rent ? `€${unit.monthly_rent.toLocaleString('nl-NL')}` : '-'}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Tenants Section */}
+                                  <div className="mb-4">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
+                                    {tenants.length > 0 ? (
+                                      <div className="flex flex-wrap gap-2">
+                                        {tenants.map((tenant) => (
+                                          <Link
+                                            key={tenant.id}
+                                            href={`${basePath}/tenants/${tenant.id}`}
+                                            className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                                          >
+                                            <span className="font-medium text-sm text-gray-900 dark:text-white">
+                                              {tenant.full_name}
+                                            </span>
+                                            <Eye className="h-4 w-4 text-gray-400" />
+                                          </Link>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="flex items-center gap-2 justify-end">
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => handleStartEditUnit(unit)}
+                                    >
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Bewerken
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
                             </div>
                           )
-                        })}
-                      </div>
-                    ) : (
-                      <div className="py-12 text-center">
-                        <DoorOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                          Geen units beschikbaar
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                          Voeg units toe aan dit object
-                        </p>
-                        <Button 
-                          className="bg-[#163300] hover:bg-[#356258] text-white"
-                          onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/new`)}
-                        >
-                          <DoorOpen className="h-4 w-4 mr-2" />
-                          Eerste Unit Toevoegen
-                        </Button>
-                      </div>
-                    )}
+                        })
+                      ) : !newUnitDraft ? (
+                        <div className="py-12 text-center">
+                          <DoorOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                            Geen units beschikbaar
+                          </h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            Voeg units toe aan dit object
+                          </p>
+                          <Button 
+                            className="bg-[#163300] hover:bg-[#356258] text-white"
+                            onClick={handleAddUnit}
+                          >
+                            <DoorOpen className="h-4 w-4 mr-2" />
+                            Eerste Unit Toevoegen
+                          </Button>
+                        </div>
+                      ) : null}
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
