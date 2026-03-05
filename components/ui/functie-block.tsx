@@ -4,6 +4,8 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 export interface FunctieBlockProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Demo-stijl: 'gray' = grijs (#f4f4f4), 'borderOnly' = wit + alleen rand (geen schaduw, geen achtergrond) */
+  demoStyle?: boolean | 'gray' | 'borderOnly'
   /** Icoon linksboven (bijv. Lucide icon). Optioneel in marketing-layout. */
   icon?: React.ReactNode
   /** Optioneel: kleine trend/grafiek rechtsboven (bijv. golfje of TrendingUp) */
@@ -37,6 +39,7 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
   (
     {
       className,
+      demoStyle = false,
       icon,
       trend,
       badge,
@@ -58,7 +61,12 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden',
+          'rounded-card overflow-hidden',
+          demoStyle === 'borderOnly'
+            ? 'bg-white dark:bg-transparent border border-gray-200 dark:border-neutral-600'
+            : demoStyle === 'gray' || demoStyle === true
+              ? 'bg-[#f4f4f4] dark:bg-neutral-800'
+              : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg',
           compact ? 'p-3' : 'p-5',
           className
         )}
@@ -91,7 +99,15 @@ const FunctieBlock = React.forwardRef<HTMLDivElement, FunctieBlockProps>(
           {title}
         </p>
         {value != null && (
-          <div className={cn('rounded-2xl bg-gray-100 dark:bg-neutral-800 p-3 mt-2', compact && 'p-2')}>
+          <div className={cn(
+            'rounded-2xl p-3 mt-2',
+            demoStyle === 'borderOnly'
+              ? 'border border-gray-200 dark:border-neutral-600'
+              : demoStyle === 'gray' || demoStyle === true
+                ? 'bg-white/60 dark:bg-neutral-700'
+                : 'bg-gray-100 dark:bg-neutral-800',
+            compact && 'p-2'
+          )}>
             <div className={cn('font-bold text-brand-primary dark:text-brand-accent tracking-tight', compact ? 'text-base' : 'text-2xl')}>
               {value}
             </div>

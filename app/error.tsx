@@ -21,25 +21,25 @@ export default function Error({
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Something went wrong!</CardTitle>
+          <CardTitle>Er is iets misgegaan</CardTitle>
           <CardDescription>
-            An error occurred while loading the page
+            Er is een fout opgetreden bij het laden van de pagina
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            <p className="font-semibold">Error:</p>
-            <p>{error.message || 'Unknown error'}</p>
+            <p className="font-semibold">Fout:</p>
+            <p>{error.message || 'Onbekende fout'}</p>
             {error.digest && (
-              <p className="mt-2 text-xs">Error ID: {error.digest}</p>
+              <p className="mt-2 text-xs">Fout-ID: {error.digest}</p>
             )}
           </div>
           <div className="flex gap-2">
             <Button onClick={reset} variant="outline">
-              Try again
+              Probeer opnieuw
             </Button>
             <Button asChild>
-              <Link href="/">Go home</Link>
+              <Link href="/">Naar home</Link>
             </Button>
           </div>
         </CardContent>

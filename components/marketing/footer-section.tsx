@@ -13,7 +13,7 @@ export function FooterSection() {
           <div className="flex flex-col gap-6 lg:max-w-md lg:flex-1">
             {/* Logo */}
             <div className="overflow-visible">
-              <Logo width={200} height={56} />
+              <Logo width={120} height={34} />
             </div>
             
             {/* Description */}
@@ -40,13 +40,13 @@ export function FooterSection() {
           <div className="flex flex-col gap-8 items-end">
             {/* Two Columns of Links */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 w-full">
-            {/* Product Column - same as header */}
+            {/* Product Column - aligned met header */}
             <div>
               <h4 className="mb-4 text-sm font-semibold text-gray-900 dark:text-gray-100">Product</h4>
               <ul className="flex flex-col gap-3">
                 <li>
                   <Link
-                    href="#features"
+                    href="/functies"
                     className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Functies
@@ -54,7 +54,7 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
-                    href="#pricing"
+                    href="/#pricing"
                     className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Prijzen
@@ -62,10 +62,10 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
-                    href="/tools/wws-calculator"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                    href="/blog"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
-                    WWS Calculator
+                    Kennisbank
                   </Link>
                 </li>
                 <li>
@@ -73,7 +73,7 @@ export function FooterSection() {
                     href="/hulp"
                     className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
                   >
-                    Hulp
+                    Hulp &amp; Contact
                   </Link>
                 </li>
                 <li>
@@ -81,7 +81,15 @@ export function FooterSection() {
                     href="/contact"
                     className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
                   >
-                    Contact
+                    Contactformulier
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/faq"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                  >
+                    FAQ
                   </Link>
                 </li>
               </ul>
@@ -105,14 +113,6 @@ export function FooterSection() {
                     className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Voorwaarden
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/faq"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
-                  >
-                    FAQ
                   </Link>
                 </li>
               </ul>

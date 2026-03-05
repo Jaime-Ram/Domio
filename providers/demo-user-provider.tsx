@@ -50,6 +50,7 @@ export function DemoUserProvider({ children }: { children: React.ReactNode }) {
         profile,
         loading: false,
         isDemo: true,
+        basePath: '/demo/app',
         refetch,
       }}
     >

@@ -43,11 +43,6 @@ import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
-const COMPLIANCE_NAV = [
-  { label: 'WWS Overzicht', href: '/dashboard/employer/compliance', icon: BarChart3 },
-  { label: 'Puntentelling', href: '/dashboard/employer/compliance/puntentelling', icon: Calculator },
-  { label: 'Alerts', href: '/dashboard/employer/compliance/alerts', icon: AlertTriangle },
-]
 
 const SECTOR_LABELS: Record<WWSSector, string> = {
   sociaal: 'Sociaal',
@@ -104,9 +99,16 @@ function SectorDonutChart({
   )
 }
 
+const getComplianceNav = (basePath: string) => [
+  { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
+  { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
+  { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
+]
+
 export default function CompliancePage() {
   const router = useRouter()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
+  const COMPLIANCE_NAV = getComplianceNav(basePath)
   const [searchQuery, setSearchQuery] = useState('')
   const [sectorFilter, setSectorFilter] = useState<WWSSector | 'all'>('all')
   const [sortKey, setSortKey] = useState<SortKey>('address')
@@ -289,7 +291,7 @@ export default function CompliancePage() {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">Actie: {alert.actie}</p>
                     <div className="flex gap-2 mt-3">
                       <Button size="sm" variant="outline" asChild>
-                        <Link href={`/dashboard/employer/portfolio/properties/${alert.objectId}`}>
+                        <Link href={`${basePath}/portfolio/properties/${alert.objectId}`}>
                           <Eye className="h-3 w-3 mr-1" />
                           Bekijk object
                         </Link>
@@ -405,12 +407,12 @@ export default function CompliancePage() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           <Button size="sm" variant="ghost" title="Herbereken" asChild>
-                            <Link href={`/dashboard/employer/portfolio/properties/${obj.id}`}>
+                            <Link href={`${basePath}/portfolio/properties/${obj.id}`}>
                               <RefreshCw className="h-4 w-4" />
                             </Link>
                           </Button>
                           <Button size="sm" variant="ghost" title="PDF" asChild>
-                            <Link href={`/dashboard/employer/portfolio/properties/${obj.id}`}>
+                            <Link href={`${basePath}/portfolio/properties/${obj.id}`}>
                               <FileText className="h-4 w-4" />
                             </Link>
                           </Button>

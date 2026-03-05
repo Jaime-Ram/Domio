@@ -168,7 +168,7 @@ export function FunctiesSection() {
 
         <div className="mt-14 sm:mt-16 flex justify-center">
           <Link
-            href="/#features"
+            href="/functies"
             className="inline-flex items-center justify-center px-10 py-3.5 rounded-full bg-[#163300] text-white font-semibold text-base shadow-lg shadow-[#163300]/20 hover:bg-[#163300]/90 transition-colors"
           >
             Ontdek alle functies

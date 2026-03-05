@@ -5,14 +5,17 @@ import { Calendar, Wrench, ClipboardCheck } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
-const MAINTENANCE_NAV = [
-  { label: 'Tickets', href: '/dashboard/employer/maintenance', icon: Wrench },
-  { label: 'Inspecties', href: '/dashboard/employer/maintenance/inspecties', icon: ClipboardCheck },
-  { label: 'Planning', href: '/dashboard/employer/maintenance/planning', icon: Calendar },
+const getMaintenanceNav = (basePath: string) => [
+  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+  { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
+  { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
 ]
 
 export default function PlanningPage() {
+  const { basePath } = useDashboardUser()
+  const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   return (
     <div className="space-y-6">
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} />
@@ -32,7 +35,7 @@ export default function PlanningPage() {
             Planning is gekoppeld aan onderhoudstickets.
           </p>
           <Button asChild variant="default">
-            <Link href="/dashboard/employer/maintenance">Naar Tickets</Link>
+            <Link href={`${basePath}/maintenance`}>Naar Tickets</Link>
           </Button>
         </CardContent>
       </Card>

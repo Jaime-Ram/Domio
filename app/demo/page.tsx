@@ -9,6 +9,9 @@ export default function DemoPage() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'domio_demo=1; path=/; max-age=86400' // 24 uur
+    }
     router.prefetch('/demo/app')
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)

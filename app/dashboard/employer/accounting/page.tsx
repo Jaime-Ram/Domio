@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -93,6 +94,7 @@ const accountingIntegrations: AccountingIntegration[] = [
 ]
 
 export default function AccountingPage() {
+  const { basePath } = useDashboardUser()
   const [integrations, setIntegrations] = useState<AccountingIntegration[]>(accountingIntegrations)
   const [showConnectDialog, setShowConnectDialog] = useState<string | null>(null)
   const [selectedIntegration, setSelectedIntegration] = useState<AccountingIntegration | null>(null)
@@ -184,7 +186,7 @@ export default function AccountingPage() {
                 Registreer en beheer financiële transacties
               </p>
               <Button variant="outline" size="sm" className="w-full" asChild>
-                <a href="/dashboard/employer/financial">Ga naar Financieel</a>
+                <a href={`${basePath}/financial`}>Ga naar Financieel</a>
               </Button>
             </div>
             <div className="p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">

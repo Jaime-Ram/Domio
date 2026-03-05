@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { MessageCircle, Phone, Mail, HelpCircle, ArrowRight, Clock } from 'lucide-react'
+import { MessageCircle, Phone, Mail, HelpCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/Logo'
+import { MarketingLayout } from '@/components/marketing/marketing-layout'
+import { FooterSection } from '@/components/marketing/footer-section'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 
@@ -12,30 +13,21 @@ const WHATSAPP_LINK = `https://wa.me/31646231696`
 
 export default function HulpPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur border-b border-gray-200 dark:border-neutral-800">
-        <div className="mx-auto max-w-4xl px-6 h-16 flex items-center justify-between">
-          <Logo width={100} height={28} href="/" />
-          <Link
-            href="/"
-            className="text-sm font-medium text-gray-600 hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#9FE870] transition-colors"
-          >
-            ← Terug
-          </Link>
-        </div>
-      </header>
+    <MarketingLayout>
+      <main className="min-h-screen bg-white dark:bg-gray-900">
+        <section className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:pt-24 sm:pb-16 lg:px-8">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl font-bold tracking-tight text-[#163300] dark:text-white sm:text-5xl md:text-6xl">
+              Klantenservice
+            </h1>
+            <p className="mt-6 text-lg text-gray-600 dark:text-gray-400">
+              We staan voor je klaar. Kies hoe je contact wilt opnemen.
+            </p>
+          </div>
+        </section>
 
-      <main className="mx-auto max-w-4xl px-6 py-12 md:py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight text-[#163300] dark:text-white sm:text-5xl">
-            Klantenservice
-          </h1>
-          <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
-            We staan voor je klaar. Kies hoe je contact wilt opnemen.
-          </p>
-        </div>
-
+        <div className="mx-auto max-w-7xl px-6 pb-16 md:px-8 md:pb-20">
+        <div className="max-w-4xl">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Live chat / WhatsApp – primair voor direct contact */}
           <a
@@ -137,23 +129,15 @@ export default function HulpPage() {
           </Link>
         </div>
 
-        {/* Openingstijden */}
-        <div className="mt-12 rounded-2xl border border-gray-200 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-900/50 p-6 flex items-center gap-4">
-          <Clock className="h-6 w-6 shrink-0 text-[#163300] dark:text-[#9FE870]" />
-          <div>
-            <p className="font-medium text-gray-900 dark:text-white">Beschikbaarheid</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              WhatsApp: meestal binnen minuten. Telefoon: ma–vr 09:00–17:00.
-            </p>
-          </div>
-        </div>
-
         <div className="mt-8 text-center">
-          <Button asChild variant="outline" className="rounded-full border-[#163300]/30 text-[#163300] hover:bg-[#163300]/5 hover:border-[#163300]">
+          <Button asChild className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
             <Link href="/contact">Uitgebreid contactformulier →</Link>
           </Button>
         </div>
+        </div>
+        </div>
       </main>
-    </div>
+      <FooterSection />
+    </MarketingLayout>
   )
 }

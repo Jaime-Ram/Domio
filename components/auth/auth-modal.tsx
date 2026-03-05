@@ -17,6 +17,7 @@ import {
 import { Logo } from '@/components/Logo'
 import { AlertCircle } from 'lucide-react'
 import { signIn, signUp, signInWithGoogle } from '@/lib/supabase/auth'
+import { translateAuthError } from '@/lib/auth-errors'
 
 interface AuthModalProps {
   open: boolean
@@ -118,7 +119,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
         router.push('/dashboard/employer')
       }
     } catch (err: any) {
-      setError(err.message || 'Er is een fout opgetreden')
+      setError(translateAuthError(err.message || 'Er is een fout opgetreden'))
       setLoading(false)
     }
   }
@@ -130,7 +131,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
       const { error: authError } = await signInWithGoogle()
       if (authError) throw authError
     } catch (err: any) {
-      setError(err.message || 'Google inloggen mislukt')
+      setError(translateAuthError(err.message || 'Google inloggen mislukt'))
       setLoading(false)
     }
   }
@@ -377,7 +378,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
 
             <Button 
               type="submit" 
-              className={`w-full mt-auto ${
+              className={`w-full h-12 rounded-full mt-auto ${
                 mode === 'login'
                   ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
                   : mode === 'signup' && signupStep === 1
@@ -385,7 +386,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                   : mode === 'signup' && signupStep === 2
                   ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
                   : ''
-              }`}
+              } font-semibold text-base border-0 shadow-sm`}
               disabled={loading}
             >
               {loading
@@ -413,7 +414,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
             <SocialButton
               type="button"
               variant="google"
-              className="w-full"
+              className="w-full h-12 rounded-xl"
               onClick={handleGoogleLogin}
               disabled={loading}
             >

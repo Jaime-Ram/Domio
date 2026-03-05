@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { translateAuthError } from '@/lib/auth-errors'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
@@ -60,7 +61,7 @@ export default function ResetPasswordPage() {
       if (authError) throw authError
       setSuccess(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Wachtwoord wijzigen mislukt')
+      setError(translateAuthError(err instanceof Error ? err.message : 'Wachtwoord wijzigen mislukt'))
     } finally {
       setLoading(false)
     }

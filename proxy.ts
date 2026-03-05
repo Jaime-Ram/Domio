@@ -32,6 +32,11 @@ export async function proxy(request: NextRequest) {
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
   const isDemo = request.cookies.get('domio_demo')?.value === '1'
 
+  // Demo volledig gescheiden: bij domio_demo cookie mag men niet naar /dashboard (eigen account)
+  if (isDashboard && isDemo) {
+    return NextResponse.redirect(new URL('/demo/app', request.url))
+  }
+
   if (isDashboard && !session && !isDemo) {
     return NextResponse.redirect(new URL('/login', request.url))
   }

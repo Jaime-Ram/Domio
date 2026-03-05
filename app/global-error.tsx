@@ -11,9 +11,9 @@ export default function GlobalError({
     <html>
       <body>
         <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
-          <h1>Application Error</h1>
-          <p>{error.message || 'An unexpected error occurred'}</p>
-          <button onClick={reset}>Try again</button>
+          <h1>Applicatiefout</h1>
+          <p>{error.message || 'Er is een onverwachte fout opgetreden.'}</p>
+          <button onClick={reset}>Probeer opnieuw</button>
         </div>
       </body>
     </html>

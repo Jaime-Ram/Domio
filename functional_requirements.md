@@ -8,6 +8,7 @@ MoSCoW standard:
 - C := Could have
 - W := Won't have
 
+<<<<<<< HEAD
 ### 1. Account
 
 - M: Een verhuurder moet kunnen inloggen
@@ -20,6 +21,9 @@ MoSCoW standard:
 - M: Een huurder moet automatisch naar de verhuurder dashboard worden geleid
 
 ### 2. Pandenbeheer
+=======
+### 1. Pandenbeheer
+>>>>>>> main
 
 - M: Een verhuurder moet handmatig een pand kunnen toevoegen (adres, type, aantal eenheden, etc.)
 - M: Een verhuurder moet een pand kunnen toevoegen via de AI scan
@@ -33,7 +37,11 @@ MoSCoW standard:
 - M: Een verhuurder moet een object kunnen verwijderen
 - C: Een verhuurder moet een object van een pand naar een ander pand kunnen overzetten
 
+<<<<<<< HEAD
 ### 3. Huurdersbeheer
+=======
+### 2. Huurdersbeheer
+>>>>>>> main
 
 - M: Een verhuurder moet een huurder kunnen toevoegen aan een object
 - M: Een verhuurder moet een huurder kunnen toevoegen door een contract in te scannen
@@ -45,7 +53,11 @@ MoSCoW standard:
 - S: Een verhuurder moet een contract kunnen maken voor een bestaande huurder
 - C: Een verhuurder moet een contract kunnen laten ondertekenen door een bestaande huurder
 
+<<<<<<< HEAD
 ### 4. Onderhoud & Tickets
+=======
+### 3. Onderhoud & Tickets
+>>>>>>> main
 
 - M: Een verhuurder moet een ticket kunnen aanmaken voor een pand
 - M: Een verhuurder moet een ticket kunnen aanmaken voor een object
@@ -54,7 +66,11 @@ MoSCoW standard:
 - M: Een verhuurder moet de status van een ticket kunnen bijwerken (open, in behandeling, afgerond)
 - C: Een verhuurder moet een ticket kunnen toewijzen aan een derde partij (bijv. aannemer)
 
+<<<<<<< HEAD
 ### 5. Betalingsbeheer
+=======
+### 4. Betalingsbeheer
+>>>>>>> main
 
 - M: Een verhuurder moet een overzicht kunnen zien van verwachte en ontvangen betalingen
 - M: Een verhuurder moet een betaling handmatig kunnen registreren
@@ -63,7 +79,11 @@ MoSCoW standard:
 - S: Een verhuurder moet een betalingsherinnering kunnen sturen
 - C: Een verhuurder moet een loonsverhoging mail kunnen sturen
 
+<<<<<<< HEAD
 ### 6. Communicatie
+=======
+### 5. Communicatie
+>>>>>>> main
 
 - M: Een verhuurder moet vanuit een onderhoudsticket een bericht kunnen sturen naar de betreffende huurder
 - M: Een verhuurder moet de communicatiehistorie per ticket kunnen inzien

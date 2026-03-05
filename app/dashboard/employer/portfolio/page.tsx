@@ -20,14 +20,16 @@ import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-
-const PORTFOLIO_NAV = [
-  { label: 'Objecten', href: '/dashboard/employer/portfolio', icon: Building2 },
-  { label: 'Huurders', href: '/dashboard/employer/tenants', icon: Users },
-]
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 export default function PortfolioPage() {
   const router = useRouter()
+  const { basePath } = useDashboardUser()
+
+  const PORTFOLIO_NAV = [
+    { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
+    { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
+  ]
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [properties, setProperties] = useState<any[]>([])
@@ -99,7 +101,7 @@ export default function PortfolioPage() {
           </p>
         </div>
         <Button 
-          onClick={() => router.push('/dashboard/employer/portfolio/properties/new')}
+          onClick={() => router.push(`${basePath}/portfolio/properties/new`)}
           className="bg-[#163300] hover:bg-[#356258] text-white"
         >
           <Plus className="h-4 w-4 mr-2" />

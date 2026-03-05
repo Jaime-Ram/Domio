@@ -32,6 +32,8 @@ export interface TransactionListWidgetProps {
   compact?: boolean
   /** Gebruik shadow-card-elevated en overflow-visible (voor Functies-sectie op gekleurde achtergrond) */
   elevatedShadow?: boolean
+  /** Demo-stijl: lichtgrijs (#FAFAFA), geen schaduw */
+  demoStyle?: boolean
 }
 
 const CARD_CLASS =
@@ -53,10 +55,13 @@ export function TransactionListWidget({
   className,
   compact = false,
   elevatedShadow = false,
+  demoStyle = false,
 }: TransactionListWidgetProps) {
-  const cardClass = elevatedShadow
-    ? 'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-card-elevated overflow-visible'
-    : CARD_CLASS
+  const cardClass = demoStyle
+    ? 'rounded-card bg-[#f4f4f4] dark:bg-neutral-800 overflow-hidden shadow-none'
+    : elevatedShadow
+      ? 'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-card-elevated overflow-visible'
+      : CARD_CLASS
   return (
     <div className={cn(cardClass, 'p-5', className)}>
       <div className="flex items-center justify-between mb-4">
@@ -73,7 +78,7 @@ export function TransactionListWidget({
           </Link>
         )}
       </div>
-      <div className="border-t border-gray-200/80 dark:border-neutral-700 pt-3">
+      <div className={cn('pt-3', !demoStyle && 'border-t border-gray-200/80 dark:border-neutral-700')}>
         <ul className="space-y-0">
           {items.map((item, index) => (
             <li

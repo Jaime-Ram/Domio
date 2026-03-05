@@ -42,6 +42,8 @@ interface DashboardUserContextValue {
   profile: Profile | null
   loading: boolean
   isDemo: boolean
+  /** Base path voor links: /demo/app in demo, /dashboard/employer anders */
+  basePath: string
   refetch: () => Promise<void>
 }
 
@@ -50,6 +52,7 @@ export const DashboardUserContext = createContext<DashboardUserContextValue>({
   profile: null,
   loading: true,
   isDemo: false,
+  basePath: '/dashboard/employer',
   refetch: async () => {},
 })
 
@@ -116,6 +119,7 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
         profile,
         loading,
         isDemo,
+        basePath: isDemo ? '/demo/app' : '/dashboard/employer',
         refetch: fetchUserAndProfile,
       }}
     >

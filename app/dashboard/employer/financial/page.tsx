@@ -54,16 +54,17 @@ import { nl } from 'date-fns/locale'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
-const FINANCIAL_NAV = [
-  { label: 'Facturatie', href: '/dashboard/employer/financial', icon: Receipt },
-  { label: 'Betalingen', href: '/dashboard/employer/financial/betalingen', icon: CreditCard },
-  { label: 'Rendement', href: '/dashboard/employer/financial/rendement', icon: TrendingUp },
-  { label: 'Bankimport', href: '/dashboard/employer/financial/bankimport', icon: Scan },
+const getFinancialNav = (basePath: string) => [
+  { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
+  { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
+  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
+  { label: 'Bankimport', href: `${basePath}/financial/bankimport`, icon: Scan },
 ]
 
 export default function FinancialPage() {
   const router = useRouter()
-  const { isDemo } = useDashboardUser()
+  const { isDemo, basePath } = useDashboardUser()
+  const FINANCIAL_NAV = getFinancialNav(basePath)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
 
