@@ -42,15 +42,16 @@ export async function POST(request: NextRequest) {
       if (!user) {
         return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 })
       }
-      const { data: payment, error: payErr } = await supabase
+      const { data: paymentData, error: payErr } = await supabase
         .from('payments')
         .select('id, owner_id, status')
         .eq('id', paymentId)
         .eq('owner_id', user.id)
         .single()
-      if (payErr || !payment) {
+      if (payErr || !paymentData) {
         return NextResponse.json({ error: 'Betaling niet gevonden' }, { status: 404 })
       }
+      const payment = paymentData as { id: string; owner_id: string; status: string }
       if (payment.status === 'betaald') {
         return NextResponse.json({ error: 'Deze betaling is al voldaan' }, { status: 400 })
       }
@@ -66,10 +67,8 @@ export async function POST(request: NextRequest) {
     })
 
     if (linkedPaymentId) {
-      await supabase
-        .from('payments')
-        .update({ tink_payment_request_id: result.id })
-        .eq('id', linkedPaymentId)
+      // @ts-expect-error - payments.Update allows tink_payment_request_id; Supabase infers never in some builds
+      await supabase.from('payments').update({ tink_payment_request_id: result.id }).eq('id', linkedPaymentId)
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin

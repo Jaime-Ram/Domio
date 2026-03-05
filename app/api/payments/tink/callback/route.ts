@@ -30,18 +30,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${cancelUrl}&reason=config`)
   }
 
-  const { data: payment } = await admin
+  const { data } = await admin
     .from('payments')
     .select('id, status')
     .eq('tink_payment_request_id', paymentRequestId)
     .maybeSingle()
 
+  const payment = data as { id: string; status: string } | null
   if (payment && payment.status !== 'betaald') {
     const today = new Date().toISOString().split('T')[0]
-    await admin
-      .from('payments')
-      .update({ status: 'betaald', paid_date: today })
-      .eq('id', payment.id)
+    // Supabase client infers update payload as 'never' in some build environments; types are correct in lib/supabase/types.ts
+    // @ts-expect-error - payments.Update allows status and paid_date
+    await admin.from('payments').update({ status: 'betaald', paid_date: today }).eq('id', payment.id)
   }
 
   return NextResponse.redirect(successUrl)
