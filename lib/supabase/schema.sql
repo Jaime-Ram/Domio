@@ -137,6 +137,7 @@ create table if not exists public.payments (
     paid_date date,
     status text not null default 'openstaand' check (status in ('betaald', 'openstaand', 'te_laat', 'geannuleerd')),
     description text,
+    tink_payment_request_id text,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

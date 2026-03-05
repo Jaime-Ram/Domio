@@ -756,6 +756,17 @@ export const paymentQueries = {
     return data;
   },
 
+  // Get payment by Tink payment request id (for callback)
+  async getByTinkPaymentRequestId(tinkPaymentRequestId: string) {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('tink_payment_request_id', tinkPaymentRequestId)
+      .maybeSingle();
+    if (error) throw error;
+    return data as Payment | null;
+  },
+
   // Create payment
   async create(payment: PaymentInsert) {
     const { data, error } = await supabase
