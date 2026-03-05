@@ -16,6 +16,7 @@ import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 import { supabase } from '@/lib/supabase/client'
+import { getUser } from '@/lib/supabase/auth'
 import { getProfile } from '@/lib/supabase/profile'
 
 // Lazy load heavy sections for better initial load
@@ -48,7 +49,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { user } = await getUser()
       if (user) {
         const profile = await getProfile(user.id)
         const name = profile?.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? user.email?.split('@')[0] ?? 'daar'

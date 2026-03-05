@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
+import { getUser } from '@/lib/supabase/auth'
 import { getProfile, type Profile } from '@/lib/supabase/profile'
 import { currentUser } from '@/lib/mock-data/domio-dashboard'
 
@@ -71,19 +72,12 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
   const [isDemo, setIsDemo] = useState(false)
 
   const fetchUserAndProfile = async () => {
-    const { data: { user: u }, error } = await supabase.auth.getUser()
+    const { user: u } = await getUser()
 
     if (isDemoMode()) {
       setUser(getDemoUser())
       setProfile(getDemoProfile())
       setIsDemo(true)
-      setLoading(false)
-      return
-    }
-
-    if (error) {
-      setUser(null)
-      setProfile(null)
       setLoading(false)
       return
     }

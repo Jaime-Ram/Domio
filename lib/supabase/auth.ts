@@ -59,12 +59,28 @@ export async function resetPassword(email: string) {
   return { data, error }
 }
 
+/** Ongeldige refresh token – sessie opschonen zodat gebruiker opnieuw kan inloggen */
+function isInvalidRefreshTokenError(error: { message?: string } | null): boolean {
+  return Boolean(
+    error?.message &&
+    (error.message.includes('Refresh Token') || error.message.includes('refresh_token') || error.message.includes('JWT'))
+  )
+}
+
 export async function getSession() {
   const { data, error } = await supabase.auth.getSession()
+  if (error && isInvalidRefreshTokenError(error)) {
+    await supabase.auth.signOut({ scope: 'local' })
+    return { session: null, error: null }
+  }
   return { session: data.session, error }
 }
 
 export async function getUser() {
   const { data, error } = await supabase.auth.getUser()
+  if (error && isInvalidRefreshTokenError(error)) {
+    await supabase.auth.signOut({ scope: 'local' })
+    return { user: null, error: null }
+  }
   return { user: data.user, error }
 }

@@ -6,9 +6,30 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
 import { MarketingLayout } from '@/components/marketing/marketing-layout'
 import { FooterSection } from '@/components/marketing/footer-section'
+import { FeatureCard } from '@/components/marketing/feature-card'
 import { FunctieFeatureBlock, InkomstenWidget, PortefeuilleWidget, ComplianceWidget, FeatureImagePlaceholder } from '@/components/marketing/functie-feature-block'
 import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
 import { FileText, Wrench, Euro, UserPlus, ArrowUpRight, Plus, Minus } from 'lucide-react'
+
+/** Afbeeldingen uit public (worden geroteerd over de kaarten) */
+const FEATURE_IMAGES = [
+  '/images/Achtergrond5.jpg',
+  '/images/Achtergrond11.jpg',
+  '/images/gebouwen_silhouet.svg',
+] as const
+
+/** Feature-kaarten voor het grid (categorie, titel, beschrijving, demo-link) */
+const FEATURE_CARDS = [
+  { category: 'Financieel', title: 'Maandelijkse inkomsten inzichtelijk', description: 'Volg je huurinkomsten in realtime. Bekijk trends per week en maand, en exporteer rapporten voor je boekhouding.', demoHref: '/demo' },
+  { category: 'Portefeuille', title: 'Portefeuille en objecten beheren', description: 'Overzicht van al je panden en units. Beheer huurders, contracten en documenten per object. Altijd up-to-date.', demoHref: '/demo' },
+  { category: 'Dashboard', title: 'Recente activiteit op één plek', description: 'Zie direct wat er speelt: nieuwe huurders, onderhoudsmeldingen, betalingen en contractwijzigingen. Nooit meer iets missen.', demoHref: '/demo' },
+  { category: 'Compliance', title: 'Compliance en WWS-scoring', description: 'Houd je energieprestatie bij met automatische WWS-berekening en puntentelling. Blijf compliant met actuele regelgeving.', demoHref: '/demo' },
+  { category: 'Financieel', title: 'Facturatie en betalingen', description: 'Stuur facturen, volg betalingen en koppel je bank voor automatische import. Volledig overzicht van je financiën.', demoHref: '/demo' },
+  { category: 'Onderhoud', title: 'Onderhoud en inspecties', description: 'Beheer meldingen, plan inspecties en wijs onderhoud toe aan leveranciers. Alles geregeld vanuit één dashboard.', demoHref: '/demo' },
+  { category: 'Documenten', title: 'Drive en documenten', description: 'Centrale opslag voor contracten, rapporten en overige documenten. Zoekbaar en gekoppeld aan objecten en huurders.', demoHref: '/demo' },
+  { category: 'Rapportage', title: 'Rapportages', description: 'Genereer overzichten en exporteer data voor je boekhouding of belastingaangifte.', demoHref: '/demo' },
+  { category: 'Communicatie', title: 'Communicatie', description: 'Berichten en notities met huurders, alles gekoppeld aan objecten en tickets.', demoHref: '/demo' },
+]
 
 const MINDER_BELANGRIJKE_FUNCTIES = [
   { title: 'Rapportages', description: 'Genereer overzichten en exporteer data voor je boekhouding of belastingaangifte.', demoHref: '/demo' },
@@ -71,7 +92,34 @@ export default function FunctiesPage() {
           </div>
         </section>
 
-        {/* Functies — scrollbare sectie */}
+        {/* Overzicht in kaarten — meerdere rijen */}
+        <section className="border-t border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/30">
+          <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8">
+            <h2 className="text-2xl font-bold tracking-tight text-[#163300] dark:text-[#9FE870] sm:text-3xl">
+              Alle functies op een rij
+            </h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl">
+              Klik door naar de demo om elke functie in actie te zien.
+            </p>
+            <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURE_CARDS.map((card, index) => (
+                <FeatureCard
+                  key={card.title}
+                  imageSrc={FEATURE_IMAGES[index % FEATURE_IMAGES.length]}
+                  imageAlt={card.title}
+                  category={card.category}
+                  title={card.title}
+                  description={card.description}
+                  href={card.demoHref}
+                  footerLabel="Bekijk in demo"
+                  footerMeta="Direct in de app"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Functies — scrollbare sectie (grote blokken) */}
         <section className="border-t border-gray-200 dark:border-neutral-800">
           <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8 space-y-24 sm:space-y-32">
             {/* 1. Maandelijkse inkomsten */}
