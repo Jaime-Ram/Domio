@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,10 +13,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { ArrowLeft, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
+import { propertyQueries } from '@/lib/supabase/queries'
 
 const PROPERTY_TYPES = [
   { value: 'appartement', label: 'Appartement' },
@@ -30,10 +42,14 @@ const PROPERTY_TYPES = [
 
 const ENERGY_LABELS = ['A+++++', 'A++++', 'A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
 
-export default function NewPropertyPage() {
+export default function EditPropertyPage() {
   const router = useRouter()
+  const params = useParams()
+  const propertyId = params.id as string
   const { user } = useDashboardUser()
   const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [fetching, setFetching] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: '',
@@ -46,25 +62,52 @@ export default function NewPropertyPage() {
     energy_label: '',
   })
 
+  useEffect(() => {
+    const loadProperty = async () => {
+      try {
+        const data = await propertyQueries.getWithUnits(propertyId) as any
+        if (data) {
+          setForm({
+            name: data.name || '',
+            address: data.address || '',
+            postcode: data.postcode || '',
+            city: data.city || '',
+            type: data.type || 'appartement',
+            build_year: data.build_year?.toString() || '',
+            woz_value: data.woz_value?.toString() || '',
+            energy_label: data.energy_label || '',
+          })
+        }
+      } catch (err) {
+        setError('Kon pand niet laden')
+      } finally {
+        setFetching(false)
+      }
+    }
+    loadProperty()
+  }, [propertyId])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user?.id) return
     setLoading(true)
     setError(null)
     try {
-      const { error: err } = await supabase.from('properties').insert({
-        owner_id: user.id,
-        name: form.name || form.address || 'Nieuw pand',
-        address: form.address,
-        postcode: form.postcode || null,
-        city: form.city || null,
-        type: form.type,
-        build_year: form.build_year ? parseInt(form.build_year) : null,
-        woz_value: form.woz_value ? parseFloat(form.woz_value) : null,
-        energy_label: form.energy_label || null,
-      } as never)
+      const { error: err } = await supabase
+        .from('properties')
+        .update({
+          name: form.name || form.address || 'Nieuw pand',
+          address: form.address,
+          postcode: form.postcode || null,
+          city: form.city || null,
+          type: form.type,
+          build_year: form.build_year ? parseInt(form.build_year) : null,
+          woz_value: form.woz_value ? parseFloat(form.woz_value) : null,
+          energy_label: form.energy_label || null,
+        } as never)
+        .eq('id', propertyId)
       if (err) throw err
-      router.push('/dashboard/employer/portfolio')
+      router.push(`/dashboard/employer/portfolio/properties/${propertyId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
     } finally {
@@ -72,20 +115,46 @@ export default function NewPropertyPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!user?.id) return
+    setDeleting(true)
+    setError(null)
+    try {
+      const { error: err } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId)
+      if (err) throw err
+      router.push('/dashboard/employer/portfolio')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
+      setDeleting(false)
+    }
+  }
+
+  if (fetching) {
+    return (
+      <div className="max-w-xl space-y-6 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-neutral-700 rounded w-1/3" />
+        <div className="h-96 bg-gray-200 dark:bg-neutral-700 rounded" />
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-xl">
       <Link
-        href="/dashboard/employer/portfolio"
+        href={`/dashboard/employer/portfolio/properties/${propertyId}`}
         className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870] mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
-        Terug naar portefeuille
+        Terug naar pand
       </Link>
       <Card>
         <CardHeader>
-          <CardTitle>Nieuw pand toevoegen</CardTitle>
+          <CardTitle>Pand bewerken</CardTitle>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Vul de gegevens van je pand in.
+            Wijzig de gegevens van je pand.
           </p>
         </CardHeader>
         <CardContent>
@@ -189,13 +258,41 @@ export default function NewPropertyPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={loading} className="bg-[#163300] hover:bg-[#356258]">
-                {loading ? 'Bezig...' : 'Pand toevoegen'}
-              </Button>
-              <Button type="button" variant="outline" asChild>
-                <Link href="/dashboard/employer/portfolio">Annuleren</Link>
-              </Button>
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex gap-3">
+                <Button type="submit" disabled={loading} className="bg-[#163300] hover:bg-[#356258]">
+                  {loading ? 'Bezig...' : 'Opslaan'}
+                </Button>
+                <Button type="button" variant="outline" asChild>
+                  <Link href={`/dashboard/employer/portfolio/properties/${propertyId}`}>Annuleren</Link>
+                </Button>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Verwijderen
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Pand verwijderen</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Weet je zeker dat je dit pand wilt verwijderen? Alle bijbehorende units, huurcontracten en documenten worden permanent verwijderd. Deze actie kan niet ongedaan worden gemaakt.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white"
+                    >
+                      {deleting ? 'Bezig...' : 'Definitief verwijderen'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </form>
         </CardContent>

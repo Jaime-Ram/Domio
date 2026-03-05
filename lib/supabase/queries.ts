@@ -86,12 +86,12 @@ export const propertyQueries = {
   async getByOwner(ownerId: string) {
     const { data, error } = await supabase
       .from('properties')
-      .select('*')
+      .select('*, units(id, monthly_rent)')
       .eq('owner_id', ownerId)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data as Property[];
+    return data as (Property & { units: { id: string; monthly_rent: number | null }[] })[];
   },
 
   // Get single property with units

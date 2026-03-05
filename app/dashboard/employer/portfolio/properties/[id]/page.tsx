@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -245,8 +245,11 @@ function ComplianceTabContent({
 export default function PropertyDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const { isDemo } = useDashboardUser()
   const propertyId = params.id as string
+  const initialTab = searchParams.get('tab') || 'basic'
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [unitLeases, setUnitLeases] = useState<Record<string, any>>({})
@@ -369,11 +372,11 @@ export default function PropertyDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  {getStatusBadge(property.status)}
                   <Button 
                     variant="outline"
                     onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/edit`)}
                   >
+                    <Edit className="h-4 w-4 mr-2" />
                     Bewerken
                   </Button>
                 </div>
@@ -381,7 +384,7 @@ export default function PropertyDetailPage() {
             </div>
 
             {/* Tabs */}
-            <Tabs defaultValue="basic" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="basic">Info</TabsTrigger>
                 <TabsTrigger value="units">Units</TabsTrigger>
@@ -454,6 +457,12 @@ export default function PropertyDetailPage() {
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '-'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Totale maandhuur</p>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            €{(property.units?.reduce((sum: number, u: any) => sum + (u.monthly_rent || 0), 0) || 0).toLocaleString('nl-NL')}
                           </p>
                         </div>
                       </div>
@@ -588,7 +597,10 @@ export default function PropertyDetailPage() {
                         <CardTitle>Units</CardTitle>
                         <CardDescription>Alle units in dit object</CardDescription>
                       </div>
-                      <Button className="bg-[#163300] hover:bg-[#356258] text-white">
+                      <Button 
+                        className="bg-[#163300] hover:bg-[#356258] text-white"
+                        onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/new`)}
+                      >
                         <DoorOpen className="h-4 w-4 mr-2" />
                         Unit Toevoegen
                       </Button>
@@ -678,7 +690,11 @@ export default function PropertyDetailPage() {
 
                               {/* Actions */}
                               <div className="flex items-center gap-2 justify-end">
-                                <Button size="sm" variant="outline">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/${unit.id}/edit`)}
+                                >
                                   <Edit className="h-4 w-4 mr-2" />
                                   Bewerken
                                 </Button>
@@ -696,7 +712,10 @@ export default function PropertyDetailPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                           Voeg units toe aan dit object
                         </p>
-                        <Button className="bg-[#163300] hover:bg-[#356258] text-white">
+                        <Button 
+                          className="bg-[#163300] hover:bg-[#356258] text-white"
+                          onClick={() => router.push(`/dashboard/employer/portfolio/properties/${propertyId}/units/new`)}
+                        >
                           <DoorOpen className="h-4 w-4 mr-2" />
                           Eerste Unit Toevoegen
                         </Button>
