@@ -34,6 +34,7 @@ export default function PortfolioPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -101,11 +102,28 @@ export default function PortfolioPage() {
           </p>
         </div>
         <Button 
-          onClick={() => router.push(`${basePath}/portfolio/properties/new`)}
+          onClick={async () => {
+            setCreating(true)
+            try {
+              const { user } = await getUser()
+              if (!user) { router.push('/login'); return }
+              const newProperty = await propertyQueries.create({
+                owner_id: user.id,
+                name: 'Nieuw pand',
+                address: '',
+                type: 'appartement',
+              })
+              router.push(`${basePath}/portfolio/properties/${newProperty.id}?edit=true&new=true`)
+            } catch (error) {
+              console.error('Failed to create property:', error)
+              setCreating(false)
+            }
+          }}
+          disabled={creating}
           className="bg-[#163300] hover:bg-[#356258] text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Nieuw Pand
+          {creating ? 'Aanmaken...' : 'Nieuw Pand'}
         </Button>
       </div>
 

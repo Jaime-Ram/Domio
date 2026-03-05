@@ -207,6 +207,16 @@ export const unitQueries = {
     if (error) throw error;
     return data as Unit;
   },
+
+  // Delete unit
+  async delete(unitId: string) {
+    const { error } = await supabase
+      .from('units')
+      .delete()
+      .eq('id', unitId);
+    
+    if (error) throw error;
+  },
 };
 
 // ============================================================================
