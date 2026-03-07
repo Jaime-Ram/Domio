@@ -214,7 +214,7 @@ export default function AccountingPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {connectedIntegrations.map((integration) => (
-              <Card key={integration.id} className="border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10">
+              <Card key={integration.id} className={isDemo ? dashboardCardClass(undefined, true) : 'border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'}>
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">

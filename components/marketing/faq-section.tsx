@@ -177,7 +177,7 @@ export function FAQSection() {
       </div>
 
       {hasMore && (
-        <div className="mt-12 flex flex-col items-center gap-3">
+        <div className="mt-8 flex flex-col items-center gap-3">
           <div className="relative min-h-[2.5rem] flex flex-col items-center justify-center">
             <AnimatePresence mode="wait">
               {!isExpanded ? (

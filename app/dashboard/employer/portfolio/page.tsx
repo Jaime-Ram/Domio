@@ -103,8 +103,8 @@ export default function PortfolioPage() {
         items={PORTFOLIO_NAV}
         titleVariant="hero"
         widgetMenu={
-          <SectionWidgetMenu>
-            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <SectionWidgetMenu>
+              <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
             <DropdownMenuWidgetCheckboxItem
               checked={visibleWidgets.pandenoverzicht}
               onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, pandenoverzicht: !w.pandenoverzicht }))}

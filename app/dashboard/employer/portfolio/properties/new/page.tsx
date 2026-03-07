@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +33,7 @@ const ENERGY_LABELS = ['A+++++', 'A++++', 'A+++', 'A++', 'A+', 'A', 'B', 'C', 'D
 
 export default function NewPropertyPage() {
   const router = useRouter()
-  const { user, basePath } = useDashboardUser()
+  const { user, basePath, isDemo } = useDashboardUser()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
@@ -81,7 +82,7 @@ export default function NewPropertyPage() {
         <ArrowLeft className="h-4 w-4" />
         Terug naar portefeuille
       </Link>
-      <Card>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle>Nieuw pand toevoegen</CardTitle>
           <p className="text-sm text-gray-600 dark:text-gray-400">

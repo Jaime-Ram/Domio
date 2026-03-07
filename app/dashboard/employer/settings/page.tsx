@@ -74,7 +74,7 @@ export default function SettingsPage() {
               description="Beheer je account en voorkeuren"
               widgetMenu={
                 <SectionWidgetMenu>
-                  <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                  <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
                   <DropdownMenuWidgetCheckboxItem checked={showSettings} onCheckedChange={() => setShowSettings((v) => !v)}>
                     Account en voorkeuren
                   </DropdownMenuWidgetCheckboxItem>

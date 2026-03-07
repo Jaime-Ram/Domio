@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { ClipboardCheck, Wrench, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,7 @@ const getMaintenanceNav = (basePath: string) => [
 ]
 
 export default function InspectiesPage() {
-  const { basePath } = useDashboardUser()
+  const { basePath, isDemo } = useDashboardUser()
   const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   return (
     <div className="space-y-6">
@@ -33,7 +34,7 @@ export default function InspectiesPage() {
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Inspecties</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Geplande en uitgevoerde inspecties.</p>
       </div>
-      <Card>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardCheck className="h-5 w-5" />

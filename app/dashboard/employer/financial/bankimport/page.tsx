@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
@@ -16,7 +17,7 @@ const getFinancialNav = (basePath: string) => [
 ]
 
 export default function BankimportPage() {
-  const { basePath } = useDashboardUser()
+  const { basePath, isDemo } = useDashboardUser()
   const FINANCIAL_NAV = getFinancialNav(basePath)
   return (
     <div className="space-y-6">
@@ -34,7 +35,7 @@ export default function BankimportPage() {
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Bankimport</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Banktransacties importeren en matchen.</p>
       </div>
-      <Card>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Scan className="h-5 w-5" />

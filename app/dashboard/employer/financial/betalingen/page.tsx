@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
@@ -150,7 +151,7 @@ export default function BetalingenPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />

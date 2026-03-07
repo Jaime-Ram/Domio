@@ -32,6 +32,7 @@ import { FunctieBlock } from '@/components/ui/functie-block'
 import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 
 const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
 const CARD_CLASS_DEMO = 'rounded-[1.75rem] bg-white dark:bg-neutral-900 overflow-hidden'
@@ -171,9 +172,14 @@ export default function EmployerDashboardPage() {
     <>
       {/* Welkomstbanner */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          {greeting}, {firstName}
-        </h1>
+        <div className="flex flex-wrap items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {greeting}, {firstName}
+          </h1>
+          <SectionWidgetMenu>
+            <SectionWidgetMenuPlaceholder />
+          </SectionWidgetMenu>
+        </div>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {propertyCount !== null ? (
             <>Overzicht van je portefeuille</>

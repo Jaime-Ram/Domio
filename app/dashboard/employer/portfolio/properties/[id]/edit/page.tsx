@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -46,7 +47,7 @@ export default function EditPropertyPage() {
   const router = useRouter()
   const params = useParams()
   const propertyId = params.id as string
-  const { user } = useDashboardUser()
+  const { user, isDemo } = useDashboardUser()
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -150,7 +151,7 @@ export default function EditPropertyPage() {
         <ArrowLeft className="h-4 w-4" />
         Terug naar pand
       </Link>
-      <Card>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle>Pand bewerken</CardTitle>
           <p className="text-sm text-gray-600 dark:text-gray-400">

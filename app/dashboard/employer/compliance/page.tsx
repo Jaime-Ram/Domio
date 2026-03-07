@@ -129,7 +129,7 @@ function ComplianceWidgetMenu({
 }) {
   return (
     <SectionWidgetMenu>
-      <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+      <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
       {COMPLIANCE_WIDGET_IDS.map((id) => (
         <DropdownMenuWidgetCheckboxItem
           key={id}

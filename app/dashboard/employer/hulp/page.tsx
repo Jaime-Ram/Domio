@@ -25,7 +25,7 @@ export default function DashboardHulpPage() {
         description="We staan voor je klaar. Kies hoe je contact wilt opnemen."
         widgetMenu={
           <SectionWidgetMenu>
-            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
             <DropdownMenuWidgetCheckboxItem checked={showContactCards} onCheckedChange={() => setShowContactCards((v) => !v)}>
               Contactopties
             </DropdownMenuWidgetCheckboxItem>

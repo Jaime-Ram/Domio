@@ -349,7 +349,7 @@ export default function DocumentsPage() {
                 className="mb-0"
                 widgetMenu={
                   <SectionWidgetMenu>
-                    <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                    <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
                     <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.stats} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, stats: !w.stats }))}>
                       Statistieken
                     </DropdownMenuWidgetCheckboxItem>

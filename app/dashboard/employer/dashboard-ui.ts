@@ -6,7 +6,7 @@ export const DASHBOARD_CARD_CLASS =
 
 /** Demo: kaart zonder schaduw of rand, alleen wit/grijs */
 export const DASHBOARD_CARD_CLASS_DEMO =
-  'rounded-card bg-white dark:bg-neutral-900'
+  'rounded-card border-0 shadow-none bg-white dark:bg-neutral-900'
 
 /** Binnenblok in kaart: grijze achtergrond, ronde hoeken */
 export const DASHBOARD_INNER_BLOCK_CLASS =

@@ -173,7 +173,7 @@ export default function FinancialPage() {
               titleVariant="hero"
               widgetMenu={
                 <SectionWidgetMenu>
-                  <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                  <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
                   <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.totalCards} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, totalCards: !w.totalCards }))}>
                     Totalen (inkomsten, uitgaven, saldo)
                   </DropdownMenuWidgetCheckboxItem>

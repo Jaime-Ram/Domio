@@ -33,7 +33,7 @@ export default function MessagesPage() {
         description="Communicatie met huurders en partijen."
         widgetMenu={
           <SectionWidgetMenu>
-            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
             <DropdownMenuWidgetCheckboxItem checked={showMessages} onCheckedChange={() => setShowMessages((v) => !v)}>
               Berichtenoverzicht
             </DropdownMenuWidgetCheckboxItem>

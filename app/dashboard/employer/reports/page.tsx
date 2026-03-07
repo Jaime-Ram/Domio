@@ -49,8 +49,8 @@ export default function ReportsPage() {
         title="Rapportages"
         description="Genereer rapporten en exporteer naar PDF."
         widgetMenu={
-          <SectionWidgetMenu>
-            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+        <SectionWidgetMenu>
+          <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
             <DropdownMenuWidgetCheckboxItem
               checked={showReportCards}
               onCheckedChange={() => setShowReportCards((v) => !v)}

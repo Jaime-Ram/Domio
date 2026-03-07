@@ -15,18 +15,18 @@ interface SectionHeroHeaderProps {
  */
 export function SectionHeroHeader({ title, description, widgetMenu, className }: SectionHeroHeaderProps) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-3 mb-6', className)}>
-      <div>
+    <div className={cn('mb-6', className)}>
+      <div className="flex flex-wrap items-baseline gap-3">
         <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
           {title}
         </h1>
-        {description != null && description !== '' && (
-          <p className="mt-1.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            {description}
-          </p>
-        )}
+        {widgetMenu}
       </div>
-      {widgetMenu}
+      {description != null && description !== '' && (
+        <p className="mt-1.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+          {description}
+        </p>
+      )}
     </div>
   )
 }

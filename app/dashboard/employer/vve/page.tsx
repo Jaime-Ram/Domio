@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { vveData, vveMjop } from '@/lib/mock-data/domio-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -45,7 +46,7 @@ export default function VvEPage() {
 
         <TabsContent value="overzicht" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="text-base">Gebouwinfo</CardTitle>
               </CardHeader>
@@ -55,7 +56,7 @@ export default function VvEPage() {
                 <p><span className="text-gray-500 dark:text-gray-400">Maandelijkse bijdrage per appartement:</span> €{data.monthlyContributionPerUnit}</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="text-base">Reservefonds</CardTitle>
               </CardHeader>
@@ -73,7 +74,7 @@ export default function VvEPage() {
               </CardContent>
             </Card>
           </div>
-          <Card>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle className="text-base">Bestuur</CardTitle>
             </CardHeader>
@@ -84,7 +85,7 @@ export default function VvEPage() {
         </TabsContent>
 
         <TabsContent value="leden">
-          <Card>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Leden ({data.units} appartementen)</CardTitle>
             </CardHeader>
@@ -95,7 +96,7 @@ export default function VvEPage() {
         </TabsContent>
 
         <TabsContent value="financieel">
-          <Card>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Financieel</CardTitle>
             </CardHeader>
@@ -106,7 +107,7 @@ export default function VvEPage() {
         </TabsContent>
 
         <TabsContent value="vergaderingen">
-          <Card>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Vergaderingen</CardTitle>
             </CardHeader>
@@ -117,7 +118,7 @@ export default function VvEPage() {
         </TabsContent>
 
         <TabsContent value="mjop" className="space-y-4">
-          <Card>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Meerjarenonderhoudsplan</CardTitle>
               <p className="text-sm text-gray-500 dark:text-gray-400">Geplande onderhoudskosten vs beschikbaar fonds</p>
