@@ -34,6 +34,7 @@ export default function DashboardHulpPage() {
       />
 
       {showContactCards && (
+      <>
       <div className="grid gap-6 md:grid-cols-2">
         {/* Chat met ons / WhatsApp – primair voor direct contact */}
         <a
@@ -134,12 +135,12 @@ export default function DashboardHulpPage() {
           </div>
         </Link>
       </div>
-
       <div className="mt-8">
         <Button asChild className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
           <Link href="/contact">Uitgebreid contactformulier →</Link>
         </Button>
       </div>
+      </>
       )}
     </>
   )
