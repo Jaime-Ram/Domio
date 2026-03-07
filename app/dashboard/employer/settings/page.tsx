@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,8 +19,11 @@ import {
   Upload,
   Save,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function SettingsPage() {
+  const { isDemo } = useDashboardUser()
+  const [showSettings, setShowSettings] = useState(false)
   // Account settings state
   const [accountForm, setAccountForm] = useState({
     name: 'John Doe',
@@ -62,19 +69,22 @@ export default function SettingsPage() {
 
   return (
     <>
-            {/* Header */}
-            <div className="mb-wise-lg">
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
-                Instellingen
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Beheer je account en voorkeuren
-              </p>
-            </div>
+            <SectionHeroHeader
+              title="Instellingen"
+              description="Beheer je account en voorkeuren"
+              widgetMenu={
+                <SectionWidgetMenu>
+                  <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                  <DropdownMenuWidgetCheckboxItem checked={showSettings} onCheckedChange={() => setShowSettings((v) => !v)}>
+                    Account en voorkeuren
+                  </DropdownMenuWidgetCheckboxItem>
+                </SectionWidgetMenu>
+              }
+            />
 
-            {/* Tabs */}
+            {showSettings && (
             <Tabs defaultValue="account" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-wise-md rounded-block bg-gray-100 dark:bg-neutral-800 p-wise-xs gap-wise-xs h-auto">
+              <TabsList className={cn("grid w-full grid-cols-3 mb-wise-md rounded-block bg-gray-100 dark:bg-neutral-800 p-wise-xs gap-wise-xs h-auto", isDemo && "[&_[data-state=active]]:!shadow-none")}>
                 <TabsTrigger value="account" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
                   <User className="h-4 w-4 mr-2" />
                   Mijn Account
@@ -91,7 +101,7 @@ export default function SettingsPage() {
 
               {/* Tab 1: Mijn Account */}
               <TabsContent value="account">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <CardTitle>Persoonlijke Gegevens</CardTitle>
                     <CardDescription>Update je persoonlijke informatie</CardDescription>
@@ -172,7 +182,7 @@ export default function SettingsPage() {
 
               {/* Tab 2: Bedrijfsgegevens */}
               <TabsContent value="company">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <CardTitle>Bedrijfsgegevens</CardTitle>
                     <CardDescription>Informatie voor correspondentie en documenten</CardDescription>
@@ -292,7 +302,7 @@ export default function SettingsPage() {
 
               {/* Tab 3: Notificaties */}
               <TabsContent value="notifications">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <CardTitle>Notificatie Voorkeuren</CardTitle>
                     <CardDescription>Kies welke notificaties je wilt ontvangen</CardDescription>
@@ -383,6 +393,7 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
             </Tabs>
+            )}
     </>
   )
 }

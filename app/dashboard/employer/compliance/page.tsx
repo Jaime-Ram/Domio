@@ -31,6 +31,11 @@ import {
   Calculator,
 } from 'lucide-react'
 import {
+  DropdownMenuWidgetCheckboxItem,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import {
   mockWwsObjects,
   mockWwsAlerts,
   mockWwsSectorDistribution,
@@ -105,6 +110,47 @@ const getComplianceNav = (basePath: string) => [
   { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
 ]
 
+const COMPLIANCE_WIDGET_IDS = ['statusBanner', 'kpiStrip', 'alerts', 'overzichtTabel', 'sectorverdeling'] as const
+type ComplianceWidgetId = (typeof COMPLIANCE_WIDGET_IDS)[number]
+const COMPLIANCE_WIDGET_LABELS: Record<ComplianceWidgetId, string> = {
+  statusBanner: 'Statusbanner',
+  kpiStrip: 'KPI-strip',
+  alerts: 'Actie-alerts',
+  overzichtTabel: 'Overzichtstabel',
+  sectorverdeling: 'Sectorverdeling',
+}
+
+function ComplianceWidgetMenu({
+  visible,
+  onToggle,
+}: {
+  visible: Record<ComplianceWidgetId, boolean>
+  onToggle: (id: ComplianceWidgetId) => void
+}) {
+  return (
+    <SectionWidgetMenu>
+      <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+      {COMPLIANCE_WIDGET_IDS.map((id) => (
+        <DropdownMenuWidgetCheckboxItem
+          key={id}
+          checked={visible[id]}
+          onCheckedChange={() => onToggle(id)}
+        >
+          {COMPLIANCE_WIDGET_LABELS[id]}
+        </DropdownMenuWidgetCheckboxItem>
+      ))}
+    </SectionWidgetMenu>
+  )
+}
+
+const defaultWidgetVisibility: Record<ComplianceWidgetId, boolean> = {
+  statusBanner: false,
+  kpiStrip: false,
+  alerts: false,
+  overzichtTabel: false,
+  sectorverdeling: false,
+}
+
 export default function CompliancePage() {
   const router = useRouter()
   const { isDemo, basePath } = useDashboardUser()
@@ -113,6 +159,11 @@ export default function CompliancePage() {
   const [sectorFilter, setSectorFilter] = useState<WWSSector | 'all'>('all')
   const [sortKey, setSortKey] = useState<SortKey>('address')
   const [sortAsc, setSortAsc] = useState(true)
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<ComplianceWidgetId, boolean>>(defaultWidgetVisibility)
+
+  const toggleWidget = (id: ComplianceWidgetId) => {
+    setVisibleWidgets((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
 
   const wwsObjects = isDemo ? mockWwsObjects : []
   const wwsAlerts = isDemo ? mockWwsAlerts : []
@@ -191,17 +242,21 @@ export default function CompliancePage() {
 
   return (
     <>
-      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">WWS Compliance</h1>
-        <p className="text-gray-600 dark:text-gray-400">
+      <SectionNavDashboard
+        title="Compliance"
+        items={COMPLIANCE_NAV}
+        titleVariant="hero"
+        widgetMenu={<ComplianceWidgetMenu visible={visibleWidgets} onToggle={toggleWidget} />}
+      />
+      {Object.values(visibleWidgets).some(Boolean) && (
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
           Puntentelling en maximale huurprijs per woning. Sinds 1 januari 2025 verplicht bij elk nieuw contract.
         </p>
-      </div>
+      )}
 
       {/* Statusbanner */}
-      <Card className={dashboardCardClass('mb-8')}>
+      {visibleWidgets.statusBanner && (
+      <Card className={dashboardCardClass('mb-8', isDemo)}>
         <CardContent className="pt-6">
           <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {compliantCount} van {totalCount} woningen compliant ({compliantPercent}%)
@@ -217,10 +272,12 @@ export default function CompliancePage() {
           </p>
         </CardContent>
       </Card>
+      )}
 
       {/* KPI strip */}
+      {visibleWidgets.kpiStrip && (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500 dark:text-gray-400">Gemiddeld puntenaantal</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -234,7 +291,7 @@ export default function CompliancePage() {
             </p>
           </CardContent>
         </Card>
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500 dark:text-gray-400">Vrije sector woningen</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -242,23 +299,24 @@ export default function CompliancePage() {
             </p>
           </CardContent>
         </Card>
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500 dark:text-gray-400">Actie vereist</p>
             <p className="text-2xl font-bold text-amber-600">{actieVereist} woningen</p>
           </CardContent>
         </Card>
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500 dark:text-gray-400">Verlopen puntentellingen</p>
             <p className="text-2xl font-bold text-red-600">{verlopenCount}</p>
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* Alert sectie */}
-      {wwsAlerts.length > 0 && (
-        <Card className={dashboardCardClass('mb-8')}>
+      {visibleWidgets.alerts && wwsAlerts.length > 0 && (
+        <Card className={dashboardCardClass('mb-8', isDemo)}>
           <CardHeader>
             <CardTitle>Actie vereist</CardTitle>
             <CardDescription>Woningen met WWS-compliance problemen</CardDescription>
@@ -310,9 +368,11 @@ export default function CompliancePage() {
       )}
 
       {/* Overzichtstabel + Sectorverdeling */}
+      {(visibleWidgets.overzichtTabel || visibleWidgets.sectorverdeling) && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {visibleWidgets.overzichtTabel && (
         <div className="lg:col-span-2">
-          <Card className={dashboardCardClass()}>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Overzicht per woning</CardTitle>
               <CardDescription>Sorteerbaar en filterbaar overzicht</CardDescription>
@@ -425,10 +485,12 @@ export default function CompliancePage() {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Sectorverdeling donut */}
+        {visibleWidgets.sectorverdeling && (
         <div>
-          <Card className={dashboardCardClass()}>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle>Sectorverdeling</CardTitle>
               <CardDescription>Woningen per WWS-sector</CardDescription>
@@ -454,23 +516,26 @@ export default function CompliancePage() {
             </CardContent>
           </Card>
         </div>
+        )}
       </div>
+      )}
 
-      {/* Buttons onderaan */}
-      <div className="flex flex-wrap gap-3 mt-8">
-        <Button className="bg-[#163300] hover:bg-[#163300]/90">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Bulk herberekening
-        </Button>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export compliance rapport
-        </Button>
-        <Button variant="outline">
-          <FileText className="h-4 w-4 mr-2" />
-          Download alle PDF&apos;s
-        </Button>
-      </div>
+      {Object.values(visibleWidgets).some(Boolean) && (
+        <div className="flex flex-wrap gap-3 mt-8">
+          <Button className="bg-[#163300] hover:bg-[#163300]/90">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Bulk herberekening
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export compliance rapport
+          </Button>
+          <Button variant="outline">
+            <FileText className="h-4 w-4 mr-2" />
+            Download alle PDF&apos;s
+          </Button>
+        </div>
+      )}
     </>
   )
 }

@@ -9,12 +9,12 @@ export function UpdatesSidebar({ className }: { className?: string }) {
   const updates = getUpdates().slice(0, 5)
 
   return (
-    <div className={cn('rounded-xl border border-gray-200 bg-gray-50/50 p-4', className)}>
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-[#163300]">
-        <Calendar className="h-4 w-4" />
+    <div className={cn('rounded-2xl bg-gray-100 dark:bg-neutral-800 p-5', className)}>
+      <h3 className="flex items-center gap-2 text-xl font-semibold text-[#163300] dark:text-[#9FE870]">
+        <Calendar className="h-6 w-6 shrink-0" />
         Wat verandert er?
       </h3>
-      <p className="mt-1 text-xs text-gray-600">Recente en aankomende wijzigingen</p>
+      <p className="mt-1.5 text-base text-gray-600 dark:text-gray-400">Recente en aankomende wijzigingen</p>
       <ul className="mt-3 space-y-2">
         {updates.map((u) => (
           <li key={`${u.date}-${u.title}`}>

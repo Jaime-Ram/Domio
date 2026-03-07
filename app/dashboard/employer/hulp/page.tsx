@@ -6,23 +6,34 @@ import { Button } from '@/components/ui/button'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { useState } from 'react'
 
 const PHONE = '+31 6 46 23 16 96'
 const WHATSAPP_LINK = 'https://wa.me/31646231696'
 
 export default function DashboardHulpPage() {
+  const { isDemo } = useDashboardUser()
+  const [showContactCards, setShowContactCards] = useState(false)
   return (
     <>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
-          Klantenservice
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">
-          We staan voor je klaar. Kies hoe je contact wilt opnemen.
-        </p>
-      </div>
+      <SectionHeroHeader
+        title="Hulp"
+        description="We staan voor je klaar. Kies hoe je contact wilt opnemen."
+        widgetMenu={
+          <SectionWidgetMenu>
+            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuWidgetCheckboxItem checked={showContactCards} onCheckedChange={() => setShowContactCards((v) => !v)}>
+              Contactopties
+            </DropdownMenuWidgetCheckboxItem>
+          </SectionWidgetMenu>
+        }
+      />
 
+      {showContactCards && (
       <div className="grid gap-6 md:grid-cols-2">
         {/* Chat met ons / WhatsApp – primair voor direct contact */}
         <a
@@ -62,7 +73,7 @@ export default function DashboardHulpPage() {
         {/* Bellen */}
         <a
           href={`tel:${PHONE.replace(/\s/g, '')}`}
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg')}
+          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
@@ -83,7 +94,7 @@ export default function DashboardHulpPage() {
         {/* E-mail */}
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg')}
+          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
@@ -104,7 +115,7 @@ export default function DashboardHulpPage() {
         {/* FAQ */}
         <Link
           href="/faq"
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg')}
+          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
@@ -129,6 +140,7 @@ export default function DashboardHulpPage() {
           <Link href="/contact">Uitgebreid contactformulier →</Link>
         </Button>
       </div>
+      )}
     </>
   )
 }

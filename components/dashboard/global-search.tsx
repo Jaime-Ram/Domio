@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Search, Building2, Users, FileText, Wrench, Euro, FolderOpen, ShieldCheck, Settings, Plus, Download, Send, Edit, Eye, Calendar, BarChart3, Home, UserCircle, Briefcase, Link2, CreditCard, Receipt, TrendingUp, CheckCircle, AlertCircle, Zap, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 interface SearchAction {
   id: string
@@ -20,6 +21,7 @@ const BP = '/dashboard/employer'
 
 export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
   const router = useRouter()
+  const { isDemo } = useDashboardUser()
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -233,15 +235,23 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-4 h-10 rounded-full border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm placeholder:text-gray-400 focus-visible:ring-[#163300] dark:focus-visible:ring-[#9FE870]"
+          className={cn(
+            'pl-10 pr-4 h-10 rounded-full placeholder:text-gray-400',
+            isDemo
+              ? 'bg-gray-100 dark:bg-neutral-800 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none'
+              : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm focus-visible:ring-[#163300] dark:focus-visible:ring-[#9FE870]'
+          )}
         />
       </div>
 
       {/* Search Results Dropdown */}
       {isOpen && filteredActions.length > 0 && (
-        <div className="absolute top-full mt-2 w-full rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg z-50 max-h-96 overflow-y-auto overflow-x-hidden">
+        <div className={cn(
+          'absolute top-full mt-2 w-full rounded-[1.75rem] z-50 max-h-96 overflow-y-auto overflow-x-hidden',
+          isDemo ? 'bg-white dark:bg-neutral-900' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg'
+        )}>
           {query.trim() === '' && (
-            <div className="px-4 py-3 border-b border-gray-200/80 dark:border-neutral-700 bg-gray-50/80 dark:bg-neutral-800/50">
+            <div className={cn('px-4 py-3', isDemo ? 'bg-gray-100 dark:bg-neutral-800' : 'border-b border-gray-200/80 dark:border-neutral-700 bg-gray-50/80 dark:bg-neutral-800/50')}>
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Populaire acties</p>
             </div>
           )}
@@ -287,7 +297,10 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
 
       {/* No Results Message */}
       {isOpen && query.trim() !== '' && filteredActions.length === 0 && (
-        <div className="absolute top-full mt-2 w-full rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg z-50 overflow-hidden">
+        <div className={cn(
+          'absolute top-full mt-2 w-full rounded-[1.75rem] z-50 overflow-hidden',
+          isDemo ? 'bg-white dark:bg-neutral-900' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg'
+        )}>
           <div className="px-4 py-8 text-center">
             <Search className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
             <p className="text-sm text-gray-500 dark:text-gray-400">

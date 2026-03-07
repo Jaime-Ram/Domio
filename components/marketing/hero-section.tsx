@@ -108,7 +108,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
-                          transition={{ duration: 0.4, ease: 'easeOut' }}
+                          transition={{ duration: 0.35, ease: 'easeOut', delay: 0 }}
                           className="flex items-center justify-center absolute inset-0"
                         >
                           <Icon className="h-5 w-5 text-[#163300]" strokeWidth={2.5} />
@@ -123,7 +123,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.06 }}
                     className="text-base font-bold text-gray-900 truncate flex-1 min-w-0"
                   >
                     {PILL_ITEMS[activeIndex]?.label}
@@ -136,7 +136,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  transition={{ duration: 0.35, ease: 'easeOut', delay: 0.12 }}
                   className="text-base font-bold text-[#163300] whitespace-nowrap shrink-0"
                 >
                   {PILL_ITEMS[activeIndex].value}

@@ -20,16 +20,19 @@ import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 export default function PortfolioPage() {
   const router = useRouter()
-  const { basePath } = useDashboardUser()
+  const { basePath, isDemo } = useDashboardUser()
 
   const PORTFOLIO_NAV = [
     { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
     { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
   ]
+  const [visibleWidgets, setVisibleWidgets] = useState({ pandenoverzicht: false })
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [properties, setProperties] = useState<any[]>([])
@@ -38,6 +41,11 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     const loadProperties = async () => {
+      if (isDemo) {
+        setProperties([])
+        setLoading(false)
+        return
+      }
       try {
         const { user } = await getUser()
         if (!user) {
@@ -53,7 +61,7 @@ export default function PortfolioPage() {
       }
     }
     loadProperties()
-  }, [router])
+  }, [router, isDemo])
 
   const filteredProperties = properties.filter(property =>
     property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,19 +98,31 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Portefeuille
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Overzicht van al je panden en objecten
-          </p>
-        </div>
+      <SectionNavDashboard
+        title="Portefeuille"
+        items={PORTFOLIO_NAV}
+        titleVariant="hero"
+        widgetMenu={
+          <SectionWidgetMenu>
+            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuWidgetCheckboxItem
+              checked={visibleWidgets.pandenoverzicht}
+              onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, pandenoverzicht: !w.pandenoverzicht }))}
+            >
+              Pandenoverzicht
+            </DropdownMenuWidgetCheckboxItem>
+          </SectionWidgetMenu>
+        }
+      />
+      {visibleWidgets.pandenoverzicht && (
+      <>
+      <div className="mb-8 flex items-center justify-end">
         <Button 
           onClick={async () => {
+            if (isDemo) {
+              router.push(`${basePath}/portfolio/properties/new`)
+              return
+            }
             setCreating(true)
             try {
               const { user } = await getUser()
@@ -127,8 +147,7 @@ export default function PortfolioPage() {
         </Button>
       </div>
 
-      {/* Jouw Panden */}
-      <Card className={dashboardCardClass('mb-6')}>
+      <Card className={dashboardCardClass('mb-6', isDemo)}>
           <CardHeader className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -186,8 +205,8 @@ export default function PortfolioPage() {
                 {ownerGroups.map((group, index) => (
                   <Card 
                     key={index}
-                    className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer')}
-                    onClick={() => router.push(`/dashboard/employer/portfolio/properties/${group.property.id}`)}
+                    className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer', isDemo)}
+                    onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
@@ -244,7 +263,7 @@ export default function PortfolioPage() {
                       <tr 
                         key={index}
                         className="border-b border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-                        onClick={() => router.push(`/dashboard/employer/portfolio/properties/${group.property.id}`)}
+                        onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-3">
@@ -275,7 +294,7 @@ export default function PortfolioPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              router.push(`/dashboard/employer/portfolio/properties/${group.property.id}`)
+                              router.push(`${basePath}/portfolio/properties/${group.property.id}`)
                             }}
                           >
                             <Eye className="h-4 w-4" />
@@ -289,6 +308,8 @@ export default function PortfolioPage() {
             )}
           </CardContent>
         </Card>
+      </>
+      )}
     </>
   )
 }

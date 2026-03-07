@@ -63,6 +63,37 @@
   animation: dropdownItemIn 0.25s ease-out both;
 }
 
+/* Widget-uitklapmenu: transformatie uit het grijze bolletje (scale + fade) */
+@keyframes widget-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes widget-menu-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.widget-menu-enter {
+  animation: widget-menu-in 0.2s ease-out forwards;
+}
+
+.widget-menu-exit {
+  animation: widget-menu-out 0.15s ease-in forwards;
+}
+
 /* Huurdersportaal – elk bolletje individueel: schaal 0→1 + fade */
 @keyframes avatarBolIn {
   from {

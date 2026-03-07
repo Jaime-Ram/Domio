@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 
 
 type TenantRow = {
@@ -122,10 +123,16 @@ export default function TenantsPage() {
     }
   }
 
+  const portefeuilleWidgetMenu = (
+    <SectionWidgetMenu>
+      <SectionWidgetMenuPlaceholder />
+    </SectionWidgetMenu>
+  )
+
   if (loading) {
     return (
       <>
-        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
+        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" widgetMenu={portefeuilleWidgetMenu} />
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
@@ -135,7 +142,7 @@ export default function TenantsPage() {
 
   return (
     <>
-            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} />
+            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" widgetMenu={portefeuilleWidgetMenu} />
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -156,7 +163,7 @@ export default function TenantsPage() {
             </div>
 
             {/* Search */}
-            <Card className={dashboardCardClass('mb-6')}>
+            <Card className={dashboardCardClass('mb-6', isDemo)}>
               <CardContent className="p-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -171,7 +178,7 @@ export default function TenantsPage() {
             </Card>
 
             {/* Tenants Table */}
-            <Card className={dashboardCardClass()}>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle>Alle Huurders ({filteredTenants.length})</CardTitle>
               </CardHeader>

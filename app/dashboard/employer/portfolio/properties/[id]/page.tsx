@@ -68,7 +68,7 @@ export default function PropertyDetailPage() {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
-  const { basePath } = useDashboardUser()
+  const { basePath, isDemo } = useDashboardUser()
   const propertyId = params.id as string
   const initialTab = searchParams.get('tab') || 'basic'
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -421,7 +421,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 1: Basisinfo */}
               <TabsContent value="basic">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <CardTitle>Object Details</CardTitle>
                     <CardDescription>Algemene informatie over het object</CardDescription>
@@ -644,7 +644,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 2: Units */}
               <TabsContent value="units">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
@@ -1006,7 +1006,7 @@ export default function PropertyDetailPage() {
 
               {/* Tab 3: Documenten */}
               <TabsContent value="documents">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>

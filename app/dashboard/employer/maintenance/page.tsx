@@ -57,6 +57,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 
 const getMaintenanceNav = (basePath: string) => [
   { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
@@ -64,10 +66,15 @@ const getMaintenanceNav = (basePath: string) => [
   { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
 ]
 
+const MAINTENANCE_WIDGET_IDS = ['stats', 'filters', 'ticketsList'] as const
+type MaintenanceWidgetId = (typeof MAINTENANCE_WIDGET_IDS)[number]
+const defaultMaintenanceWidgets: Record<MaintenanceWidgetId, boolean> = { stats: false, filters: false, ticketsList: false }
+
 export default function MaintenancePage() {
   const router = useRouter()
   const { isDemo, basePath } = useDashboardUser()
   const MAINTENANCE_NAV = getMaintenanceNav(basePath)
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<MaintenanceWidgetId, boolean>>(defaultMaintenanceWidgets)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showNewModal, setShowNewModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<typeof mockMaintenanceRequests[0] | null>(null)
@@ -159,17 +166,27 @@ export default function MaintenancePage() {
 
   return (
     <>
-            <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} />
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  Onderhoud
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Beheer alle onderhoudsmeldingen
-                </p>
-              </div>
+            <SectionNavDashboard
+            title="Onderhoud"
+            items={MAINTENANCE_NAV}
+            titleVariant="hero"
+            widgetMenu={
+              <SectionWidgetMenu>
+                <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.stats} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, stats: !w.stats }))}>
+                  KPI-strip
+                </DropdownMenuWidgetCheckboxItem>
+                <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.filters} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, filters: !w.filters }))}>
+                  Zoeken en filter
+                </DropdownMenuWidgetCheckboxItem>
+                <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.ticketsList} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, ticketsList: !w.ticketsList }))}>
+                  Ticketslijst
+                </DropdownMenuWidgetCheckboxItem>
+              </SectionWidgetMenu>
+            }
+          />
+            {Object.values(visibleWidgets).some(Boolean) && (
+            <div className="mb-8 flex items-center justify-end">
               <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
                 <DialogTrigger asChild>
                   <Button className="bg-[#163300] hover:bg-[#356258] text-white">
@@ -259,10 +276,11 @@ export default function MaintenancePage() {
                 </DialogContent>
               </Dialog>
             </div>
+            )}
 
-            {/* Stats Cards */}
+            {visibleWidgets.stats && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -275,7 +293,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -288,7 +306,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -301,7 +319,7 @@ export default function MaintenancePage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -315,9 +333,10 @@ export default function MaintenancePage() {
                 </CardContent>
               </Card>
             </div>
+            )}
 
-            {/* Filters */}
-            <Card className={dashboardCardClass('mb-6')}>
+            {visibleWidgets.filters && (
+            <Card className={dashboardCardClass('mb-6', isDemo)}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <DropdownMenu>
@@ -353,9 +372,10 @@ export default function MaintenancePage() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
-            {/* Maintenance Table */}
-            <Card className={dashboardCardClass()}>
+            {visibleWidgets.ticketsList && (
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle>Alle Meldingen ({filteredRequests.length})</CardTitle>
                 <CardDescription>Klik op een melding voor meer details</CardDescription>
@@ -424,6 +444,7 @@ export default function MaintenancePage() {
                 </Table>
               </CardContent>
             </Card>
+            )}
 
             {/* Detail Modal */}
             <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>

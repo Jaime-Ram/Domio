@@ -49,11 +49,14 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
   const avatarInitials = getInitials(profile?.full_name ?? null, userEmail || '')
   const unreadCount = 0
 
-  const dropdownContentClass =
-    'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden min-w-[260px]'
+  const dropdownContentClass = isDemo
+    ? 'rounded-card bg-white dark:bg-neutral-900 p-0 overflow-hidden min-w-[260px]'
+    : 'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-0 overflow-hidden min-w-[260px]'
   const quickActionItemClass =
     'flex w-full items-center gap-3 py-3 px-4 text-left cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/80 active:bg-gray-100 dark:active:bg-neutral-700 transition-colors rounded-block focus:bg-gray-50 dark:focus:bg-neutral-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2'
-  const quickActionIconWrap = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800'
+  const quickActionIconWrap = isDemo
+    ? 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800'
+    : 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800'
   const quickActionIconClass = 'h-5 w-5 text-brand-primary dark:text-brand-accent'
 
   const quickActions = [
@@ -89,7 +92,10 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="group h-10 px-4 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm font-medium text-sm gap-3"
+                  className={cn(
+                    'group h-10 px-4 rounded-pill font-medium text-sm gap-3 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800',
+                    isDemo ? 'bg-gray-100 dark:bg-neutral-800' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm'
+                  )}
                 >
                   <Zap className="h-4 w-4 shrink-0 transition-colors group-hover:text-[#9FE870] group-hover:stroke-[#9FE870] group-hover:fill-[#9FE870] dark:group-hover:text-[#9FE870] dark:group-hover:stroke-[#9FE870] dark:group-hover:fill-[#9FE870]" />
                   <span>Snelle acties</span>
@@ -132,7 +138,10 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="group h-10 w-10 rounded-pill border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shadow-sm shrink-0"
+                  className={cn(
+                    'group h-10 w-10 rounded-pill text-brand-primary dark:text-brand-accent hover:bg-gray-50 dark:hover:bg-neutral-800 shrink-0',
+                    isDemo ? 'bg-gray-100 dark:bg-neutral-800' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm'
+                  )}
                 >
                   <Zap className="h-4 w-4 transition-colors group-hover:text-[#9FE870] group-hover:stroke-[#9FE870] group-hover:fill-[#9FE870] dark:group-hover:text-[#9FE870] dark:group-hover:stroke-[#9FE870] dark:group-hover:fill-[#9FE870]" />
                 </Button>
@@ -211,7 +220,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                             : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
                         }`}
                       >
-                        <div className="h-9 w-9 rounded-full border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 flex items-center justify-center flex-shrink-0">
+                        <div className={cn('h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0', isDemo ? 'bg-gray-100 dark:bg-neutral-800' : 'border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800')}>
                           <Icon className="h-4 w-4 text-brand-primary dark:text-brand-accent" />
                         </div>
                         <div className="flex-1 min-w-0">

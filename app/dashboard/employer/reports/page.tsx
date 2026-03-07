@@ -13,6 +13,10 @@ import {
   Building2,
   BarChart3,
 } from 'lucide-react'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+
 const reportTemplates = [
   { id: 'portfolio', title: 'Portefeuille Overzicht', description: 'Overzicht van alle objecten en bezetting', icon: Building2 },
   { id: 'compliance', title: 'Compliance Rapport', description: 'WWS-status en puntentellingen', icon: ShieldCheck },
@@ -27,6 +31,7 @@ const reportTemplates = [
 export default function ReportsPage() {
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [showReportCards, setShowReportCards] = useState(false)
 
   const handleGenerate = (id: string, title: string) => {
     setGeneratingId(id)
@@ -40,10 +45,21 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Rapportages</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Genereer rapporten en exporteer naar PDF.</p>
-      </div>
+      <SectionHeroHeader
+        title="Rapportages"
+        description="Genereer rapporten en exporteer naar PDF."
+        widgetMenu={
+          <SectionWidgetMenu>
+            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuWidgetCheckboxItem
+              checked={showReportCards}
+              onCheckedChange={() => setShowReportCards((v) => !v)}
+            >
+              Rapportkaarten
+            </DropdownMenuWidgetCheckboxItem>
+          </SectionWidgetMenu>
+        }
+      />
 
       {toastMessage && (
         <div className="rounded-block bg-brand-primary dark:bg-brand-accent/30 text-white dark:text-brand-primary px-4 py-3 text-sm font-medium flex items-center gap-2">
@@ -52,6 +68,7 @@ export default function ReportsPage() {
         </div>
       )}
 
+      {showReportCards && (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {reportTemplates.map((r) => {
           const Icon = r.icon
@@ -77,6 +94,7 @@ export default function ReportsPage() {
           )
         })}
       </div>
+      )}
     </div>
   )
 }

@@ -8,12 +8,16 @@ import { conversations } from '@/lib/mock-data/domio-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 
 export default function MessagesPage() {
   const { isDemo } = useDashboardUser()
   const convos = isDemo ? conversations : []
   const [selectedId, setSelectedId] = useState<string | null>(convos[0]?.id ?? null)
   const [search, setSearch] = useState('')
+  const [showMessages, setShowMessages] = useState(false)
 
   const filtered = convos.filter(
     (c) =>
@@ -24,12 +28,21 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] min-h-[500px]">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Berichten</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Communicatie met huurders en partijen.</p>
-      </div>
+      <SectionHeroHeader
+        title="Berichten"
+        description="Communicatie met huurders en partijen."
+        widgetMenu={
+          <SectionWidgetMenu>
+            <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+            <DropdownMenuWidgetCheckboxItem checked={showMessages} onCheckedChange={() => setShowMessages((v) => !v)}>
+              Berichtenoverzicht
+            </DropdownMenuWidgetCheckboxItem>
+          </SectionWidgetMenu>
+        }
+      />
 
-      <div className={cn('flex flex-1 min-h-0 overflow-hidden', dashboardCardClass())}>
+      {showMessages && (
+      <div className={cn('flex flex-1 min-h-0 overflow-hidden', dashboardCardClass(undefined, isDemo))}>
         {/* Conversation list */}
         <div className="w-80 sm:w-96 border-e border-gray-200 dark:border-neutral-700 flex flex-col flex-shrink-0">
           <div className="p-4 border-b border-gray-200 dark:border-neutral-700">
@@ -134,6 +147,7 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+      )}
     </div>
   )
 }

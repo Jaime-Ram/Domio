@@ -53,6 +53,8 @@ import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Facturatie', href: `${basePath}/financial`, icon: Receipt },
@@ -61,10 +63,15 @@ const getFinancialNav = (basePath: string) => [
   { label: 'Bankimport', href: `${basePath}/financial/bankimport`, icon: Scan },
 ]
 
+const FINANCIAL_WIDGET_IDS = ['totalCards', 'inkomsten', 'uitgaven'] as const
+type FinancialWidgetId = (typeof FINANCIAL_WIDGET_IDS)[number]
+const defaultFinancialWidgets: Record<FinancialWidgetId, boolean> = { totalCards: false, inkomsten: false, uitgaven: false }
+
 export default function FinancialPage() {
   const router = useRouter()
   const { isDemo, basePath } = useDashboardUser()
   const FINANCIAL_NAV = getFinancialNav(basePath)
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<FinancialWidgetId, boolean>>(defaultFinancialWidgets)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showExpenseModal, setShowExpenseModal] = useState(false)
 
@@ -160,29 +167,38 @@ export default function FinancialPage() {
 
   return (
     <>
-            <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} />
-            {/* Header */}
+            <SectionNavDashboard
+              title="Financieel"
+              items={FINANCIAL_NAV}
+              titleVariant="hero"
+              widgetMenu={
+                <SectionWidgetMenu>
+                  <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                  <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.totalCards} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, totalCards: !w.totalCards }))}>
+                    Totalen (inkomsten, uitgaven, saldo)
+                  </DropdownMenuWidgetCheckboxItem>
+                  <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.inkomsten} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, inkomsten: !w.inkomsten }))}>
+                    Inkomsten
+                  </DropdownMenuWidgetCheckboxItem>
+                  <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.uitgaven} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, uitgaven: !w.uitgaven }))}>
+                    Uitgaven
+                  </DropdownMenuWidgetCheckboxItem>
+                </SectionWidgetMenu>
+              }
+            />
+            {Object.values(visibleWidgets).some(Boolean) && (
             <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  Financiën
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Overzicht van inkomsten en uitgaven
-                </p>
-              </div>
-              <Button 
-                variant="outline"
-                onClick={exportToCSV}
-              >
+              <p className="text-gray-600 dark:text-gray-400">Overzicht van inkomsten en uitgaven</p>
+              <Button variant="outline" onClick={exportToCSV}>
                 <Download className="h-4 w-4 mr-2" />
                 Export naar Excel
               </Button>
             </div>
+            )}
 
-            {/* Totals Cards */}
+            {visibleWidgets.totalCards && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Totaal Inkomsten
@@ -199,7 +215,7 @@ export default function FinancialPage() {
                 </CardContent>
               </Card>
 
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Totaal Uitgaven
@@ -216,7 +232,7 @@ export default function FinancialPage() {
                 </CardContent>
               </Card>
 
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     Saldo
@@ -233,9 +249,10 @@ export default function FinancialPage() {
                 </CardContent>
               </Card>
             </div>
+            )}
 
-            {/* Inkomsten Section */}
-            <Card className={dashboardCardClass('mb-6')}>
+            {visibleWidgets.inkomsten && (
+            <Card className={dashboardCardClass('mb-6', isDemo)}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -369,9 +386,10 @@ export default function FinancialPage() {
                 </Table>
               </CardContent>
             </Card>
+            )}
 
-            {/* Uitgaven Section */}
-            <Card className={dashboardCardClass()}>
+            {visibleWidgets.uitgaven && (
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -520,6 +538,7 @@ export default function FinancialPage() {
                 </Table>
               </CardContent>
             </Card>
+            )}
     </>
   )
 }

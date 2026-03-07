@@ -104,6 +104,20 @@ const config: Config = {
         /* Schaduw boven + onder voor zwevende kaarten op groene achtergrond */
         'card-elevated': '0 -6px 20px -5px rgba(0,0,0,0.08), 0 20px 50px -8px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.08)',
       },
+      keyframes: {
+        'widget-menu-in': {
+          from: { opacity: '0', transform: 'scale(0.85)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'widget-menu-out': {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(0.85)' },
+        },
+      },
+      animation: {
+        'widget-menu-in': 'widget-menu-in 0.2s ease-out forwards',
+        'widget-menu-out': 'widget-menu-out 0.15s ease-in forwards',
+      },
     }
   },
   plugins: [require("tailwindcss-animate")],

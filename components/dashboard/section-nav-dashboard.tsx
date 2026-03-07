@@ -16,9 +16,13 @@ interface SectionNavDashboardProps {
   title: string
   items: SectionNavItem[]
   className?: string
+  /** Grote groene titel, geen "kies een onderdeel" */
+  titleVariant?: 'default' | 'hero'
+  /** Bijv. rondje met drie bolletjes voor widget-instellingen */
+  widgetMenu?: React.ReactNode
 }
 
-export function SectionNavDashboard({ title, items, className }: SectionNavDashboardProps) {
+export function SectionNavDashboard({ title, items, className, titleVariant = 'default', widgetMenu }: SectionNavDashboardProps) {
   const pathname = usePathname()
   const { isDemo } = useDashboardUser()
 
@@ -29,9 +33,18 @@ export function SectionNavDashboard({ title, items, className }: SectionNavDashb
 
   return (
     <div className={cn('mb-8', className)}>
-      <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-        {title} — kies een onderdeel
-      </h2>
+      {titleVariant === 'hero' ? (
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
+            {title}
+          </h1>
+          {widgetMenu}
+        </div>
+      ) : (
+        <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+          {title} — kies een onderdeel
+        </h2>
+      )}
       <div className="flex flex-wrap gap-2">
         {items.map((item) => {
           const Icon = item.icon || FileText
@@ -45,7 +58,7 @@ export function SectionNavDashboard({ title, items, className }: SectionNavDashb
                 isDemo
                   ? active
                     ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
-                    : 'bg-[#f4f4f4] dark:bg-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-600'
+                    : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-600'
                   : active
                     ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 shadow-sm'
                     : 'bg-gray-100 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-700 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-neutral-700 hover:border-gray-300 dark:hover:border-neutral-500'

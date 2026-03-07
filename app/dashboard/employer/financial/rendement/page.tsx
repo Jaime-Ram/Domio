@@ -5,6 +5,7 @@ import { TrendingUp, Receipt, CreditCard, Scan } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 const getFinancialNav = (basePath: string) => [
@@ -19,7 +20,16 @@ export default function RendementPage() {
   const FINANCIAL_NAV = getFinancialNav(basePath)
   return (
     <div className="space-y-6">
-      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} />
+      <SectionNavDashboard
+        title="Financieel"
+        items={FINANCIAL_NAV}
+        titleVariant="hero"
+        widgetMenu={
+          <SectionWidgetMenu>
+            <SectionWidgetMenuPlaceholder />
+          </SectionWidgetMenu>
+        }
+      />
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Rendement</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Rendement per object en portefeuille.</p>

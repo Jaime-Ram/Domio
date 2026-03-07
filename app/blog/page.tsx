@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Image from 'next/image'
 import { MarketingLayout } from '@/components/marketing/marketing-layout'
 import { FooterSection } from '@/components/marketing/footer-section'
 import { ArticleCard } from '@/components/blog/article-card'
@@ -45,33 +44,20 @@ export default function BlogPage() {
   }, [allArticles, selectedCategories, search])
 
   const showFeatured = selectedCategories.length === 0 && !search.trim()
+  const displayList = useMemo(() => {
+    if (showFeatured && featured) return [featured, ...filtered]
+    return filtered
+  }, [showFeatured, featured, filtered])
 
   return (
     <MarketingLayout>
       <div className="min-h-screen bg-white">
-        <section className="relative border-b border-gray-100 overflow-hidden py-12 md:py-16">
-          {/* Achtergrond alleen bij bovenste deel */}
-          <div className="absolute inset-0">
-            <Image
-              src="/images/Achtergrond5.jpg"
-              alt=""
-              fill
-              className="object-cover object-center"
-              quality={85}
-              sizes="100vw"
-              priority
-            />
-            {/* Zeer lichte overgangsfade naar wit */}
-            <div
-              className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
-              style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.18) 100%)' }}
-            />
-          </div>
+        <section className="relative border-b border-gray-200 overflow-hidden py-12 md:py-16 bg-gray-100 dark:bg-neutral-800">
           <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-[#163300] dark:text-[#9FE870] sm:text-4xl md:text-5xl">
               Kennisbank
             </h1>
-            <p className="mt-3 max-w-2xl text-lg text-white/90">
+            <p className="mt-3 max-w-2xl text-lg text-[#163300]/90 dark:text-[#9FE870]/90">
               Uitgebreide artikelen over wetgeving, financieel beheer, verduurzaming en meer. Voor verhuurders en vastgoedbeheerders in Nederland.
             </p>
           </div>
@@ -123,21 +109,13 @@ export default function BlogPage() {
                 ))}
               </div>
 
-              {/* Featured */}
-              {featured && showFeatured && (
-                <div className="mb-10">
-                  <p className="mb-3 text-sm font-medium text-gray-500">Uitgelicht</p>
-                  <ArticleCard article={featured} featured />
-                </div>
-              )}
-
-              {/* Artikelgrid */}
-              <div className="grid gap-6 sm:grid-cols-2">
-                {filtered.map((article) => (
-                  <ArticleCard key={article.slug} article={article} />
+              {/* Artikelgrid — altijd minimaal 2 blokken per rij (2 of 3 kolommen); uitgelicht staat mee in grid */}
+              <div className="grid gap-8 grid-cols-2 lg:grid-cols-3">
+                {displayList.map((article, index) => (
+                  <ArticleCard key={article.slug} article={article} imageIndex={index} />
                 ))}
               </div>
-              {filtered.length === 0 && (
+              {displayList.length === 0 && (
                 <p className="py-12 text-center text-gray-500">Geen artikelen gevonden.</p>
               )}
             </div>

@@ -114,6 +114,38 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName
 
+/** Checkbox-item met lege/gevulde rondjes; menu blijft open bij klikken (meerdere opties aan/uit). */
+const DropdownMenuWidgetCheckboxItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
+>(({ className, children, checked, onSelect, ...props }, ref) => (
+  <DropdownMenuPrimitive.CheckboxItem
+    ref={ref}
+    className={cn(
+      "relative flex cursor-pointer select-none items-center gap-3 rounded-lg py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:bg-gray-100 focus:dark:bg-neutral-800 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    checked={checked}
+    onSelect={(e) => {
+      e.preventDefault()
+      onSelect?.(e)
+    }}
+    {...props}
+  >
+    <span
+      className={cn(
+        "absolute left-3 top-1/2 -translate-y-1/2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
+        checked
+          ? "bg-[#163300] dark:bg-[#9FE870]"
+          : "border-2 border-gray-400 dark:border-gray-500 bg-transparent"
+      )}
+      aria-hidden
+    />
+    {children}
+  </DropdownMenuPrimitive.CheckboxItem>
+))
+DropdownMenuWidgetCheckboxItem.displayName = "DropdownMenuWidgetCheckboxItem"
+
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
@@ -185,6 +217,7 @@ export {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
+  DropdownMenuWidgetCheckboxItem,
   DropdownMenuRadioItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,

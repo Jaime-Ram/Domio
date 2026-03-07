@@ -34,9 +34,9 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 
 const CARD_CLASS = 'rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden'
-const CARD_CLASS_DEMO = 'rounded-[1.75rem] bg-[#f4f4f4] dark:bg-neutral-800 overflow-hidden shadow-none'
+const CARD_CLASS_DEMO = 'rounded-[1.75rem] bg-white dark:bg-neutral-900 overflow-hidden'
 const INNER_BLOCK_CLASS = 'rounded-2xl bg-gray-100 dark:bg-neutral-800'
-const INNER_BLOCK_CLASS_DEMO = 'rounded-2xl border border-gray-200 dark:border-neutral-600 overflow-hidden'
+const INNER_BLOCK_CLASS_DEMO = 'rounded-2xl bg-gray-100 dark:bg-neutral-800 overflow-hidden'
 
 // Bar heights voor weergave (relatief)
 const FINANCIAL_BARS = [
@@ -144,7 +144,7 @@ export default function EmployerDashboardPage() {
             Welkom bij Domio. Begin met het toevoegen van je panden.
           </p>
         </div>
-        <div className="rounded-[1.75rem] border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden p-8 sm:p-12">
+        <div className={cn(CARD_CLASS, 'p-8 sm:p-12')}>
           <div className="max-w-md mx-auto text-center">
             <div className="h-16 w-16 rounded-2xl bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center mx-auto mb-6">
               <Building2 className="h-8 w-8 text-[#163300] dark:text-[#9FE870]" />
@@ -310,7 +310,7 @@ export default function EmployerDashboardPage() {
       {/* Onderste rij: Financieel (met balken) | Aankomende taken */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Financieel deze maand – donkere kaart met balken (zoals homepage Maandelijkse inkomsten) */}
-        <div className={cn(isDemo ? CARD_CLASS_DEMO : CARD_CLASS, '!bg-[#163300] !border-[#163300]/20 p-6')}>
+        <div className={cn(isDemo ? CARD_CLASS_DEMO : CARD_CLASS, isDemo ? '!bg-[#163300] p-6' : '!bg-[#163300] !border-[#163300]/20 p-6')}>
           <p className="text-white/80 text-sm font-medium mb-1">
             Financieel deze maand
           </p>

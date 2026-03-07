@@ -32,7 +32,7 @@ export interface TransactionListWidgetProps {
   compact?: boolean
   /** Gebruik shadow-card-elevated en overflow-visible (voor Functies-sectie op gekleurde achtergrond) */
   elevatedShadow?: boolean
-  /** Demo-stijl: lichtgrijs (#FAFAFA), geen schaduw */
+  /** Demo-stijl: wit/grijs, geen schaduw, geen rand (zoals overige demo-blokken) */
   demoStyle?: boolean
 }
 
@@ -58,7 +58,7 @@ export function TransactionListWidget({
   demoStyle = false,
 }: TransactionListWidgetProps) {
   const cardClass = demoStyle
-    ? 'rounded-card bg-[#f4f4f4] dark:bg-neutral-800 overflow-hidden shadow-none'
+    ? 'rounded-card bg-gray-100 dark:bg-neutral-800 overflow-hidden'
     : elevatedShadow
       ? 'rounded-card border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-card-elevated overflow-visible'
       : CARD_CLASS
@@ -86,11 +86,11 @@ export function TransactionListWidget({
               className={cn(
                 'flex items-center gap-3 w-full text-left',
                 compact ? 'py-2.5' : 'py-3',
-                index > 0 && 'border-t border-gray-100 dark:border-neutral-800'
+                !demoStyle && index > 0 && 'border-t border-gray-100 dark:border-neutral-800'
               )}
             >
               <div
-                className={item.iconAccent !== false ? ICON_ACCENT : ICON_NEUTRAL}
+                className={demoStyle ? ICON_NEUTRAL : (item.iconAccent !== false ? ICON_ACCENT : ICON_NEUTRAL)}
               >
                 {item.icon}
               </div>

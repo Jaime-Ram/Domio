@@ -2,8 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 export default function RestaurantPage() {
+  const { isDemo } = useDashboardUser()
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="mb-6 sm:mb-8">
@@ -15,7 +17,7 @@ export default function RestaurantPage() {
         </p>
       </div>
 
-      <Card className={dashboardCardClass()}>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle>Restaurant Overzicht</CardTitle>
           <CardDescription>Beheer je restaurant en POS integraties</CardDescription>

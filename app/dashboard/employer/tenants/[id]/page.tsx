@@ -195,7 +195,7 @@ export default function TenantDetailPage() {
               {/* Tab 1: Gegevens */}
               <TabsContent value="details">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <Card className={dashboardCardClass('lg:col-span-2')}>
+                  <Card className={dashboardCardClass('lg:col-span-2', isDemo)}>
                     <CardHeader>
                       <CardTitle>Persoonlijke Gegevens</CardTitle>
                       <CardDescription>Contact- en contractinformatie</CardDescription>
@@ -279,7 +279,7 @@ export default function TenantDetailPage() {
                   </Card>
 
                   {/* Notities */}
-                  <Card className={dashboardCardClass()}>
+                  <Card className={dashboardCardClass(undefined, isDemo)}>
                     <CardHeader>
                       <CardTitle>Notities</CardTitle>
                       <CardDescription>Memo&apos;s over deze huurder</CardDescription>
@@ -301,7 +301,7 @@ export default function TenantDetailPage() {
 
               {/* Tab 2: Betalingen */}
               <TabsContent value="payments">
-                <Card className={dashboardCardClass()}>
+                <Card className={dashboardCardClass(undefined, isDemo)}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>

@@ -47,6 +47,7 @@ import { mockWwsObjects, mockWwsOptimalisatieAdviezen } from '@/lib/mock-data/ww
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { downloadWWSPDF } from '@/lib/pdf/generate-wws-pdf'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 
 const getComplianceNav = (basePath: string) => [
   { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
@@ -274,13 +275,22 @@ export default function PuntentellingPage() {
   if (!isDemo && propertyInputs.length === 0) {
     return (
       <>
-        <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
+        <SectionNavDashboard
+        title="Compliance"
+        items={COMPLIANCE_NAV}
+        titleVariant="hero"
+        widgetMenu={
+          <SectionWidgetMenu>
+            <SectionWidgetMenuPlaceholder />
+          </SectionWidgetMenu>
+        }
+      />
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Puntentelling</h1>
             <p className="text-gray-600 dark:text-gray-400">Bereken WWS-punten voor je panden</p>
           </div>
-          <Card className={dashboardCardClass()}>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardContent className="py-12 text-center">
               <p className="text-gray-500 dark:text-gray-400">Nog geen objecten voor puntentelling.</p>
               <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Voeg eerst panden toe aan je portefeuille.</p>
@@ -310,9 +320,15 @@ export default function PuntentellingPage() {
     verwarming: 'centraal',
   })
 
+  const complianceWidgetMenu = (
+    <SectionWidgetMenu>
+      <SectionWidgetMenuPlaceholder />
+    </SectionWidgetMenu>
+  )
+
   return (
     <div className="space-y-6">
-      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} />
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" widgetMenu={complianceWidgetMenu} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -340,7 +356,7 @@ export default function PuntentellingPage() {
       </div>
 
       {/* Property selector */}
-      <Card className={dashboardCardClass()}>
+      <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardContent className="pt-6 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4">
             <div className="flex-1 space-y-1.5">
@@ -374,7 +390,7 @@ export default function PuntentellingPage() {
 
       {/* Score overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6 flex flex-col items-center text-center">
             <div className="h-24 w-24 rounded-full bg-[#163300] flex items-center justify-center mb-3">
               <span className="text-3xl font-bold text-white">{result.punten}</span>
@@ -386,7 +402,7 @@ export default function PuntentellingPage() {
           </CardContent>
         </Card>
 
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6 flex flex-col items-center text-center">
             <Euro className="h-8 w-8 text-[#163300] dark:text-[#9FE870] mb-2" />
             <p className="text-3xl font-bold text-gray-900 dark:text-white">€{result.maxHuur.toLocaleString('nl-NL')}</p>
@@ -399,7 +415,7 @@ export default function PuntentellingPage() {
           </CardContent>
         </Card>
 
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardContent className="pt-6 flex flex-col items-center text-center">
             <TrendingUp className="h-8 w-8 text-[#163300] dark:text-[#9FE870] mb-2" />
             <p className="text-3xl font-bold text-gray-900 dark:text-white">+{totalOptExtra}</p>
@@ -438,7 +454,7 @@ export default function PuntentellingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Form (3 cols) */}
           <div className="lg:col-span-3 space-y-4">
-            <Card className={dashboardCardClass()}>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Home className="h-5 w-5" />
@@ -474,7 +490,7 @@ export default function PuntentellingPage() {
               </CardContent>
             </Card>
 
-            <Card className={dashboardCardClass()}>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Maximize2 className="h-5 w-5" />
@@ -503,7 +519,7 @@ export default function PuntentellingPage() {
               </CardContent>
             </Card>
 
-            <Card className={dashboardCardClass()}>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Sun className="h-5 w-5" />
@@ -540,7 +556,7 @@ export default function PuntentellingPage() {
               </CardContent>
             </Card>
 
-            <Card className={dashboardCardClass()}>
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Flame className="h-5 w-5" />
@@ -582,7 +598,7 @@ export default function PuntentellingPage() {
 
           {/* Breakdown (2 cols) */}
           <div className="lg:col-span-2 space-y-4">
-            <Card className={dashboardCardClass('sticky top-20')}>
+            <Card className={dashboardCardClass('sticky top-20', isDemo)}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <BarChart3 className="h-5 w-5" />
@@ -668,7 +684,7 @@ export default function PuntentellingPage() {
       {/* Tab: Optimalisatie */}
       {activeTab === 'optimalisatie' && (
         <div className="space-y-4">
-          <Card className={dashboardCardClass()}>
+          <Card className={dashboardCardClass(undefined, isDemo)}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="h-5 w-5" />
@@ -757,7 +773,7 @@ export default function PuntentellingPage() {
 
       {/* Tab: Historie */}
       {activeTab === 'historie' && (
-        <Card className={dashboardCardClass()}>
+        <Card className={dashboardCardClass(undefined, isDemo)}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />

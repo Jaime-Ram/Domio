@@ -30,6 +30,10 @@ export interface BlogArticle {
   featured: boolean
   relatedArticles: string[]
   placeholder?: boolean
+  /** Optioneel: afbeelding voor de kaart (pad in public) */
+  image?: string
+  /** Optioneel: auteur voor onderaan de kaart */
+  author?: { name: string; avatar?: string }
 }
 
 export interface UpdateItem {

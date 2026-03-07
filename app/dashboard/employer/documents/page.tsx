@@ -57,11 +57,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuWidgetCheckboxItem,
+  DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
+
+const DOCUMENT_WIDGET_IDS = ['stats', 'searchFilter', 'documentList'] as const
+type DocumentWidgetId = (typeof DOCUMENT_WIDGET_IDS)[number]
+const defaultDocWidgets: Record<DocumentWidgetId, boolean> = { stats: false, searchFilter: false, documentList: false }
 
 export default function DocumentsPage() {
   const router = useRouter()
   const { isDemo, basePath } = useDashboardUser()
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<DocumentWidgetId, boolean>>(defaultDocWidgets)
   const [searchQuery, setSearchQuery] = useState('')
 
   const documents = isDemo ? mockDocuments : []
@@ -333,16 +342,26 @@ export default function DocumentsPage() {
 
   return (
     <>
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  Drive
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Al je documenten
-                </p>
-              </div>
+            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+              <SectionHeroHeader
+                title="Documenten"
+                description="Al je documenten"
+                className="mb-0"
+                widgetMenu={
+                  <SectionWidgetMenu>
+                    <DropdownMenuLabel>Widgets tonen</DropdownMenuLabel>
+                    <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.stats} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, stats: !w.stats }))}>
+                      Statistieken
+                    </DropdownMenuWidgetCheckboxItem>
+                    <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.searchFilter} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, searchFilter: !w.searchFilter }))}>
+                      Zoeken en filter
+                    </DropdownMenuWidgetCheckboxItem>
+                    <DropdownMenuWidgetCheckboxItem checked={visibleWidgets.documentList} onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, documentList: !w.documentList }))}>
+                      Documentlijst
+                    </DropdownMenuWidgetCheckboxItem>
+                  </SectionWidgetMenu>
+                }
+              />
               <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
                 <DialogTrigger asChild>
                   <Button className="bg-[#163300] hover:bg-[#356258] text-white">
@@ -593,9 +612,9 @@ export default function DocumentsPage() {
               </Dialog>
             </div>
 
-            {/* Stats Cards */}
+            {visibleWidgets.stats && (
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Totaal</p>
@@ -603,7 +622,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Contracten</p>
@@ -611,7 +630,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Keuringen</p>
@@ -619,7 +638,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Verzekeringen</p>
@@ -627,7 +646,7 @@ export default function DocumentsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className={dashboardCardClass()}>
+              <Card className={dashboardCardClass(undefined, isDemo)}>
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">Facturen</p>
@@ -636,9 +655,10 @@ export default function DocumentsPage() {
                 </CardContent>
               </Card>
             </div>
+            )}
 
-            {/* Search and Filters */}
-            <Card className={dashboardCardClass('mb-6')}>
+            {visibleWidgets.searchFilter && (
+            <Card className={dashboardCardClass('mb-6', isDemo)}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <div className="flex-1 relative">
@@ -681,9 +701,10 @@ export default function DocumentsPage() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
-            {/* Documents Table */}
-            <Card className={dashboardCardClass()}>
+            {visibleWidgets.documentList && (
+            <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader>
                 <CardTitle>Alle documenten ({filteredDocuments.length})</CardTitle>
                 <CardDescription>Bekijk, download of verwijder documenten</CardDescription>
@@ -776,6 +797,7 @@ export default function DocumentsPage() {
                 </Table>
               </CardContent>
             </Card>
+            )}
     </>
   )
 }

@@ -94,7 +94,7 @@ const accountingIntegrations: AccountingIntegration[] = [
 ]
 
 export default function AccountingPage() {
-  const { basePath } = useDashboardUser()
+  const { basePath, isDemo } = useDashboardUser()
   const [integrations, setIntegrations] = useState<AccountingIntegration[]>(accountingIntegrations)
   const [showConnectDialog, setShowConnectDialog] = useState<string | null>(null)
   const [selectedIntegration, setSelectedIntegration] = useState<AccountingIntegration | null>(null)
@@ -149,7 +149,7 @@ export default function AccountingPage() {
       </div>
 
       {/* Eigen Boekhouding Section */}
-      <Card className={dashboardCardClass('mb-8')}>
+      <Card className={dashboardCardClass('mb-8', isDemo)}>
         <CardHeader>
           <div className="flex items-start gap-4">
             <div className="p-3 bg-[#163300]/10 dark:bg-[#9FE870]/10 rounded-lg">
@@ -273,7 +273,7 @@ export default function AccountingPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableIntegrations.map((integration) => (
-            <Card key={integration.id} className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors')}>
+            <Card key={integration.id} className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors', isDemo)}>
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">
