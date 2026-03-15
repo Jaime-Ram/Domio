@@ -7,6 +7,8 @@ export const dynamic = 'force-dynamic'
 const DOCUMENTS_BUCKET = 'documents'
 const URL_EXPIRY_SECONDS = 60
 
+type DocumentRow = { id: string; owner_id: string; storage_path: string | null }
+
 /**
  * GET /api/documents/[id]/url?download=1
  * Returns a signed URL to view (or download) the document file.
@@ -28,12 +30,13 @@ export async function GET(
       return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 })
     }
 
-    const { data: doc, error: docError } = await supabase
+    const { data, error: docError } = await supabase
       .from('documents')
       .select('id, owner_id, storage_path')
       .eq('id', id)
       .single()
 
+    const doc = data as DocumentRow | null
     if (docError || !doc) {
       return NextResponse.json({ error: 'Document niet gevonden' }, { status: 404 })
     }

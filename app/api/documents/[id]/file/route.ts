@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic'
 
 const DOCUMENTS_BUCKET = 'documents'
 
+type DocumentRow = { id: string; owner_id: string; storage_path: string | null; mime_type: string | null }
+
 /**
  * GET /api/documents/[id]/file
  * Streams the document file (same-origin, for PDF.js preview without CORS).
@@ -27,12 +29,13 @@ export async function GET(
       return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 })
     }
 
-    const { data: doc, error: docError } = await supabase
+    const { data, error: docError } = await supabase
       .from('documents')
       .select('id, owner_id, storage_path, mime_type')
       .eq('id', id)
       .single()
 
+    const doc = data as DocumentRow | null
     if (docError || !doc) {
       return NextResponse.json({ error: 'Document niet gevonden' }, { status: 404 })
     }

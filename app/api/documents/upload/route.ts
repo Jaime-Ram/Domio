@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { Database } from '@/lib/supabase/types'
 
 export const dynamic = 'force-dynamic'
+
+type DocumentInsert = Database['public']['Tables']['documents']['Insert']
+type DocumentRow = Database['public']['Tables']['documents']['Row']
 
 const DOCUMENTS_BUCKET = 'documents'
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024 // 10 MB
@@ -71,17 +75,19 @@ export async function POST(request: NextRequest) {
     const fileName = sanitizeFileName(file.name || `${displayName}.pdf`)
 
     // 1) Insert document row (we need id for storage path)
-    const { data: doc, error: insertError } = await supabase
+    const insertPayload: DocumentInsert = {
+      owner_id: user.id,
+      property_id: propertyId,
+      name: displayName,
+      type: docType as 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig',
+      file_name: fileName,
+      mime_type: mimeType,
+      source: 'upload',
+    }
+    const { data: insertData, error: insertError } = await supabase
       .from('documents')
-      .insert({
-        owner_id: user.id,
-        property_id: propertyId,
-        name: displayName,
-        type: docType as 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig',
-        file_name: fileName,
-        mime_type: mimeType,
-        source: 'upload',
-      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generic infers never for documents table
+      .insert(insertPayload as any)
       .select()
       .single()
 
@@ -91,6 +97,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+    const doc = insertData as DocumentRow
 
     const storagePath = `${user.id}/${doc.id}/${fileName}`
 
@@ -132,12 +139,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 4) Update document with storage_path
-    const { data: updated, error: updateError } = await supabase
+    const { data: updateData, error: updateError } = await supabase
       .from('documents')
+      // @ts-expect-error Supabase client infers documents table as never
       .update({ storage_path: storagePath })
       .eq('id', doc.id)
       .select()
       .single()
+    const updated = updateData as DocumentRow | null
 
     if (updateError) {
       // Document exists but path not set; storage has file. Still return doc with path for consistency
