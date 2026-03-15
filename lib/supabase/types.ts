@@ -316,6 +316,9 @@ export interface Database {
           file_name: string | null
           mime_type: string | null
           extracted_data: Json | null
+          storage_path: string | null
+          source: 'upload' | 'generated' | null
+          template_type: string | null
           created_at: string
           updated_at: string
         }
@@ -328,6 +331,9 @@ export interface Database {
           file_name?: string | null
           mime_type?: string | null
           extracted_data?: Json | null
+          storage_path?: string | null
+          source?: 'upload' | 'generated' | null
+          template_type?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -340,6 +346,9 @@ export interface Database {
           file_name?: string | null
           mime_type?: string | null
           extracted_data?: Json | null
+          storage_path?: string | null
+          source?: 'upload' | 'generated' | null
+          template_type?: string | null
           created_at?: string
           updated_at?: string
         }

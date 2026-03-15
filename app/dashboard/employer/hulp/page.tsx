@@ -6,37 +6,20 @@ import { Button } from '@/components/ui/button'
 import { CONTACT_EMAIL } from '@/lib/site-config'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
-import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
-import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
-import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
-import { useState } from 'react'
 
 const PHONE = '+31 6 46 23 16 96'
 const WHATSAPP_LINK = 'https://wa.me/31646231696'
 
 export default function DashboardHulpPage() {
-  const { isDemo } = useDashboardUser()
-  const [showContactCards, setShowContactCards] = useState(false)
   return (
     <>
       <SectionHeroHeader
-        title="Hulp"
+        title="Hulp nodig?"
         description="We staan voor je klaar. Kies hoe je contact wilt opnemen."
-        widgetMenu={
-          <SectionWidgetMenu>
-            <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
-            <DropdownMenuWidgetCheckboxItem checked={showContactCards} onCheckedChange={() => setShowContactCards((v) => !v)}>
-              Contactopties
-            </DropdownMenuWidgetCheckboxItem>
-          </SectionWidgetMenu>
-        }
       />
 
-      {showContactCards && (
-      <>
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Chat met ons / WhatsApp – primair voor direct contact */}
+      <div className="grid gap-content-blocks md:grid-cols-2">
         <a
           href={WHATSAPP_LINK}
           target="_blank"
@@ -71,17 +54,16 @@ export default function DashboardHulpPage() {
           </div>
         </a>
 
-        {/* Bellen */}
         <a
           href={`tel:${PHONE.replace(/\s/g, '')}`}
-          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
+          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
         >
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
               <Phone className="h-6 w-6" strokeWidth={2} />
             </span>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Bel ons</h2>
+              <h2 className="text-xl font-semibold text-[#163300] dark:text-[#9FE870]">Bel ons</h2>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Voor urgente vragen of een persoonlijk gesprek.
               </p>
@@ -92,13 +74,12 @@ export default function DashboardHulpPage() {
           </div>
         </a>
 
-        {/* E-mail */}
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
+          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
         >
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
               <Mail className="h-6 w-6" strokeWidth={2} />
             </span>
             <div>
@@ -113,17 +94,16 @@ export default function DashboardHulpPage() {
           </div>
         </a>
 
-        {/* FAQ */}
         <Link
           href="/faq"
-          className={dashboardCardClass(isDemo ? 'group flex flex-col p-6 md:p-8 transition-all' : 'group flex flex-col p-6 md:p-8 transition-all hover:border-[#163300]/40 hover:shadow-lg', isDemo)}
+          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
         >
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
               <HelpCircle className="h-6 w-6" strokeWidth={2} />
             </span>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Veelgestelde vragen</h2>
+              <h2 className="text-xl font-semibold text-[#163300] dark:text-[#9FE870]">Veelgestelde vragen</h2>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Vind snel antwoorden op veelgestelde vragen over Domio.
               </p>
@@ -140,8 +120,6 @@ export default function DashboardHulpPage() {
           <Link href="/contact">Uitgebreid contactformulier →</Link>
         </Button>
       </div>
-      </>
-      )}
     </>
   )
 }

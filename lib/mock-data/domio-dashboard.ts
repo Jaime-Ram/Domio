@@ -307,10 +307,16 @@ export const vveMjop = [
 
 // ——— Gebruiker (topbar) ———
 export const currentUser = {
-  name: 'Thomas van Dijk',
-  email: 'thomas@domio.nl',
-  avatarInitials: 'TvD',
+  name: 'Jaime Ram',
+  email: 'jaime@domio.nl',
+  avatarInitials: 'JR',
 }
+
+// ——— Gekoppelde rekeningen (demo: Jaime Ram) ———
+export const demoLinkedAccounts = [
+  { name: 'ABN AMRO', last4: '4521', description: 'Hoofdrekening' },
+  { name: 'ING', last4: '8832', description: 'Reserve / onderhoud' },
+]
 
 // ——— Notificaties ———
 export const notifications = [

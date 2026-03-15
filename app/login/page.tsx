@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { KeyRound } from 'lucide-react'
-import { signIn, signInWithGoogle } from '@/lib/supabase/auth'
+import { signIn, signInWithGoogle, signInWithMicrosoft } from '@/lib/supabase/auth'
 import { translateAuthError } from '@/lib/auth-errors'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
@@ -190,7 +190,7 @@ function LoginContent() {
                 <span className="bg-white dark:bg-gray-900 px-3 text-sm text-gray-500">Of log in met</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <SocialButton
                 type="button"
                 variant="default"
@@ -212,17 +212,35 @@ function LoginContent() {
                 variant="default"
                 size="lg"
                 className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                onClick={async () => {
+                  setLoading(true); setError(null)
+                  try { const { error: e } = await signInWithMicrosoft(); if (e) throw e } catch (err: unknown) { setError(translateAuthError(err instanceof Error ? err.message : 'Inloggen met Microsoft mislukt')); setLoading(false) }
+                }}
+                disabled={loading}
+                aria-label="Inloggen met Microsoft"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
+                  <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+                  <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
+                  <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
+                  <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
+                </svg>
+              </SocialButton>
+              <SocialButton
+                type="button"
+                variant="default"
+                size="lg"
+                className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 onClick={handleSocialLogin}
                 disabled={loading}
                 aria-label="Inloggen met Apple"
               >
-                {/* Apple logo: eenvoudige appel-vorm (geen “persoon”-icoon) */}
                 <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19z" />
                 </svg>
               </SocialButton>
             </div>
-            <div className="pt-2">
+            <div className="grid grid-cols-1 gap-3">
               <SocialButton
                 type="button"
                 variant="default"

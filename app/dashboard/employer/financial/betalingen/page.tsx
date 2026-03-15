@@ -62,7 +62,7 @@ export default function BetalingenPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-content-blocks">
       <SectionNavDashboard
         title="Financieel"
         items={FINANCIAL_NAV}
@@ -73,100 +73,6 @@ export default function BetalingenPage() {
           </SectionWidgetMenu>
         }
       />
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Betalingen</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Betalingen en transacties.</p>
-      </div>
-
-      {/* Betaal met bank (Tink) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Betaal met bank
-          </CardTitle>
-          <CardDescription>
-            Start een betaling via Tink – de huurder kiest zijn bank en autoriseert de betaling. Geschikt voor eenmalige incasso.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isDemo && (
-            <p className="text-sm text-amber-600 dark:text-amber-500">
-              In de demo is Tink uitgeschakeld. Configureer TINK_CLIENT_ID en TINK_CLIENT_SECRET in .env.local en log in om dit te gebruiken.
-            </p>
-          )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="tink-amount">Bedrag (€)</Label>
-              <Input
-                id="tink-amount"
-                type="text"
-                inputMode="decimal"
-                placeholder="bijv. 1200"
-                value={tinkForm.amount}
-                onChange={(e) => setTinkForm((f) => ({ ...f, amount: e.target.value }))}
-                disabled={isDemo}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tink-recipient">Naam ontvanger</Label>
-              <Input
-                id="tink-recipient"
-                placeholder="bijv. Verhuurder B.V."
-                value={tinkForm.recipientName}
-                onChange={(e) => setTinkForm((f) => ({ ...f, recipientName: e.target.value }))}
-                disabled={isDemo}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tink-iban">IBAN ontvanger</Label>
-            <Input
-              id="tink-iban"
-              placeholder="NL00 BANK 0000 0000 00"
-              value={tinkForm.recipientIban}
-              onChange={(e) => setTinkForm((f) => ({ ...f, recipientIban: e.target.value.toUpperCase() }))}
-              disabled={isDemo}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tink-desc">Omschrijving (optioneel)</Label>
-            <Input
-              id="tink-desc"
-              placeholder="Huur, servicekosten, etc."
-              value={tinkForm.description}
-              onChange={(e) => setTinkForm((f) => ({ ...f, description: e.target.value }))}
-              disabled={isDemo}
-            />
-          </div>
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-          <Button
-            onClick={startTinkPayment}
-            disabled={isDemo || loading}
-            className="bg-brand-primary text-white hover:bg-brand-primary-hover"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
-            {loading ? 'Bezig…' : 'Betaal met bank starten'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className={dashboardCardClass(undefined, isDemo)}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Betalingen overzicht
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Betalingen worden getoond in het financiële dashboard.
-          </p>
-          <Button asChild variant="default">
-            <Link href={`${basePath}/financial`}>Naar Financieel</Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

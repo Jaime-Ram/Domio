@@ -54,14 +54,10 @@ export function SectionNavDashboard({ title, items, className, titleVariant = 'd
               key={item.href}
               href={item.href}
               className={cn(
-                'inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all',
-                isDemo
-                  ? active
-                    ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
-                    : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-600'
-                  : active
-                    ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 shadow-sm'
-                    : 'bg-gray-100 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-600 text-gray-700 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-neutral-700 hover:border-gray-300 dark:hover:border-neutral-500'
+                'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
+                active
+                  ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
+                  : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
               )}
             >
               <Icon className="size-4 shrink-0 text-current" />

@@ -71,7 +71,12 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const pathname = usePathname()
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
+  const [trialDismissed, setTrialDismissed] = useState(false)
   const [showTrialBlock, setShowTrialBlock] = useState(!collapsed)
+
+  useEffect(() => {
+    if (localStorage.getItem('domio_trial_dismissed') === '1') setTrialDismissed(true)
+  }, [])
 
   // Auto-expand alleen de sectie van de actieve route; maximaal één accordion open
   useEffect(() => {
@@ -169,7 +174,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       icon: FileCheck,
     },
     {
-      label: 'Instellingen',
+      label: 'Accountinstellingen',
       href: `${basePath}/settings`,
       icon: Settings,
     },
@@ -208,7 +213,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         data-vastgoed-sidebar
         className={cn(
           "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] dark:bg-neutral-800 transform rounded-tr-3xl rounded-br-3xl",
-          !demoMode && "border-e border-gray-200 dark:border-neutral-700",
+          
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
@@ -223,7 +228,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       >
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
-            "h-16 flex items-center border-b border-gray-200 dark:border-neutral-700 transition-all duration-300",
+            "h-16 flex items-center transition-all duration-300",
             collapsed ? "px-3 justify-end" : "px-6 justify-between"
           )}>
             {/* Logo - Disappears when collapsed */}
@@ -428,12 +433,24 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
           </div>
           
           {/* 30 dagen gratis blokje - Only visible after sidebar animation completes */}
+          {!trialDismissed && (
           <div className={cn(
-            "border-t border-gray-200 dark:border-neutral-700 p-3 flex-shrink-0 transition-opacity duration-200",
+            "p-3 flex-shrink-0 transition-opacity duration-200",
             showTrialBlock ? "opacity-100" : "opacity-0 pointer-events-none"
           )}>
             {showTrialBlock && (
-              <div className="bg-[#163300] rounded-xl p-4 relative overflow-hidden">
+              <div className="bg-[#163300] rounded-3xl p-4 relative overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTrialDismissed(true)
+                    localStorage.setItem('domio_trial_dismissed', '1')
+                  }}
+                  className="absolute top-3 right-3 z-20 h-6 w-6 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors"
+                  aria-label="Sluiten"
+                >
+                  <X className="h-3.5 w-3.5 text-white" />
+                </button>
                 <div className="relative z-10">
                   <h3 className="text-sm font-semibold text-white mb-1">
                     Domio zelf ervaren?
@@ -448,7 +465,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                     Registreren
                   </Button>
                 </div>
-                {/* Geometric decorative element - subtle in quiet corner */}
                 <GeometricShapes 
                   variant="trapezoid" 
                   className="right-0 bottom-0 w-32 h-32"
@@ -459,6 +475,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               </div>
             )}
           </div>
+          )}
         </div>
       </div>
     </>

@@ -180,7 +180,7 @@ export default function PropertyDetailPage() {
   if (!property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] mb-4">
           Object niet gevonden
         </h2>
         <Button onClick={() => router.push(`${basePath}/portfolio`)}>
@@ -360,7 +360,7 @@ export default function PropertyDetailPage() {
               
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
                     {isEditing ? (editForm.name || 'Nieuw pand') : property.name}
                   </h1>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
@@ -668,7 +668,7 @@ export default function PropertyDetailPage() {
                         <div className="border-2 border-dashed border-[#163300]/40 dark:border-[#9FE870]/40 rounded-lg p-6">
                           <div className="flex items-center gap-3 mb-4">
                             <DoorOpen className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Nieuwe unit</h3>
+                            <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">Nieuwe unit</h3>
                           </div>
 
                           {newUnitError && (
@@ -771,7 +771,7 @@ export default function PropertyDetailPage() {
                                   {/* Edit mode */}
                                   <div className="flex items-center gap-3 mb-4">
                                     <DoorOpen className="h-5 w-5 text-gray-400" />
-                                    <h3 className="font-semibold text-gray-900 dark:text-white">{unitForm.unit_number || unit.unit_number}</h3>
+                                    <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">{unitForm.unit_number || unit.unit_number}</h3>
                                   </div>
 
                                   {unitErrors[unit.id] && (
@@ -905,7 +905,7 @@ export default function PropertyDetailPage() {
                                     <div className="flex items-center gap-3">
                                       <DoorOpen className="h-5 w-5 text-gray-400" />
                                       <div>
-                                        <h3 className="font-semibold text-gray-900 dark:text-white">{unit.unit_number}</h3>
+                                        <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">{unit.unit_number}</h3>
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -984,7 +984,7 @@ export default function PropertyDetailPage() {
                       ) : !newUnitDraft ? (
                         <div className="py-12 text-center">
                           <DoorOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                          <h3 className="text-lg font-medium text-[#163300] dark:text-[#9FE870] mb-2">
                             Geen units beschikbaar
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">

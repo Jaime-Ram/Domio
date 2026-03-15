@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Klikbare elementen: pointer-cursor */
+@layer base {
+  button:not(:disabled),
+  a[href],
+  [role="button"]:not([aria-disabled="true"]),
+  [role="menuitem"] {
+    cursor: pointer;
+  }
+}
+
 /* Codec Pro Font Face */
 @font-face {
   font-family: 'Codec Pro';
@@ -264,9 +274,11 @@
     --space-small: 16px;
     --space-medium: 24px;
     --space-large: 32px;
-    /* Wise-style radius (cards, blocks) */
-    --radius-card: 1.75rem;
-    --radius-block: 1rem;
+    /* Ruimte tussen contentblokken in dashboard (o.a. tussen Persoonlijke gegevens en Taalvoorkeur) */
+    --space-content-blocks: 3.5rem;
+    /* Wise-style radius (cards, blocks) – contentblokken iets minder rond */
+    --radius-card: 1rem;
+    --radius-block: 0.75rem;
     --radius-pill: 9999px;
   }
 

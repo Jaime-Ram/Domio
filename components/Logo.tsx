@@ -62,7 +62,13 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
         height={height}
         priority
         className={imageClass}
-        style={variant === 'default' ? { filter: darkGreenFilter } : undefined}
+        style={{
+          maxWidth: width,
+          maxHeight: height,
+          width: 'auto',
+          height: 'auto',
+          ...(variant === 'default' ? { filter: darkGreenFilter } : {}),
+        }}
         onError={handleError}
         unoptimized={false}
       />

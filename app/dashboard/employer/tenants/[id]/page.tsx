@@ -62,8 +62,15 @@ export default function TenantDetailPage() {
         const tenantLeases = await leaseQueries.getByOwner(user.id)
         const filteredLeases = tenantLeases?.filter((l: any) => l.tenant_id === tenantId) || []
         setLeases(filteredLeases)
-      } catch (error) {
-        console.error('Failed to load tenant:', error)
+      } catch (error: unknown) {
+        // Supabase .single() throws PGRST116 when no row found — show "not found" UI
+        const err = error as { code?: string; message?: string }
+        if (err?.code === 'PGRST116') {
+          setTenant(null)
+          return
+        }
+        const message = err?.message ?? (error instanceof Error ? error.message : String(error))
+        console.error('Failed to load tenant:', message || error)
       } finally {
         setLoading(false)
       }
@@ -85,7 +92,7 @@ export default function TenantDetailPage() {
     return (
       <>
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] mb-4">
             Huurder niet gevonden
           </h2>
           <Button onClick={() => router.push(`${basePath}/tenants`)}>
@@ -155,7 +162,7 @@ export default function TenantDetailPage() {
               
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
                     {tenant.full_name}
                   </h1>
                   {activeLease && (
@@ -194,7 +201,7 @@ export default function TenantDetailPage() {
 
               {/* Tab 1: Gegevens */}
               <TabsContent value="details">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-content-blocks">
                   <Card className={dashboardCardClass('lg:col-span-2', isDemo)}>
                     <CardHeader>
                       <CardTitle>Persoonlijke Gegevens</CardTitle>

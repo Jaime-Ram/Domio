@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Search, Building2, Users, FileText, Wrench, Euro, FolderOpen, ShieldCheck, Settings, Plus, Download, Send, Edit, Eye, Calendar, BarChart3, Home, UserCircle, Briefcase, Link2, CreditCard, Receipt, TrendingUp, CheckCircle, AlertCircle, Zap, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useDashboardUser } from '@/providers/dashboard-user-provider'
+
 
 interface SearchAction {
   id: string
@@ -21,7 +21,6 @@ const BP = '/dashboard/employer'
 
 export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
   const router = useRouter()
-  const { isDemo } = useDashboardUser()
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -103,7 +102,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
     { id: 'page-accounting', label: 'Boekhouden', category: 'Pagina\'s', keywords: ['boekhouden', 'accounting', 'boekhouding'], icon: BookOpen, action: () => router.push(`${basePath}/accounting`), description: 'Bekijk boekhouden' },
     { id: 'page-documents', label: 'Drive', category: 'Pagina\'s', keywords: ['drive', 'documenten', 'documents', 'bestanden'], icon: FolderOpen, action: () => router.push(`${basePath}/documents`), description: 'Bekijk alle documenten' },
     { id: 'page-compliance', label: 'Compliance', category: 'Pagina\'s', keywords: ['compliance', 'naleving'], icon: ShieldCheck, action: () => router.push(`${basePath}/compliance`), description: 'Bekijk compliance' },
-    { id: 'page-settings', label: 'Instellingen', category: 'Pagina\'s', keywords: ['instellingen', 'settings', 'configuratie'], icon: Settings, action: () => router.push(`${basePath}/settings`), description: 'Bekijk instellingen' },
+    { id: 'page-settings', label: 'Accountinstellingen', category: 'Pagina\'s', keywords: ['instellingen', 'settings', 'configuratie', 'account'], icon: Settings, action: () => router.push(`${basePath}/settings`), description: 'Bekijk accountinstellingen' },
   ], [basePath, router])
 
   const fuzzyMatch = (text: string, pattern: string): number => {
@@ -235,27 +234,19 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className={cn(
-            'pl-10 pr-4 h-10 rounded-full placeholder:text-gray-400',
-            isDemo
-              ? 'bg-gray-100 dark:bg-neutral-800 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none'
-              : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm focus-visible:ring-[#163300] dark:focus-visible:ring-[#9FE870]'
-          )}
+          className="pl-10 pr-4 h-10 rounded-full placeholder:text-gray-400 bg-[#f4f4f4] dark:bg-neutral-800 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
         />
       </div>
 
       {/* Search Results Dropdown */}
       {isOpen && filteredActions.length > 0 && (
-        <div className={cn(
-          'absolute top-full mt-2 w-full rounded-[1.75rem] z-50 max-h-96 overflow-y-auto overflow-x-hidden',
-          isDemo ? 'bg-white dark:bg-neutral-900' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg'
-        )}>
+        <div className="absolute top-full mt-2 w-full rounded-2xl z-50 max-h-96 overflow-y-auto overflow-x-hidden bg-white dark:bg-neutral-800 border-0 shadow-soft-lg">
           {query.trim() === '' && (
-            <div className={cn('px-4 py-3', isDemo ? 'bg-gray-100 dark:bg-neutral-800' : 'border-b border-gray-200/80 dark:border-neutral-700 bg-gray-50/80 dark:bg-neutral-800/50')}>
+            <div className="px-4 pt-3 pb-1.5">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Populaire acties</p>
             </div>
           )}
-          <div className="p-2">
+          <div className="p-1.5">
             {filteredActions.map((action, index) => {
               const Icon = action.icon
               return (
@@ -264,13 +255,13 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
                   onClick={() => handleActionClick(action)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(
-                    'w-full flex items-start gap-3 px-3 py-2.5 rounded-2xl transition-colors text-left',
+                    'w-full flex items-start gap-3 px-3 py-2.5 rounded-xl transition-colors text-left',
                     index === selectedIndex
-                      ? 'bg-gray-100 dark:bg-neutral-800'
-                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800/70'
+                      ? 'bg-[#f4f4f4] dark:bg-neutral-900'
+                      : 'hover:bg-[#f4f4f4]/60 dark:hover:bg-neutral-900/50'
                   )}
                 >
-                  <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center">
+                  <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#f4f4f4] dark:bg-neutral-900 flex items-center justify-center">
                     <Icon className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -278,7 +269,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {action.label}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-neutral-700 px-2 py-0.5 rounded-xl">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-[#f4f4f4] dark:bg-neutral-900 px-2 py-0.5 rounded-lg">
                         {action.category}
                       </span>
                     </div>
@@ -297,10 +288,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
 
       {/* No Results Message */}
       {isOpen && query.trim() !== '' && filteredActions.length === 0 && (
-        <div className={cn(
-          'absolute top-full mt-2 w-full rounded-[1.75rem] z-50 overflow-hidden',
-          isDemo ? 'bg-white dark:bg-neutral-900' : 'border border-gray-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg'
-        )}>
+        <div className="absolute top-full mt-2 w-full rounded-2xl z-50 overflow-hidden bg-white dark:bg-neutral-800 border-0 shadow-soft-lg">
           <div className="px-4 py-8 text-center">
             <Search className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
             <p className="text-sm text-gray-500 dark:text-gray-400">

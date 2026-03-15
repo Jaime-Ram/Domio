@@ -54,16 +54,20 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="mask-icon" href="/images/offerla.png" color="#9FE870" />
-        <link rel="preconnect" href="https://consent.cookiebot.com" />
-        <link rel="dns-prefetch" href="https://consent.cookiebot.com" />
-        <Script
-          id="Cookiebot"
-          src="https://consent.cookiebot.com/uc.js"
-          data-cbid="89ee426f-246b-433f-beee-676fb434af4f"
-          data-blockingmode="auto"
-          data-culture="NL"
-          strategy="lazyOnload"
-        />
+        {process.env.NODE_ENV === 'production' && (
+          <>
+            <link rel="preconnect" href="https://consent.cookiebot.com" />
+            <link rel="dns-prefetch" href="https://consent.cookiebot.com" />
+            <Script
+              id="Cookiebot"
+              src="https://consent.cookiebot.com/uc.js"
+              data-cbid="89ee426f-246b-433f-beee-676fb434af4f"
+              data-blockingmode="auto"
+              data-culture="NL"
+              strategy="lazyOnload"
+            />
+          </>
+        )}
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <RouteProvider>

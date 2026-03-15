@@ -1,28 +1,47 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { 
   Building2,
   Plus,
   Search,
   MapPin,
   Users,
-  Eye,
   Grid3x3,
   Table2,
-  Briefcase,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronRight,
+  Info,
+  Filter,
 } from 'lucide-react'
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
-import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu'
 
 export default function PortfolioPage() {
   const router = useRouter()
@@ -32,12 +51,36 @@ export default function PortfolioPage() {
     { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
     { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
   ]
-  const [visibleWidgets, setVisibleWidgets] = useState({ pandenoverzicht: false })
+  type PortfolioSegment = 'objecten' | 'rechtspersonen'
+  const [activeSegment, setActiveSegment] = useState<PortfolioSegment>('objecten')
+  const tabsContainerRef = useRef<HTMLDivElement | null>(null)
+  const objectenRef = useRef<HTMLButtonElement | null>(null)
+  const rechtspersonenRef = useRef<HTMLButtonElement | null>(null)
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 })
+
   const [searchQuery, setSearchQuery] = useState('')
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
+  const [typeFilter, setTypeFilter] = useState<Record<string, boolean>>({ appartement: true, huis: true, overig: true })
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+
+  type SortColumn = 'name' | 'type' | 'units' | 'income'
+  const [sort, setSort] = useState<{ column: SortColumn | null; direction: 'asc' | 'desc' | null }>({
+    column: null,
+    direction: null,
+  })
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const container = tabsContainerRef.current
+    if (!container) return
+    const btn = activeSegment === 'objecten' ? objectenRef.current : rechtspersonenRef.current
+    if (!btn) return
+    const containerRect = container.getBoundingClientRect()
+    const btnRect = btn.getBoundingClientRect()
+    setTabIndicator({ left: btnRect.left - containerRect.left, width: btnRect.width })
+  }, [activeSegment])
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -63,17 +106,23 @@ export default function PortfolioPage() {
     loadProperties()
   }, [router, isDemo])
 
-  const filteredProperties = properties.filter(property =>
-    property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    property.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    property.type.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredProperties = properties.filter(property => {
+    const matchesSearch =
+      property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (property.type || '').toLowerCase().includes(searchQuery.toLowerCase())
+    const typeKey = (property.type === 'appartement' || property.type === 'huis' ? property.type : 'overig') as string
+    const matchesType = typeFilter[typeKey] !== false
+    return matchesSearch && matchesType
+  })
+
+  // Rechtspersonen-count: later uit DB (profile_legal_entities / legal_entities)
+  const rechtspersonenCount = 0
 
   const getMonthlyIncome = (property: any) => {
     return (property.units || []).reduce((sum: number, u: any) => sum + (u.monthly_rent || 0), 0)
   }
 
-  // Group properties by owner_id for now (will need to enhance with tenant/registration data)
   type PropertyGroup = {
     property: any
     properties: any[]
@@ -96,6 +145,47 @@ export default function PortfolioPage() {
   }, {} as Record<string, PropertyGroup>)
   const ownerGroups: PropertyGroup[] = Object.values(groupedByOwner)
 
+  const toggleSort = (column: SortColumn) => {
+    setSort((prev) => {
+      if (prev.column !== column || prev.direction === null) {
+        return { column, direction: 'asc' }
+      }
+      if (prev.direction === 'asc') {
+        return { column, direction: 'desc' }
+      }
+      return { column: null, direction: null }
+    })
+  }
+
+  const getSortIcon = (column: SortColumn) => {
+    if (sort.column !== column || !sort.direction) {
+      return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
+    }
+    if (sort.direction === 'asc') {
+      return <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
+    }
+    return <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
+  }
+
+  const sortedGroups = [...ownerGroups]
+  if (sort.column && sort.direction) {
+    sortedGroups.sort((a, b) => {
+      const dir = sort.direction === 'asc' ? 1 : -1
+      switch (sort.column) {
+        case 'name':
+          return dir * String(a.property.name ?? '').localeCompare(String(b.property.name ?? ''), 'nl')
+        case 'type':
+          return dir * String(a.property.type ?? '').localeCompare(String(b.property.type ?? ''), 'nl')
+        case 'units':
+          return dir * (((a.property.units?.length as number) ?? 0) - ((b.property.units?.length as number) ?? 0))
+        case 'income':
+          return dir * (a.totalIncome - b.totalIncome)
+        default:
+          return 0
+      }
+    })
+  }
+
   return (
     <>
       <SectionNavDashboard
@@ -103,21 +193,133 @@ export default function PortfolioPage() {
         items={PORTFOLIO_NAV}
         titleVariant="hero"
         widgetMenu={
-            <SectionWidgetMenu>
-              <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
-            <DropdownMenuWidgetCheckboxItem
-              checked={visibleWidgets.pandenoverzicht}
-              onCheckedChange={() => setVisibleWidgets((w) => ({ ...w, pandenoverzicht: !w.pandenoverzicht }))}
-            >
-              Pandenoverzicht
-            </DropdownMenuWidgetCheckboxItem>
+          <SectionWidgetMenu>
+            <SectionWidgetMenuPlaceholder />
           </SectionWidgetMenu>
         }
       />
-      {visibleWidgets.pandenoverzicht && (
-      <>
-      <div className="mb-8 flex items-center justify-end">
-        <Button 
+      <Card className={dashboardCardClass(undefined, isDemo)}>
+        <CardHeader className="space-y-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            {/* Tabs: Objecten | Rechtspersonen (zelfde stijl als Huurders) */}
+            <div
+              ref={tabsContainerRef}
+              className="relative flex w-full sm:w-auto text-sm border-b border-gray-200 dark:border-neutral-700"
+            >
+              <button
+                type="button"
+                ref={objectenRef}
+                onClick={() => setActiveSegment('objecten')}
+                className={cn(
+                  'flex-1 pb-2 mr-6 text-left sm:text-center font-semibold transition-colors duration-200 whitespace-nowrap',
+                  activeSegment === 'objecten'
+                    ? 'text-[#163300] dark:text-[#9FE870]'
+                    : 'text-gray-500 dark:text-gray-400'
+                )}
+              >
+                <span>Objecten</span>
+                <span
+                  className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]"
+                >
+                  {filteredProperties.length}
+                </span>
+              </button>
+              <button
+                type="button"
+                ref={rechtspersonenRef}
+                onClick={() => setActiveSegment('rechtspersonen')}
+                className={cn(
+                  'flex-1 pb-2 text-left sm:text-center font-semibold transition-colors duration-200 whitespace-nowrap',
+                  activeSegment === 'rechtspersonen'
+                    ? 'text-[#163300] dark:text-[#9FE870]'
+                    : 'text-gray-500 dark:text-gray-400'
+                )}
+              >
+                <span>Rechtspersonen</span>
+                <span
+                  className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]"
+                >
+                  {rechtspersonenCount}
+                </span>
+              </button>
+              <div
+                className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
+                style={{ left: tabIndicator.left, width: tabIndicator.width }}
+              />
+            </div>
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0">
+              <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
+                <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
+                <Input
+                  placeholder="Zoek objecten..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
+                />
+              </div>
+              {/* Filter –zelfde plek als bij huurders (pill in header) */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="inline-flex h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4"
+                  >
+                    <Filter className="h-4 w-4 md:mr-1.5" />
+                    <span className="hidden md:inline">Filter</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  sideOffset={8}
+                  className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]"
+                >
+                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Type
+                  </DropdownMenuLabel>
+                  <div className="space-y-1">
+                    <DropdownMenuCheckboxItem
+                      checked={typeFilter.appartement !== false}
+                      onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, appartement: Boolean(v) }))}
+                      className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                    >
+                      Appartement
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={typeFilter.huis !== false}
+                      onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, huis: Boolean(v) }))}
+                      className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                    >
+                      Huis
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={typeFilter.overig !== false}
+                      onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, overig: Boolean(v) }))}
+                      className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                    >
+                      Overig
+                    </DropdownMenuCheckboxItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className={cn(
+                  'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
+                  'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
+                )}
+                onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
+                aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
+              >
+                {viewMode === 'table' ? (
+                  <Grid3x3 className="h-4 w-4" />
+                ) : (
+                  <Table2 className="h-4 w-4" />
+                )}
+              </Button>
+              <Button 
           onClick={async () => {
             if (isDemo) {
               router.push(`${basePath}/portfolio/properties/new`)
@@ -140,56 +342,31 @@ export default function PortfolioPage() {
             }
           }}
           disabled={creating}
-          className="bg-[#163300] hover:bg-[#356258] text-white"
+          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
         >
           <Plus className="h-4 w-4 mr-2" />
           {creating ? 'Aanmaken...' : 'Nieuw Pand'}
         </Button>
-      </div>
-
-      <Card className={dashboardCardClass('mb-6', isDemo)}>
-          <CardHeader className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                  Jouw Panden
-                </CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Overzicht van al je vastgoedbezit
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+            {activeSegment === 'rechtspersonen' ? (
+              <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 bg-[#f4f4f4] dark:bg-neutral-800/50 p-8 text-center">
+                <Building2 className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-[#163300] dark:text-[#9FE870] mb-2">Rechtspersonen</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                  Bekijk en beheer je objecten per rechtspersoon of orgaan (BV, stichting, VvE, etc.). Koppel rechtspersonen in accountinstellingen om hier per organisatie te filteren.
                 </p>
-              </div>
-              <div className="flex items-center gap-2">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="icon"
-                  onClick={() => setViewMode('grid')}
-                  className={viewMode === 'grid' ? 'bg-[#163300] text-white hover:bg-[#356258]' : ''}
+                  variant="outline"
+                  className="border-[#163300] text-[#163300] dark:border-[#9FE870] dark:text-[#9FE870]"
+                  onClick={() => router.push(`${basePath}/settings`)}
                 >
-                  <Grid3x3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'table' ? 'default' : 'ghost'}
-                  size="icon"
-                  onClick={() => setViewMode('table')}
-                  className={viewMode === 'table' ? 'bg-[#163300] text-white hover:bg-[#356258]' : ''}
-                >
-                  <Table2 className="h-4 w-4" />
+                  Naar accountinstellingen
                 </Button>
               </div>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Zoek op naam, adres of type..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
+            ) : loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="h-40 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
@@ -202,17 +379,20 @@ export default function PortfolioPage() {
               </div>
             ) : viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ownerGroups.map((group, index) => (
-                  <Card 
+                {sortedGroups.map((group, index) => (
+                  <Card
                     key={index}
-                    className={dashboardCardClass('hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer', isDemo)}
+                    className={cn(
+                      dashboardCardClass('transition-colors cursor-pointer', isDemo),
+                      'rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 hover:border-[#163300] dark:hover:border-[#9FE870]'
+                    )}
                     onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
                         <Building2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5" />
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-base font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                          <CardTitle className="text-base font-semibold text-[#163300] dark:text-[#9FE870] mb-1 truncate">
                             {group.property.name}
                           </CardTitle>
                           <p className="text-xs text-gray-500 dark:text-gray-400 capitalize mb-2">
@@ -247,69 +427,152 @@ export default function PortfolioPage() {
                 ))}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-neutral-700">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Pand</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Type</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Objecten</th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Maandhuur</th>
-                      <th className="text-right py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">Acties</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ownerGroups.map((group, index) => (
-                      <tr 
-                        key={index}
-                        className="border-b border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-                        onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
-                      >
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="relative w-10 h-10 rounded-lg bg-gray-200 dark:bg-neutral-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                              <Building2 className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-white">{group.property.name}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {group.property.address}
+              <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 overflow-hidden">
+                <Table className="w-full">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort('name')}
+                        >
+                          <span>Object</span>
+                          {getSortIcon('name')}
+                        </button>
+                      </TableHead>
+                      <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort('type')}
+                        >
+                          <span>Type</span>
+                          {getSortIcon('type')}
+                        </button>
+                      </TableHead>
+                      <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort('units')}
+                        >
+                          <span>Eenheden</span>
+                          {getSortIcon('units')}
+                        </button>
+                      </TableHead>
+                      <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort('income')}
+                        >
+                          <span>Maandhuur</span>
+                          {getSortIcon('income')}
+                        </button>
+                      </TableHead>
+                      <TableHead className="w-px py-3 text-center">
+                        <span className="inline-flex items-center justify-center text-gray-500 dark:text-gray-400" title="Details">
+                          <Info className="h-4 w-4" />
+                        </span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedGroups.map((group) => (
+                      <Fragment key={group.property.id}>
+                        <TableRow
+                          className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer"
+                          onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
+                        >
+                          <TableCell className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="relative w-10 h-10 rounded-lg bg-gray-200 dark:bg-neutral-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                <Building2 className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50" />
+                              </div>
+                              <div>
+                                <div className="font-medium text-gray-900 dark:text-white">{group.property.name}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {group.property.address}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 text-sm text-gray-900 dark:text-white capitalize">
-                          {group.property.type}
-                        </td>
-                        <td className="py-4 px-4 text-sm text-gray-900 dark:text-white">
-                          {group.property.units?.length || 0}
-                        </td>
-                        <td className="py-4 px-4 text-sm font-medium text-green-600 dark:text-green-400">
-                          €{group.totalIncome.toLocaleString('nl-NL')}
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              router.push(`${basePath}/portfolio/properties/${group.property.id}`)
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
+                          </TableCell>
+                          <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white capitalize">
+                            {group.property.type}
+                          </TableCell>
+                          <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white">
+                            {group.property.units?.length || 0}
+                          </TableCell>
+                          <TableCell className="py-4 px-4 text-sm font-medium text-[#163300] dark:text-[#9FE870]">
+                            €{group.totalIncome.toLocaleString('nl-NL')}
+                          </TableCell>
+                          <TableCell className="w-px text-right pr-3">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setExpandedId(expandedId === group.property.id ? null : group.property.id)
+                              }}
+                              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors"
+                              aria-label={expandedId === group.property.id ? 'Details verbergen' : 'Details tonen'}
+                            >
+                              <ChevronRight
+                                className={cn(
+                                  'h-4 w-4 transition-transform duration-200',
+                                  expandedId === group.property.id ? 'rotate-90' : 'rotate-0'
+                                )}
+                              />
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                        {expandedId === group.property.id && (
+                          <TableRow className="bg-gray-50/60 dark:bg-neutral-900/60">
+                            <TableCell colSpan={5} className="py-3 px-6 text-sm text-gray-600 dark:text-gray-300">
+                              <div className="flex flex-wrap gap-4 justify-between">
+                                {group.property.postcode || group.property.city ? (
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-400">Plaats</p>
+                                    <p>
+                                      {[group.property.postcode, group.property.city].filter(Boolean).join(' ')}
+                                    </p>
+                                  </div>
+                                ) : null}
+                                {group.property.build_year != null && (
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-400">Bouwjaar</p>
+                                    <p>{group.property.build_year}</p>
+                                  </div>
+                                )}
+                                {group.property.woz_value != null && (
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-400">WOZ-waarde</p>
+                                    <p>€{Number(group.property.woz_value).toLocaleString('nl-NL')}</p>
+                                  </div>
+                                )}
+                                {group.property.energy_label && (
+                                  <div>
+                                    <p className="text-xs uppercase tracking-wide text-gray-400">Energielabel</p>
+                                    <p>{group.property.energy_label}</p>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-gray-400">Eenheden</p>
+                                  <p>{group.property.units?.length ?? 0} eenheden</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </>
-      )}
+        </CardContent>
+      </Card>
     </>
   )
 }

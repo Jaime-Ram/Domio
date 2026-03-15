@@ -140,7 +140,7 @@ export default function AccountingPage() {
     <>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
           Boekhouden
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
@@ -168,7 +168,7 @@ export default function AccountingPage() {
             <div className="p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="h-5 w-5 text-gray-400" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Facturen</h3>
+                <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">Facturen</h3>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Creëer en beheer facturen
@@ -180,7 +180,7 @@ export default function AccountingPage() {
             <div className="p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-gray-400" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">Inkomsten & Uitgaven</h3>
+                <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">Inkomsten & Uitgaven</h3>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                 Registreer en beheer financiële transacties
@@ -209,12 +209,12 @@ export default function AccountingPage() {
       {/* Gekoppelde Integraties */}
       {connectedIntegrations.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-xl font-semibold text-[#163300] dark:text-[#9FE870] mb-4">
             Gekoppelde Integraties
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {connectedIntegrations.map((integration) => (
-              <Card key={integration.id} className={isDemo ? dashboardCardClass(undefined, true) : 'border border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'}>
+              <Card key={integration.id} className={dashboardCardClass()}>
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -268,7 +268,7 @@ export default function AccountingPage() {
 
       {/* Beschikbare Integraties */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-xl font-semibold text-[#163300] dark:text-[#9FE870] mb-4">
           Beschikbare Integraties
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

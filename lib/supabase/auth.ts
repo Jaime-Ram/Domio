@@ -1,5 +1,13 @@
 import { supabase } from './client'
 
+/** Origin voor auth-redirects: productie-URL als gezet (NEXT_PUBLIC_APP_URL), anders huidige origin. Zo gaan e-maillinks naar productie i.p.v. localhost. */
+function getAppOrigin(): string {
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || ''
+}
+
 export async function signUp(
   email: string,
   password: string,
@@ -7,12 +15,13 @@ export async function signUp(
   role: 'verhuurder' | 'huurder',
   phone?: string
 ) {
+  const origin = getAppOrigin()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName, role, phone: phone || null },
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
     },
   })
   if (error && (error.message === 'Failed to fetch' || error.message === 'Load failed')) {
@@ -40,9 +49,19 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
+  const origin = getAppOrigin()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}/auth/callback` },
+    options: { redirectTo: origin ? `${origin}/auth/callback` : undefined },
+  })
+  return { data, error }
+}
+
+export async function signInWithMicrosoft() {
+  const origin = getAppOrigin()
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: { redirectTo: origin ? `${origin}/auth/callback` : undefined },
   })
   return { data, error }
 }
@@ -52,9 +71,55 @@ export async function signOut() {
   return { error }
 }
 
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({ password: newPassword })
+  return { data, error }
+}
+
+export async function updateEmail(newEmail: string) {
+  const { data, error } = await supabase.auth.updateUser({ email: newEmail })
+  return { data, error }
+}
+
+// ─── MFA / 2FA ───
+export async function enrollMfa() {
+  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Authenticator' })
+  return { data, error }
+}
+
+export async function verifyMfa(factorId: string, code: string) {
+  const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId })
+  if (challengeError) return { data: null, error: challengeError }
+  const { data, error } = await supabase.auth.mfa.verify({ factorId, challengeId: challengeData.id, code })
+  return { data, error }
+}
+
+export async function unenrollMfa(factorId: string) {
+  const { data, error } = await supabase.auth.mfa.unenroll({ factorId })
+  return { data, error }
+}
+
+export async function listMfaFactors() {
+  const { data, error } = await supabase.auth.mfa.listFactors()
+  return { data, error }
+}
+
+export async function deleteAccount() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: { message: 'Niet ingelogd' } }
+  const res = await fetch('/api/auth/delete-account', { method: 'POST' })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    return { error: { message: body.error || 'Account verwijderen mislukt' } }
+  }
+  await supabase.auth.signOut()
+  return { error: null }
+}
+
 export async function resetPassword(email: string) {
+  const origin = getAppOrigin()
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/reset-password`,
+    redirectTo: origin ? `${origin}/auth/reset-password` : undefined,
   })
   return { data, error }
 }

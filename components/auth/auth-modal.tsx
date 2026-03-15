@@ -368,7 +368,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                   type="button"
                   className="text-sm font-medium text-[#163300] hover:underline"
                   onClick={() => {
-                    alert('🎯 Demo Modus\n\nWachtwoord reset is uitgeschakeld.')
+                    window.location.href = '/forgot-password'
                   }}
                 >
                   Wachtwoord vergeten?

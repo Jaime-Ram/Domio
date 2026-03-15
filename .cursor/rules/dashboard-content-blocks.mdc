@@ -1,0 +1,26 @@
+---
+description: Stijl voor dashboard contentblokken (kaarten, secties)
+globs: app/dashboard/**/*.tsx
+alwaysApply: false
+---
+
+# Contentblokken in het dashboard
+
+Voor kaarten en secties met een titel (zoals op Instellingen, Rapportages, overige employer-pagina’s):
+
+- **Geen emoji’s** in titels of bij secties.
+- **Geen icoontjes bij de titel**: sectietitels (h2 e.d.) zijn alleen tekst, geen `<Icon />` of `flex items-center gap-2` met een icoon ervoor.
+
+Voorbeeld:
+
+```tsx
+// ❌ Niet doen
+<h2 className="text-2xl font-semibold ... flex items-center gap-2">
+  <Globe className="h-5 w-5" /> Taalvoorkeur
+</h2>
+
+// ✅ Wel doen
+<h2 className="text-2xl font-semibold ...">Taalvoorkeur</h2>
+```
+
+Navigatie (bijv. pill-tabs) mag wel iconen gebruiken. Deze regel gaat alleen over de titel van een contentblok/sectie.

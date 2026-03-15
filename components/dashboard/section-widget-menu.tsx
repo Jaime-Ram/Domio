@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,7 @@ import { cn } from '@/lib/utils'
 
 /** Content class: lichtgrijs, geen rand/schaduw, animatie uit het bolletje (origin-top-right + widget-menu-in/out) */
 export const SECTION_WIDGET_MENU_CONTENT_CLASS =
-  'rounded-2xl bg-gray-100 dark:bg-neutral-800 min-w-[200px] border-0 shadow-none py-2 px-1.5 origin-top-right data-[state=open]:animate-widget-menu-in data-[state=closed]:animate-widget-menu-out [&_[role="menuitem"]]:rounded-lg [&_[role="menuitem"]]:mx-1 [&_[role="menuitem"]]:px-3 [&_[role="menuitem"]]:focus:bg-gray-200 [&_[role="menuitem"]]:focus:dark:bg-neutral-700 [&_[data-radix-menu-label]]:rounded-lg [&_[data-radix-menu-label]]:mx-1 [&_[data-radix-menu-label]]:px-3 [&_[data-radix-menu-label]]:text-gray-900 [&_[data-radix-menu-label]]:dark:text-white'
+  'rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 min-w-[200px] border-0 shadow-none py-2 px-1.5 origin-top-right data-[state=open]:animate-widget-menu-in data-[state=closed]:animate-widget-menu-out [&_[role="menuitem"]]:rounded-lg [&_[role="menuitem"]]:mx-1 [&_[role="menuitem"]]:px-3 [&_[role="menuitem"]]:focus:bg-white [&_[role="menuitem"]]:focus:dark:bg-neutral-700 [&_[data-radix-menu-label]]:rounded-lg [&_[data-radix-menu-label]]:mx-1 [&_[data-radix-menu-label]]:px-3 [&_[data-radix-menu-label]]:text-gray-900 [&_[data-radix-menu-label]]:dark:text-white'
 
 interface SectionWidgetMenuProps {
   children: React.ReactNode
@@ -23,18 +24,34 @@ interface SectionWidgetMenuProps {
  * Gebruik als widgetMenu in SectionNavDashboard. Design: geen rand/schaduw op het menu.
  */
 export function SectionWidgetMenu({ children, className }: SectionWidgetMenuProps) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const buttonClass = cn(
+    'h-8 w-8 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-400',
+    'flex items-center justify-center shrink-0',
+    mounted && 'hover:bg-[#eaeaea] dark:hover:bg-neutral-700',
+    className
+  )
+
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        className={buttonClass}
+        aria-label="Widgets aanpassen"
+        aria-hidden
+        tabIndex={-1}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+    )
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            'h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400',
-            'hover:bg-gray-200 dark:hover:bg-neutral-700 flex items-center justify-center shrink-0',
-            className
-          )}
-          aria-label="Widgets aanpassen"
-        >
+        <button type="button" className={buttonClass} aria-label="Widgets aanpassen">
           <MoreHorizontal className="h-4 w-4" />
         </button>
       </DropdownMenuTrigger>

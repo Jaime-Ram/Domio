@@ -1,400 +1,266 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
-import { SectionWidgetMenu } from '@/components/dashboard/section-widget-menu'
-import { DropdownMenuWidgetCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  User,
-  Building2,
-  Bell,
-  Upload,
-  Save,
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import {
+  User, Building2, Bell, Upload, Save, Shield, CreditCard,
+  CheckCircle2, AlertTriangle, Loader2, Eye, EyeOff, Mail, Calendar,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { GekoppeldeRekeningenBlock } from '@/components/dashboard/gekoppelde-rekeningen-block'
+import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
+import { demoLinkedAccounts } from '@/lib/mock-data/domio-dashboard'
+import { updatePassword, updateEmail, deleteAccount, enrollMfa, verifyMfa, unenrollMfa, listMfaFactors } from '@/lib/supabase/auth'
+import { supabase } from '@/lib/supabase/client'
 
-export default function SettingsPage() {
-  const { isDemo } = useDashboardUser()
-  const [showSettings, setShowSettings] = useState(false)
-  // Account settings state
-  const [accountForm, setAccountForm] = useState({
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+31 6 12345678',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  })
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+type SettingsTab = 'account' | 'bedrijf' | 'notificaties' | 'beveiliging' | 'abonnement'
 
-  // Company settings state
-  const [companyForm, setCompanyForm] = useState({
-    companyName: 'Mijn Vastgoedbeheer BV',
-    address: 'Hoofdstraat 123',
-    postalCode: '1234 AB',
-    city: 'Amsterdam',
-    kvk: '12345678',
-    email: 'info@mijnvastgoed.nl',
-    phone: '+31 20 1234567',
-    logo: null as File | null,
-  })
+function StatusBadge({ status, error }: { status: SaveStatus; error?: string }) {
+  if (status === 'saving') return <span className="text-sm text-gray-500 flex items-center gap-1"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Opslaan…</span>
+  if (status === 'saved') return <span className="text-sm text-green-600 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Opgeslagen</span>
+  if (status === 'error') return <span className="text-sm text-red-600 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" /> {error || 'Fout'}</span>
+  return null
+}
 
-  // Notification settings state
-  const [notificationSettings, setNotificationSettings] = useState({
-    newPayment: true,
-    paymentOverdue: true,
-    maintenanceRequest: true,
-    documentExpiring: true,
-    emailNotifications: true,
-  })
-
-  const handleSaveAccount = () => {
-    console.log('Save account settings:', accountForm)
-  }
-
-  const handleSaveCompany = () => {
-    console.log('Save company settings:', companyForm)
-  }
-
-  const handleSaveNotifications = () => {
-    console.log('Save notification settings:', notificationSettings)
-  }
+function SettingsPillNav({ activeTab, onTabChange }: { activeTab: SettingsTab; onTabChange: (t: SettingsTab) => void }) {
+  const tabs: { key: SettingsTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { key: 'account', label: 'Account', icon: User },
+    { key: 'bedrijf', label: 'Bedrijf', icon: Building2 },
+    { key: 'notificaties', label: 'Notificaties', icon: Bell },
+    { key: 'beveiliging', label: 'Beveiliging', icon: Shield },
+    { key: 'abonnement', label: 'Abonnement', icon: CreditCard },
+  ]
 
   return (
-    <>
-            <SectionHeroHeader
-              title="Instellingen"
-              description="Beheer je account en voorkeuren"
-              widgetMenu={
-                <SectionWidgetMenu>
-                  <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
-                  <DropdownMenuWidgetCheckboxItem checked={showSettings} onCheckedChange={() => setShowSettings((v) => !v)}>
-                    Account en voorkeuren
-                  </DropdownMenuWidgetCheckboxItem>
-                </SectionWidgetMenu>
-              }
-            />
-
-            {showSettings && (
-            <Tabs defaultValue="account" className="w-full">
-              <TabsList className={cn("grid w-full grid-cols-3 mb-wise-md rounded-block bg-gray-100 dark:bg-neutral-800 p-wise-xs gap-wise-xs h-auto", isDemo && "[&_[data-state=active]]:!shadow-none")}>
-                <TabsTrigger value="account" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
-                  <User className="h-4 w-4 mr-2" />
-                  Mijn Account
-                </TabsTrigger>
-                <TabsTrigger value="company" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
-                  <Building2 className="h-4 w-4 mr-2" />
-                  Bedrijfsgegevens
-                </TabsTrigger>
-                <TabsTrigger value="notifications" className="rounded-block data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-brand-primary dark:data-[state=active]:text-brand-accent data-[state=active]:shadow-sm py-2.5">
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notificaties
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Tab 1: Mijn Account */}
-              <TabsContent value="account">
-                <Card className={dashboardCardClass(undefined, isDemo)}>
-                  <CardHeader>
-                    <CardTitle>Persoonlijke Gegevens</CardTitle>
-                    <CardDescription>Update je persoonlijke informatie</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Naam</Label>
-                        <Input
-                          id="name"
-                          value={accountForm.name}
-                          onChange={(e) => setAccountForm({...accountForm, name: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={accountForm.email}
-                          onChange={(e) => setAccountForm({...accountForm, email: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefoonnummer</Label>
-                      <Input
-                        id="phone"
-                        value={accountForm.phone}
-                        onChange={(e) => setAccountForm({...accountForm, phone: e.target.value})}
-                      />
-                    </div>
-
-                    <div className="border-t pt-6">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        Wachtwoord Wijzigen
-                      </h3>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="current-password">Huidig wachtwoord</Label>
-                          <Input
-                            id="current-password"
-                            type="password"
-                            value={accountForm.currentPassword}
-                            onChange={(e) => setAccountForm({...accountForm, currentPassword: e.target.value})}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="new-password">Nieuw wachtwoord</Label>
-                          <Input
-                            id="new-password"
-                            type="password"
-                            value={accountForm.newPassword}
-                            onChange={(e) => setAccountForm({...accountForm, newPassword: e.target.value})}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="confirm-password">Bevestig nieuw wachtwoord</Label>
-                          <Input
-                            id="confirm-password"
-                            type="password"
-                            value={accountForm.confirmPassword}
-                            onChange={(e) => setAccountForm({...accountForm, confirmPassword: e.target.value})}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveAccount} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
-                        <Save className="h-4 w-4 mr-2" />
-                        Opslaan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Tab 2: Bedrijfsgegevens */}
-              <TabsContent value="company">
-                <Card className={dashboardCardClass(undefined, isDemo)}>
-                  <CardHeader>
-                    <CardTitle>Bedrijfsgegevens</CardTitle>
-                    <CardDescription>Informatie voor correspondentie en documenten</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="company-name">Bedrijfsnaam</Label>
-                      <Input
-                        id="company-name"
-                        value={companyForm.companyName}
-                        onChange={(e) => setCompanyForm({...companyForm, companyName: e.target.value})}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="address">Adres</Label>
-                        <Input
-                          id="address"
-                          value={companyForm.address}
-                          onChange={(e) => setCompanyForm({...companyForm, address: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="postal-code">Postcode</Label>
-                        <Input
-                          id="postal-code"
-                          value={companyForm.postalCode}
-                          onChange={(e) => setCompanyForm({...companyForm, postalCode: e.target.value})}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="city">Plaats</Label>
-                        <Input
-                          id="city"
-                          value={companyForm.city}
-                          onChange={(e) => setCompanyForm({...companyForm, city: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="kvk">KvK-nummer</Label>
-                        <Input
-                          id="kvk"
-                          value={companyForm.kvk}
-                          onChange={(e) => setCompanyForm({...companyForm, kvk: e.target.value})}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-email">Email (voor correspondentie)</Label>
-                        <Input
-                          id="company-email"
-                          type="email"
-                          value={companyForm.email}
-                          onChange={(e) => setCompanyForm({...companyForm, email: e.target.value})}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-phone">Telefoon</Label>
-                        <Input
-                          id="company-phone"
-                          value={companyForm.phone}
-                          onChange={(e) => setCompanyForm({...companyForm, phone: e.target.value})}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="border-t pt-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="logo">Logo upload (voor documenten)</Label>
-                        <div className="flex items-center gap-4">
-                          <div className="w-24 h-24 rounded-lg bg-gray-100 dark:bg-neutral-800 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-neutral-700">
-                            {companyForm.logo ? (
-                              <p className="text-xs text-center p-2">{companyForm.logo.name}</p>
-                            ) : (
-                              <Building2 className="h-8 w-8 text-gray-400" />
-                            )}
-                          </div>
-                          <div>
-                            <Input
-                              id="logo"
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setCompanyForm({...companyForm, logo: e.target.files?.[0] || null})}
-                              className="hidden"
-                            />
-                            <label htmlFor="logo">
-                              <Button variant="outline" asChild>
-                                <span>
-                                  <Upload className="h-4 w-4 mr-2" />
-                                  Upload Logo
-                                </span>
-                              </Button>
-                            </label>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                              PNG of JPG, max 2MB
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveCompany} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
-                        <Save className="h-4 w-4 mr-2" />
-                        Opslaan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Tab 3: Notificaties */}
-              <TabsContent value="notifications">
-                <Card className={dashboardCardClass(undefined, isDemo)}>
-                  <CardHeader>
-                    <CardTitle>Notificatie Voorkeuren</CardTitle>
-                    <CardDescription>Kies welke notificaties je wilt ontvangen</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-neutral-700">
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">Email notificaties</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Ontvang alle notificaties via email
-                          </p>
-                        </div>
-                        <Switch
-                          checked={notificationSettings.emailNotifications}
-                          onCheckedChange={(checked) => setNotificationSettings({...notificationSettings, emailNotifications: checked})}
-                        />
-                      </div>
-
-                      <div className="space-y-4 pt-2">
-                        <h3 className="font-medium text-gray-900 dark:text-white">Email notificaties voor:</h3>
-                        
-                        <div className="flex items-center justify-between py-2">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Nieuwe betaling</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Wanneer een huurder een betaling doet
-                            </p>
-                          </div>
-                          <Switch
-                            checked={notificationSettings.newPayment}
-                            onCheckedChange={(checked) => setNotificationSettings({...notificationSettings, newPayment: checked})}
-                            disabled={!notificationSettings.emailNotifications}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between py-2">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Huurachterstand &gt; 14 dagen</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Wanneer een betaling meer dan 14 dagen achterstallig is
-                            </p>
-                          </div>
-                          <Switch
-                            checked={notificationSettings.paymentOverdue}
-                            onCheckedChange={(checked) => setNotificationSettings({...notificationSettings, paymentOverdue: checked})}
-                            disabled={!notificationSettings.emailNotifications}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between py-2">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Onderhoud gemeld</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Wanneer er een nieuwe onderhoudsmelding is
-                            </p>
-                          </div>
-                          <Switch
-                            checked={notificationSettings.maintenanceRequest}
-                            onCheckedChange={(checked) => setNotificationSettings({...notificationSettings, maintenanceRequest: checked})}
-                            disabled={!notificationSettings.emailNotifications}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between py-2">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Document verloopt binnen 30 dagen</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Herinnering voor verlopende keuringen en verzekeringen
-                            </p>
-                          </div>
-                          <Switch
-                            checked={notificationSettings.documentExpiring}
-                            onCheckedChange={(checked) => setNotificationSettings({...notificationSettings, documentExpiring: checked})}
-                            disabled={!notificationSettings.emailNotifications}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                      <Button onClick={handleSaveNotifications} className="bg-brand-primary hover:bg-brand-primary-hover text-white focus-visible:ring-brand-primary">
-                        <Save className="h-4 w-4 mr-2" />
-                        Opslaan
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+    <div className="flex flex-wrap gap-2">
+      {tabs.map(({ key, label, icon: Icon }) => {
+        const active = key === activeTab
+        return (
+          <button
+            key={key}
+            onClick={() => onTabChange(key)}
+            className={cn(
+              'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
+              active
+                ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
+                : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
             )}
-    </>
+          >
+            <Icon className="size-4 shrink-0 text-current" />
+            <span className="truncate">{label}</span>
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
+export default function SettingsPage() {
+  const { isDemo, user, profile: dashProfile, basePath } = useDashboardUser()
+  const showLinkedAccounts = isDemo || dashProfile?.full_name?.trim() === 'Jaime Ram'
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<SettingsTab>('account')
+
+  const [accountForm, setAccountForm] = useState({ name: '', email: '', phone: '' })
+  const [pwForm, setPwForm] = useState({ newPassword: '', confirmPassword: '' })
+  const [showPw, setShowPw] = useState(false)
+  const [emailForm, setEmailForm] = useState({ newEmail: '' })
+
+  const [companyForm, setCompanyForm] = useState({
+    companyName: '', address: '', postalCode: '', city: '',
+    kvk: '', btw: '', email: '', phone: '', logo: null as File | null,
+  })
+
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(getDefaultNotificationPrefs())
+  const [language, setLanguage] = useState<'nl' | 'en'>('nl')
+
+  const [accountStatus, setAccountStatus] = useState<SaveStatus>('idle')
+  const [accountError, setAccountError] = useState('')
+  const [pwStatus, setPwStatus] = useState<SaveStatus>('idle')
+  const [pwError, setPwError] = useState('')
+  const [emailStatus, setEmailStatus] = useState<SaveStatus>('idle')
+  const [emailError, setEmailError] = useState('')
+  const [companyStatus, setCompanyStatus] = useState<SaveStatus>('idle')
+  const [companyError, setCompanyError] = useState('')
+  const [notifStatus, setNotifStatus] = useState<SaveStatus>('idle')
+  const [langStatus, setLangStatus] = useState<SaveStatus>('idle')
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
+
+  const [mfaFactors, setMfaFactors] = useState<{ id: string; status: string; friendly_name?: string }[]>([])
+  const [mfaEnrolling, setMfaEnrolling] = useState(false)
+  const [mfaQr, setMfaQr] = useState('')
+  const [mfaSecret, setMfaSecret] = useState('')
+  const [mfaFactorId, setMfaFactorId] = useState('')
+  const [mfaCode, setMfaCode] = useState('')
+  const [mfaError, setMfaError] = useState('')
+  const [mfaVerifying, setMfaVerifying] = useState(false)
+
+  const loadMfaFactors = useCallback(async () => {
+    if (isDemo) return
+    const { data } = await listMfaFactors()
+    if (data?.totp) setMfaFactors(data.totp.map((f) => ({ id: f.id, status: f.status, friendly_name: f.friendly_name ?? undefined })))
+  }, [isDemo])
+
+  const loadProfile = useCallback(async () => {
+    if (!user?.id || isDemo) return
+    const p = await getProfile(user.id)
+    if (!p) return
+    setAccountForm({ name: p.full_name || '', email: p.email || '', phone: p.phone || '' })
+    setCompanyForm({
+      companyName: p.company_name || '', address: p.company_address || '',
+      postalCode: p.company_postal_code || '', city: p.company_city || '',
+      kvk: p.kvk_number || '', btw: p.btw_number || '',
+      email: p.company_email || '', phone: p.company_phone || '', logo: null,
+    })
+    setNotifPrefs(p.notification_prefs || getDefaultNotificationPrefs())
+    setLanguage(p.language || 'nl')
+  }, [user?.id, isDemo])
+
+  useEffect(() => { loadProfile() }, [loadProfile])
+  useEffect(() => { loadMfaFactors() }, [loadMfaFactors])
+
+  useEffect(() => {
+    if (isDemo && dashProfile) {
+      setAccountForm({ name: dashProfile.full_name || 'Demo Gebruiker', email: dashProfile.email || 'demo@domio.nl', phone: dashProfile.phone || '' })
+    }
+  }, [isDemo, dashProfile])
+
+  const handleSaveAccount = async () => {
+    if (isDemo || !user?.id) return
+    setAccountStatus('saving')
+    const { error } = await updateProfile(user.id, { full_name: accountForm.name, phone: accountForm.phone || null })
+    if (error) { setAccountStatus('error'); setAccountError(error.message); return }
+    setAccountStatus('saved')
+    setTimeout(() => setAccountStatus('idle'), 3000)
+  }
+
+  const handleChangePassword = async () => {
+    if (isDemo) return
+    if (pwForm.newPassword.length < 8) { setPwStatus('error'); setPwError('Minimaal 8 tekens'); return }
+    if (pwForm.newPassword !== pwForm.confirmPassword) { setPwStatus('error'); setPwError('Wachtwoorden komen niet overeen'); return }
+    setPwStatus('saving')
+    const { error } = await updatePassword(pwForm.newPassword)
+    if (error) { setPwStatus('error'); setPwError(error.message); return }
+    setPwStatus('saved'); setPwForm({ newPassword: '', confirmPassword: '' })
+    setTimeout(() => setPwStatus('idle'), 3000)
+  }
+
+  const handleChangeEmail = async () => {
+    if (isDemo) return
+    if (!emailForm.newEmail.includes('@')) { setEmailStatus('error'); setEmailError('Ongeldig e-mailadres'); return }
+    setEmailStatus('saving')
+    const { error } = await updateEmail(emailForm.newEmail)
+    if (error) { setEmailStatus('error'); setEmailError(error.message); return }
+    setEmailStatus('saved'); setEmailError('')
+    setEmailForm({ newEmail: '' })
+    setTimeout(() => setEmailStatus('idle'), 5000)
+  }
+
+  const handleSaveCompany = async () => {
+    if (isDemo || !user?.id) return
+    setCompanyStatus('saving')
+    const { error } = await updateProfile(user.id, {
+      company_name: companyForm.companyName || null,
+      kvk_number: companyForm.kvk || null,
+      btw_number: companyForm.btw || null,
+      company_address: companyForm.address || null,
+      company_postal_code: companyForm.postalCode || null,
+      company_city: companyForm.city || null,
+      company_email: companyForm.email || null,
+      company_phone: companyForm.phone || null,
+    })
+    if (error) { setCompanyStatus('error'); setCompanyError(error.message); return }
+    setCompanyStatus('saved')
+    setTimeout(() => setCompanyStatus('idle'), 3000)
+  }
+
+  const handleSaveNotifications = async () => {
+    if (isDemo || !user?.id) return
+    setNotifStatus('saving')
+    const { error } = await updateProfile(user.id, { notification_prefs: notifPrefs })
+    if (error) { setNotifStatus('error'); return }
+    setNotifStatus('saved')
+    setTimeout(() => setNotifStatus('idle'), 3000)
+  }
+
+  const handleSaveLanguage = async () => {
+    if (isDemo || !user?.id) return
+    setLangStatus('saving')
+    const { error } = await updateProfile(user.id, { language })
+    if (error) { setLangStatus('error'); return }
+    setLangStatus('saved')
+    setTimeout(() => setLangStatus('idle'), 3000)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (isDemo) return
+    setDeleting(true)
+    const { error } = await deleteAccount()
+    setDeleting(false)
+    if (error) { alert(error.message); return }
+    router.push('/')
+  }
+
+  const sCard = 'rounded-card border-[0.5px] border-gray-200 dark:border-neutral-700 shadow-none bg-white dark:bg-neutral-900'
+
+  const displayName = accountForm.name?.trim() || 'Mijn Account'
+  const initials = (() => {
+    const parts = displayName.split(/\s+/).filter(Boolean)
+    if (parts.length === 0) return '?'
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  })()
+
+  return (
+    <>
+      {/* ===== PROFIEL HEADER (Wise-stijl) ===== */}
+      <div className={cn(sCard, 'overflow-hidden')}>
+        <div
+          className="h-28 sm:h-32 bg-[#163300] bg-cover bg-no-repeat"
+          style={{ backgroundImage: "url('/images/Achtergrond2.jpg')", backgroundPosition: '50% 26%' }}
+        />
+        <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
+          <div className="-mt-[4.5rem] shrink-0">
+            <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold">
+              {initials}
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mt-2">
+            <div className="flex flex-col items-center sm:items-start gap-3">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870] text-center sm:text-left">
+                {displayName}
+              </h1>
+              <div className="mt-3">
+                <SettingsPillNav activeTab={activeTab} onTabChange={setActiveTab} />
+              </div>
+            </div>
+            <div className="flex flex-col items-center sm:items-end gap-2 sm:flex-shrink-0">
+              <p className="text-sm text-gray-500 dark:text-gray-400">E-mail: <span className="text-gray-900 dark:text-white">{accountForm.email || 'email@domio.nl'}</span></p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Rol: <span className="text-gray-900 dark:text-white">Verhuurder</span></p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Gebruiker sinds feb. 2026</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </>
+  )
+}

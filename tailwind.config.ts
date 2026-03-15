@@ -99,10 +99,12 @@ const config: Config = {
         'wise-sm': 'var(--space-small)',
         'wise-md': 'var(--space-medium)',
         'wise-lg': 'var(--space-large)',
+        'content-blocks': 'var(--space-content-blocks)',
       },
       boxShadow: {
-        /* Schaduw boven + onder voor zwevende kaarten op groene achtergrond */
         'card-elevated': '0 -6px 20px -5px rgba(0,0,0,0.08), 0 20px 50px -8px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.08)',
+        'soft': '0 0 8px 0 rgba(0,0,0,0.06)',
+        'soft-lg': '0 0 12px 0 rgba(0,0,0,0.08)',
       },
       keyframes: {
         'widget-menu-in': {
@@ -120,7 +122,7 @@ const config: Config = {
       },
     }
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/container-queries")],
 };
 
 export default config;

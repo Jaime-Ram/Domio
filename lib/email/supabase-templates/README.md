@@ -2,6 +2,17 @@
 
 Uniforme email-design voor alle Supabase-auth e-mails, in lijn met ons onboarding-design en design system.
 
+## Logo niet zichtbaar in mail / link gaat naar localhost
+
+Als het logo in de mail niet laadt of de bevestigingslink naar **localhost** gaat:
+
+1. **Supabase Dashboard** → je project → **Authentication** → **URL Configuration**
+2. Zet **Site URL** op je productie-URL (zonder slash), bijv. `https://domio.nl` of `https://jouw-app.vercel.app`. Niet op `http://localhost:3000`.
+3. Voeg onder **Redirect URLs** je productie-URLs toe, bijv. `https://domio.nl/auth/callback` en `https://domio.nl/**`.
+4. In je **deployment** (Vercel/omgeving): zet de env-variabele **`NEXT_PUBLIC_APP_URL`** op dezelfde productie-URL. Dan gebruikt de app die URL voor redirects in aanmeld-/wachtwoord-mails, zodat de link in de mail naar productie wijst.
+
+Het logo in de mail is `{{ .SiteURL }}/images/DomioLogo.png`; die URL moet dus je live site zijn zodat afbeeldingen laden. De bevestigingslink wordt eveneens met **Site URL** opgebouwd.
+
 ## Installatie
 
 1. Ga naar [Supabase Dashboard](https://supabase.com/dashboard) → je project

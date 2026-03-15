@@ -474,6 +474,8 @@ export const mockDocuments = [
     uploadDate: '2024-01-10',
     size: '123 KB',
     url: '/documents/factuur-001.pdf',
+    amount_due: 0,
+    due_date: '2024-02-14',
   },
   {
     id: '6',

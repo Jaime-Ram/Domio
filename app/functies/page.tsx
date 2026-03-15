@@ -13,7 +13,7 @@ import { FileText, Wrench, Euro, UserPlus, ArrowUpRight, Plus, Minus } from 'luc
 const MINDER_BELANGRIJKE_FUNCTIES = [
   { title: 'Rapportages', description: 'Genereer overzichten en exporteer data voor je boekhouding of belastingaangifte.', demoHref: '/demo' },
   { title: 'Communicatie', description: 'Berichten en notities met huurders, alles gekoppeld aan objecten en tickets.', demoHref: '/demo' },
-  { title: 'Instellingen', description: 'Configureer je account, notificaties en koppelingen met externe systemen.', demoHref: '/demo' },
+  { title: 'Accountinstellingen', description: 'Configureer je account, notificaties en koppelingen met externe systemen.', demoHref: '/demo' },
   { title: 'Bankimport', description: 'Importeer bankafschriften voor automatische verwerking van betalingen.', demoHref: '/demo' },
   { title: 'Boekhoudintegratie', description: 'Koppel Domio aan Exact, Moneybird of andere boekhoudsoftware.', demoHref: '/demo' },
   { title: 'Inspectieplanning', description: 'Plan en log periodieke inspecties per object met foto\'s en rapporten.', demoHref: '/demo' },

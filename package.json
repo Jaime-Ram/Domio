@@ -34,6 +34,7 @@
     "motion": "^12.34.0",
     "next": "^16.1.0",
     "next-themes": "^0.2.1",
+    "pdfjs-dist": "^4.4.168",
     "postcss": "^8.4.32",
     "react": "^18.3.1",
     "react-aria-components": "^1.0.0",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.4",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/node": "^20.10.6",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",

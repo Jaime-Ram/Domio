@@ -9,7 +9,7 @@ export default function HoursPage() {
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
           Urenbeheer
         </h1>
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
