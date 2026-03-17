@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -75,7 +75,6 @@ export default function SettingsPage() {
   const { isDemo, user, profile: dashProfile, basePath } = useDashboardUser()
   const showLinkedAccounts = isDemo || dashProfile?.full_name?.trim() === 'Jaime Ram'
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<SettingsTab>('account')
 
   const [accountForm, setAccountForm] = useState({ name: '', email: '', phone: '' })
@@ -139,16 +138,18 @@ export default function SettingsPage() {
 
   // Initieel tab kiezen op basis van ?tab= in de URL
   useEffect(() => {
-    const tab = searchParams.get('tab')
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
     if (!tab) return
     if (tab === 'notificaties') {
       setActiveTab('account')
       return
     }
-    if (['account','beveiliging','abonnement','instellingen'].includes(tab)) {
+    if (['account', 'beveiliging', 'abonnement', 'instellingen'].includes(tab)) {
       setActiveTab(tab as SettingsTab)
     }
-  }, [searchParams])
+  }, [])
 
   useEffect(() => {
     if (isDemo && dashProfile) {
