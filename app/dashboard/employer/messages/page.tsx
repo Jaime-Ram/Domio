@@ -60,7 +60,7 @@ export default function MessagesPage() {
 
       <div className="flex-1 mt-4 flex gap-4 min-h-0 overflow-hidden">
         {/* Linkerblok: type + lijst in één witte kaart */}
-        <aside className="w-full max-w-xs md:max-w-sm lg:max-w-md flex flex-col">
+        <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col">
           <div className="flex-1 h-full rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
             {/* Segment-tabs: Individueel | Groepen (zelfde formaat als Objecten/Rechtspersonen) */}
           <div
@@ -131,7 +131,7 @@ export default function MessagesPage() {
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-left"
                 >
                   <div className="relative">
-                    <div className="h-10 w-10 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-xs font-semibold text-gray-800 dark:text-gray-100">
+                    <div className="h-10 w-10 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-sm font-semibold text-gray-800 dark:text-gray-100">
                       {getInitials(c.name)}
                     </div>
                     <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#9FE870] border-2 border-white dark:border-neutral-900" />
@@ -163,14 +163,6 @@ export default function MessagesPage() {
             <div className="flex items-center gap-3 min-w-0">
               <div className="h-9 w-9 rounded-full bg-[#163300] text-white flex items-center justify-center text-sm font-semibold">
                 <MessageSquare className="h-4 w-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                  Kies een gesprek
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  Selecteer links een {activeType === 'individueel' ? 'huurder' : 'groep'} om de chat te openen.
-                </p>
               </div>
             </div>
             <Button

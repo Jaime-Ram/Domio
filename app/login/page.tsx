@@ -30,6 +30,12 @@ function LoginContent() {
     if (err) setError(translateAuthError(decodeURIComponent(err)))
   }, [searchParams])
 
+  const clearDemoCookie = () => {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'domio_demo=; path=/; max-age=0'
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -37,6 +43,7 @@ function LoginContent() {
     try {
       const { error: authError } = await signIn(email, password)
       if (authError) throw authError
+      clearDemoCookie()
       setTransitioning(true)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -79,6 +86,7 @@ function LoginContent() {
       })
       if (credential && credential.type === 'public-key') {
         await new Promise((r) => setTimeout(r, 500))
+        clearDemoCookie()
         router.push('/dashboard/employer')
       } else {
         setError('Geen passkey geselecteerd. Probeer opnieuw of log in met e-mail.')
@@ -98,7 +106,10 @@ function LoginContent() {
   if (transitioning) {
     return (
       <AuthLoadingScreen
-        onAnimationComplete={() => router.push('/dashboard/employer')}
+        onAnimationComplete={() => {
+          clearDemoCookie()
+          router.push('/dashboard/employer')
+        }}
       />
     )
   }

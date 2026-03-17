@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Eye, FileText, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download } from 'lucide-react'
+import { Eye, FileText, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
 
 /** PDF.js één keer laden en hergebruiken (niet per kaart opnieuw importeren). */
 let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null
@@ -378,7 +379,14 @@ export function DocumentCard({
           </div>
           <Button
             size="icon"
-            className="h-8 w-8 rounded-full bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 shadow-none flex-shrink-0 self-end mb-4"
+            className={cn(
+              'h-8 w-8 rounded-full flex-shrink-0 self-end mb-4',
+              selectionMode
+                ? selected
+                  ? 'bg-[#163300] dark:bg-[#163300] border border-[#163300] shadow-none'
+                  : 'bg-transparent border border-[#163300] dark:border-[#9FE870] shadow-none hover:bg-[#163300]/10 dark:hover:bg-[#9FE870]/10'
+                : 'bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 shadow-none'
+            )}
             onClick={(e) => {
               e.stopPropagation()
               handleView()
@@ -386,13 +394,9 @@ export function DocumentCard({
             aria-label={selectionMode ? (selected ? 'Deselecteer' : 'Selecteer') : 'Bekijk'}
           >
             {selectionMode ? (
-              <span
-                className={
-                  selected
-                    ? 'h-3.5 w-3.5 rounded-full border-2 border-[#163300] bg-transparent'
-                    : 'h-3.5 w-3.5 rounded-full border border-[#163300] bg-transparent'
-                }
-              />
+              selected ? (
+                <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+              ) : null
             ) : (
               <Eye className="h-4 w-4 shrink-0" />
             )}
@@ -419,7 +423,7 @@ export function DocumentCard({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-3 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
+              className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
               aria-label="Documentacties"
             >
               <MoreHorizontal className="h-4 w-4" />

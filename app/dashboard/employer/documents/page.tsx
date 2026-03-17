@@ -310,7 +310,7 @@ export default function DocumentsPage() {
                 className={cn(
                   'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
                   selectionMode
-                    ? 'text-[#163300] dark:text-[#9FE870] border-[#163300] dark:border-[#9FE870]'
+                    ? 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/60 hover:bg-red-50 dark:hover:bg-red-950/40'
                     : 'text-gray-700 dark:text-gray-200'
                 )}
               >
@@ -472,7 +472,7 @@ export default function DocumentsPage() {
                   />
                 ))}
               </div>
-              {selectionMode && selectedIds.length > 0 && bulkCenter !== null && (
+              {selectionMode && bulkCenter !== null && (
                 <div
                   className="fixed bottom-6 z-30 pointer-events-none"
                   style={{ left: bulkCenter, transform: 'translateX(-50%)' }}
@@ -503,7 +503,7 @@ export default function DocumentsPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-8 rounded-full px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                      className="h-8 rounded-full px-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
                       onClick={toggleSelectionMode}
                     >
                       Annuleer

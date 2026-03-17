@@ -17,5 +17,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL(next, request.url))
+  const redirectUrl = new URL(next, request.url)
+  const res = NextResponse.redirect(redirectUrl)
+  // Na inloggen: demo-cookie wissen zodat gebruiker eigen dashboard ziet (incl. documenten uploaden)
+  res.cookies.set('domio_demo', '', { path: '/', maxAge: 0 })
+  return res
 }
