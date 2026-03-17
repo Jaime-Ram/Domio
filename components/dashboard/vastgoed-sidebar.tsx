@@ -41,7 +41,8 @@ import {
   AlertTriangle,
   ClipboardCheck,
   HardDrive,
-  HelpCircle
+  HelpCircle,
+  Ticket
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -153,7 +154,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Onderhoud',
       icon: Wrench,
       children: [
-        { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+        { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
         { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
         { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
       ],
@@ -229,7 +230,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
             "h-16 flex items-center transition-all duration-300",
-            collapsed ? "px-3 justify-end" : "px-6 justify-between"
+            collapsed ? "pl-3 pr-2 justify-start" : "px-6 justify-between"
           )}>
             {/* Logo - Disappears when collapsed */}
             <div className={cn(
@@ -247,7 +248,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden lg:flex items-center justify-center h-8 w-8"
+                  className="hidden lg:flex items-center justify-center h-10 w-10 rounded-xl"
                   onClick={onToggleCollapse}
                   title={collapsed ? "Uitklappen" : "Inklappen"}
                 >

@@ -4,9 +4,10 @@ import { ClipboardCheck, Wrench, Calendar } from 'lucide-react'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { Ticket } from 'lucide-react'
 
 const getMaintenanceNav = (basePath: string) => [
-  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
   { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
   { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
 ]

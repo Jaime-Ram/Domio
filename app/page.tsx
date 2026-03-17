@@ -11,7 +11,7 @@ import { HeroSection } from '@/components/marketing/hero-section'
 import { SupportSection } from '@/components/marketing/support-section'
 import { FAQSection } from '@/components/marketing/faq-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle, MessageCircle } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle, MessageCircle, Ticket } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CONTACT_EMAIL } from '@/lib/site-config'
@@ -234,7 +234,7 @@ export default function Home() {
                     { title: 'Facturatie & Betalingsverwerking', desc: 'Facturen aanmaken en incasseren', icon: Euro },
                     { title: 'Servicekostenafrekening', desc: 'Servicekosten verrekenen met huurders', icon: Calculator },
                     { title: 'Rapportages & Financieel Beheer', desc: 'Inzicht en rapportages op maat', icon: BarChart3 },
-                    { title: 'Ticketsysteem voor Onderhoud', desc: 'Meldingen en onderhoud plannen', icon: Wrench },
+                    { title: 'Ticketsysteem voor Onderhoud', desc: 'Meldingen en onderhoud plannen', icon: Ticket },
                     { title: 'Inspectiemodule', desc: 'Inspecties vastleggen en rapporteren', icon: ClipboardCheck },
                     { title: 'Scan & Herken Functie', desc: 'Documenten scannen en herkennen', icon: Scan },
                   ].map((item, i) => (

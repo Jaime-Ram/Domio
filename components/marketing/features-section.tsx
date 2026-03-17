@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText, Users, Lock, CreditCard, Bell, Receipt, TrendingUp, Scan, Calculator, Link2, Building2, CheckCircle, Eye, PenTool } from 'lucide-react'
+import { FileText, Users, Lock, CreditCard, Bell, Receipt, TrendingUp, Scan, Calculator, Link2, Building2, CheckCircle, Eye, PenTool, Ticket } from 'lucide-react'
 
 interface Feature {
   name: string
@@ -18,7 +18,7 @@ const featureCategories: FeatureCategory[] = [
     features: [
       { name: 'Assets- en leverancierscontracten', icon: FileText },
       { name: 'Huurovereenkomsten', icon: Building2 },
-      { name: 'Ticketsysteem', icon: CheckCircle },
+      { name: 'Ticketsysteem', icon: Ticket },
       { name: 'Inspectiemodule', icon: Eye },
       { name: 'Online klantportaal', icon: Users },
       { name: 'Digitaal Ondertekenen', icon: PenTool },

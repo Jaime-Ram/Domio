@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import {
-  User, Building2, Bell, Upload, Save, Shield, CreditCard,
+  User, Building2, Bell, Upload, Save, Shield, CreditCard, Settings,
   CheckCircle2, AlertTriangle, Loader2, Eye, EyeOff, Mail, Calendar,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -30,7 +30,7 @@ import { updatePassword, updateEmail, deleteAccount, enrollMfa, verifyMfa, unenr
 import { supabase } from '@/lib/supabase/client'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
-type SettingsTab = 'account' | 'bedrijf' | 'notificaties' | 'beveiliging' | 'abonnement'
+type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'instellingen'
 
 function StatusBadge({ status, error }: { status: SaveStatus; error?: string }) {
   if (status === 'saving') return <span className="text-sm text-gray-500 flex items-center gap-1"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Opslaan…</span>
@@ -42,10 +42,9 @@ function StatusBadge({ status, error }: { status: SaveStatus; error?: string }) 
 function SettingsPillNav({ activeTab, onTabChange }: { activeTab: SettingsTab; onTabChange: (t: SettingsTab) => void }) {
   const tabs: { key: SettingsTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { key: 'account', label: 'Account', icon: User },
-    { key: 'bedrijf', label: 'Bedrijf', icon: Building2 },
-    { key: 'notificaties', label: 'Notificaties', icon: Bell },
     { key: 'beveiliging', label: 'Beveiliging', icon: Shield },
     { key: 'abonnement', label: 'Abonnement', icon: CreditCard },
+    { key: 'instellingen', label: 'Instellingen', icon: Settings },
   ]
 
   return (
@@ -76,6 +75,7 @@ export default function SettingsPage() {
   const { isDemo, user, profile: dashProfile, basePath } = useDashboardUser()
   const showLinkedAccounts = isDemo || dashProfile?.full_name?.trim() === 'Jaime Ram'
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<SettingsTab>('account')
 
   const [accountForm, setAccountForm] = useState({ name: '', email: '', phone: '' })
@@ -136,6 +136,19 @@ export default function SettingsPage() {
 
   useEffect(() => { loadProfile() }, [loadProfile])
   useEffect(() => { loadMfaFactors() }, [loadMfaFactors])
+
+  // Initieel tab kiezen op basis van ?tab= in de URL
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (!tab) return
+    if (tab === 'notificaties') {
+      setActiveTab('account')
+      return
+    }
+    if (['account','beveiliging','abonnement','instellingen'].includes(tab)) {
+      setActiveTab(tab as SettingsTab)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (isDemo && dashProfile) {

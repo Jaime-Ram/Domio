@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Menu, Bell, User, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
+import { Menu, Bell, User, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
 import { GlobalSearch } from './global-search'
 import {
   DropdownMenu,
@@ -41,6 +42,7 @@ function clearDemoCookie() {
 
 export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/employer' }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
@@ -172,7 +174,11 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={8} className={dropdownContentClass}>
                 <div className="px-3 pt-3 pb-2">
-                  <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.push(`${basePath}/settings?tab=account`)}
+                    className="flex items-center gap-3 w-full rounded-lg px-2 py-1.5 transition-colors hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 text-left"
+                  >
                     <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center">
                       {avatarInitials}
                     </div>
@@ -180,45 +186,71 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{userEmail}</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
                 <div className="px-1.5 py-1">
-                  <DropdownMenuItem asChild>
-                    <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white">
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
+                  >
+                    <Link href={`${basePath}/settings?tab=account`} className="flex items-center gap-3 w-full">
                       <User className="h-4 w-4 shrink-0" />
-                      Profiel
+                      <span>Account</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white">
-                      <Bell className="h-4 w-4 shrink-0" />
-                      Notificaties
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
+                  >
+                    <Link href={`${basePath}/settings?tab=beveiliging`} className="flex items-center gap-3 w-full">
+                      <Shield className="h-4 w-4 shrink-0" />
+                      <span>Beveiliging</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white">
-                    <Shield className="h-4 w-4 shrink-0" />
-                    Beveiliging
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
+                  >
+                    <Link href={`${basePath}/settings?tab=abonnement`} className="flex items-center gap-3 w-full">
+                      <CreditCard className="h-4 w-4 shrink-0" />
+                      <span>Abonnement</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
+                  >
+                    <Link href={`${basePath}/settings?tab=instellingen`} className="flex items-center gap-3 w-full">
+                      <SettingsIcon className="h-4 w-4 shrink-0" />
+                      <span>Instellingen</span>
+                    </Link>
                   </DropdownMenuItem>
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 py-1">
-                  <DropdownMenuItem asChild>
-                    <Link href="/privacy" className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white">
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
+                  >
+                    <Link href="/privacy" className="flex items-center gap-3 w-full">
                       <ExternalLink className="h-4 w-4 shrink-0" />
-                      Privacy
+                      <span>Privacy</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/terms" className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white">
+                  <DropdownMenuItem
+                    asChild
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
+                  >
+                    <Link href="/terms" className="flex items-center gap-3 w-full">
                       <ExternalLink className="h-4 w-4 shrink-0" />
-                      Algemene voorwaarden
+                      <span>Algemene voorwaarden</span>
                     </Link>
                   </DropdownMenuItem>
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 pt-1 pb-1.5">
                   <DropdownMenuItem
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-red-600 dark:hover:text-red-400 focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-red-600 dark:focus:text-red-400"
                     onSelect={async () => {
                       if (isDemo) {
                         clearDemoCookie()

@@ -20,7 +20,8 @@ import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
-import { Search, Filter, Grid3x3, Table2, Plus, FileText, Eye, Download } from 'lucide-react'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
+import { Search, Filter, Grid3x3, Table2, Plus, FileText, Eye, Download, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,6 +54,10 @@ export default function DocumentsPage() {
     Verzekering: true,
     Overig: true,
   })
+  const [selectionMode, setSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const [bulkCenter, setBulkCenter] = useState<number | null>(null)
 
   const [loadedDocuments, setLoadedDocuments] = useState<any[]>([])
   const documents = isDemo ? mockDocuments : loadedDocuments
@@ -71,6 +76,29 @@ export default function DocumentsPage() {
     if (isDemo) return
     refreshDocuments()
   }, [isDemo])
+
+  useEffect(() => {
+    const updateCenter = () => {
+      if (!contentRef.current) return
+      const rect = contentRef.current.getBoundingClientRect()
+      setBulkCenter(rect.left + rect.width / 2)
+    }
+    updateCenter()
+    window.addEventListener('resize', updateCenter)
+    return () => {
+      window.removeEventListener('resize', updateCenter)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selectionMode || selectedIds.length === 0) return
+    const id = requestAnimationFrame(() => {
+      if (!contentRef.current) return
+      const rect = contentRef.current.getBoundingClientRect()
+      setBulkCenter(rect.left + rect.width / 2)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [selectionMode, selectedIds.length])
 
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc: any) => {
@@ -122,21 +150,23 @@ export default function DocumentsPage() {
   }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || isDemo) return
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0 || isDemo) return
     setUploading(true)
     setUploadError(null)
-    const formData = new FormData()
-    formData.set('file', file)
     try {
-      const res = await fetch('/api/documents/upload', {
-        method: 'POST',
-        body: formData,
-      })
-      const json = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setUploadError(json.error || 'Upload mislukt')
-        return
+      for (const file of files) {
+        const formData = new FormData()
+        formData.set('file', file)
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          setUploadError(json.error || 'Upload mislukt')
+          break
+        }
       }
       refreshDocuments()
     } catch {
@@ -145,6 +175,19 @@ export default function DocumentsPage() {
       setUploading(false)
       e.target.value = ''
     }
+  }
+
+  const toggleSelectionMode = () => {
+    setSelectionMode((prev) => {
+      if (prev) {
+        setSelectedIds([])
+      }
+      return !prev
+    })
+  }
+
+  const toggleSelectDoc = (id: string) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
   const openDocumentUrl = async (docId: string, download: boolean) => {
@@ -196,11 +239,15 @@ export default function DocumentsPage() {
 
   return (
     <>
-      <div className="mb-8">
+      <div className="mb-8" ref={contentRef}>
         <SectionHeroHeader
           title="Documenten"
-          description="Al je documenten"
           className="mb-0"
+          widgetMenu={
+            <SectionWidgetMenu>
+              <SectionWidgetMenuPlaceholder />
+            </SectionWidgetMenu>
+          }
         />
       </div>
 
@@ -244,7 +291,7 @@ export default function DocumentsPage() {
                           key={t}
                           checked={typeFilter[t] !== false}
                           onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
-                          className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                          className="flex items-center justify-between rounded-lg py-1.5 pl-8 pr-2 text-sm"
                         >
                           {t}
                         </DropdownMenuCheckboxItem>
@@ -255,6 +302,20 @@ export default function DocumentsPage() {
               ) : (
                 <div className="inline-flex h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 md:px-4 items-center gap-1.5 min-w-[4.5rem]" aria-hidden />
               )}
+              {/* Selecteer voor bulkacties */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={toggleSelectionMode}
+                className={cn(
+                  'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
+                  selectionMode
+                    ? 'text-[#163300] dark:text-[#9FE870] border-[#163300] dark:border-[#9FE870]'
+                    : 'text-gray-700 dark:text-gray-200'
+                )}
+              >
+                {selectionMode ? 'Annuleer' : 'Selecteer'}
+              </Button>
               <div className={cn('flex flex-wrap items-center gap-3', !previewDocId && 'lg:ml-auto')}>
               <Button
                 id="documents-view-mode-trigger"
@@ -279,6 +340,7 @@ export default function DocumentsPage() {
                   <input
                     ref={fileInputRef}
                     type="file"
+                    multiple
                     className="hidden"
                     accept=".pdf,.doc,.docx,.txt,.csv,image/jpeg,image/png,image/webp"
                     onChange={handleFileChange}
@@ -395,17 +457,61 @@ export default function DocumentsPage() {
               </Table>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {sortedDocuments.map((doc) => (
-                <DocumentCard
-                  key={doc.id}
-                  doc={toCardDoc(doc)}
-                  onPreview={() => handleView(doc)}
-                  onDownload={() => handleDownload(doc)}
-                  skipPreviewFetch={isDemo}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                {sortedDocuments.map((doc) => (
+                  <DocumentCard
+                    key={doc.id}
+                    doc={toCardDoc(doc)}
+                    onPreview={selectionMode ? undefined : () => handleView(doc)}
+                    onDownload={selectionMode ? undefined : () => handleDownload(doc)}
+                    skipPreviewFetch={isDemo}
+                    selectionMode={selectionMode}
+                    selected={selectedIds.includes(doc.id)}
+                    onToggleSelect={() => toggleSelectDoc(doc.id)}
+                  />
+                ))}
+              </div>
+              {selectionMode && selectedIds.length > 0 && bulkCenter !== null && (
+                <div
+                  className="fixed bottom-6 z-30 pointer-events-none"
+                  style={{ left: bulkCenter, transform: 'translateX(-50%)' }}
+                >
+                  <div className="pointer-events-auto inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white dark:bg-neutral-700 shadow-sm border border-gray-200/80 dark:border-neutral-600">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 tabular-nums">
+                      {selectedIds.length} geselecteerd
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
+                      aria-label="Download geselecteerde documenten"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
+                      aria-label="Geselecteerde verwijderen"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 rounded-full px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                      onClick={toggleSelectionMode}
+                    >
+                      Annuleer
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

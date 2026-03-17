@@ -8,6 +8,7 @@ import { DocumentPreviewProvider, useDocumentPreview } from '@/providers/documen
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { DashboardUserProvider } from '@/providers/dashboard-user-provider'
+import { usePathname } from 'next/navigation'
 
 const ENTER_DURATION_MS = 420
 const ENTER_EASE = 'cubic-bezier(0.4, 0, 0.08, 1)'
@@ -69,6 +70,7 @@ function EmployerLayoutInner({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [isLargeScreen, setIsLargeScreen] = useState(false)
   const { previewDocId, closePreview } = useDocumentPreview()
+  const pathname = usePathname()
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)')
@@ -95,6 +97,14 @@ function EmployerLayoutInner({
       }
     }
   }, [previewDocId, sidebarCollapsed])
+
+  // Als je navigeert buiten Documenten, sluit de preview
+  useEffect(() => {
+    if (!previewDocId) return
+    // geldig binnen documenten, incl. /documents/preview/[id]
+    if (pathname.includes('/documents')) return
+    closePreview()
+  }, [pathname, previewDocId, closePreview])
 
   useEffect(() => {
     if (typeof window === 'undefined') return

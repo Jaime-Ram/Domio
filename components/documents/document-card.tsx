@@ -73,6 +73,10 @@ type DocumentCardProps = {
   onRename?: (doc: DocumentCardDoc) => void
   onDelete?: (doc: DocumentCardDoc) => void
   onMoreInfo?: (doc: DocumentCardDoc) => void
+  /** Bulk-select modus: hele kaart selecteert/deselecteert in plaats van openen. */
+  selectionMode?: boolean
+  selected?: boolean
+  onToggleSelect?: (doc: DocumentCardDoc) => void
 }
 
 function getExtension(name: string, file_name?: string | null): string {
@@ -119,6 +123,9 @@ export function DocumentCard({
   onRename,
   onDelete,
   onMoreInfo,
+  selectionMode = false,
+  selected = false,
+  onToggleSelect,
 }: DocumentCardProps) {
   const ext = getExtension(doc.name, doc.file_name)
   const realName = doc.name || doc.file_name || 'Document'
@@ -294,12 +301,32 @@ export function DocumentCard({
   const showPdfPreview = isPdf(doc) && previewRendered
   const showImagePreview = isImage(doc) && imagePreviewUrl
 
+  const handleView = () => {
+    if (selectionMode && onToggleSelect) {
+      onToggleSelect(doc)
+      return
+    }
+    if (onPreview) {
+      onPreview(doc)
+      return
+    }
+    if (onDownload) {
+      onDownload(doc)
+    }
+  }
+
   return (
-    <article className="@container rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 shadow-sm">
-      {/* Bovenste deel: grijs — titel + soort; document tegen rand grijs/wit, hoekje ingeklapt. Schaal op kaartbreedte: smalle kolom = compact, brede kolom = volledig. */}
-      <div className="bg-[#e8ebe6] dark:bg-neutral-700/80 px-4 pt-4 pb-0 flex flex-col">
+    <article
+      className="@container rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 shadow-sm cursor-pointer"
+      onClick={handleView}
+    >
+      {/* Bovenste deel: grijs — klikbaar, onderstreept titel bij hover, opent viewer of selecteert. */}
+      <div className="bg-[#e8ebe6] dark:bg-neutral-700/80 px-4 pt-4 pb-0 flex flex-col group">
         <div className="mb-1 flex flex-col gap-0 @[320px]:flex-row @[320px]:items-baseline @[320px]:gap-1.5 min-w-0">
-          <p className="font-semibold text-gray-900 dark:text-white text-sm min-w-0 truncate" title={realName}>
+          <p
+            className="font-semibold text-gray-900 dark:text-white text-sm min-w-0 truncate group-hover:underline"
+            title={realName}
+          >
             {realName}
           </p>
           <p className="text-gray-600 dark:text-gray-400 text-sm font-normal mt-0.5 @[320px]:mt-0 flex-shrink-0">
@@ -350,13 +377,25 @@ export function DocumentCard({
             )}
           </div>
           <Button
-            size="sm"
-            className="rounded-full bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 gap-1.5 font-medium text-sm shadow-none h-8 w-8 p-0 @[320px]:w-auto @[320px]:px-3 flex-shrink-0 self-end mb-4"
-            onClick={() => onPreview?.(doc) ?? onDownload?.(doc)}
-            aria-label="Bekijk"
+            size="icon"
+            className="h-8 w-8 rounded-full bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 shadow-none flex-shrink-0 self-end mb-4"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleView()
+            }}
+            aria-label={selectionMode ? (selected ? 'Deselecteer' : 'Selecteer') : 'Bekijk'}
           >
-            <Eye className="h-4 w-4 shrink-0" />
-            <span className="hidden @[320px]:inline">Bekijk</span>
+            {selectionMode ? (
+              <span
+                className={
+                  selected
+                    ? 'h-3.5 w-3.5 rounded-full border-2 border-[#163300] bg-transparent'
+                    : 'h-3.5 w-3.5 rounded-full border border-[#163300] bg-transparent'
+                }
+              />
+            ) : (
+              <Eye className="h-4 w-4 shrink-0" />
+            )}
           </Button>
         </div>
       </div>

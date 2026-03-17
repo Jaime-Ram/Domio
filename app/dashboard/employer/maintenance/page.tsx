@@ -44,6 +44,7 @@ import {
   Eye,
   ClipboardCheck,
   Calendar,
+  Ticket,
 } from 'lucide-react'
 import { mockMaintenanceRequests, mockProperties } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -60,7 +61,7 @@ import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboar
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 
 const getMaintenanceNav = (basePath: string) => [
-  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Wrench },
+  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
   { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
   { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
 ]

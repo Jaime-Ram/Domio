@@ -366,39 +366,19 @@ export default function TenantsPage() {
                       style={{ left: indicator.left, width: indicator.width }}
                     />
                   </div>
-                  {/* Controls: zoeken, filter, aanmaken */}
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                    {/* Desktop search */}
-                    <div className="hidden md:flex items-center gap-2 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 max-w-xs">
-                      <Search className="h-4 w-4 text-gray-400" />
+                  {/* Controls: zoeken, filter, aanmaken (zelfde layout als Portefeuille) */}
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0">
+                    {/* Zoekveld in pill-vorm */}
+                    <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
+                      <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
                       <Input
                         placeholder="Zoek huurders..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-7 px-0 text-sm w-36 sm:w-44"
+                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
                       />
                     </div>
-                    {/* Mobile search */}
-                    <div className="flex md:hidden items-center gap-2 flex-1">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <Input
-                          placeholder="Zoek huurders..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-9 text-sm"
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700"
-                      >
-                        <Filter className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {/* Filter – Wise-style pill (desktop) */}
+                    {/* Filter – Wise-style pill */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
