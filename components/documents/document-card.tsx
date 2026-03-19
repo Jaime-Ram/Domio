@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Eye, FileText, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check } from 'lucide-react'
+import { Eye, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
+import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
 
 /** PDF.js één keer laden en hergebruiken (niet per kaart opnieuw importeren). */
 let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null
@@ -367,7 +368,12 @@ export function DocumentCard({
             )}
             {!showPdfPreview && !showImagePreview && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-white dark:bg-neutral-900 p-2">
-                <FileText className="h-8 w-8 text-gray-400 dark:text-neutral-500 shrink-0" aria-hidden />
+                <DocumentTypeGlyph
+                  name={realName}
+                  file_name={doc.file_name}
+                  mime_type={doc.mime_type}
+                  className="h-8 w-8 text-gray-400 dark:text-neutral-500 shrink-0"
+                />
                 <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wide">{ext}</span>
                 {previewError && (
                   <span className="text-[9px] text-red-600 dark:text-red-400 max-w-full truncate" title={previewError}>

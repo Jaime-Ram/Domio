@@ -1,14 +1,29 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { VastgoedSidebar } from "@/components/dashboard/vastgoed-sidebar"
 import { ContentHeader } from "@/components/dashboard/content-header"
 import { DocumentPreviewPanel } from '@/components/documents/document-preview-panel'
 import { DocumentPreviewProvider, useDocumentPreview } from '@/providers/document-preview-provider'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
-import { DashboardUserProvider } from '@/providers/dashboard-user-provider'
+import { DashboardUserProvider, useDashboardUser } from '@/providers/dashboard-user-provider'
 import { usePathname } from 'next/navigation'
+import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
+
+function Require2FaRedirect() {
+  const { profile, isDemo, loading } = useDashboardUser()
+  const router = useRouter()
+  useEffect(() => {
+    if (loading || isDemo || !profile?.mfa_email_enabled) return
+    const hasCookie = typeof document !== 'undefined' && document.cookie.includes('two_fa_verified=1')
+    if (!hasCookie) {
+      router.replace('/login/verify-2fa')
+    }
+  }, [loading, isDemo, profile?.mfa_email_enabled, router])
+  return null
+}
 
 const ENTER_DURATION_MS = 420
 const ENTER_EASE = 'cubic-bezier(0.4, 0, 0.08, 1)'
@@ -18,9 +33,8 @@ export default function EmployerDashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [enterDone, setEnterDone] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Soepele fade-in na laden (demo én normaal inloggen)
   useEffect(() => {
@@ -29,6 +43,18 @@ export default function EmployerDashboardLayout({
     })
     return () => cancelAnimationFrame(t)
   }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    setIsMobile(mq.matches)
+    const onChange = () => setIsMobile(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  if (isMobile) {
+    return <MobileAppOnlyScreen />
+  }
 
   return (
     <DocumentPreviewProvider>
@@ -140,19 +166,22 @@ function EmployerLayoutInner({
         }}
       >
         <DashboardUserProvider>
+          <Require2FaRedirect />
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
-            <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16 flex flex-col gap-content-blocks">
+            <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16 flex flex-col gap-content-blocks h-full min-h-0">
               {children}
-              <div className="flex justify-center items-center mt-16 pt-8">
-                <Logo
-                  width={80}
-                  height={24}
-                  href="/dashboard/employer"
-                  className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
-                  imgClassName="grayscale brightness-90 dark:brightness-110"
-                />
-              </div>
+              {!pathname.includes('/messages') && (
+                <div className="flex justify-center items-center mt-16 pt-8">
+                  <Logo
+                    width={80}
+                    height={24}
+                    href="/dashboard/employer"
+                    className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
+                    imgClassName="grayscale brightness-90 dark:brightness-110"
+                  />
+                </div>
+              )}
             </div>
           </main>
         </DashboardUserProvider>

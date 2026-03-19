@@ -40,6 +40,7 @@ interface HeroSectionProps {
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [headlineIndex, setHeadlineIndex] = useState(0)
+  const [managedTenants, setManagedTenants] = useState(10000)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -53,6 +54,26 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       setHeadlineIndex((i) => (i + 1) % HEADLINE_WORDS.length)
     }, 3500)
     return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    const scheduleNext = () => {
+      // Willekeurige momenten tussen ~3 en ~12 seconden.
+      const nextInMs = 3000 + Math.floor(Math.random() * 9000)
+      timeoutId = setTimeout(() => {
+        // Kleine willekeurige groei per stap.
+        const increment = 1 + Math.floor(Math.random() * 9)
+        setManagedTenants((current) => current + increment)
+        scheduleNext()
+      }, nextInMs)
+    }
+
+    scheduleNext()
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [])
 
   return (
@@ -224,7 +245,22 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               ))}
             </div>
             <p className="text-sm font-medium text-gray-600">
-              meer dan 12.000 huurders worden beheerd via Domio
+              Momenteel worden{' '}
+              <span className="inline-flex min-w-[5.5ch] justify-end tabular-nums text-[#163300] font-semibold">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={managedTenants}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.24, ease: 'easeOut' }}
+                    className="inline-block"
+                  >
+                    {managedTenants.toLocaleString('nl-NL')}
+                  </motion.span>
+                </AnimatePresence>
+              </span>{' '}
+              huurders beheerd via Domio
             </p>
           </div>
         </div>

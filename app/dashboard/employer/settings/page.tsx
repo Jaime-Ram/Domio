@@ -111,6 +111,8 @@ export default function SettingsPage() {
   const [mfaCode, setMfaCode] = useState('')
   const [mfaError, setMfaError] = useState('')
   const [mfaVerifying, setMfaVerifying] = useState(false)
+  const [mfaEmailEnabled, setMfaEmailEnabled] = useState(false)
+  const [mfaEmailStatus, setMfaEmailStatus] = useState<SaveStatus>('idle')
 
   const loadMfaFactors = useCallback(async () => {
     if (isDemo) return
@@ -131,6 +133,7 @@ export default function SettingsPage() {
     })
     setNotifPrefs(p.notification_prefs || getDefaultNotificationPrefs())
     setLanguage(p.language || 'nl')
+    setMfaEmailEnabled(p.mfa_email_enabled ?? false)
   }, [user?.id, isDemo])
 
   useEffect(() => { loadProfile() }, [loadProfile])
@@ -224,6 +227,16 @@ export default function SettingsPage() {
     setTimeout(() => setLangStatus('idle'), 3000)
   }
 
+  const handleToggleMfaEmail = async (enabled: boolean) => {
+    if (isDemo || !user?.id) return
+    setMfaEmailStatus('saving')
+    const { error } = await updateProfile(user.id, { mfa_email_enabled: enabled })
+    if (error) { setMfaEmailStatus('error'); return }
+    setMfaEmailEnabled(enabled)
+    setMfaEmailStatus('saved')
+    setTimeout(() => setMfaEmailStatus('idle'), 3000)
+  }
+
   const handleDeleteAccount = async () => {
     if (isDemo) return
     setDeleting(true)
@@ -274,6 +287,34 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Tab-inhoud: Beveiliging — 2FA per e-mail */}
+      {activeTab === 'beveiliging' && (
+        <div className={cn(sCard, 'mt-6 p-6')}>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Twee-stapsverificatie</h2>
+          {!isDemo && (
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="font-medium text-gray-900 dark:text-white">2FA met code per e-mail</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  Bij inloggen sturen we een 6-cijferige code naar je e-mailadres. Voer die code in om in te loggen.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <StatusBadge status={mfaEmailStatus} />
+                <Switch
+                  checked={mfaEmailEnabled}
+                  onCheckedChange={handleToggleMfaEmail}
+                  disabled={mfaEmailStatus === 'saving'}
+                />
+              </div>
+            </div>
+          )}
+          {isDemo && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Schakel 2FA in via je account in de echte omgeving.</p>
+          )}
+        </div>
+      )}
 
     </>
   )

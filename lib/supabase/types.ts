@@ -21,6 +21,7 @@ export interface Database {
           company_name: string | null
           kvk_number: string | null
           avatar_url: string | null
+          mfa_email_enabled: boolean
           created_at: string
           updated_at: string
         }
@@ -33,6 +34,7 @@ export interface Database {
           company_name?: string | null
           kvk_number?: string | null
           avatar_url?: string | null
+          mfa_email_enabled?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -45,8 +47,29 @@ export interface Database {
           company_name?: string | null
           kvk_number?: string | null
           avatar_url?: string | null
+          mfa_email_enabled?: boolean
           created_at?: string
           updated_at?: string
+        }
+      }
+      email_otp: {
+        Row: {
+          id: string
+          user_id: string
+          code_hash: string
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          code_hash: string
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          code_hash?: string
+          expires_at?: string
         }
       }
       properties: {

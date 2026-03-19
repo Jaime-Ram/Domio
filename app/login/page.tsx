@@ -87,6 +87,16 @@ function LoginContent() {
       if (credential && credential.type === 'public-key') {
         await new Promise((r) => setTimeout(r, 500))
         clearDemoCookie()
+        try {
+          const res = await fetch('/api/auth/2fa/required')
+          const data = await res.json().catch(() => ({}))
+          if (data.required) {
+            router.push('/login/verify-2fa')
+            return
+          }
+        } catch {
+          // bij fout gewoon naar dashboard
+        }
         router.push('/dashboard/employer')
       } else {
         setError('Geen passkey geselecteerd. Probeer opnieuw of log in met e-mail.')
@@ -106,8 +116,18 @@ function LoginContent() {
   if (transitioning) {
     return (
       <AuthLoadingScreen
-        onAnimationComplete={() => {
+        onAnimationComplete={async () => {
           clearDemoCookie()
+          try {
+            const res = await fetch('/api/auth/2fa/required')
+            const data = await res.json().catch(() => ({}))
+            if (data.required) {
+              router.push('/login/verify-2fa')
+              return
+            }
+          } catch {
+            // bij fout gewoon naar dashboard
+          }
           router.push('/dashboard/employer')
         }}
       />

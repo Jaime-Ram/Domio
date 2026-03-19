@@ -28,6 +28,7 @@ export type Profile = {
   avatar_url: string | null
   language: 'nl' | 'en'
   notification_prefs: NotificationPrefs
+  mfa_email_enabled?: boolean
   created_at: string
   updated_at: string
 }
@@ -64,7 +65,7 @@ export type ProfileUpdatable = Partial<Pick<Profile,
   | 'company_name' | 'kvk_number' | 'btw_number'
   | 'company_address' | 'company_postal_code' | 'company_city'
   | 'company_email' | 'company_phone' | 'company_logo_url'
-  | 'language' | 'notification_prefs'
+  | 'language' | 'notification_prefs' | 'mfa_email_enabled'
 >>
 
 export async function updateProfile(userId: string, updates: ProfileUpdatable) {

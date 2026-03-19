@@ -6,6 +6,7 @@ import { ContentHeader } from '@/components/dashboard/content-header'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { DemoUserProvider } from '@/providers/demo-user-provider'
+import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
 
 const ENTER_DURATION_MS = 420
 const ENTER_EASE = 'cubic-bezier(0.4, 0, 0.08, 1)'
@@ -19,6 +20,7 @@ export default function DemoAppLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [enterDone, setEnterDone] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const t = requestAnimationFrame(() => {
@@ -37,6 +39,18 @@ export default function DemoAppLayout({
       }
     }
   }, [sidebarOpen])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    setIsMobile(mq.matches)
+    const onChange = () => setIsMobile(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  if (isMobile) {
+    return <MobileAppOnlyScreen />
+  }
 
   return (
     <DemoUserProvider>

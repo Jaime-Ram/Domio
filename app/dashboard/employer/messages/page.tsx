@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { MessageSquare, Users, Search, Send, ChevronRight } from 'lucide-react'
+import { Search, Send, ChevronRight } from 'lucide-react'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { Input } from '@/components/ui/input'
@@ -18,11 +18,8 @@ export default function MessagesPage() {
   const groepenRef = useRef<HTMLButtonElement | null>(null)
   const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 })
 
-  const contacts = [
-    { id: '1', name: 'Yeong-Ja Pachamama', handle: '@yeongjap92' },
-    { id: '2', name: 'Levana Hedvig', handle: '@levanah019' },
-    { id: '3', name: 'Nikolas Lourdes', handle: '@nikolasl928' },
-  ]
+  // TODO: haal echte gesprekken/contacts op uit de backend.
+  const contacts: { id: string; name: string; handle: string }[] = []
 
   const filteredContacts = contacts.filter((c) =>
     (c.name + ' ' + c.handle).toLowerCase().includes(search.toLowerCase())
@@ -48,7 +45,7 @@ export default function MessagesPage() {
   }, [activeType])
 
   return (
-    <div className="flex flex-col h-full min-h-[500px] overflow-hidden">
+    <div className="flex flex-col h-full flex-1 min-h-0 overflow-hidden">
       <SectionHeroHeader
         title="Communicatie"
         widgetMenu={
@@ -60,8 +57,8 @@ export default function MessagesPage() {
 
       <div className="flex-1 mt-4 flex gap-4 min-h-0 overflow-hidden">
         {/* Linkerblok: type + lijst in één witte kaart */}
-        <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col">
-          <div className="flex-1 h-full rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
+        <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col min-h-0 h-full">
+          <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
             {/* Segment-tabs: Individueel | Groepen (zelfde formaat als Objecten/Rechtspersonen) */}
           <div
             ref={tabsContainerRef}
@@ -157,23 +154,7 @@ export default function MessagesPage() {
         </aside>
 
         {/* Rechterblok: chat interface */}
-        <section className="flex-1 h-full flex flex-col min-w-0 rounded-2xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-          {/* Chat header */}
-          <div className="h-14 px-4 border-b border-gray-200 dark:border-neutral-700 flex items-center justify-between">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="h-9 w-9 rounded-full bg-[#163300] text-white flex items-center justify-center text-sm font-semibold">
-                <MessageSquare className="h-4 w-4" />
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden sm:inline-flex rounded-full text-xs px-3 py-1 h-8"
-            >
-              Nieuw gesprek
-            </Button>
-          </div>
-
+        <section className="flex-1 h-full flex flex-col min-w-0 min-h-0 rounded-2xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm overflow-hidden">
           {/* Chat body */}
           <div className="flex-1 flex items-center justify-center px-6">
             <div className="text-center max-w-md">

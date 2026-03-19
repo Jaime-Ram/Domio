@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
+import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
 import { mockDocuments } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
@@ -21,7 +22,7 @@ import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
-import { Search, Filter, Grid3x3, Table2, Plus, FileText, Eye, Download, Trash2 } from 'lucide-react'
+import { Search, Filter, Grid3x3, Table2, Plus, Eye, Download, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -410,7 +411,12 @@ export default function DocumentsPage() {
                         <TableCell className="py-3 px-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-neutral-800 flex items-center justify-center flex-shrink-0">
-                              <FileText className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50" />
+                              <DocumentTypeGlyph
+                                name={cardDoc.name}
+                                file_name={cardDoc.file_name}
+                                mime_type={cardDoc.mime_type}
+                                className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50"
+                              />
                             </div>
                             <span className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
                               {cardDoc.name}

@@ -14,7 +14,6 @@ import {
   Receipt,
   Calculator,
   TrendingUp,
-  FileCheck,
   Eye,
   Settings,
   FolderOpen,
@@ -168,11 +167,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Drive',
       href: `${basePath}/documents`,
       icon: HardDrive,
-    },
-    {
-      label: 'Rapportages',
-      href: `${basePath}/reports`,
-      icon: FileCheck,
     },
     {
       label: 'Accountinstellingen',
