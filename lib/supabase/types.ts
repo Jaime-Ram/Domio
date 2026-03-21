@@ -397,6 +397,41 @@ export interface Database {
           updated_at?: string
         }
       }
+      bank_connections: {
+        Row: {
+          id: string
+          owner_id: string
+          provider: string
+          access_token: string
+          refresh_token: string | null
+          iban: string | null
+          last_synced_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          provider?: string
+          access_token: string
+          refresh_token?: string | null
+          iban?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          owner_id?: string
+          provider?: string
+          access_token?: string
+          refresh_token?: string | null
+          iban?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -424,3 +459,4 @@ export type Message = Database['public']['Tables']['messages']['Row']
 export type WWS = Database['public']['Tables']['wws']['Row']
 export type Document = Database['public']['Tables']['documents']['Row']
 export type Payment = Database['public']['Tables']['payments']['Row']
+export type BankConnection = Database['public']['Tables']['bank_connections']['Row']
