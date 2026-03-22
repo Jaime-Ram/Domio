@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  TrendingUp,
   CreditCard,
   LayoutDashboard,
   CalendarClock,
@@ -32,13 +31,11 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { MetricCard } from '@/components/finance/MetricCard'
 import { cn } from '@/lib/utils'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
   { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
   { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
 ]
@@ -942,17 +939,9 @@ export default function AchterstandenPage() {
 
   return (
     <div className="space-y-content-blocks">
-      <SectionNavDashboard
-        title="Financieel"
-        items={FINANCIAL_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
 
+      <div className="pl-6">
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
@@ -1041,6 +1030,7 @@ export default function AchterstandenPage() {
           )}
         </div>
       ) : null}
+      </div>
 
       {/* Floating bulk action bar */}
       {hasSelection && (

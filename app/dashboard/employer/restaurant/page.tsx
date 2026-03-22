@@ -7,7 +7,7 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 export default function RestaurantPage() {
   const { isDemo } = useDashboardUser()
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto pl-6">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
           Restaurant Beheer

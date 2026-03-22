@@ -173,19 +173,35 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                     <p className="text-xs text-gray-500 mt-0.5">Antwoord op veelgestelde vragen</p>
                   </div>
                 </Link>
-                <a href="tel:+31646231696" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                <a
+                  href="tel:+31646231696"
+                  className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start"
+                  aria-label="Telefoon — opent de bel-app"
+                >
                   <Phone className="size-5 text-[#163300] shrink-0 mt-0.5" />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-[#163300]">Telefoon</p>
                     <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
                   </div>
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#163300] mt-0.5"
+                    aria-hidden
+                  />
                 </a>
-                <a href={`mailto:${CONTACT_EMAIL}`} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start">
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start"
+                  aria-label={`E-mail — opent je mailapp (${CONTACT_EMAIL})`}
+                >
                   <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-[#163300]">E-mail</p>
                     <p className="text-xs text-gray-500 mt-0.5">{CONTACT_EMAIL}</p>
                   </div>
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#163300] mt-0.5"
+                    aria-hidden
+                  />
                 </a>
                 <button type="button" onClick={() => handleCopy('92211542', 'kvk')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full">
                   <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />

@@ -13,7 +13,6 @@ import {
   CreditCard,
   Receipt,
   Calculator,
-  TrendingUp,
   Eye,
   Settings,
   FolderOpen,
@@ -145,7 +144,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       icon: Euro,
       children: [
         { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-        { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
         { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
         { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
       ],
@@ -182,7 +180,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     return pathname === href || pathname?.startsWith(href + '/')
   }
 
-  /** Binnen een accordion alleen het meest specifieke (langste) pad als actief; voorkomt dat Facturatie én Rendement beide geselecteerd zijn. */
+  /** Binnen een accordion alleen het meest specifieke (langste) pad als actief. */
   const getActiveChildHref = (children: SidebarItem['children']): string | null => {
     if (!children?.length) return null
     const matching = children.filter((c) => pathname === c.href || pathname.startsWith(c.href + '/'))

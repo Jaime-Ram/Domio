@@ -32,7 +32,6 @@ import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries } from '@/lib/supabase/queries'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import {
@@ -188,16 +187,7 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <SectionNavDashboard
-        title="Portefeuille"
-        items={PORTFOLIO_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
       <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader className="space-y-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

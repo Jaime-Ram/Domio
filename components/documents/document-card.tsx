@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Eye, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check } from 'lucide-react'
+import { Eye, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -13,19 +13,7 @@ import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
-
-/** PDF.js één keer laden en hergebruiken (niet per kaart opnieuw importeren). */
-let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null
-function getPdfjs() {
-  if (!pdfjsPromise) {
-    pdfjsPromise = import('pdfjs-dist').then((m) => {
-      const version = (m as { version?: string }).version ?? '4.4.168'
-      m.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`
-      return m
-    })
-  }
-  return pdfjsPromise
-}
+import { getPdfjs } from '@/lib/pdfjs-client'
 
 /** Maximaal 2 previews tegelijk laden om de main thread niet te overbelasten. */
 const MAX_CONCURRENT_PREVIEWS = 2
@@ -79,6 +67,8 @@ type DocumentCardProps = {
   selectionMode?: boolean
   selected?: boolean
   onToggleSelect?: (doc: DocumentCardDoc) => void
+  /** Tijdens bulk download/verwijderen: toon laad-indicator in de selectiecirkels. */
+  bulkActionLoading?: boolean
 }
 
 function getExtension(name: string, file_name?: string | null): string {
@@ -128,6 +118,7 @@ export function DocumentCard({
   selectionMode = false,
   selected = false,
   onToggleSelect,
+  bulkActionLoading = false,
 }: DocumentCardProps) {
   const ext = getExtension(doc.name, doc.file_name)
   const realName = doc.name || doc.file_name || 'Document'
@@ -317,13 +308,48 @@ export function DocumentCard({
     }
   }
 
+  /** Hele kaart klikbaar alleen in selectiemodus (selecteren). */
+  const handleArticleClick = () => {
+    if (selectionMode && bulkActionLoading) return
+    if (selectionMode) handleView()
+  }
+
+  /** Alleen bovenste (preview) deel: voorvertoning openen. */
+  const handlePreviewAreaClick = (e: React.MouseEvent) => {
+    if (selectionMode) return
+    e.stopPropagation()
+    handleView()
+  }
+
   return (
     <article
-      className="@container rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 shadow-sm cursor-pointer"
-      onClick={handleView}
+      className={cn(
+        '@container rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 shadow-sm',
+        selectionMode && 'cursor-pointer'
+      )}
+      onClick={selectionMode ? handleArticleClick : undefined}
     >
-      {/* Bovenste deel: grijs — klikbaar, onderstreept titel bij hover, opent viewer of selecteert. */}
-      <div className="bg-[#e8ebe6] dark:bg-neutral-700/80 px-4 pt-4 pb-0 flex flex-col group">
+      {/* Bovenste deel: grijs — klik = voorvertoning (niet in selectiemodus: hele kaart selecteert). */}
+      <div
+        className={cn(
+          'bg-[#e8ebe6] dark:bg-neutral-700/80 px-4 pt-4 pb-0 flex flex-col group',
+          !selectionMode && 'cursor-pointer'
+        )}
+        onClick={handlePreviewAreaClick}
+        role={selectionMode ? undefined : 'button'}
+        tabIndex={selectionMode ? undefined : 0}
+        onKeyDown={
+          selectionMode
+            ? undefined
+            : (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleView()
+                }
+              }
+        }
+        aria-label={selectionMode ? undefined : `Open voorvertoning: ${realName}`}
+      >
         <div className="mb-1 flex flex-col gap-0 @[320px]:flex-row @[320px]:items-baseline @[320px]:gap-1.5 min-w-0">
           <p
             className="font-semibold text-gray-900 dark:text-white text-sm min-w-0 truncate group-hover:underline"
@@ -385,6 +411,7 @@ export function DocumentCard({
           </div>
           <Button
             size="icon"
+            disabled={selectionMode && bulkActionLoading && selected}
             className={cn(
               'h-8 w-8 rounded-full flex-shrink-0 self-end mb-4',
               selectionMode
@@ -395,13 +422,26 @@ export function DocumentCard({
             )}
             onClick={(e) => {
               e.stopPropagation()
+              if (selectionMode && bulkActionLoading && selected) return
               handleView()
             }}
-            aria-label={selectionMode ? (selected ? 'Deselecteer' : 'Selecteer') : 'Bekijk'}
+            aria-label={
+              selectionMode && bulkActionLoading && selected
+                ? 'Bezig met verwerken'
+                : selectionMode
+                  ? selected
+                    ? 'Deselecteer'
+                    : 'Selecteer'
+                  : 'Bekijk'
+            }
           >
             {selectionMode ? (
               selected ? (
-                <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+                bulkActionLoading ? (
+                  <Loader2 className="h-4 w-4 text-white animate-spin" aria-hidden />
+                ) : (
+                  <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+                )
               ) : null
             ) : (
               <Eye className="h-4 w-4 shrink-0" />
@@ -410,32 +450,63 @@ export function DocumentCard({
         </div>
       </div>
 
-      {/* Onderste deel: wit — soort document + datum + actiemenu rechtsonder */}
-      <div className="bg-white dark:bg-neutral-900 px-4 py-3 relative">
-        <div className="flex items-start justify-between gap-2 pr-8">
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {getTypeLabel(doc.type)}
-            </p>
-            {addedDate && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Toegevoegd {addedDate}
+      {/* Onderste deel: wit — klik opent actiemenu; in selectiemodus: klik op kaart selecteert (geen menu). */}
+      {selectionMode ? (
+        <div className="bg-white dark:bg-neutral-900 px-4 py-3 relative">
+          <div className="flex items-start justify-between gap-2 pr-8">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {getTypeLabel(doc.type)}
               </p>
+              {addedDate && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Toegevoegd {addedDate}
+                </p>
+              )}
+            </div>
+          </div>
+          <div
+            className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center pointer-events-none"
+            aria-hidden
+          >
+            {bulkActionLoading && selected ? (
+              <Loader2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870] animate-spin" />
+            ) : (
+              <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-400" />
             )}
           </div>
         </div>
+      ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700"
-              aria-label="Documentacties"
+            <div
+              className="bg-white dark:bg-neutral-900 px-4 py-3 relative w-full text-left cursor-pointer outline-none transition-colors hover:bg-gray-50/90 dark:hover:bg-neutral-800/90 focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2"
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Acties voor ${realName}`}
             >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+              <div className="flex items-start justify-between gap-2 pr-8">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {getTypeLabel(doc.type)}
+                  </p>
+                  {addedDate && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      Toegevoegd {addedDate}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center pointer-events-none">
+                <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              </div>
+            </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-xl min-w-[220px] border-gray-200 dark:border-neutral-700" sideOffset={6}>
+          <DropdownMenuContent
+            align="end"
+            className="rounded-xl min-w-[220px] border-gray-200 dark:border-neutral-700"
+            sideOffset={6}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <DropdownMenuItem onClick={() => onAddToPerson?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
               <UserPlus className="h-4 w-4" />
               Toewijzen aan bewoner
@@ -460,13 +531,20 @@ export function DocumentCard({
               <Info className="h-4 w-4" />
               Meer info
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDownload?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
+            <DropdownMenuItem
+              onSelect={() => {
+                setTimeout(() => onDownload?.(doc), 0)
+              }}
+              className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+            >
               <Download className="h-4 w-4" />
               Downloaden
             </DropdownMenuItem>
             <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" role="separator" />
             <DropdownMenuItem
-              onClick={() => onDelete?.(doc)}
+              onSelect={() => {
+                setTimeout(() => onDelete?.(doc), 0)
+              }}
               className="gap-2 text-red-600 dark:text-red-400 focus:bg-gray-100 focus:text-red-600 hover:bg-gray-100 hover:text-red-600 dark:focus:bg-neutral-700 dark:focus:text-red-400 dark:hover:bg-neutral-700 dark:hover:text-red-400"
             >
               <Trash2 className="h-4 w-4" />
@@ -474,7 +552,7 @@ export function DocumentCard({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      )}
     </article>
   )
 }

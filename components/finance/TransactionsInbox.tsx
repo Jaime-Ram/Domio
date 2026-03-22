@@ -1,10 +1,19 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -19,10 +28,14 @@ import {
   ChevronDown,
   ChevronsUpDown,
   Euro,
+  Plus,
+  Loader2,
 } from 'lucide-react'
 import { AssignDrawer } from './AssignDrawer'
 import { cn } from '@/lib/utils'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { supabase } from '@/lib/supabase/client'
 
 export interface TransactionRow {
   id: string
@@ -96,11 +109,46 @@ interface TransactionsInboxProps {
   onRefresh?: () => void
 }
 
+function todayISODate() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+async function ensureManualBankConnection(ownerId: string): Promise<string> {
+  const { data: existing, error: selErr } = await supabase
+    .from('bank_connections')
+    .select('id')
+    .eq('owner_id', ownerId)
+    .eq('provider', 'manual')
+    .maybeSingle()
+
+  if (selErr) throw selErr
+  if (existing?.id) return existing.id
+
+  const { data: inserted, error: insErr } = await supabase
+    .from('bank_connections')
+    .insert({
+      owner_id: ownerId,
+      provider: 'manual',
+      access_token: '',
+      refresh_token: null,
+    } as never)
+    .select('id')
+    .single()
+
+  if (insErr) throw insErr
+  return (inserted as { id: string }).id
+}
+
 export function TransactionsInbox({
   transactions,
   properties,
   onRefresh,
 }: TransactionsInboxProps) {
+  const { user, isDemo } = useDashboardUser()
   const [filter, setFilter] = useState<Filter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [drawerTx, setDrawerTx] = useState<TransactionRow | null>(null)
@@ -108,6 +156,64 @@ export function TransactionsInbox({
     column: null,
     direction: null,
   })
+
+  const [addOpen, setAddOpen] = useState(false)
+  const [addSubmitting, setAddSubmitting] = useState(false)
+  const [addError, setAddError] = useState('')
+  const [addForm, setAddForm] = useState({
+    value_date: todayISODate(),
+    amount: '',
+    sender_name: '',
+    sender_iban: '',
+    description: '',
+  })
+
+  const resetAddForm = useCallback(() => {
+    setAddForm({
+      value_date: todayISODate(),
+      amount: '',
+      sender_name: '',
+      sender_iban: '',
+      description: '',
+    })
+    setAddError('')
+  }, [])
+
+  const handleAddPayment = async () => {
+    if (isDemo || !user?.id) return
+    setAddError('')
+    const raw = String(addForm.amount).replace(',', '.').trim()
+    const amountNum = Number(raw)
+    if (!Number.isFinite(amountNum) || amountNum === 0) {
+      setAddError('Vul een geldig bedrag in (niet nul).')
+      return
+    }
+    setAddSubmitting(true)
+    try {
+      const connId = await ensureManualBankConnection(user.id)
+      const externalId = `manual-${crypto.randomUUID()}`
+      const { error } = await supabase.from('raw_transactions').insert({
+        owner_id: user.id,
+        bank_connection_id: connId,
+        external_id: externalId,
+        value_date: addForm.value_date || null,
+        amount: amountNum,
+        currency: 'EUR',
+        sender_name: addForm.sender_name.trim() || null,
+        sender_iban: addForm.sender_iban.trim() || null,
+        description: addForm.description.trim() || null,
+      } as never)
+      if (error) throw error
+      setAddOpen(false)
+      resetAddForm()
+      onRefresh?.()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Opslaan mislukt.'
+      setAddError(msg)
+    } finally {
+      setAddSubmitting(false)
+    }
+  }
 
   // Sliding underline refs
   const tabsContainerRef = useRef<HTMLDivElement | null>(null)
@@ -125,18 +231,30 @@ export function TransactionsInbox({
     { key: 'unmatched', label: 'Niet gekoppeld', count: unmatched.length, ref: unmatchedRef },
   ]
 
-  // Update underline position
+  // Onderstreepje: alleen breedte van label + badge (geen flex-1-stretch)
   useEffect(() => {
-    const container = tabsContainerRef.current
-    const btn = tabs.find((t) => t.key === filter)?.ref.current
-    if (!container || !btn) return
+    const updateIndicator = () => {
+      const container = tabsContainerRef.current
+      const btn = tabs.find((t) => t.key === filter)?.ref.current
+      if (!container || !btn) return
 
-    const containerRect = container.getBoundingClientRect()
-    const btnRect = btn.getBoundingClientRect()
-    setIndicator({
-      left: btnRect.left - containerRect.left,
-      width: btnRect.width,
-    })
+      const containerRect = container.getBoundingClientRect()
+      const btnRect = btn.getBoundingClientRect()
+      setIndicator({
+        left: btnRect.left - containerRect.left,
+        width: btnRect.width,
+      })
+    }
+
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateIndicator) : null
+    if (ro && tabsContainerRef.current) ro.observe(tabsContainerRef.current)
+
+    return () => {
+      window.removeEventListener('resize', updateIndicator)
+      ro?.disconnect()
+    }
   }, [filter, transactions.length])
 
   const formatAmount = (amount: number) =>
@@ -245,7 +363,7 @@ export function TransactionsInbox({
           {/* Segment tabs with sliding underline */}
           <div
             ref={tabsContainerRef}
-            className="relative flex w-full sm:w-auto text-sm border-b border-gray-200 dark:border-neutral-700"
+            className="relative flex flex-wrap items-end gap-x-6 gap-y-1 w-full sm:w-auto text-sm border-b border-gray-200 dark:border-neutral-700"
           >
             {tabs.map((tab) => (
               <button
@@ -254,7 +372,7 @@ export function TransactionsInbox({
                 ref={tab.ref}
                 onClick={() => setFilter(tab.key)}
                 className={cn(
-                  'flex-1 pb-2 mr-6 last:mr-0 text-left sm:text-center whitespace-nowrap transition-colors duration-200 font-semibold',
+                  'inline-flex items-center justify-center gap-0 pb-2 shrink-0 whitespace-nowrap transition-colors duration-200 font-semibold',
                   filter === tab.key
                     ? 'text-[#163300] dark:text-[#9FE870]'
                     : 'text-gray-500 dark:text-gray-400'
@@ -272,8 +390,8 @@ export function TransactionsInbox({
             />
           </div>
 
-          {/* Search pill */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0">
+          {/* Betaling toevoegen + zoeken */}
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 w-full sm:w-auto justify-end min-w-0">
             <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[260px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
               <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
               <Input
@@ -283,6 +401,19 @@ export function TransactionsInbox({
                 className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
               />
             </div>
+            <Button
+              type="button"
+              onClick={() => {
+                resetAddForm()
+                setAddOpen(true)
+              }}
+              disabled={isDemo || !user?.id}
+              title={isDemo ? 'Niet beschikbaar in demo' : !user?.id ? 'Niet ingelogd' : undefined}
+              className="shrink-0 h-9 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] font-medium px-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Betaling toevoegen
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -429,6 +560,105 @@ export function TransactionsInbox({
           category: drawerTx.assignment.category ?? null,
         } : undefined}
       />
+
+      <Dialog
+        open={addOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open)
+          if (!open) resetAddForm()
+        }}
+      >
+        <DialogContent className="border border-gray-200 dark:border-neutral-700 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Betaling toevoegen</DialogTitle>
+            <DialogDescription>
+              Handmatige inkomende betaling registreren. Daarna kun je hem koppelen aan een pand of huurder.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-2">
+              <Label htmlFor="add-pay-date">Datum</Label>
+              <Input
+                id="add-pay-date"
+                type="date"
+                value={addForm.value_date}
+                onChange={(e) => setAddForm((f) => ({ ...f, value_date: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="add-pay-amount">Bedrag (EUR) *</Label>
+              <Input
+                id="add-pay-amount"
+                type="number"
+                step="0.01"
+                inputMode="decimal"
+                placeholder="Bijv. 1250,50"
+                value={addForm.amount}
+                onChange={(e) => setAddForm((f) => ({ ...f, amount: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="add-pay-sender">Naam afzender</Label>
+              <Input
+                id="add-pay-sender"
+                placeholder="Optioneel"
+                value={addForm.sender_name}
+                onChange={(e) => setAddForm((f) => ({ ...f, sender_name: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="add-pay-iban">IBAN</Label>
+              <Input
+                id="add-pay-iban"
+                placeholder="Optioneel"
+                value={addForm.sender_iban}
+                onChange={(e) => setAddForm((f) => ({ ...f, sender_iban: e.target.value }))}
+                className="rounded-xl font-mono text-sm"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="add-pay-desc">Omschrijving</Label>
+              <Input
+                id="add-pay-desc"
+                placeholder="Optioneel"
+                value={addForm.description}
+                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
+                className="rounded-xl"
+              />
+            </div>
+            {addError ? <p className="text-sm text-red-600 dark:text-red-400">{addError}</p> : null}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full"
+              onClick={() => setAddOpen(false)}
+              disabled={addSubmitting}
+            >
+              Annuleren
+            </Button>
+            <Button
+              type="button"
+              className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
+              onClick={handleAddPayment}
+              disabled={addSubmitting}
+            >
+              {addSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Opslaan…
+                </>
+              ) : (
+                'Opslaan'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

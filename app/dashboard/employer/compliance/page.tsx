@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
@@ -30,11 +29,6 @@ import {
   BarChart3,
   Calculator,
 } from 'lucide-react'
-import {
-  DropdownMenuWidgetCheckboxItem,
-  DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import {
   mockWwsObjects,
   mockWwsAlerts,
@@ -110,61 +104,13 @@ const getComplianceNav = (basePath: string) => [
   { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
 ]
 
-const COMPLIANCE_WIDGET_IDS = ['statusBanner', 'kpiStrip', 'alerts', 'overzichtTabel', 'sectorverdeling'] as const
-type ComplianceWidgetId = (typeof COMPLIANCE_WIDGET_IDS)[number]
-const COMPLIANCE_WIDGET_LABELS: Record<ComplianceWidgetId, string> = {
-  statusBanner: 'Statusbanner',
-  kpiStrip: 'KPI-strip',
-  alerts: 'Actie-alerts',
-  overzichtTabel: 'Overzichtstabel',
-  sectorverdeling: 'Sectorverdeling',
-}
-
-function ComplianceWidgetMenu({
-  visible,
-  onToggle,
-}: {
-  visible: Record<ComplianceWidgetId, boolean>
-  onToggle: (id: ComplianceWidgetId) => void
-}) {
-  return (
-    <SectionWidgetMenu>
-      <DropdownMenuLabel>Widget selectie</DropdownMenuLabel>
-      {COMPLIANCE_WIDGET_IDS.map((id) => (
-        <DropdownMenuWidgetCheckboxItem
-          key={id}
-          checked={visible[id]}
-          onCheckedChange={() => onToggle(id)}
-        >
-          {COMPLIANCE_WIDGET_LABELS[id]}
-        </DropdownMenuWidgetCheckboxItem>
-      ))}
-    </SectionWidgetMenu>
-  )
-}
-
-const defaultWidgetVisibility: Record<ComplianceWidgetId, boolean> = {
-  statusBanner: false,
-  kpiStrip: false,
-  alerts: false,
-  overzichtTabel: false,
-  sectorverdeling: false,
-}
-
 export default function CompliancePage() {
-  const router = useRouter()
   const { isDemo, basePath } = useDashboardUser()
   const COMPLIANCE_NAV = getComplianceNav(basePath)
   const [searchQuery, setSearchQuery] = useState('')
   const [sectorFilter, setSectorFilter] = useState<WWSSector | 'all'>('all')
   const [sortKey, setSortKey] = useState<SortKey>('address')
   const [sortAsc, setSortAsc] = useState(true)
-  const [visibleWidgets, setVisibleWidgets] = useState<Record<ComplianceWidgetId, boolean>>(defaultWidgetVisibility)
-
-  const toggleWidget = (id: ComplianceWidgetId) => {
-    setVisibleWidgets((prev) => ({ ...prev, [id]: !prev[id] }))
-  }
-
   const wwsObjects = isDemo ? mockWwsObjects : []
   const wwsAlerts = isDemo ? mockWwsAlerts : []
   const sectorDistribution = isDemo ? mockWwsSectorDistribution : []
@@ -242,16 +188,7 @@ export default function CompliancePage() {
 
   return (
     <>
-      <SectionNavDashboard
-        title="Compliance"
-        items={COMPLIANCE_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
     </>
   )
 }

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Search, Send, ChevronRight, MessageSquareDashed, Plus, TicketPlus, UserPlus, Ticket, FileText, Users, X, UsersRound, Paperclip, MessageCircle, MoreHorizontal, BellOff, Archive, Trash2, MessageCircleMore } from 'lucide-react'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -490,16 +489,9 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-full flex-1 min-h-0 overflow-hidden">
-      <SectionHeroHeader
-        title="Communicatie"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionHeroHeader title="Communicatie" className="mb-0" />
 
-      <div className="flex-1 mt-4 flex gap-4 min-h-0 overflow-hidden">
+      <div className="flex-1 mt-4 flex gap-4 min-h-0 overflow-hidden pl-6">
         {/* Linkerblok: type + lijst in één witte kaart */}
         <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col min-h-0 h-full">
           <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
@@ -919,7 +911,7 @@ export default function MessagesPage() {
       </div>
 
       <Dialog open={createChatOpen} onOpenChange={handleChatDialogOpenChange}>
-        <DialogContent className="!rounded-[28px] border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+        <DialogContent className="border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
           <DialogHeader>
             <DialogTitle>Chat aanmaken</DialogTitle>
             <DialogDescription>Kies een of meerdere contacten uit je volledige huurderslijst.</DialogDescription>
@@ -971,7 +963,7 @@ export default function MessagesPage() {
       </Dialog>
 
       <Dialog open={createGroupOpen} onOpenChange={handleGroupDialogOpenChange}>
-        <DialogContent className="!rounded-[28px] border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+        <DialogContent className="border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#163300] dark:text-[#9FE870]">Groep aanmaken</DialogTitle>
             <DialogDescription>Kies deelnemers uit je volledige contactenlijst.</DialogDescription>

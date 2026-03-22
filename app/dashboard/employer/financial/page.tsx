@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import {
-  TrendingUp,
   CreditCard,
   CheckCircle2,
   ArrowRight,
@@ -25,12 +24,10 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { MetricCard } from '@/components/finance/MetricCard'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
   { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
   { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
 ]
@@ -49,6 +46,21 @@ interface DashboardData {
 const formatEur = (amount: number) =>
   new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount)
 
+/** Lease loopt in de gegeven kalendermaand (monthStart … monthEndExclusive). */
+function leaseOverlapsCalendarMonth(
+  status: string,
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  monthStart: string,
+  monthEndExclusive: string
+): boolean {
+  if (status !== 'actief') return false
+  if (!startDate) return false
+  if (startDate >= monthEndExclusive) return false
+  if (endDate != null && endDate !== '' && endDate < monthStart) return false
+  return true
+}
+
 export default function FinancialPage() {
   const router = useRouter()
   const { basePath } = useDashboardUser()
@@ -65,14 +77,13 @@ export default function FinancialPage() {
 
   useEffect(() => {
     async function fetchDashboard() {
-      const [txRes, expRes, expOverdueRes, assignRes] = await Promise.all([
+      const [txRes, leasesRes, expOverdueRes, assignRes] = await Promise.all([
         supabase
           .from('raw_transactions')
           .select('id, value_date, amount'),
         supabase
-          .from('rent_expectations')
-          .select('id, expected_amount, property_id')
-          .eq('period_label', currentPeriod),
+          .from('leases')
+          .select('monthly_rent, status, start_date, end_date, units(property_id)'),
         supabase
           .from('rent_expectations')
           .select('id')
@@ -84,9 +95,32 @@ export default function FinancialPage() {
       ])
 
       const allTx = txRes.data ?? []
-      const expectations = expRes.data ?? []
+      const leases = leasesRes.data ?? []
       const overdueExpectations = expOverdueRes.data ?? []
       const assignments = assignRes.data ?? []
+
+      // Verwachte huur deze maand = som maandhuren portefeuille (actieve leases in deze kalendermaand)
+      let expectedThisMonth = 0
+      const expectedByProp = new Map<string, number>()
+      for (const row of leases as any[]) {
+        if (
+          !leaseOverlapsCalendarMonth(
+            row.status,
+            row.start_date,
+            row.end_date,
+            monthStart,
+            monthEnd
+          )
+        ) {
+          continue
+        }
+        const rent = Number(row.monthly_rent) || 0
+        expectedThisMonth += rent
+        const pid = row.units?.property_id as string | undefined
+        if (pid) {
+          expectedByProp.set(pid, (expectedByProp.get(pid) ?? 0) + rent)
+        }
+      }
 
       // Total received (all time)
       const totalReceived = allTx.reduce((sum: number, tx: any) => sum + Number(tx.amount), 0)
@@ -97,7 +131,6 @@ export default function FinancialPage() {
         return tx.value_date >= monthStart && tx.value_date < monthEnd
       })
       const receivedThisMonth = monthTx.reduce((sum: number, tx: any) => sum + Number(tx.amount), 0)
-      const expectedThisMonth = expectations.reduce((sum: number, e: any) => sum + Number(e.expected_amount), 0)
 
       // Unmatched
       const assignedTxIds = new Set(assignments.map((a: any) => a.transaction_id))
@@ -106,13 +139,7 @@ export default function FinancialPage() {
       // Uncategorized: assigned but category is null
       const uncategorizedCount = assignments.filter((a: any) => a.category === null).length
 
-      // Rent discrepancy: properties where received != expected this month
-      const expectedByProp = new Map<string, number>()
-      for (const e of expectations) {
-        const pid = (e as any).property_id
-        if (pid) expectedByProp.set(pid, (expectedByProp.get(pid) ?? 0) + Number((e as any).expected_amount))
-      }
-
+      // Rent discrepancy: properties where ontvangen deze maand (huur) ≠ verwacht uit portefeuille
       const monthTxMap = new Map<string, any>(monthTx.map((tx: any) => [tx.id, tx]))
       const receivedByProp = new Map<string, number>()
       for (const a of assignments) {
@@ -234,17 +261,9 @@ export default function FinancialPage() {
 
   return (
     <div className="space-y-content-blocks">
-      <SectionNavDashboard
-        title="Financieel"
-        items={FINANCIAL_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
 
+      <div className="pl-6">
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
@@ -269,7 +288,7 @@ export default function FinancialPage() {
               label="Verwacht deze maand"
               value={formatEur(data.expectedThisMonth)}
               icon={<CalendarCheck01 className="h-5 w-5" />}
-              accent="blue"
+              variant="bright-green"
             />
             <MetricCard
               label="Niet gekoppeld"
@@ -333,6 +352,7 @@ export default function FinancialPage() {
             </Card>
         </div>
       ) : null}
+      </div>
     </div>
   )
 }

@@ -48,8 +48,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
-
 
 type TenantRow = {
   id: string
@@ -279,17 +277,11 @@ export default function TenantsPage() {
     { opPeil: 0, openstaand: 0, teveelBetaald: 0 }
   )
 
-  const portefeuilleWidgetMenu = (
-    <SectionWidgetMenu>
-      <SectionWidgetMenuPlaceholder />
-    </SectionWidgetMenu>
-  )
-
   if (loading) {
     return (
       <>
-        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" widgetMenu={portefeuilleWidgetMenu} />
-        <div className="flex items-center justify-center min-h-[200px]">
+        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
+        <div className="pl-6 flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
       </>
@@ -298,7 +290,8 @@ export default function TenantsPage() {
 
   return (
     <>
-            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" widgetMenu={portefeuilleWidgetMenu} />
+            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
+            <div className="pl-6">
             <Card className={dashboardCardClass(undefined, isDemo)}>
               <CardHeader className="space-y-3">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -706,6 +699,7 @@ export default function TenantsPage() {
                 )}
               </CardContent>
             </Card>
+            </div>
     </>
   )
 }

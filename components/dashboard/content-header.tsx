@@ -57,7 +57,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
 
   return (
     <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-3">
+      <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 h-16 flex items-center justify-between gap-3">
         {/* Hamburger menu for mobile */}
         <Button
             variant="ghost"

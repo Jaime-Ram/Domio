@@ -97,7 +97,7 @@ export default function DemoAppLayout({
             >
               <ContentHeader onMenuClick={() => setSidebarOpen(true)} basePath={DEMO_BASE_PATH} />
               <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
-                <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-4 sm:py-6 lg:py-10 pb-16">
+                <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 py-4 sm:py-6 lg:py-10 pb-16">
                   {children}
                   <div className="flex justify-center items-center mt-16 pt-8">
                     <Logo

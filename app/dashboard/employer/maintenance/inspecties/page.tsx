@@ -2,7 +2,6 @@
 
 import { ClipboardCheck, Wrench, Calendar } from 'lucide-react'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Ticket } from 'lucide-react'
 
@@ -17,16 +16,7 @@ export default function InspectiesPage() {
   const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   return (
     <div className="space-y-content-blocks">
-      <SectionNavDashboard
-        title="Onderhoud"
-        items={MAINTENANCE_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
     </div>
   )
 }

@@ -1,32 +1,21 @@
 'use client'
 
-import { TrendingUp, CreditCard, LayoutDashboard, CalendarClock } from 'lucide-react'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
-const getFinancialNav = (basePath: string) => [
-  { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
-  { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-  { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
-]
-
-export default function RendementPage() {
+/** Rendement tijdelijk uit navigatie; oude links doorsturen naar financieel dashboard. */
+export default function RendementRedirectPage() {
+  const router = useRouter()
   const { basePath } = useDashboardUser()
-  const FINANCIAL_NAV = getFinancialNav(basePath)
+
+  useEffect(() => {
+    router.replace(`${basePath}/financial`)
+  }, [router, basePath])
+
   return (
-    <div className="space-y-content-blocks">
-      <SectionNavDashboard
-        title="Financieel"
-        items={FINANCIAL_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+    <div className="flex min-h-[120px] items-center justify-center pl-6">
+      <p className="text-sm text-gray-500">Bezig met doorsturen…</p>
     </div>
   )
 }

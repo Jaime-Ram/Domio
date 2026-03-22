@@ -64,7 +64,6 @@ import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { ticketQueries } from '@/lib/supabase/queries'
 import { cn } from '@/lib/utils'
 
@@ -364,16 +363,7 @@ export default function MaintenancePage() {
 
   return (
     <>
-      <SectionNavDashboard
-        title="Onderhoud"
-        items={MAINTENANCE_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
       <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader className="space-y-3">
@@ -622,7 +612,7 @@ export default function MaintenancePage() {
           if (!open) resetCreateForm()
         }}
       >
-        <DialogContent className="rounded-2xl border border-gray-200 dark:border-neutral-700 sm:max-w-md">
+        <DialogContent className="border border-gray-200 dark:border-neutral-700 sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Nieuw ticket</DialogTitle>
             <DialogDescription>Beschrijf kort het probleem. Je kunt later vanuit het ticket chatten en details toevoegen.</DialogDescription>

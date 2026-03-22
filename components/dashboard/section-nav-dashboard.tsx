@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 export interface SectionNavItem {
   label: string
@@ -18,13 +17,10 @@ interface SectionNavDashboardProps {
   className?: string
   /** Grote groene titel, geen "kies een onderdeel" */
   titleVariant?: 'default' | 'hero'
-  /** Bijv. rondje met drie bolletjes voor widget-instellingen */
-  widgetMenu?: React.ReactNode
 }
 
-export function SectionNavDashboard({ title, items, className, titleVariant = 'default', widgetMenu }: SectionNavDashboardProps) {
+export function SectionNavDashboard({ title, items, className, titleVariant = 'default' }: SectionNavDashboardProps) {
   const pathname = usePathname()
-  const { isDemo } = useDashboardUser()
 
   // Alleen het meest specifieke (langste) overeenkomende item actief
   const activeHref = items
@@ -32,13 +28,12 @@ export function SectionNavDashboard({ title, items, className, titleVariant = 'd
     .sort((a, b) => b.href.length - a.href.length)[0]?.href
 
   return (
-    <div className={cn('mb-8', className)}>
+    <div className={cn('mb-8 pl-6', className)}>
       {titleVariant === 'hero' ? (
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
             {title}
           </h1>
-          {widgetMenu}
         </div>
       ) : (
         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">

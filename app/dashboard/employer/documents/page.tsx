@@ -15,14 +15,22 @@ import {
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
 import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
+import { LocalPdfThumbnail } from '@/components/documents/local-pdf-thumbnail'
 import { mockDocuments } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
-import { Search, Filter, Grid3x3, Table2, Plus, Eye, Download, Trash2 } from 'lucide-react'
+import { Search, Filter, Grid3x3, Table2, Plus, Eye, Download, Trash2, Upload, X } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,14 +45,30 @@ import { nl } from 'date-fns/locale'
 const DOC_TYPES = ['Contract', 'Keuring', 'Factuur', 'Verzekering', 'Overig'] as const
 type SortKey = 'name' | 'type' | 'date'
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function getLocalPreviewKind(file: File): 'image' | 'pdf' | 'other' {
+  if (file.type.startsWith('image/')) return 'image'
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) return 'pdf'
+  return 'other'
+}
+
 export default function DocumentsPage() {
   const { isDemo } = useDashboardUser()
   const { previewDocId, openPreview } = useDocumentPreview()
   const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const [dropActive, setDropActive] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  /** Bestanden gekozen in de popup; pas na bevestiging uploaden. */
+  const [stagedUploadFiles, setStagedUploadFiles] = useState<File[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortAsc, setSortAsc] = useState(false)
@@ -57,6 +81,8 @@ export default function DocumentsPage() {
   })
   const [selectionMode, setSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  /** Documenten waar nu een bulk-download of -verwijdering op bezig is (per id spinner op de kaart). */
+  const [bulkProcessingIds, setBulkProcessingIds] = useState<string[]>([])
   const contentRef = useRef<HTMLDivElement | null>(null)
   const [bulkCenter, setBulkCenter] = useState<number | null>(null)
 
@@ -90,6 +116,21 @@ export default function DocumentsPage() {
       window.removeEventListener('resize', updateCenter)
     }
   }, [])
+
+  /** Alleen voor afbeeldingen (blob-URL); PDF gebruikt LocalPdfThumbnail (geen iframe / geen zwarte viewerbalk). */
+  const stagedImagePreviewUrls = useMemo(
+    () =>
+      stagedUploadFiles.map((f) => (f.type.startsWith('image/') ? URL.createObjectURL(f) : '')),
+    [stagedUploadFiles]
+  )
+
+  useEffect(() => {
+    return () => {
+      stagedImagePreviewUrls.forEach((u) => {
+        if (u) URL.revokeObjectURL(u)
+      })
+    }
+  }, [stagedImagePreviewUrls])
 
   useEffect(() => {
     if (!selectionMode || selectedIds.length === 0) return
@@ -145,16 +186,12 @@ export default function DocumentsPage() {
     }
   }
 
-  const handleUploadClick = () => {
-    setUploadError(null)
-    fileInputRef.current?.click()
-  }
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? [])
+  /** Upload bevestigde bestanden; sluit dialoog alleen bij succes. */
+  const uploadFilesWithClose = async (files: File[]) => {
     if (files.length === 0 || isDemo) return
     setUploading(true)
     setUploadError(null)
+    let hadError = false
     try {
       for (const file of files) {
         const formData = new FormData()
@@ -166,19 +203,75 @@ export default function DocumentsPage() {
         const json = await res.json().catch(() => ({}))
         if (!res.ok) {
           setUploadError(json.error || 'Upload mislukt')
+          hadError = true
           break
         }
       }
-      refreshDocuments()
+      if (!hadError) {
+        setStagedUploadFiles([])
+        refreshDocuments()
+        setUploadDialogOpen(false)
+      }
     } catch {
       setUploadError('Upload mislukt')
     } finally {
       setUploading(false)
-      e.target.value = ''
     }
   }
 
+  const addFilesToUploadStage = (files: File[]) => {
+    if (files.length === 0) return
+    setStagedUploadFiles((prev) => {
+      const seen = new Set(prev.map((f) => `${f.name}-${f.size}-${f.lastModified}`))
+      const merged = [...prev]
+      for (const f of files) {
+        const key = `${f.name}-${f.size}-${f.lastModified}`
+        if (!seen.has(key)) {
+          seen.add(key)
+          merged.push(f)
+        }
+      }
+      return merged
+    })
+    setUploadError(null)
+  }
+
+  const removeStagedFile = (index: number) => {
+    setStagedUploadFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleUploadClick = () => {
+    setUploadError(null)
+    setStagedUploadFiles([])
+    setUploadDialogOpen(true)
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    addFilesToUploadStage(files)
+    e.target.value = ''
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDropActive(false)
+    const files = Array.from(e.dataTransfer.files)
+    addFilesToUploadStage(files)
+  }
+
+  const handleConfirmUpload = () => {
+    if (stagedUploadFiles.length === 0) return
+    void uploadFilesWithClose(stagedUploadFiles)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+  }
+
   const toggleSelectionMode = () => {
+    if (bulkProcessingIds.length > 0) return
     setSelectionMode((prev) => {
       if (prev) {
         setSelectedIds([])
@@ -188,6 +281,7 @@ export default function DocumentsPage() {
   }
 
   const toggleSelectDoc = (id: string) => {
+    if (bulkProcessingIds.length > 0) return
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
@@ -225,6 +319,91 @@ export default function DocumentsPage() {
     openDocumentUrl(doc.id, true)
   }
 
+  const deleteDocumentById = async (docId: string, opts?: { quiet?: boolean }): Promise<boolean> => {
+    if (isDemo) {
+      if (!opts?.quiet) alert('In demomodus kun je geen documenten verwijderen.')
+      return false
+    }
+    try {
+      const res = await fetch(`/api/documents/${docId}`, { method: 'DELETE' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        if (!opts?.quiet) {
+          alert(typeof json.error === 'string' ? json.error : 'Verwijderen mislukt')
+        }
+        return false
+      }
+      return true
+    } catch {
+      if (!opts?.quiet) alert('Verwijderen mislukt')
+      return false
+    }
+  }
+
+  const handleDelete = (doc: { id: string }) => {
+    if (!window.confirm('Dit document permanent verwijderen?')) return
+    void (async () => {
+      const ok = await deleteDocumentById(doc.id)
+      if (ok) refreshDocuments()
+    })()
+  }
+
+  const handleBulkDownloadSelected = () => {
+    if (selectedIds.length === 0 || bulkProcessingIds.length > 0) return
+    if (isDemo) {
+      alert('In demomodus kun je niet downloaden.')
+      return
+    }
+    const ids = [...selectedIds]
+    setBulkProcessingIds(ids)
+    void (async () => {
+      try {
+        for (let i = 0; i < ids.length; i++) {
+          if (i > 0) await new Promise((r) => setTimeout(r, 350))
+          await openDocumentUrl(ids[i], true)
+          setBulkProcessingIds((prev) => prev.filter((x) => x !== ids[i]))
+        }
+      } finally {
+        setBulkProcessingIds([])
+      }
+    })()
+  }
+
+  const handleBulkDeleteSelected = () => {
+    if (selectedIds.length === 0 || bulkProcessingIds.length > 0) return
+    if (isDemo) {
+      alert('In demomodus kun je niet verwijderen.')
+      return
+    }
+    if (!window.confirm(`${selectedIds.length} document(en) permanent verwijderen?`)) return
+    const ids = [...selectedIds]
+    setBulkProcessingIds(ids)
+    void (async () => {
+      try {
+        let failed = 0
+        for (const id of ids) {
+          const ok = await deleteDocumentById(id, { quiet: true })
+          setBulkProcessingIds((prev) => prev.filter((x) => x !== id))
+          if (!ok) failed++
+        }
+        if (failed > 0) {
+          alert(
+            failed === ids.length
+              ? 'Verwijderen mislukt. Probeer het opnieuw.'
+              : `${failed} van ${ids.length} document(en) konden niet worden verwijderd.`
+          )
+        }
+        setSelectedIds([])
+        setSelectionMode(false)
+        refreshDocuments()
+      } finally {
+        setBulkProcessingIds([])
+      }
+    })()
+  }
+
+  const bulkBusy = bulkProcessingIds.length > 0
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortAsc((a) => !a)
     else {
@@ -241,15 +420,7 @@ export default function DocumentsPage() {
   return (
     <>
       <div className="mb-8" ref={contentRef}>
-        <SectionHeroHeader
-          title="Documenten"
-          className="mb-0"
-          widgetMenu={
-            <SectionWidgetMenu>
-              <SectionWidgetMenuPlaceholder />
-            </SectionWidgetMenu>
-          }
-        />
+        <SectionHeroHeader title="Documenten" className="mb-0" />
       </div>
 
       <Card className={dashboardCardClass(undefined, isDemo)}>
@@ -308,6 +479,7 @@ export default function DocumentsPage() {
                 type="button"
                 variant="outline"
                 onClick={toggleSelectionMode}
+                disabled={bulkBusy}
                 className={cn(
                   'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
                   selectionMode
@@ -355,6 +527,165 @@ export default function DocumentsPage() {
                     <Plus className="h-4 w-4" />
                     {uploading ? 'Bezig…' : 'Document uploaden'}
                   </Button>
+                  <Dialog
+                    open={uploadDialogOpen}
+                    onOpenChange={(open) => {
+                      setUploadDialogOpen(open)
+                      if (!open) {
+                        setUploadError(null)
+                        setDropActive(false)
+                        setStagedUploadFiles([])
+                      }
+                    }}
+                  >
+                    <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 overflow-hidden [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+                      <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
+                        <DialogTitle className="text-[#163300] dark:text-[#9FE870] text-lg">
+                          Documenten uploaden
+                        </DialogTitle>
+                        <DialogDescription>
+                          Kies bestanden en controleer de voorbeelden. Daarna upload je ze definitief naar je documenten.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="px-6 pb-2 flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto">
+                        {stagedUploadFiles.length > 0 && (
+                          <div className="space-y-3">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              Te uploaden ({stagedUploadFiles.length})
+                            </p>
+                            <ul className="space-y-3">
+                              {stagedUploadFiles.map((file, index) => {
+                                const imageUrl = stagedImagePreviewUrls[index]
+                                const kind = getLocalPreviewKind(file)
+                                return (
+                                  <li
+                                    key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
+                                    className="flex gap-3 rounded-xl border border-gray-200 dark:border-neutral-600 bg-gray-50/80 dark:bg-neutral-800/80 p-3 pr-2"
+                                  >
+                                    <div className="w-[100px] h-[72px] shrink-0 rounded-lg overflow-hidden bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 flex items-center justify-center">
+                                      {kind === 'image' && imageUrl ? (
+                                        // eslint-disable-next-line @next/next/no-img-element -- lokale blob-preview vóór upload
+                                        <img src={imageUrl} alt="" className="max-w-full max-h-full object-contain" />
+                                      ) : kind === 'pdf' ? (
+                                        <LocalPdfThumbnail file={file} />
+                                      ) : (
+                                        <DocumentTypeGlyph
+                                          name={file.name}
+                                          file_name={file.name}
+                                          mime_type={file.type || undefined}
+                                          className="h-10 w-10 text-gray-400 dark:text-neutral-500"
+                                        />
+                                      )}
+                                    </div>
+                                    <div className="min-w-0 flex-1 py-0.5">
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={file.name}>
+                                        {file.name}
+                                      </p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatFileSize(file.size)}</p>
+                                      {kind === 'other' && (
+                                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                                          Voorbeeld niet beschikbaar; bestand wordt wel geüpload.
+                                        </p>
+                                      )}
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 shrink-0 rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                      onClick={() => removeStagedFile(index)}
+                                      disabled={uploading}
+                                      aria-label={`${file.name} uit lijst halen`}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          onDragEnter={(e) => {
+                            e.preventDefault()
+                            setDropActive(true)
+                          }}
+                          onDragLeave={(e) => {
+                            e.preventDefault()
+                            if (e.currentTarget.contains(e.relatedTarget as Node)) return
+                            setDropActive(false)
+                          }}
+                          onDragOver={handleDragOver}
+                          onDrop={handleDrop}
+                          disabled={uploading}
+                          className={cn(
+                            'w-full rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+                            stagedUploadFiles.length > 0 ? 'py-5' : 'py-10',
+                            dropActive
+                              ? 'border-[#163300] bg-[#9FE870]/20 dark:bg-[#9FE870]/10'
+                              : 'border-gray-200 dark:border-neutral-600 bg-gray-50/90 dark:bg-neutral-800/80 hover:border-[#163300]/50 hover:bg-gray-100/80 dark:hover:bg-neutral-800',
+                            uploading && 'pointer-events-none opacity-70'
+                          )}
+                        >
+                          <Upload
+                            className={cn(
+                              'mx-auto h-8 w-8 mb-2',
+                              stagedUploadFiles.length > 0 ? 'mb-1.5' : 'mb-3 h-10 w-10',
+                              dropActive ? 'text-[#163300] dark:text-[#9FE870]' : 'text-gray-400 dark:text-gray-500'
+                            )}
+                            aria-hidden
+                          />
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {stagedUploadFiles.length > 0 ? 'Meer bestanden toevoegen' : 'Sleep bestanden hierheen'}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            of klik om te bladeren · PDF, Word, afbeeldingen, CSV, …
+                          </p>
+                        </button>
+                        {uploadError && (
+                          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+                            {uploadError}
+                          </p>
+                        )}
+                      </div>
+                      <DialogFooter className="px-6 pb-6 pt-3 flex-row flex-wrap justify-end gap-2 sm:gap-2 border-t border-gray-100 dark:border-neutral-800 shrink-0">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-full"
+                          onClick={() => setUploadDialogOpen(false)}
+                          disabled={uploading}
+                        >
+                          Annuleren
+                        </Button>
+                        {stagedUploadFiles.length > 0 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                          >
+                            Bestanden toevoegen
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] disabled:opacity-60"
+                          onClick={stagedUploadFiles.length > 0 ? handleConfirmUpload : () => fileInputRef.current?.click()}
+                          disabled={uploading}
+                        >
+                          {uploading
+                            ? 'Bezig met uploaden…'
+                            : stagedUploadFiles.length > 0
+                              ? `Definitief uploaden (${stagedUploadFiles.length})`
+                              : 'Bestanden kiezen'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </>
               )}
               </div>
@@ -362,9 +693,6 @@ export default function DocumentsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {uploadError && (
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">{uploadError}</p>
-          )}
           {sortedDocuments.length === 0 ? (
             <p className="text-gray-600 dark:text-gray-400 py-8 text-center">
               {!isDemo ? 'Nog geen documenten. Klik op "Document uploaden" om te beginnen.' : 'Geen documenten in demomodus.'}
@@ -471,10 +799,12 @@ export default function DocumentsPage() {
                     doc={toCardDoc(doc)}
                     onPreview={selectionMode ? undefined : () => handleView(doc)}
                     onDownload={selectionMode ? undefined : () => handleDownload(doc)}
+                    onDelete={selectionMode ? undefined : () => handleDelete(doc)}
                     skipPreviewFetch={isDemo}
                     selectionMode={selectionMode}
                     selected={selectedIds.includes(doc.id)}
                     onToggleSelect={() => toggleSelectDoc(doc.id)}
+                    bulkActionLoading={bulkProcessingIds.includes(doc.id)}
                   />
                 ))}
               </div>
@@ -493,6 +823,8 @@ export default function DocumentsPage() {
                       size="icon"
                       className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
                       aria-label="Download geselecteerde documenten"
+                      disabled={selectedIds.length === 0 || bulkBusy}
+                      onClick={handleBulkDownloadSelected}
                     >
                       <Download className="h-4 w-4" />
                     </Button>
@@ -502,6 +834,8 @@ export default function DocumentsPage() {
                       size="icon"
                       className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
                       aria-label="Geselecteerde verwijderen"
+                      disabled={selectedIds.length === 0 || bulkBusy}
+                      onClick={handleBulkDeleteSelected}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -510,6 +844,7 @@ export default function DocumentsPage() {
                       variant="ghost"
                       size="sm"
                       className="h-8 rounded-full px-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40"
+                      disabled={bulkBusy}
                       onClick={toggleSelectionMode}
                     >
                       Annuleer

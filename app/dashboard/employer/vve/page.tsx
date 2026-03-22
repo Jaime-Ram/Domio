@@ -14,7 +14,7 @@ export default function VvEPage() {
   const reservePercent = data.targetReserve > 0 ? Math.min(100, (data.reserveFund / data.targetReserve) * 100) : 0
 
   return (
-    <div className="space-y-content-blocks">
+    <div className="space-y-content-blocks pl-6">
       <div>
         <h1 className="text-2xl font-semibold text-[#163300] dark:text-[#9FE870]">{data.name}</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">{data.address}</p>

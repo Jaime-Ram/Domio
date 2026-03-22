@@ -1,70 +1,80 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Card, CardContent } from '@/components/ui/card'
 
+/** @deprecated Accent wordt niet meer gebruikt voor styling. */
 type AccentColor = 'green' | 'blue' | 'amber' | 'red'
 
-const accentStyles: Record<AccentColor, { iconBg: string; iconText: string; border: string }> = {
-  green: {
-    iconBg: 'bg-[#ECFDF3] dark:bg-[#054F31]/30',
-    iconText: 'text-[#067647] dark:text-[#75E0A7]',
-    border: 'border-[#ABEFC6]/40 dark:border-[#054F31]/50',
-  },
-  blue: {
-    iconBg: 'bg-[#EFF8FF] dark:bg-[#194185]/30',
-    iconText: 'text-[#175CD3] dark:text-[#84CAFF]',
-    border: 'border-[#B2DDFF]/40 dark:border-[#194185]/50',
-  },
-  amber: {
-    iconBg: 'bg-[#FFFAEB] dark:bg-[#7A2E0E]/30',
-    iconText: 'text-[#B54708] dark:text-[#FDB022]',
-    border: 'border-[#FEDF89]/40 dark:border-[#7A2E0E]/50',
-  },
-  red: {
-    iconBg: 'bg-[#FEF3F2] dark:bg-[#7A271A]/30',
-    iconText: 'text-[#B42318] dark:text-[#FDA29B]',
-    border: 'border-[#FECDCA]/40 dark:border-[#7A271A]/50',
-  },
-}
-
 interface MetricCardProps {
+  /** Omschrijving onder het bedrag (bijv. "Totaal ontvangen") */
   label: string
+  /** Groot weergegeven bedrag of getal */
   value: string
+  /** Optionele extra regel onder de omschrijving (bijv. "transacties", uitsplitsing) */
   subtitle?: string
   icon: React.ReactNode
-  accent: AccentColor
+  /** Felgroene tegel (Domio-accent), o.a. “Verwacht deze maand” */
+  variant?: 'default' | 'bright-green'
+  /** @deprecated Niet meer gebruikt voor styling */
+  accent?: AccentColor
 }
 
-export function MetricCard({ label, value, subtitle, icon, accent }: MetricCardProps) {
-  const styles = accentStyles[accent]
+/**
+ * Financieel dashboard: grijze tegel (zelfde tint als inner blocks), sterk afgerond, geen rand.
+ * Volgorde: icoon → bedrag → beschrijving; geen munteenheid (alles NL / euro in het getal).
+ */
+export function MetricCard({ label, value, subtitle, icon, variant = 'default', accent: _accent }: MetricCardProps) {
+  const isBrightGreen = variant === 'bright-green'
+  const showSubtitle = Boolean(subtitle)
 
   return (
-    <Card className={dashboardCardClass(`border ${styles.border}`)}>
-      <CardContent className="pt-5 pb-5 px-5">
-        <div className="flex items-start gap-4">
-          {/* Icon container — Untitled UI style: rounded-lg with tinted bg */}
-          <div className={cn(
-            'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 border',
-            styles.iconBg,
-            styles.border,
-          )}>
-            <span className={styles.iconText}>{icon}</span>
+    <Card
+      className={cn(
+        'rounded-[1.25rem] sm:rounded-4xl border-0 shadow-none overflow-hidden',
+        isBrightGreen
+          ? 'bg-[#9FE870] dark:bg-[#9FE870]'
+          : 'bg-[#f4f4f4] dark:bg-neutral-800'
+      )}
+    >
+      <CardContent className="p-5 pt-5 pb-5">
+        <div className="flex flex-col gap-3">
+          <div
+            className={cn(
+              '[&>svg]:h-5 [&>svg]:w-5 shrink-0',
+              isBrightGreen ? 'text-[#163300]' : 'text-gray-500 dark:text-gray-400'
+            )}
+          >
+            {icon}
           </div>
 
-          <div className="flex-1 min-w-0 space-y-1">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 leading-tight">
-              {label}
-            </p>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight leading-none">
+          <div className="min-w-0 space-y-1">
+            <p
+              className={cn(
+                'text-3xl sm:text-[2rem] font-bold tracking-tight tabular-nums leading-none',
+                isBrightGreen ? 'text-[#163300]' : 'text-gray-900 dark:text-white'
+              )}
+            >
               {value}
             </p>
-            {subtitle && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-tight">
+            <p
+              className={cn(
+                'text-sm font-medium leading-snug pt-0.5',
+                isBrightGreen ? 'text-[#163300]/85' : 'text-gray-600 dark:text-gray-400'
+              )}
+            >
+              {label}
+            </p>
+            {showSubtitle ? (
+              <p
+                className={cn(
+                  'text-xs pt-0.5',
+                  isBrightGreen ? 'text-[#163300]/70' : 'text-gray-500 dark:text-gray-500'
+                )}
+              >
                 {subtitle}
               </p>
-            )}
+            ) : null}
           </div>
         </div>
       </CardContent>

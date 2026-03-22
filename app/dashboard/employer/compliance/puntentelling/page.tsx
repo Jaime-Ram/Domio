@@ -2,7 +2,6 @@
 
 import { Calculator, BarChart3, AlertTriangle } from 'lucide-react'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
-import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
 const getComplianceNav = (basePath: string) => [
@@ -16,16 +15,7 @@ export default function PuntentellingPage() {
   const COMPLIANCE_NAV = getComplianceNav(basePath)
   return (
     <div className="space-y-content-blocks">
-      <SectionNavDashboard
-        title="Compliance"
-        items={COMPLIANCE_NAV}
-        titleVariant="hero"
-        widgetMenu={
-          <SectionWidgetMenu>
-            <SectionWidgetMenuPlaceholder />
-          </SectionWidgetMenu>
-        }
-      />
+      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
     </div>
   )
 }

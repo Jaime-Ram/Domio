@@ -137,7 +137,7 @@ export default function AccountingPage() {
   const availableIntegrations = integrations.filter(i => !i.isConnected)
 
   return (
-    <>
+    <div className="pl-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
@@ -357,7 +357,7 @@ export default function AccountingPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }
 
