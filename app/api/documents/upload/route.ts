@@ -26,6 +26,18 @@ function sanitizeFileName(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 200) || 'document'
 }
 
+/** Runtime FormData van Request heeft `.entries()`; TS-typen botsen tussen DOM/undici. */
+function formDataGet(formData: unknown, key: string): string | File | null {
+  const fd = formData as { entries?: () => IterableIterator<[string, unknown]> }
+  if (typeof fd.entries !== 'function') return null
+  for (const [k, value] of fd.entries()) {
+    if (k !== key) continue
+    if (typeof value === 'string') return value
+    if (value instanceof File) return value
+  }
+  return null
+}
+
 /**
  * POST /api/documents/upload
  * FormData: file (required), name? (display name), type? (Contract|Keuring|Factuur|Verzekering|Overig), property_id?
@@ -40,7 +52,8 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData()
-    const file = formData.get('file') as File | null
+    const fileCandidate = formDataGet(formData, 'file')
+    const file = fileCandidate instanceof File ? fileCandidate : null
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { error: 'Geen bestand ontvangen. Stuur een bestand onder de key "file".' },
@@ -63,9 +76,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const nameOverride = (formData.get('name') as string)?.trim()
-    const typeParam = (formData.get('type') as string)?.trim()
-    const propertyIdParam = formData.get('property_id') as string | null
+    const nameRaw = formDataGet(formData, 'name')
+    const typeRaw = formDataGet(formData, 'type')
+    const propertyRaw = formDataGet(formData, 'property_id')
+    const nameOverride = typeof nameRaw === 'string' ? nameRaw.trim() : undefined
+    const typeParam = typeof typeRaw === 'string' ? typeRaw.trim() : undefined
+    const propertyIdParam = typeof propertyRaw === 'string' ? propertyRaw : null
     const docType = ['Contract', 'Keuring', 'Factuur', 'Verzekering', 'Overig'].includes(typeParam || '')
       ? typeParam
       : 'Overig'

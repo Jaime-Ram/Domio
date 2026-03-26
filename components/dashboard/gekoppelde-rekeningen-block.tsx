@@ -69,7 +69,7 @@ export function GekoppeldeRekeningenBlock({
 
   return (
     <div className={cn(sCard, 'overflow-hidden', className)}>
-      <div className="p-6 sm:p-8">
+      <div className="p-5 sm:p-7">
         <h2 className="text-2xl font-semibold text-[#163300] dark:text-white">Gekoppelde rekeningen</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Bankrekeningen gekoppeld voor ontvangst en betalingen

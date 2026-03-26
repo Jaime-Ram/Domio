@@ -28,7 +28,7 @@ export function SectionNavDashboard({ title, items, className, titleVariant = 'd
     .sort((a, b) => b.href.length - a.href.length)[0]?.href
 
   return (
-    <div className={cn('mb-8 pl-6', className)}>
+    <div className={cn('mb-8', className)}>
       {titleVariant === 'hero' ? (
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">

@@ -12,7 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
+  DASHBOARD_TABLE_ICON_WRAP_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
 import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
 import { LocalPdfThumbnail } from '@/components/documents/local-pdf-thumbnail'
@@ -417,14 +424,21 @@ export default function DocumentsPage() {
     return sortAsc ? ' ↑' : ' ↓'
   }
 
+  const tableBleedDocuments = viewMode === 'table'
+
   return (
     <>
       <div className="mb-8" ref={contentRef}>
         <SectionHeroHeader title="Documenten" className="mb-0" />
       </div>
 
-      <Card className={dashboardCardClass(undefined, isDemo)}>
-        <CardHeader className="space-y-3">
+      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+        <CardHeader
+          className={cn(
+            'space-y-3',
+            tableBleedDocuments && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS
+          )}
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-wrap items-center gap-3 w-full min-w-0">
               <div className="relative flex-1 min-w-[140px] max-w-[220px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
@@ -692,35 +706,38 @@ export default function DocumentsPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          {sortedDocuments.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-400 py-8 text-center">
-              {!isDemo ? 'Nog geen documenten. Klik op "Document uploaden" om te beginnen.' : 'Geen documenten in demomodus.'}
-            </p>
-          ) : viewMode === 'table' ? (
-            <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 overflow-hidden">
+        <CardContent
+          className={cn(
+            tableBleedDocuments && 'p-0 px-0 pb-0',
+            tableBleedDocuments && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
+          )}
+        >
+          {viewMode === 'table' ? (
+            <DashboardTableBlock empty={sortedDocuments.length === 0}>
               <Table className="w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('name')}>
                         Naam {getSortIcon('name')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('type')}>
                         Type {getSortIcon('type')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('date')}>
                         Datum {getSortIcon('date')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       Pand
                     </TableHead>
-                    <TableHead className="w-px py-3 pr-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead
+                      className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-px pr-4 text-right')}
+                    >
                       Acties
                     </TableHead>
                   </TableRow>
@@ -738,12 +755,17 @@ export default function DocumentsPage() {
                       >
                         <TableCell className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-neutral-800 flex items-center justify-center flex-shrink-0">
+                            <div
+                              className={cn(
+                                'h-10 w-10 rounded-lg',
+                                DASHBOARD_TABLE_ICON_WRAP_CLASS
+                              )}
+                            >
                               <DocumentTypeGlyph
                                 name={cardDoc.name}
                                 file_name={cardDoc.file_name}
                                 mime_type={cardDoc.mime_type}
-                                className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50"
+                                className="h-5 w-5 text-[#163300] dark:text-[#9FE870]"
                               />
                             </div>
                             <span className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
@@ -789,7 +811,7 @@ export default function DocumentsPage() {
                   })}
                 </TableBody>
               </Table>
-            </div>
+            </DashboardTableBlock>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">

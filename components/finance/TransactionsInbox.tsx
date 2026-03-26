@@ -17,11 +17,10 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { DashboardTableHead, DashboardTableCell } from '@/components/dashboard/dashboard-table'
 import {
   Search,
   ChevronUp,
@@ -31,11 +30,23 @@ import {
   Plus,
   Loader2,
 } from 'lucide-react'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { AssignDrawer } from './AssignDrawer'
 import { cn } from '@/lib/utils'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_DASHBOARD_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
+import type { Database } from '@/lib/supabase/types'
+
+type BankConnectionIdRow = Pick<
+  Database['public']['Tables']['bank_connections']['Row'],
+  'id'
+>
+type RawTransactionInsert = Database['public']['Tables']['raw_transactions']['Insert']
 
 export interface TransactionRow {
   id: string
@@ -126,21 +137,26 @@ async function ensureManualBankConnection(ownerId: string): Promise<string> {
     .maybeSingle()
 
   if (selErr) throw selErr
-  if (existing?.id) return existing.id
+  const existingRow = existing as BankConnectionIdRow | null
+  if (existingRow?.id) return existingRow.id
+
+  const insertPayload: Database['public']['Tables']['bank_connections']['Insert'] = {
+    owner_id: ownerId,
+    provider: 'manual',
+    access_token: '',
+    refresh_token: null,
+  }
 
   const { data: inserted, error: insErr } = await supabase
     .from('bank_connections')
-    .insert({
-      owner_id: ownerId,
-      provider: 'manual',
-      access_token: '',
-      refresh_token: null,
-    } as never)
+    .insert(insertPayload as never)
     .select('id')
     .single()
 
   if (insErr) throw insErr
-  return (inserted as { id: string }).id
+  const insertedRow = inserted as BankConnectionIdRow | null
+  if (!insertedRow?.id) throw new Error('Kon handmatige bankkoppeling niet aanmaken')
+  return insertedRow.id
 }
 
 export function TransactionsInbox({
@@ -192,7 +208,7 @@ export function TransactionsInbox({
     try {
       const connId = await ensureManualBankConnection(user.id)
       const externalId = `manual-${crypto.randomUUID()}`
-      const { error } = await supabase.from('raw_transactions').insert({
+      const row: RawTransactionInsert = {
         owner_id: user.id,
         bank_connection_id: connId,
         external_id: externalId,
@@ -202,7 +218,8 @@ export function TransactionsInbox({
         sender_name: addForm.sender_name.trim() || null,
         sender_iban: addForm.sender_iban.trim() || null,
         description: addForm.description.trim() || null,
-      } as never)
+      }
+      const { error } = await supabase.from('raw_transactions').insert(row as never)
       if (error) throw error
       setAddOpen(false)
       resetAddForm()
@@ -356,9 +373,7 @@ export function TransactionsInbox({
     })
   }
 
-  return (
-    <Card className={dashboardCardClass()}>
-      <CardHeader className="space-y-3">
+  const transactionsToolbar = (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           {/* Segment tabs with sliding underline */}
           <div
@@ -416,83 +431,81 @@ export function TransactionsInbox({
             </Button>
           </div>
         </div>
-      </CardHeader>
+  )
 
-      <CardContent>
-        <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 overflow-hidden">
+  return (
+    <Card className={cn(dashboardCardClass(), 'overflow-hidden')}>
+      <CardHeader className={DASHBOARD_TABLE_TOOLBAR_HEADER_DASHBOARD_CLASS}>
+        {transactionsToolbar}
+      </CardHeader>
+      <CardContent className={cn('p-0 px-0 pb-0', DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
+        <DashboardTableBlock empty={sortedTransactions.length === 0}>
           <Table className="w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <DashboardTableHead>
                   <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('date')}>
                     <span>Datum</span>
                     {getSortIcon('date')}
                   </button>
-                </TableHead>
-                <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                </DashboardTableHead>
+                <DashboardTableHead>
                   <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('amount')}>
                     <span>Bedrag</span>
                     {getSortIcon('amount')}
                   </button>
-                </TableHead>
-                <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                </DashboardTableHead>
+                <DashboardTableHead>
                   <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('sender')}>
                     <span>Afzender</span>
                     {getSortIcon('sender')}
                   </button>
-                </TableHead>
-                <TableHead className="hidden lg:table-cell py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                </DashboardTableHead>
+                <DashboardTableHead className="hidden lg:table-cell">
                   IBAN
-                </TableHead>
-                <TableHead className="hidden md:table-cell py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                </DashboardTableHead>
+                <DashboardTableHead className="hidden md:table-cell">
                   Omschrijving
-                </TableHead>
-                <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                </DashboardTableHead>
+                <DashboardTableHead>
                   <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
                     <span>Status</span>
                     {getSortIcon('status')}
                   </button>
-                </TableHead>
-                <TableHead className="w-px py-3" />
+                </DashboardTableHead>
+                <DashboardTableHead className="w-px p-0" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedTransactions.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-gray-500 dark:text-gray-400">
-                    Geen transacties gevonden
-                  </TableCell>
-                </TableRow>
-              )}
               {sortedTransactions.map((tx) => (
                 <TableRow key={tx.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                  <TableCell className="whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <DashboardTableCell className="whitespace-nowrap text-gray-900 dark:text-white">
                     {formatDate(tx.value_date)}
-                  </TableCell>
-                  <TableCell>
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <div className="flex items-center gap-1 text-sm">
                       <Euro className="h-4 w-4 text-gray-400" />
                       <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
                         {formatAmount(tx.amount)}
                       </span>
                     </div>
-                  </TableCell>
-                  <TableCell className="max-w-[160px]">
+                  </DashboardTableCell>
+                  <DashboardTableCell className="max-w-[160px]">
                     <span className="text-sm text-gray-900 dark:text-white truncate block">
                       {tx.sender_name || '—'}
                     </span>
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell">
+                  </DashboardTableCell>
+                  <DashboardTableCell className="hidden lg:table-cell">
                     <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
                       {tx.sender_iban || '—'}
                     </span>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell max-w-[200px]">
+                  </DashboardTableCell>
+                  <DashboardTableCell className="hidden md:table-cell max-w-[200px]">
                     <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">
                       {tx.description || '—'}
                     </span>
-                  </TableCell>
-                  <TableCell>
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     {tx.assignment ? (
                       tx.assignment.category && tx.assignment.category !== 'huur' ? (
                         <Badge
@@ -516,8 +529,8 @@ export function TransactionsInbox({
                         Niet toegewezen
                       </Badge>
                     )}
-                  </TableCell>
-                  <TableCell className="w-px text-right pr-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell className="w-px text-right pr-6">
                     {tx.assignment ? (
                       <Button
                         size="sm"
@@ -537,12 +550,12 @@ export function TransactionsInbox({
                         Toewijzen
                       </Button>
                     )}
-                  </TableCell>
+                  </DashboardTableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        </DashboardTableBlock>
       </CardContent>
 
       {/* Assign drawer */}

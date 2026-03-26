@@ -11,6 +11,7 @@ import { Logo } from '@/components/Logo'
 import { DashboardUserProvider, useDashboardUser } from '@/providers/dashboard-user-provider'
 import { usePathname } from 'next/navigation'
 import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
+import { DASHBOARD_PAGE_GUTTER_CLASS } from '@/app/dashboard/employer/dashboard-ui'
 
 function Require2FaRedirect() {
   const { profile, isDemo, loading } = useDashboardUser()
@@ -170,7 +171,9 @@ function EmployerLayoutInner({
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 py-4 sm:py-6 lg:py-10 pb-16 flex flex-col gap-content-blocks h-full min-h-0">
-              {children}
+              <div className={cn('flex min-h-0 flex-1 flex-col gap-content-blocks', DASHBOARD_PAGE_GUTTER_CLASS)}>
+                {children}
+              </div>
               {!pathname.includes('/messages') && (
                 <div className="flex justify-center items-center mt-16 pt-8">
                   <Logo

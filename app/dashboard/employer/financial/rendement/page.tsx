@@ -14,7 +14,7 @@ export default function RendementRedirectPage() {
   }, [router, basePath])
 
   return (
-    <div className="flex min-h-[120px] items-center justify-center pl-6">
+    <div className="flex min-h-[120px] items-center justify-center">
       <p className="text-sm text-gray-500">Bezig met doorsturen…</p>
     </div>
   )

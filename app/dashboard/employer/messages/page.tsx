@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { cn } from '@/lib/utils'
 import { documentQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
 
 type MentionItem = {
@@ -491,7 +492,7 @@ export default function MessagesPage() {
     <div className="flex flex-col h-full flex-1 min-h-0 overflow-hidden">
       <SectionHeroHeader title="Communicatie" className="mb-0" />
 
-      <div className="flex-1 mt-4 flex gap-4 min-h-0 overflow-hidden pl-6">
+      <div className="mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden">
         {/* Linkerblok: type + lijst in één witte kaart */}
         <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col min-h-0 h-full">
           <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-
 const CARD_CLASS = 'rounded-card border-[0.5px] border-gray-200 dark:border-neutral-700 shadow-none bg-white dark:bg-neutral-900'
 
 export default function EmployerDashboardPage() {
@@ -40,14 +39,14 @@ export default function EmployerDashboardPage() {
   // Tijdens laden: geen mockdata of placeholder tonen, voorkomt flash van verkeerde content
   if (loading) {
     return (
-      <div className="space-y-8 pl-6">
+      <div className="space-y-8">
         <div>
           <div className="h-8 w-48 rounded-block bg-gray-200 dark:bg-neutral-700 animate-pulse mb-2" />
           <div className="h-4 w-64 rounded-block bg-gray-100 dark:bg-neutral-800 animate-pulse" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-content-blocks">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className={cn(CARD_CLASS, 'p-5')}>
+            <div key={i} className={cn(CARD_CLASS, 'p-6')}>
               <div className="h-12 w-12 rounded-block bg-gray-200 dark:bg-neutral-700 animate-pulse mb-3" />
               <div className="h-6 w-24 rounded-block bg-gray-200 dark:bg-neutral-700 animate-pulse mb-2" />
               <div className="h-4 w-16 rounded-block bg-gray-100 dark:bg-neutral-800 animate-pulse" />
@@ -55,7 +54,7 @@ export default function EmployerDashboardPage() {
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-content-blocks">
-          <div className={cn(CARD_CLASS, 'p-5 h-64')}>
+          <div className={cn(CARD_CLASS, 'p-6 h-64')}>
             <div className="h-5 w-32 rounded-block bg-gray-200 dark:bg-neutral-700 animate-pulse mb-4" />
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -63,7 +62,7 @@ export default function EmployerDashboardPage() {
               ))}
             </div>
           </div>
-          <div className={cn(CARD_CLASS, 'p-5 h-64')}>
+          <div className={cn(CARD_CLASS, 'p-6 h-64')}>
             <div className="h-5 w-40 rounded-block bg-gray-200 dark:bg-neutral-700 animate-pulse mb-4" />
             <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-neutral-800 animate-pulse mx-auto" />
           </div>
@@ -75,7 +74,7 @@ export default function EmployerDashboardPage() {
   if (isBlank) {
     return (
       <>
-        <div className="mb-8 pl-6">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
             {greeting}, {firstName}
           </h1>
@@ -109,7 +108,7 @@ export default function EmployerDashboardPage() {
   return (
     <>
       {/* Welkomstbanner */}
-      <div className="mb-8 pl-6">
+      <div className="mb-8">
         <div className="flex flex-wrap items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
             {greeting}, {firstName}

@@ -3,19 +3,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 
 export default function RestaurantPage() {
   const { isDemo } = useDashboardUser()
   return (
-    <div className="w-full max-w-7xl mx-auto pl-6">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
-          Restaurant Beheer
-        </h1>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-          Beheer je restaurant operaties
-        </p>
-      </div>
+    <div className="w-full space-y-content-blocks">
+      <SectionHeroHeader
+        title="Restaurant Beheer"
+        description="Beheer je restaurant operaties"
+      />
 
       <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>

@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { vveData, vveMjop } from '@/lib/mock-data/domio-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { Home, Users, Euro, Calendar, ClipboardList } from 'lucide-react'
-
 export default function VvEPage() {
   const { isDemo } = useDashboardUser()
   const data = isDemo ? vveData : { name: 'Geen VvE', address: '—', units: 0, reserveFund: 0, targetReserve: 0, monthlyContributionPerUnit: 0 }
@@ -14,7 +13,7 @@ export default function VvEPage() {
   const reservePercent = data.targetReserve > 0 ? Math.min(100, (data.reserveFund / data.targetReserve) * 100) : 0
 
   return (
-    <div className="space-y-content-blocks pl-6">
+    <div className="space-y-content-blocks">
       <div>
         <h1 className="text-2xl font-semibold text-[#163300] dark:text-[#9FE870]">{data.name}</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">{data.address}</p>

@@ -24,3 +24,23 @@ Voorbeeld:
 ```
 
 Navigatie (bijv. pill-tabs) mag wel iconen gebruiken. Deze regel gaat alleen over de titel van een contentblok/sectie.
+
+## Tokens & hergebruik (`app/dashboard/employer/dashboard-ui.ts`)
+
+- **`DASHBOARD_SURFACE_PADDING`** = `p-5` — binnen MetricCard / tegels; iets strakker dan vroeger `p-6`.
+- **`DASHBOARD_PAGE_GUTTER_CLASS`** = `pl-5` — **één keer** in `app/dashboard/employer/layout.tsx` om alle pagina-inhoud (titel, pills, KPI-grid, kaarten). **Geen** extra `pl-*` op `SectionNavDashboard`, `SectionHeroHeader` of losse headers — dat gaf “trapjes” (titel vs. kaarten verschoven).
+- **`DASHBOARD_PAGE_TITLE_INSET`** — alias van gutter; niet opnieuw op componenten zetten.
+- **`DASHBOARD_TABLE_HEADER_TINT_CLASS`** — lichtgrijs (`gray-100` / dark `neutral-800/90`); zelfde tint als **`DASHBOARD_TABLE_BLOCK_CLASS`**-schil.
+- **`DASHBOARD_TABLE_HEAD_CLASS`** — `DashboardTableHead` (`px-5`); groene accenttekst (`#163300` / dark `#9FE870`).
+- **`DASHBOARD_TABLE_HEAD_SHADCN_CLASS`** — shadcn `TableHead` (`px-4`); kolomtitels zelfde kleur als hierboven.
+- **`DASHBOARD_TABLE_CELL_CLASS`** — gebruik **`DashboardTableHead` / `DashboardTableCell`** uit `components/dashboard/dashboard-table.tsx` i.p.v. losse `px-*` op elke cel.
+- **`DASHBOARD_TABLE_FRAME_*`** — optioneel één blok voor toolbar + tabel (legacy).
+- **`DASHBOARD_TABLE_BLOCK_CLASS`** + **`DashboardTableBlock`** — **lichtgrijs** buitenblok (`gray-100` / dark `neutral-800/90`); `tbody` = één wit (light) / neutral-900 (dark) vlak; hover grijs per rij. Prop **`empty`** (`TableBody` zonder rijen): **`DASHBOARD_TABLE_BLOCK_EMPTY_MODIFIER_CLASS`** — geen wit datavlak; geen leegstaattekst/CTA-rij in de tabel (later uitbreidbaar).
+- **`DASHBOARD_TABLE_SHELL_*`** — nog beschikbaar; voorkeur: `DashboardTableBlock` + `CardHeader`.
+- **`DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS`** — `CardHeader` boven shadcn-tabel: `p-0 px-3.5 pt-5 pb-2.5` + `space-y-3`.
+- **`DASHBOARD_TABLE_TOOLBAR_HEADER_DASHBOARD_CLASS`** — zelfde idee met `px-5` voor dashboard-kaarten met `DashboardTableHead`/`Cell`.
+- **`DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS`** — `pt-2` op `CardContent` onder de toolbar (tussen controls en tabel; midden tussen te strak en oude `pt-3`).
+- **`DASHBOARD_TABLE_HEADER_PAD_MATCH_SHADCN`** — deprecated; gebruik de toolbar-header-classes hierboven.
+- **`dashboardCardClass()`** — shell-kaarten: `rounded-card border-0` (zelfde hoekradius als overige Domio-kaarten).
+
+Geen globale `!important` op Card-padding meer. Horizontale uitlijning: layout-gutter + kaart-padding (`p-5` op shadcn `CardHeader`/`CardContent`), geen dubbele geneste gutter-lagen.

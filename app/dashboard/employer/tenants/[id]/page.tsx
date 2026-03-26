@@ -3,18 +3,23 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_DASHBOARD_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { DashboardTableHead, DashboardTableCell } from '@/components/dashboard/dashboard-table'
 import { Textarea } from '@/components/ui/textarea'
 import { 
   ArrowLeft,
@@ -308,8 +313,8 @@ export default function TenantDetailPage() {
 
               {/* Tab 2: Betalingen */}
               <TabsContent value="payments">
-                <Card className={dashboardCardClass(undefined, isDemo)}>
-                  <CardHeader>
+                <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+                  <CardHeader className="space-y-0 px-5 pt-5 pb-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle>Betalingshistorie</CardTitle>
@@ -324,42 +329,45 @@ export default function TenantDetailPage() {
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className={cn('p-0 px-0 pb-0', DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
                     {/* Totale achterstand */}
                     {totalArrears > 0 && (
-                      <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <AlertCircle className="h-5 w-5 text-red-600" />
-                          <p className="font-semibold text-red-900 dark:text-red-400">Totale achterstand</p>
+                      <div className="px-6 pb-4">
+                        <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle className="h-5 w-5 text-red-600" />
+                            <p className="font-semibold text-red-900 dark:text-red-400">Totale achterstand</p>
+                          </div>
+                          <p className="text-2xl font-bold text-red-900 dark:text-red-400">
+                            €{totalArrears.toLocaleString('nl-NL')}
+                          </p>
                         </div>
-                        <p className="text-2xl font-bold text-red-900 dark:text-red-400">
-                          €{totalArrears.toLocaleString('nl-NL')}
-                        </p>
                       </div>
                     )}
 
-                    {/* Betalingen tabel */}
+                    {/* Betalingen tabel — tegen kaartrand, geen dubbele CardContent-marge */}
+                    <DashboardTableBlock empty={paymentHistory.length === 0}>
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-gray-50 dark:bg-neutral-800">
-                          <TableHead>Periode</TableHead>
-                          <TableHead>Bedrag</TableHead>
-                          <TableHead>Betaald op</TableHead>
-                          <TableHead>Status</TableHead>
+                        <TableRow>
+                          <DashboardTableHead>Periode</DashboardTableHead>
+                          <DashboardTableHead>Bedrag</DashboardTableHead>
+                          <DashboardTableHead>Betaald op</DashboardTableHead>
+                          <DashboardTableHead>Status</DashboardTableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {paymentHistory.map((payment) => (
                           <TableRow key={payment.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                            <TableCell>
+                            <DashboardTableCell>
                               <p className="font-medium text-gray-900 dark:text-white">{payment.month}</p>
-                            </TableCell>
-                            <TableCell>
+                            </DashboardTableCell>
+                            <DashboardTableCell>
                               <p className="font-medium text-gray-900 dark:text-white">
                                 €{payment.amount.toLocaleString('nl-NL')}
                               </p>
-                            </TableCell>
-                            <TableCell>
+                            </DashboardTableCell>
+                            <DashboardTableCell>
                               {payment.paidOn ? (
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                   {new Date(payment.paidOn).toLocaleDateString('nl-NL')}
@@ -367,17 +375,18 @@ export default function TenantDetailPage() {
                               ) : (
                                 <p className="text-sm text-gray-400">-</p>
                               )}
-                            </TableCell>
-                            <TableCell>
+                            </DashboardTableCell>
+                            <DashboardTableCell>
                               <div className="flex items-center gap-2">
                                 {getStatusIcon(payment.status)}
                                 {getStatusBadge(payment.status)}
                               </div>
-                            </TableCell>
+                            </DashboardTableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                    </DashboardTableBlock>
                   </CardContent>
                 </Card>
               </TabsContent>

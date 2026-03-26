@@ -62,7 +62,14 @@ import { mockMaintenanceRequests } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
+  DASHBOARD_TABLE_ICON_WRAP_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { ticketQueries } from '@/lib/supabase/queries'
 import { cn } from '@/lib/utils'
@@ -361,12 +368,19 @@ export default function MaintenancePage() {
     </div>
   )
 
+  const tableBleedTickets = !loading && viewMode === 'table'
+
   return (
     <>
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
-      <Card className={dashboardCardClass(undefined, isDemo)}>
-        <CardHeader className="space-y-3">
+      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+        <CardHeader
+          className={cn(
+            'space-y-3',
+            tableBleedTickets && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS
+          )}
+        >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <CardTitle className="text-lg text-[#163300] dark:text-[#9FE870]">Tickets</CardTitle>
@@ -459,35 +473,20 @@ export default function MaintenancePage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent
+          className={cn(
+            tableBleedTickets && 'p-0 px-0 pb-0',
+            tableBleedTickets && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
+          )}
+        >
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="h-36 bg-gray-200 dark:bg-neutral-700 rounded-block animate-pulse" />
               ))}
             </div>
-          ) : tickets.length === 0 ? (
-            <div className="py-12 text-center">
-              <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Nog geen tickets</p>
-              <Button
-                type="button"
-                onClick={() => {
-                  resetCreateForm()
-                  setCreateOpen(true)
-                }}
-                className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Eerste ticket aanmaken
-              </Button>
-            </div>
-          ) : sortedTickets.length === 0 ? (
-            <div className="py-12 text-center">
-              <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">Geen tickets voor deze filters of zoekopdracht.</p>
-            </div>
           ) : viewMode === 'grid' ? (
+            sortedTickets.length === 0 ? null : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {sortedTickets.map((t) => (
                 <Card
@@ -500,8 +499,8 @@ export default function MaintenancePage() {
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-lg bg-gray-200 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                        <Ticket className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50" />
+                      <div className={cn('h-10 w-10 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
+                        <Ticket className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <CardTitle className="text-base font-semibold text-[#163300] dark:text-[#9FE870] line-clamp-2">
@@ -527,30 +526,31 @@ export default function MaintenancePage() {
                 </Card>
               ))}
             </div>
+            )
           ) : (
-            <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 overflow-hidden">
+            <DashboardTableBlock empty={sortedTickets.length === 0}>
               <Table className="w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('title')}>
                         <span>Titel</span>
                         {getSortIcon('title')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
                         <span>Status</span>
                         {getSortIcon('status')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('priority')}>
                         <span>Prioriteit</span>
                         {getSortIcon('priority')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                       <button
                         type="button"
                         className="inline-flex items-center gap-1"
@@ -560,7 +560,7 @@ export default function MaintenancePage() {
                         {getSortIcon('created_at')}
                       </button>
                     </TableHead>
-                    <TableHead className="py-3 px-4 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>
                       Acties
                     </TableHead>
                   </TableRow>
@@ -574,8 +574,13 @@ export default function MaintenancePage() {
                       >
                         <TableCell className="py-4 px-4">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="relative w-10 h-10 rounded-lg bg-gray-200 dark:bg-neutral-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                              <Ticket className="h-5 w-5 text-[#163300]/50 dark:text-[#9FE870]/50" />
+                            <div
+                              className={cn(
+                                'relative h-10 w-10 rounded-lg overflow-hidden',
+                                DASHBOARD_TABLE_ICON_WRAP_CLASS
+                              )}
+                            >
+                              <Ticket className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
                             </div>
                             <div className="min-w-0">
                               <div className="font-medium text-gray-900 dark:text-white line-clamp-2">{t.title}</div>
@@ -600,7 +605,7 @@ export default function MaintenancePage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
+            </DashboardTableBlock>
           )}
         </CardContent>
       </Card>

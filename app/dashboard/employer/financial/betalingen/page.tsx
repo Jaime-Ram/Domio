@@ -118,7 +118,6 @@ export default function TransactiesPage() {
     <div className="space-y-content-blocks">
       <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
 
-      <div className="pl-6">
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
@@ -130,7 +129,6 @@ export default function TransactiesPage() {
           onRefresh={fetchData}
         />
       )}
-      </div>
     </div>
   )
 }

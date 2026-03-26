@@ -87,7 +87,8 @@ interface PageData {
 }
 
 // Shared grid for unit rows and timeline rows
-const UNIT_GRID = 'grid grid-cols-[20px_14px_64px_1fr_100px_112px_100px_120px] gap-2 items-center px-4'
+/** Geen eigen px: rijen zitten in nested card binnen CardContent (die al px-6 heeft). Extra px hier = tabel visueel “terug” naar rechts. */
+const UNIT_GRID = 'grid grid-cols-[20px_14px_64px_1fr_100px_112px_100px_120px] gap-2 items-center'
 
 // --- Helpers ---
 
@@ -894,7 +895,7 @@ export default function AchterstandenPage() {
           type="button"
           onClick={() => toggleProperty(prop.property_id)}
           className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 transition-colors text-left',
+            'w-full flex items-center gap-3 px-0 py-3 transition-colors text-left',
             variant === 'issue'
               ? 'bg-amber-50/60 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20'
               : 'bg-gray-50 dark:bg-neutral-800/50 hover:bg-gray-100 dark:hover:bg-neutral-800'
@@ -941,7 +942,6 @@ export default function AchterstandenPage() {
     <div className="space-y-content-blocks">
       <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
 
-      <div className="pl-6">
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
@@ -953,7 +953,7 @@ export default function AchterstandenPage() {
             <MetricCard
               label="Totaal achterstallig"
               value={formatEur(data.totalOverdue)}
-              icon={<CurrencyEuroCircle className="h-5 w-5" />}
+              icon={<CurrencyEuroCircle />}
               accent="red"
             />
             <MetricCard
@@ -967,7 +967,7 @@ export default function AchterstandenPage() {
               label="Afgehandeld"
               value={String(data.paidCount + data.settledCount + data.ignoredCount)}
               subtitle={`${data.paidCount} betaald · ${data.settledCount} voldaan · ${data.ignoredCount} genegeerd`}
-              icon={<CheckCircle className="h-5 w-5" />}
+              icon={<CheckCircle />}
               accent="green"
             />
           </div>
@@ -1030,7 +1030,6 @@ export default function AchterstandenPage() {
           )}
         </div>
       ) : null}
-      </div>
 
       {/* Floating bulk action bar */}
       {hasSelection && (

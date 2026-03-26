@@ -13,18 +13,13 @@ import {
   Tag,
   CalendarClock,
 } from 'lucide-react'
-import {
-  CoinsStacked01,
-  BarChart01,
-  CalendarCheck01,
-  LinkBroken01,
-  CheckCircle as UCheckCircle,
-} from '@untitledui/icons'
+import { CoinsStacked01, BarChart01, CalendarCheck01 } from '@untitledui/icons'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { MetricCard } from '@/components/finance/MetricCard'
+import { AddPaymentTile } from '@/components/finance/add-payment-tile'
 
 const getFinancialNav = (basePath: string) => [
   { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
@@ -263,7 +258,6 @@ export default function FinancialPage() {
     <div className="space-y-content-blocks">
       <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
 
-      <div className="pl-6">
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
@@ -271,34 +265,25 @@ export default function FinancialPage() {
       ) : data ? (
         <div className="space-y-6">
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               label="Totaal ontvangen"
               value={formatEur(data.totalReceived)}
-              icon={<CoinsStacked01 className="h-5 w-5" />}
-              accent="green"
+              icon={<CoinsStacked01 />}
             />
             <MetricCard
               label="Ontvangen deze maand"
               value={formatEur(data.receivedThisMonth)}
-              icon={<BarChart01 className="h-5 w-5" />}
-              accent="green"
+              icon={<BarChart01 />}
             />
             <MetricCard
               label="Verwacht deze maand"
               value={formatEur(data.expectedThisMonth)}
-              icon={<CalendarCheck01 className="h-5 w-5" />}
-              variant="bright-green"
+              icon={<CalendarCheck01 />}
             />
-            <MetricCard
-              label="Niet gekoppeld"
-              value={String(data.unmatchedCount)}
-              subtitle="transacties"
-              icon={data.unmatchedCount > 0
-                ? <LinkBroken01 className="h-5 w-5" />
-                : <UCheckCircle className="h-5 w-5" />
-              }
-              accent={data.unmatchedCount > 0 ? 'amber' : 'green'}
+            <AddPaymentTile
+              className="h-full min-h-[160px]"
+              onClick={() => router.push(betalingenUrl)}
             />
           </div>
 
@@ -352,7 +337,6 @@ export default function FinancialPage() {
             </Card>
         </div>
       ) : null}
-      </div>
     </div>
   )
 }

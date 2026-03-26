@@ -455,6 +455,50 @@ export interface Database {
           updated_at?: string
         }
       }
+      raw_transactions: {
+        Row: {
+          id: string
+          owner_id: string
+          bank_connection_id: string
+          external_id: string
+          value_date: string | null
+          amount: number
+          currency: string
+          sender_iban: string | null
+          sender_name: string | null
+          description: string | null
+          raw_data: Json | null
+          imported_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          bank_connection_id: string
+          external_id: string
+          value_date?: string | null
+          amount: number
+          currency?: string
+          sender_iban?: string | null
+          sender_name?: string | null
+          description?: string | null
+          raw_data?: Json | null
+          imported_at?: string
+        }
+        Update: {
+          id?: string
+          owner_id?: string
+          bank_connection_id?: string
+          external_id?: string
+          value_date?: string | null
+          amount?: number
+          currency?: string
+          sender_iban?: string | null
+          sender_name?: string | null
+          description?: string | null
+          raw_data?: Json | null
+          imported_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

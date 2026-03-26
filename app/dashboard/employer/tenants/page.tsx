@@ -46,7 +46,14 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
+  DASHBOARD_TABLE_ICON_WRAP_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 
 type TenantRow = {
@@ -281,19 +288,14 @@ export default function TenantsPage() {
     return (
       <>
         <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
-        <div className="pl-6 flex items-center justify-center min-h-[200px]">
+        <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
       </>
     )
   }
 
-  return (
-    <>
-            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
-            <div className="pl-6">
-            <Card className={dashboardCardClass(undefined, isDemo)}>
-              <CardHeader className="space-y-3">
+  const tenantsToolbar = (
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   {/* Tabs: aankomend, huidig, oud (Wise-stijl met schuivende underline) */}
                   <div
@@ -476,14 +478,25 @@ export default function TenantsPage() {
                     </Button>
                   </div>
                 </div>
+  )
+
+  return (
+    <>
+            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
+            <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+              {viewMode === 'table' ? (
+                <>
+              <CardHeader
+                className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}
+              >
+                    {tenantsToolbar}
               </CardHeader>
-              <CardContent>
-                {viewMode === 'table' ? (
-                  <div className="rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 overflow-hidden">
+              <CardContent className={cn('p-0 px-0 pb-0', DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
+                    <DashboardTableBlock empty={sortedTenants.length === 0}>
                     <Table className="w-full">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                           <button
                             type="button"
                             className="inline-flex items-center gap-1"
@@ -493,10 +506,10 @@ export default function TenantsPage() {
                             {getSortIcon('name')}
                           </button>
                         </TableHead>
-                        <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                           Telefoon
                         </TableHead>
-                        <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                           <button
                             type="button"
                             className="inline-flex items-center gap-1"
@@ -506,7 +519,7 @@ export default function TenantsPage() {
                             {getSortIcon('property')}
                           </button>
                         </TableHead>
-                        <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                           <button
                             type="button"
                             className="inline-flex items-center gap-1"
@@ -516,7 +529,7 @@ export default function TenantsPage() {
                             {getSortIcon('rent')}
                           </button>
                         </TableHead>
-                        <TableHead className="py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
                           <button
                             type="button"
                             className="inline-flex items-center gap-1"
@@ -526,8 +539,11 @@ export default function TenantsPage() {
                             {getSortIcon('status')}
                           </button>
                         </TableHead>
-                        <TableHead className="w-px py-3 text-center">
-                          <span className="inline-flex items-center justify-center text-gray-500 dark:text-gray-400" title="Details">
+                        <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-px text-center')}>
+                          <span
+                            className="inline-flex items-center justify-center text-[#163300]/70 dark:text-[#9FE870]/70"
+                            title="Details"
+                          >
                             <Info className="h-4 w-4" />
                           </span>
                         </TableHead>
@@ -539,7 +555,7 @@ export default function TenantsPage() {
                         <TableRow className="hover:bg-gray-50 dark:hover:bg-neutral-800">
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-[#163300]/10 dark:bg-[#9FE870]/20 flex items-center justify-center">
+                              <div className={cn('h-10 w-10 rounded-full', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
                                 <Users className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
                               </div>
                               <div className="space-y-0.5">
@@ -638,8 +654,15 @@ export default function TenantsPage() {
                       ))}
                     </TableBody>
                     </Table>
-                  </div>
+                    </DashboardTableBlock>
+              </CardContent>
+                </>
                 ) : (
+                  <>
+              <CardHeader className="space-y-3">
+                {tenantsToolbar}
+              </CardHeader>
+              <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {sortedTenants.map((tenant) => (
                       <Card
@@ -648,7 +671,7 @@ export default function TenantsPage() {
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[#163300]/10 dark:bg-[#9FE870]/20 flex items-center justify-center">
+                            <div className={cn('h-10 w-10 rounded-full', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
                               <Users className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -696,10 +719,10 @@ export default function TenantsPage() {
                       </Card>
                     ))}
                   </div>
-                )}
               </CardContent>
+                  </>
+                )}
             </Card>
-            </div>
     </>
   )
 }

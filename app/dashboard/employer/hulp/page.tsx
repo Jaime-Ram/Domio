@@ -56,7 +56,7 @@ export default function DashboardHulpPage() {
 
         <a
           href={`tel:${PHONE.replace(/\s/g, '')}`}
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
+          className={dashboardCardClass('group flex flex-col p-5 md:p-7 transition-all')}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
@@ -76,7 +76,7 @@ export default function DashboardHulpPage() {
 
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
+          className={dashboardCardClass('group flex flex-col p-5 md:p-7 transition-all')}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">
@@ -96,7 +96,7 @@ export default function DashboardHulpPage() {
 
         <Link
           href="/faq"
-          className={dashboardCardClass('group flex flex-col p-6 md:p-8 transition-all')}
+          className={dashboardCardClass('group flex flex-col p-5 md:p-7 transition-all')}
         >
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]">

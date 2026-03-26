@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
@@ -137,16 +138,11 @@ export default function AccountingPage() {
   const availableIntegrations = integrations.filter(i => !i.isConnected)
 
   return (
-    <div className="pl-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
-          Boekhouden
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Beheer je boekhouding zelf of koppel met een bestaand boekhoudprogramma
-        </p>
-      </div>
+    <div className="space-y-content-blocks">
+      <SectionHeroHeader
+        title="Boekhouden"
+        description="Beheer je boekhouding zelf of koppel met een bestaand boekhoudprogramma"
+      />
 
       {/* Eigen Boekhouding Section */}
       <Card className={dashboardCardClass('mb-8', isDemo)}>
