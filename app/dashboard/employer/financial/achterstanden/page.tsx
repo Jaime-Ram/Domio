@@ -5,10 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  TrendingUp,
-  CreditCard,
-  LayoutDashboard,
-  CalendarClock,
   ChevronDown,
   ChevronRight,
   Building2,
@@ -33,15 +29,9 @@ import { supabase } from '@/lib/supabase/client'
 import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
-import { MetricCard } from '@/components/finance/MetricCard'
 import { cn } from '@/lib/utils'
 
-const getFinancialNav = (basePath: string) => [
-  { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-  { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
-  { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-  { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
-]
+import { getFinancialNav } from '../nav'
 
 // --- Types ---
 
@@ -959,30 +949,6 @@ export default function AchterstandenPage() {
         </div>
       ) : data ? (
         <div className="space-y-6">
-          {/* Section 1 — Metric cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <MetricCard
-              label="Totaal achterstallig"
-              value={formatEur(data.totalOverdue)}
-              icon={<CurrencyEuroCircle className="h-5 w-5" />}
-              accent="red"
-            />
-            <MetricCard
-              label="Huurders met achterstand"
-              value={String(data.tenantCount)}
-              subtitle={data.tenantCount === 1 ? 'huurder' : 'huurders'}
-              icon={<Users01 className="h-5 w-5" />}
-              accent="amber"
-            />
-            <MetricCard
-              label="Afgehandeld"
-              value={String(data.paidCount + data.settledCount + data.ignoredCount)}
-              subtitle={`${data.paidCount} betaald · ${data.settledCount} voldaan · ${data.ignoredCount} genegeerd`}
-              icon={<CheckCircle className="h-5 w-5" />}
-              accent="green"
-            />
-          </div>
-
           {/* Section 2 — Actie vereist */}
           <Card className={dashboardCardClass()}>
             <CardContent className="pt-5 pb-5">

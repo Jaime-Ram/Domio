@@ -10,10 +10,10 @@ import {
   Users,
   FileText,
   Wrench,
-  CreditCard,
   Receipt,
   Calculator,
-  TrendingUp,
+  ArrowLeftRight,
+  Percent,
   FileCheck,
   Eye,
   Settings,
@@ -43,7 +43,6 @@ import {
   HardDrive,
   HelpCircle,
   Ticket,
-  CalendarClock
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -146,9 +145,9 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       icon: Euro,
       children: [
         { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-        { label: 'Rendement', href: `${basePath}/financial/rendement`, icon: TrendingUp },
-        { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-        { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
+        { label: 'Geldstromen', href: `${basePath}/financial/geldstromen`, icon: ArrowLeftRight },
+        { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
+        { label: 'Koppelingen', href: `${basePath}/financial/koppelingen`, icon: Link2 },
       ],
     },
     {
