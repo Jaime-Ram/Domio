@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
     },
   })
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
   const isDemo = request.cookies.get('domio_demo')?.value === '1'
@@ -37,8 +37,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/demo/app', request.url))
   }
 
-  if (isDashboard && !session && !isDemo) {
+  if (isDashboard && !user && !isDemo) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Enforce TOTP AAL2 on dashboard
+  if (isDashboard && user && !isDemo) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
   }
 
   return response

@@ -28,8 +28,8 @@ export default function ResetPasswordPage() {
     let cancelled = false
     const check = async () => {
       for (let i = 0; i < 5; i++) {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
           if (!cancelled) setCheckingSession(false)
           return
         }

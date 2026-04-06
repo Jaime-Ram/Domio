@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { KeyRound } from 'lucide-react'
-import { signIn, signInWithGoogle, signInWithMicrosoft } from '@/lib/supabase/auth'
+import { KeyRound, ArrowLeft } from 'lucide-react'
+import { signIn, signInWithGoogle, signInWithMicrosoft, getMfaAssuranceLevel, listMfaFactors, verifyMfa, getUser } from '@/lib/supabase/auth'
 import { translateAuthError } from '@/lib/auth-errors'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
+
+type Step = 'login' | 'totp' | 'email-2fa'
 
 function LoginContent() {
   const router = useRouter()
@@ -23,16 +25,73 @@ function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [transitioning, setTransitioning] = useState(false)
+  const [step, setStep] = useState<Step>('login')
 
-  // Toon fout van auth callback (o.a. OAuth)
+  // TOTP
+  const [totpFactorId, setTotpFactorId] = useState('')
+  const [totpCode, setTotpCode] = useState('')
+
+  // Email 2FA
+  const [emailCode, setEmailCode] = useState('')
+  const [sending, setSending] = useState(false)
+
   useEffect(() => {
     const err = searchParams.get('error')
     if (err) setError(translateAuthError(decodeURIComponent(err)))
   }, [searchParams])
 
+  // If arriving with an existing session (e.g. redirected from dashboard), detect 2FA needs
+  useEffect(() => {
+    async function checkExistingSession() {
+      const { user } = await getUser()
+      if (!user) return
+
+      // Check preferred 2FA method from profile first
+      const hasCookie = typeof document !== 'undefined' && document.cookie.includes('two_fa_verified=1')
+      if (!hasCookie) {
+        const res = await fetch('/api/auth/2fa/required')
+        const data = await res.json().catch(() => ({}))
+        if (data.required && data.method === 'email') {
+          setStep('email-2fa')
+          sendEmailCode()
+          return
+        }
+      }
+
+      // Check Supabase TOTP AAL2
+      const { data: aal } = await getMfaAssuranceLevel()
+      if (aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
+        const { data: factors } = await listMfaFactors()
+        const first = factors?.totp?.[0]
+        if (first) {
+          setTotpFactorId(first.id)
+          setStep('totp')
+          return
+        }
+      }
+
+      // Session is valid and no 2FA pending
+      router.replace('/dashboard/employer')
+    }
+    checkExistingSession()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const clearDemoCookie = () => {
     if (typeof document !== 'undefined') {
       document.cookie = 'domio_demo=; path=/; max-age=0'
+    }
+  }
+
+  const sendEmailCode = async () => {
+    setSending(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/auth/2fa/email/send', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) setError(data.error || 'Code kon niet worden verstuurd')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -44,6 +103,69 @@ function LoginContent() {
       const { error: authError } = await signIn(email, password)
       if (authError) throw authError
       clearDemoCookie()
+
+      // Check preferred 2FA method from profile first
+      const res = await fetch('/api/auth/2fa/required')
+      const mfaData = await res.json().catch(() => ({}))
+
+      if (mfaData.required && mfaData.method === 'email') {
+        setStep('email-2fa')
+        await sendEmailCode()
+        setLoading(false)
+        return
+      }
+
+      // Check Supabase TOTP AAL2 (for totp method or as fallback)
+      const { data: aal } = await getMfaAssuranceLevel()
+      if (aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
+        const { data: factors } = await listMfaFactors()
+        const first = factors?.totp?.[0]
+        if (first) {
+          setTotpFactorId(first.id)
+          setStep('totp')
+          setLoading(false)
+          return
+        }
+      }
+
+      setTransitioning(true)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(translateAuthError(msg))
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyTotp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    try {
+      const { error: verifyError } = await verifyMfa(totpFactorId, totpCode)
+      if (verifyError) throw verifyError
+      setTransitioning(true)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(translateAuthError(msg))
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const trimmed = emailCode.replace(/\s/g, '')
+    if (trimmed.length !== 6) return
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/auth/2fa/email/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: trimmed }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Code ongeldig of verlopen')
+      document.cookie = 'two_fa_verified=1; path=/; max-age=86400; SameSite=Lax'
       setTransitioning(true)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -87,16 +209,6 @@ function LoginContent() {
       if (credential && credential.type === 'public-key') {
         await new Promise((r) => setTimeout(r, 500))
         clearDemoCookie()
-        try {
-          const res = await fetch('/api/auth/2fa/required')
-          const data = await res.json().catch(() => ({}))
-          if (data.required) {
-            router.push('/login/verify-2fa')
-            return
-          }
-        } catch {
-          // bij fout gewoon naar dashboard
-        }
         router.push('/dashboard/employer')
       } else {
         setError('Geen passkey geselecteerd. Probeer opnieuw of log in met e-mail.')
@@ -116,21 +228,110 @@ function LoginContent() {
   if (transitioning) {
     return (
       <AuthLoadingScreen
-        onAnimationComplete={async () => {
-          clearDemoCookie()
-          try {
-            const res = await fetch('/api/auth/2fa/required')
-            const data = await res.json().catch(() => ({}))
-            if (data.required) {
-              router.push('/login/verify-2fa')
-              return
-            }
-          } catch {
-            // bij fout gewoon naar dashboard
-          }
+        onAnimationComplete={() => {
           router.push('/dashboard/employer')
         }}
       />
+    )
+  }
+
+  if (step === 'totp') {
+    return (
+      <>
+        <button
+          onClick={() => { setStep('login'); setTotpCode(''); setError(null) }}
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Terug
+        </button>
+        <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Voer de 6-cijferige code uit je authenticator-app in.
+        </p>
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleVerifyTotp} className="mt-8 space-y-6">
+          <Input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="000000"
+            maxLength={6}
+            value={totpCode}
+            onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+            autoFocus
+          />
+          <Button
+            type="submit"
+            disabled={loading || totpCode.length !== 6}
+            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+          >
+            {loading ? 'Controleren…' : 'Bevestigen'}
+          </Button>
+        </form>
+      </>
+    )
+  }
+
+  if (step === 'email-2fa') {
+    return (
+      <>
+        <button
+          onClick={() => { setStep('login'); setEmailCode(''); setError(null) }}
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Terug
+        </button>
+        <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          We hebben een 6-cijferige code naar je e-mailadres gestuurd. Voer die hieronder in.
+        </p>
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleVerifyEmail} className="mt-8 space-y-6">
+          <Input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="000000"
+            maxLength={6}
+            value={emailCode}
+            onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+            autoFocus
+          />
+          <Button
+            type="submit"
+            disabled={loading || emailCode.length !== 6}
+            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+          >
+            {loading ? 'Controleren…' : 'Bevestigen'}
+          </Button>
+        </form>
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
+            onClick={sendEmailCode}
+            disabled={sending}
+          >
+            {sending ? 'Bezig…' : 'Code opnieuw versturen'}
+          </button>
+        </div>
+      </>
     )
   }
 

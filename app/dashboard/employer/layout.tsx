@@ -20,7 +20,7 @@ function Require2FaRedirect() {
     if (loading || isDemo || !profile?.mfa_email_enabled) return
     const hasCookie = typeof document !== 'undefined' && document.cookie.includes('two_fa_verified=1')
     if (!hasCookie) {
-      router.replace('/login/verify-2fa')
+      router.replace('/login')
     }
   }, [loading, isDemo, profile?.mfa_email_enabled, router])
   return null
