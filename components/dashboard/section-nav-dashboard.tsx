@@ -17,9 +17,17 @@ interface SectionNavDashboardProps {
   className?: string
   /** Grote groene titel, geen "kies een onderdeel" */
   titleVariant?: 'default' | 'hero'
+  /** Optionele actions rechts van de paginatitel */
+  widgetMenu?: React.ReactNode
 }
 
-export function SectionNavDashboard({ title, items, className, titleVariant = 'default' }: SectionNavDashboardProps) {
+export function SectionNavDashboard({
+  title,
+  items,
+  className,
+  titleVariant = 'default',
+  widgetMenu,
+}: SectionNavDashboardProps) {
   const pathname = usePathname()
 
   // Alleen het meest specifieke (langste) overeenkomende item actief
@@ -34,6 +42,7 @@ export function SectionNavDashboard({ title, items, className, titleVariant = 'd
           <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
             {title}
           </h1>
+          {widgetMenu}
         </div>
       ) : (
         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
