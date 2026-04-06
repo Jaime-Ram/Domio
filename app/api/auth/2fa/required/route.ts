@@ -13,5 +13,6 @@ export async function GET() {
     return NextResponse.json({ required: false })
   }
   const profile = await getProfile(user.id)
-  return NextResponse.json({ required: Boolean(profile?.mfa_email_enabled) })
+  const method = profile?.mfa_method ?? 'none'
+  return NextResponse.json({ required: method !== 'none', method })
 }

@@ -220,9 +220,9 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
                   >
-                    <Link href={`${basePath}/settings?tab=instellingen`} className="flex items-center gap-3 w-full">
+                    <Link href={`${basePath}/settings?tab=koppelingen`} className="flex items-center gap-3 w-full">
                       <SettingsIcon className="h-4 w-4 shrink-0" />
-                      <span>Instellingen</span>
+                      <span>Koppelingen</span>
                     </Link>
                   </DropdownMenuItem>
                 </div>
