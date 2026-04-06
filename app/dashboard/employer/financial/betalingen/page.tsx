@@ -1,19 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CreditCard, LayoutDashboard, CalendarClock } from 'lucide-react'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { SectionWidgetMenu, SectionWidgetMenuPlaceholder } from '@/components/dashboard/section-widget-menu'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
-import { TransactionsInbox, type TransactionRow, type PropertyHierarchy } from '@/components/finance/TransactionsInbox'
+import { type TransactionRow, type PropertyHierarchy } from '@/components/finance/TransactionsInbox'
+import { GeldstromenPanel } from '@/components/finance/GeldstromenPanel'
+import { getFinancialNav } from '../nav'
 
-const getFinancialNav = (basePath: string) => [
-  { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-  { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-  { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
-]
-
-export default function TransactiesPage() {
+export default function GeldstromenPage() {
   const { basePath } = useDashboardUser()
   const FINANCIAL_NAV = getFinancialNav(basePath)
   const [transactions, setTransactions] = useState<TransactionRow[]>([])
@@ -114,19 +110,31 @@ export default function TransactiesPage() {
     fetchData()
   }, [])
 
+  const achterstandenUrl = `${basePath}/financial/geldstromen/achterstanden`
+
   return (
     <div className="space-y-content-blocks">
-      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
+      <SectionNavDashboard
+        title="Financieel"
+        items={FINANCIAL_NAV}
+        titleVariant="hero"
+        widgetMenu={
+          <SectionWidgetMenu>
+            <SectionWidgetMenuPlaceholder />
+          </SectionWidgetMenu>
+        }
+      />
 
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
       ) : (
-        <TransactionsInbox
+        <GeldstromenPanel
           transactions={transactions}
           properties={properties}
           onRefresh={fetchData}
+          achterstandenUrl={achterstandenUrl}
         />
       )}
     </div>

@@ -41,7 +41,8 @@ import {
   HardDrive,
   HelpCircle,
   Ticket,
-  CalendarClock
+  CalendarClock,
+  Percent
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -145,7 +146,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       children: [
         { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
         { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-        { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: CalendarClock },
+        { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
+        { label: 'Koppelingen', href: `${basePath}/financial/koppelingen`, icon: Link2 },
       ],
     },
     {
