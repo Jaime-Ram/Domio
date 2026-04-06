@@ -188,6 +188,33 @@ CREATE TABLE IF NOT EXISTS public.payment_assignments (
     assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+
+CREATE TABLE IF NOT EXISTS public.rent_expectations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    owner_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    lease_id UUID REFERENCES public.leases(id) ON DELETE CASCADE NOT NULL,
+    tenant_id UUID REFERENCES public.tenants(id) ON DELETE SET NULL,
+    unit_id UUID REFERENCES public.units(id) ON DELETE SET NULL,
+    property_id UUID REFERENCES public.properties(id) ON DELETE SET NULL,
+    expected_amount NUMERIC(10,2) NOT NULL,
+    due_date DATE NOT NULL,
+    period_label TEXT NOT NULL, -- e.g. '2026-03'
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'partial', 'overdue')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(lease_id, period_label)
+);
+
+CREATE TABLE IF NOT EXISTS public.manual_expenses (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    owner_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    property_id UUID REFERENCES public.properties(id) ON DELETE CASCADE NOT NULL,
+    category TEXT NOT NULL CHECK (category IN ('onderhoud', 'verzekering', 'belasting', 'energie', 'vve', 'hypotheek', 'beheer', 'overig')),
+    amount NUMERIC(10,2) NOT NULL,
+    date DATE NOT NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ==========================================
 -- ROW LEVEL SECURITY (RLS)
 -- ==========================================
@@ -205,6 +232,8 @@ alter table public.payments enable row level security;
 alter table public.bank_connections enable row level security;
 alter table public.raw_transactions enable row level security;
 alter table public.payment_assignments enable row level security;
+alter table public.rent_expectations enable row level security;
+alter table public.manual_expenses enable row level security;
 
 
 -- ==========================================
@@ -294,6 +323,21 @@ CREATE POLICY "Payment assignments: update own" ON public.payment_assignments
 CREATE POLICY "Payment assignments: delete own" ON public.payment_assignments
     FOR DELETE TO authenticated USING (owner_id = auth.uid());
 
+
+CREATE POLICY "Rent expectations: select own" ON public.rent_expectations
+    FOR SELECT TO authenticated USING (owner_id = auth.uid());
+CREATE POLICY "Rent expectations: insert own" ON public.rent_expectations
+    FOR INSERT TO authenticated WITH CHECK (owner_id = auth.uid());
+CREATE POLICY "Rent expectations: update own" ON public.rent_expectations
+    FOR UPDATE TO authenticated USING (owner_id = auth.uid()) WITH CHECK (owner_id = auth.uid());
+CREATE POLICY "Rent expectations: delete own" ON public.rent_expectations
+    FOR DELETE TO authenticated USING (owner_id = auth.uid());
+
+CREATE POLICY "Manual expenses: select own" ON public.manual_expenses FOR SELECT TO authenticated USING (owner_id = auth.uid());
+CREATE POLICY "Manual expenses: insert own" ON public.manual_expenses FOR INSERT TO authenticated WITH CHECK (owner_id = auth.uid());
+CREATE POLICY "Manual expenses: update own" ON public.manual_expenses FOR UPDATE TO authenticated USING (owner_id = auth.uid()) WITH CHECK (owner_id = auth.uid());
+CREATE POLICY "Manual expenses: delete own" ON public.manual_expenses FOR DELETE TO authenticated USING (owner_id = auth.uid());
+    
 -- ==========================================
 -- FUNCTIONS & TRIGGERS
 -- ==========================================
@@ -343,3 +387,7 @@ create trigger tr_wws_upd before update on public.wws for each row execute funct
 create trigger tr_documents_upd before update on public.documents for each row execute function public.update_updated_at();
 create trigger tr_payments_upd before update on public.payments for each row execute function public.update_updated_at();
 CREATE TRIGGER tr_bank_connections_upd BEFORE UPDATE ON public.bank_connections FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+CREATE TRIGGER tr_raw_transactions before update on public.raw_transactions for each row execute function public.update_updated_at();
+CREATE TRIGGER tr_payment_assignments before update on public.payment_assignments for each row execute function public.update_updated_at();
+CREATE TRIGGER tr_rent_expectations before update on public.rent_expectations for each row execute function public.update_updated_at();
+CREATE TRIGGER tr_manual_expenses before update on public.manual_expenses for each row execute function public.update_updated_at();
