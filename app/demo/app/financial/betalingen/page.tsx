@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/employer/financial/geldstromen/page'
+export { default } from '@/app/dashboard/employer/financial/betalingen/page'
