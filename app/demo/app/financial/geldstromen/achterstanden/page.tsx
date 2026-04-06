@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/employer/financial/achterstanden/page'
+export { default } from '@/app/dashboard/employer/financial/betalingen/achterstanden/page'
