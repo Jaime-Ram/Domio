@@ -11,7 +11,7 @@ import { getProfile, updateProfile } from '@/lib/supabase/profile'
 import { resetPassword, enrollMfa, enrollPhoneMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
-type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'instellingen'
+type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'koppelingen'
 
 
 function AccountHeaderSkeleton({ cardClass }: { cardClass: string }) {
@@ -54,7 +54,7 @@ function SettingsPillNav({ activeTab, onTabChange }: { activeTab: SettingsTab; o
     { key: 'account', label: 'Account', icon: User },
     { key: 'beveiliging', label: 'Beveiliging', icon: Shield },
     { key: 'abonnement', label: 'Abonnement', icon: CreditCard },
-    { key: 'instellingen', label: 'Instellingen', icon: Settings },
+    { key: 'koppelingen', label: 'Koppelingen', icon: Settings },
   ]
 
   return (
@@ -230,7 +230,7 @@ export default function SettingsPage() {
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
     if (!tab) return
-    if (['account', 'beveiliging', 'abonnement', 'instellingen'].includes(tab)) {
+    if (['account', 'beveiliging', 'abonnement', 'koppelingen'].includes(tab)) {
       setActiveTab(tab as SettingsTab)
     }
   }, [])
@@ -507,17 +507,6 @@ export default function SettingsPage() {
                 <div className="mt-3">
                   <SettingsPillNav activeTab={activeTab} onTabChange={setActiveTab} />
                 </div>
-              </div>
-              <div className="flex flex-col items-center sm:items-end gap-2 sm:flex-shrink-0">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  E-mail: <span className="text-gray-900 dark:text-white">{displayEmail || '—'}</span>
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Rol: <span className="text-gray-900 dark:text-white">Verhuurder</span>
-                </p>
-                {memberSinceLabel && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Gebruiker sinds {memberSinceLabel}</p>
-                )}
               </div>
             </div>
           </div>
