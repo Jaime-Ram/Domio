@@ -37,6 +37,9 @@ import {
   DASHBOARD_TABLE_ICON_WRAP_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
+  DASHBOARD_FILTER_MENU_CONTENT_CLASS,
+  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
@@ -341,7 +344,7 @@ export default function PortfolioPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="inline-flex h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4"
+                        className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
                       >
                         <Filter className="h-4 w-4 md:mr-1.5" />
                         <span className="hidden md:inline">Filter</span>
@@ -350,7 +353,7 @@ export default function PortfolioPage() {
                     <DropdownMenuContent
                       align="end"
                       sideOffset={8}
-                      className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]"
+                      className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}
                     >
                       <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
                         Type
@@ -359,21 +362,24 @@ export default function PortfolioPage() {
                         <DropdownMenuCheckboxItem
                           checked={typeFilter.appartement !== false}
                           onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, appartement: Boolean(v) }))}
-                          className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                          onSelect={(e) => e.preventDefault()}
+                          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                         >
                           Appartement
                         </DropdownMenuCheckboxItem>
                         <DropdownMenuCheckboxItem
                           checked={typeFilter.huis !== false}
                           onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, huis: Boolean(v) }))}
-                          className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                          onSelect={(e) => e.preventDefault()}
+                          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                         >
                           Huis
                         </DropdownMenuCheckboxItem>
                         <DropdownMenuCheckboxItem
                           checked={typeFilter.overig !== false}
                           onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, overig: Boolean(v) }))}
-                          className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm"
+                          onSelect={(e) => e.preventDefault()}
+                          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                         >
                           Overig
                         </DropdownMenuCheckboxItem>

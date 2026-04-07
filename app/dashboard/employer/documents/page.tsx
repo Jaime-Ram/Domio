@@ -18,6 +18,9 @@ import {
   DASHBOARD_TABLE_ICON_WRAP_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
+  DASHBOARD_FILTER_MENU_CONTENT_CLASS,
+  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
@@ -457,7 +460,7 @@ export default function DocumentsPage() {
                       id="documents-filter-trigger"
                       type="button"
                       variant="outline"
-                      className="inline-flex h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4"
+                      className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
                     >
                       <Filter className="h-4 w-4 md:mr-1.5" />
                       <span className="hidden md:inline">Filter</span>
@@ -466,7 +469,7 @@ export default function DocumentsPage() {
                   <DropdownMenuContent
                     align="end"
                     sideOffset={8}
-                    className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]"
+                    className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}
                   >
                     <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
                       Type
@@ -477,7 +480,8 @@ export default function DocumentsPage() {
                           key={t}
                           checked={typeFilter[t] !== false}
                           onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
-                          className="flex items-center justify-between rounded-lg py-1.5 pl-8 pr-2 text-sm"
+                          onSelect={(e) => e.preventDefault()}
+                          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                         >
                           {t}
                         </DropdownMenuCheckboxItem>

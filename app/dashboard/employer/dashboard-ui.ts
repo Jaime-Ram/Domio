@@ -14,6 +14,24 @@ export const DASHBOARD_SURFACE_PADDING = 'p-5'
 export const DASHBOARD_PAGE_GUTTER_CLASS = 'pl-5'
 
 /**
+ * Filter-knop (pill) zoals Documenten/Drive: combineer met `inline-flex` of `hidden md:inline-flex`.
+ */
+export const DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS =
+  'h-9 rounded-full border border-gray-200 dark:border-neutral-700 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4'
+
+/**
+ * Inhoud van het filter-`DropdownMenu` (zelfde schaduw/hoeken als Drive).
+ */
+export const DASHBOARD_FILTER_MENU_CONTENT_CLASS =
+  'rounded-2xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]'
+
+/**
+ * `DropdownMenuCheckboxItem` met vinkje-kolom. Gebruik samen met `onSelect={(e) => e.preventDefault()}` zodat het menu open blijft bij togglen.
+ */
+export const DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS =
+  'flex items-center justify-between rounded-lg py-1.5 pl-8 pr-2 text-sm'
+
+/**
  * @deprecated Gebruik niet meer: gutter zit in `app/dashboard/employer/layout.tsx` via
  * `DASHBOARD_PAGE_GUTTER_CLASS`. Alleen behouden voor oude imports / geleidelijke migratie.
  */
