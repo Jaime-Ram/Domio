@@ -86,6 +86,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
       { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`] },
+      { id: 'contracten-accordion', paths: [`${basePath}/contracts`] },
     ]
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
@@ -160,6 +161,15 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       ],
     },
     {
+      label: 'Contracten',
+      icon: FileText,
+      children: [
+        { label: 'Huurcontracten', href: `${basePath}/contracts/leases`, icon: FileText },
+        { label: 'Leveranciers', href: `${basePath}/contracts/suppliers`, icon: Briefcase },
+        { label: 'Sjablonen', href: `${basePath}/contracts/templates`, icon: BookOpen },
+      ],
+    },
+    {
       label: 'Communicatie',
       href: `${basePath}/messages`,
       icon: MessageSquare,
@@ -168,6 +178,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Drive',
       href: `${basePath}/documents`,
       icon: HardDrive,
+    },
+    {
+      label: 'VvE',
+      href: `${basePath}/vve`,
+      icon: Building2,
+    },
+    {
+      label: 'Rapportages',
+      href: `${basePath}/reports`,
+      icon: BarChart3,
     },
     {
       label: 'Accountinstellingen',

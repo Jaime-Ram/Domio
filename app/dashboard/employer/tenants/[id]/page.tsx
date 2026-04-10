@@ -156,10 +156,10 @@ export default function TenantDetailPage() {
     <>
             {/* Header */}
             <div className="mb-8">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => router.push(`${basePath}/tenants`)}
-                className="mb-4"
+                className="mb-4 rounded-full text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 -ml-2"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Terug naar overzicht
@@ -199,9 +199,9 @@ export default function TenantDetailPage() {
 
             {/* Tabs */}
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="details">Gegevens</TabsTrigger>
-                <TabsTrigger value="payments">Betalingen</TabsTrigger>
+              <TabsList className="flex w-fit gap-1 bg-gray-100 dark:bg-neutral-800 rounded-full p-1 mb-6">
+                <TabsTrigger value="details" className="px-4 py-1.5 rounded-full text-sm data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-[#163300] dark:data-[state=active]:text-[#9FE870] data-[state=active]:shadow-sm">Gegevens</TabsTrigger>
+                <TabsTrigger value="payments" className="px-4 py-1.5 rounded-full text-sm data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-[#163300] dark:data-[state=active]:text-[#9FE870] data-[state=active]:shadow-sm">Betalingen</TabsTrigger>
               </TabsList>
 
               {/* Tab 1: Gegevens */}
