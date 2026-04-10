@@ -227,7 +227,7 @@ export default function VvEPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                     <XAxis dataKey="maand" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                     <YAxis tickFormatter={(v) => `€${v}`} tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={55} />
-                    <Tooltip formatter={(v: number, name: string) => [`€${v.toLocaleString('nl-NL')}`, name === 'inkomsten' ? 'Bijdragen' : 'Uitgaven']}
+                    <Tooltip formatter={(v, name) => [`€${(v as number).toLocaleString('nl-NL')}`, name === 'inkomsten' ? 'Bijdragen' : 'Uitgaven']}
                       contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: 13 }} />
                     <Bar dataKey="inkomsten" name="inkomsten" fill="#9FE870" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="uitgaven" name="uitgaven" fill="#f97316" radius={[4, 4, 0, 0]} />
