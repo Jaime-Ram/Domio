@@ -29,7 +29,7 @@ export type Profile = {
   language: 'nl' | 'en'
   notification_prefs: NotificationPrefs
   mfa_email_enabled?: boolean
-  mfa_method?: 'none' | 'sms' | 'totp'
+  mfa_method?: 'none' | 'totp'
   created_at: string
   updated_at: string
 }

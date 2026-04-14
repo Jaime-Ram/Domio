@@ -17,7 +17,6 @@ import {
   Settings,
   FolderOpen,
   UserCircle,
-  Link2,
   Bell,
   Scan,
   CheckCircle,
@@ -149,7 +148,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
         { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
         { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
-        { label: 'Koppelingen', href: `${basePath}/financial/koppelingen`, icon: Link2 },
       ],
     },
     {

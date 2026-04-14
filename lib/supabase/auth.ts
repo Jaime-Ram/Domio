@@ -104,12 +104,6 @@ export async function verifyMfa(factorId: string, code: string) {
   return { data, error }
 }
 
-export async function enrollPhoneMfa(phone: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.auth.mfa as any).enroll({ factorType: 'phone', phone })
-  return { data: data as { id: string; phone: string } | null, error }
-}
-
 export async function challengeMfa(factorId: string) {
   const { data, error } = await supabase.auth.mfa.challenge({ factorId })
   return { data, error }
