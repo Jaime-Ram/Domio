@@ -5,10 +5,12 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
   User, Shield, CreditCard, Settings,
   CheckCircle2, Pencil, X, Check, Loader2, Mail, Building2,
+  Landmark, BookOpen, RefreshCw, ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProfile, updateProfile } from '@/lib/supabase/profile'
 import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
+import { supabase } from '@/lib/supabase/client'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'koppelingen'
@@ -145,6 +147,13 @@ export default function SettingsPage() {
   const [totpResetError, setTotpResetError] = useState('')
   const [totpResetWorking, setTotpResetWorking] = useState(false)
 
+  // Koppelingen
+  interface BankConnection { iban: string | null; last_synced_at: string | null }
+  const [bankConnection, setBankConnection] = useState<BankConnection | null>(null)
+  const [bankLoading, setBankLoading] = useState(true)
+  const [bankSyncing, setBankSyncing] = useState(false)
+
+
   const loadTotpFactors = useCallback(async () => {
     if (isDemo) return
     const { data } = await listMfaFactors()
@@ -217,6 +226,28 @@ export default function SettingsPage() {
       setActiveTab(tab as SettingsTab)
     }
   }, [])
+
+  useEffect(() => {
+    if (isDemo) { setBankLoading(false); return }
+    supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'tink').maybeSingle()
+      .then(({ data }) => { setBankConnection(data ?? null); setBankLoading(false) })
+  }, [isDemo])
+
+  async function handleBankSync() {
+    setBankSyncing(true)
+    try {
+      await fetch('/api/tink/sync', { method: 'POST' })
+      const { data } = await supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'tink').maybeSingle()
+      setBankConnection(data ?? null)
+    } finally {
+      setBankSyncing(false)
+    }
+  }
+
+  function handleBankConnect() { window.location.href = '/api/tink/link' }
+
+  const formatBankDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   // Account field handlers
   const cancelEditing = () => {
@@ -1043,6 +1074,75 @@ export default function SettingsPage() {
 
           </div>
 
+        </div>
+      )}
+
+      {/* Koppelingen tab */}
+      {activeTab === 'koppelingen' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Bank connection card */}
+          <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-6 py-6 flex flex-col items-start gap-4">
+            <div className="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
+              <Landmark className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Bankkoppeling (Tink)</h3>
+              {bankLoading ? (
+                <p className="text-sm text-gray-400">Laden...</p>
+              ) : bankConnection ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    <span className="text-sm font-medium text-green-700 dark:text-green-400">Verbonden</span>
+                  </div>
+                  {bankConnection.iban && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">IBAN: {bankConnection.iban}</p>
+                  )}
+                  {bankConnection.last_synced_at && (
+                    <p className="text-xs text-gray-400">Laatst gesynchroniseerd: {formatBankDate(bankConnection.last_synced_at)}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Koppel je bankrekening om transacties automatisch te importeren.
+                </p>
+              )}
+            </div>
+            {bankConnection ? (
+              <button
+                onClick={handleBankSync}
+                disabled={bankSyncing}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#163300] dark:bg-[#9FE870] px-3.5 py-2 text-sm font-medium text-white dark:text-[#163300] hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                <RefreshCw className={cn('h-4 w-4', bankSyncing && 'animate-spin')} />
+                {bankSyncing ? 'Synchroniseren...' : 'Synchroniseren'}
+              </button>
+            ) : (
+              <button
+                onClick={handleBankConnect}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#163300] dark:bg-[#9FE870] px-3.5 py-2 text-sm font-medium text-white dark:text-[#163300] hover:opacity-90 transition-opacity"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Koppel je bankrekening
+              </button>
+            )}
+          </div>
+
+          {/* Boekhoudkoppeling placeholder */}
+          <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-6 py-6 flex flex-col items-start gap-4">
+            <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
+              <BookOpen className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Boekhoudkoppeling</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                Koppel Domio met je boekhoudsoftware (Exact, Twinfield, Moneybird).
+              </p>
+            </div>
+            <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-900/20 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+              Binnenkort beschikbaar
+            </span>
+          </div>
         </div>
       )}
     </>
