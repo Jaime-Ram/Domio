@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
   User, Shield, CreditCard, Settings,
-  CheckCircle2, Pencil, X, Check, Loader2, Mail, Phone, Building2,
+  CheckCircle2, Pencil, X, Check, Loader2, Mail, Building2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProfile, updateProfile } from '@/lib/supabase/profile'
-import { resetPassword, enrollMfa, enrollPhoneMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
+import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'koppelingen'
@@ -113,7 +113,7 @@ export default function SettingsPage() {
   })
   const [originalForm, setOriginalForm] = useState<AccountFormData | null>(null)
   const [accountDataReady, setAccountDataReady] = useState(false)
-  const [mfaMethod, setMfaMethod] = useState<'none' | 'sms' | 'totp'>('none')
+  const [mfaMethod, setMfaMethod] = useState<'none' | 'totp'>('none')
   const [mfaMethodStatus, setMfaMethodStatus] = useState<SaveStatus>('idle')
   const [pwResetStatus, setPwResetStatus] = useState<SaveStatus>('idle')
   const [pwResetError, setPwResetError] = useState('')
@@ -126,23 +126,6 @@ export default function SettingsPage() {
   const [fieldError, setFieldError] = useState<string>('')
   const [emailChangeStatus, setEmailChangeStatus] = useState<'idle' | 'pending' | 'sent'>('idle')
   const [newEmail, setNewEmail] = useState('')
-
-  // SMS MFA
-  const [smsFactors, setSmsFactors] = useState<{ id: string; phone: string }[]>([])
-  const [smsEnrolling, setSmsEnrolling] = useState(false)
-  const [smsPhone, setSmsPhone] = useState('')
-  const [smsFactorId, setSmsFactorId] = useState('')
-  const [smsChallengeId, setSmsChallengeId] = useState('')
-  const [smsCode, setSmsCode] = useState('')
-  const [smsError, setSmsError] = useState('')
-  const [smsSending, setSmsSending] = useState(false)
-  const [smsVerifying, setSmsVerifying] = useState(false)
-  const [smsUnenrollId, setSmsUnenrollId] = useState('')
-  const [smsUnenrollChallengeId, setSmsUnenrollChallengeId] = useState('')
-  const [smsUnenrollCode, setSmsUnenrollCode] = useState('')
-  const [smsUnenrollError, setSmsUnenrollError] = useState('')
-  const [smsUnenrollSending, setSmsUnenrollSending] = useState(false)
-  const [smsUnenrollVerifying, setSmsUnenrollVerifying] = useState(false)
 
   // TOTP MFA
   const [totpFactors, setTotpFactors] = useState<{ id: string; friendly_name?: string }[]>([])
@@ -235,16 +218,6 @@ export default function SettingsPage() {
     }
   }, [])
 
-  const loadSmsFactors = useCallback(async () => {
-    if (isDemo) return
-    const { data } = await listMfaFactors()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const phoneFactors = (data as any)?.phone
-    if (phoneFactors) setSmsFactors(phoneFactors.map((f: { id: string; phone?: string }) => ({ id: f.id, phone: f.phone ?? '' })))
-  }, [isDemo])
-
-  useEffect(() => { loadSmsFactors() }, [loadSmsFactors])
-
   // Account field handlers
   const cancelEditing = () => {
     if (originalForm) setAccountForm(originalForm)
@@ -329,60 +302,14 @@ export default function SettingsPage() {
     setEmailChangeStatus('sent')
   }
 
-  const handleSelectMethod = async (method: 'none' | 'sms' | 'totp') => {
+  const handleSelectMethod = async (method: 'none' | 'totp') => {
     if (isDemo || !user?.id) return
     if (method === 'totp' && totpFactors.length === 0) { handleStartTotpEnroll(); return }
-    if (method === 'sms' && smsFactors.length === 0) { setSmsEnrolling(true); setSmsPhone(''); setSmsCode(''); setSmsFactorId(''); setSmsChallengeId(''); setSmsError(''); return }
     setMfaMethodStatus('saving')
     const { error } = await updateProfile(user.id, { mfa_method: method })
     if (error) { setMfaMethodStatus('error'); return }
     setMfaMethod(method)
     setMfaMethodStatus('idle')
-  }
-
-  const handleSendSmsCode = async () => {
-    if (!smsPhone.trim()) return
-    setSmsSending(true); setSmsError('')
-    const { data, error } = await enrollPhoneMfa(smsPhone.trim())
-    if (error || !data) { setSmsError(error?.message || 'Fout bij inschrijven'); setSmsSending(false); return }
-    setSmsFactorId(data.id)
-    const { data: challengeData, error: challengeError } = await challengeMfa(data.id)
-    if (challengeError || !challengeData) { setSmsError(challengeError?.message || 'SMS kon niet worden verstuurd'); setSmsSending(false); return }
-    setSmsChallengeId(challengeData.id)
-    setSmsSending(false)
-  }
-
-  const handleVerifySms = async () => {
-    if (!smsCode || !smsFactorId || !smsChallengeId) return
-    setSmsVerifying(true); setSmsError('')
-    const { error } = await verifyMfaCode(smsFactorId, smsChallengeId, smsCode)
-    setSmsVerifying(false)
-    if (error) { setSmsError(error.message); return }
-    setSmsEnrolling(false); setSmsPhone(''); setSmsCode(''); setSmsChallengeId(''); setSmsFactorId('')
-    if (user?.id) { await updateProfile(user.id, { mfa_method: 'sms' }); setMfaMethod('sms') }
-    await loadSmsFactors()
-  }
-
-  const handleSendSmsUnenrollCode = async (factorId: string) => {
-    setSmsUnenrollSending(true); setSmsUnenrollError('')
-    const { data, error } = await challengeMfa(factorId)
-    setSmsUnenrollSending(false)
-    if (error || !data) { setSmsUnenrollError(error?.message || 'SMS kon niet worden verstuurd'); return }
-    setSmsUnenrollChallengeId(data.id)
-  }
-
-  const handleUnenrollSms = async () => {
-    if (!smsUnenrollId || !smsUnenrollChallengeId || smsUnenrollCode.length !== 6) return
-    setSmsUnenrollVerifying(true); setSmsUnenrollError('')
-    const { error: verifyError } = await verifyMfaCode(smsUnenrollId, smsUnenrollChallengeId, smsUnenrollCode)
-    if (verifyError) { setSmsUnenrollError(verifyError.message); setSmsUnenrollVerifying(false); return }
-    const { error } = await unenrollMfa(smsUnenrollId)
-    setSmsUnenrollVerifying(false)
-    if (error) { setSmsUnenrollError(error.message); return }
-    const remaining = smsFactors.filter(f => f.id !== smsUnenrollId)
-    setSmsUnenrollId(''); setSmsUnenrollChallengeId(''); setSmsUnenrollCode('')
-    if (remaining.length === 0 && user?.id) { await updateProfile(user.id, { mfa_method: 'none' }); setMfaMethod('none') }
-    await loadSmsFactors()
   }
 
   const handleStartTotpEnroll = async () => {
@@ -912,7 +839,7 @@ export default function SettingsPage() {
             {isDemo ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">Schakel 2FA in via je account in de echte omgeving.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
 
                 {/* Card: Geen 2FA */}
                 <button
@@ -941,155 +868,6 @@ export default function SettingsPage() {
                     Inloggen alleen met e-mailadres en wachtwoord.
                   </p>
                 </button>
-
-                {/* Card: SMS */}
-                <div
-                  className={cn(
-                    'relative text-left rounded-xl border-2 px-5 py-4 transition-all',
-                    mfaMethod === 'sms' || smsEnrolling
-                      ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300]/5 dark:bg-[#9FE870]/5'
-                      : 'border-gray-200 dark:border-neutral-700 cursor-pointer hover:border-gray-300 dark:hover:border-neutral-600'
-                  )}
-                  onClick={() => { if (!smsEnrolling && mfaMethod !== 'sms') handleSelectMethod('sms') }}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
-                      <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-                        <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
-                      </svg>
-                    </div>
-                    {mfaMethod === 'sms' && !smsEnrolling && (
-                      <CheckCircle2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870] shrink-0 mt-0.5" />
-                    )}
-                  </div>
-                  <p className="mt-3 font-semibold text-sm text-gray-900 dark:text-white">Code per sms</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                    We sturen een 6-cijferige code naar je telefoonnummer.
-                  </p>
-
-                  {/* Enrolled phone factors */}
-                  {smsFactors.length > 0 && !smsEnrolling && (
-                    <div className="mt-4 space-y-2">
-                      {smsFactors.map((f) => (
-                        <div key={f.id}>
-                          <div className="flex items-center justify-between rounded-lg bg-white/60 dark:bg-neutral-800/60 border border-gray-100 dark:border-neutral-700 px-3 py-2">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">{f.phone || 'Telefoonnummer'}</span>
-                            </div>
-                            {smsUnenrollId === f.id ? (
-                              <button onClick={(e) => { e.stopPropagation(); setSmsUnenrollId(''); setSmsUnenrollChallengeId(''); setSmsUnenrollCode(''); setSmsUnenrollError('') }} className="text-xs font-medium text-gray-500 hover:underline">
-                                Annuleren
-                              </button>
-                            ) : (
-                              <button onClick={(e) => { e.stopPropagation(); setSmsUnenrollId(f.id); setSmsUnenrollChallengeId(''); setSmsUnenrollCode(''); setSmsUnenrollError('') }} className="text-xs font-medium text-red-600 dark:text-red-400 hover:underline">
-                                Verwijderen
-                              </button>
-                            )}
-                          </div>
-                          {smsUnenrollId === f.id && (
-                            <div onClick={(e) => e.stopPropagation()} className="mt-2 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 px-3 py-3 space-y-2">
-                              <p className="text-xs text-gray-600 dark:text-gray-400">Stuur een verificatiecode naar dit nummer om te bevestigen.</p>
-                              {!smsUnenrollChallengeId ? (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleSendSmsUnenrollCode(f.id) }}
-                                  disabled={smsUnenrollSending}
-                                  className="px-3 py-1.5 text-xs font-medium text-white bg-[#163300] hover:bg-[#356258] rounded-lg transition-colors disabled:opacity-50"
-                                >
-                                  {smsUnenrollSending ? 'Bezig…' : 'Stuur code'}
-                                </button>
-                              ) : (
-                                <>
-                                  <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    maxLength={6}
-                                    placeholder="000000"
-                                    value={smsUnenrollCode}
-                                    onChange={(e) => setSmsUnenrollCode(e.target.value.replace(/\D/g, ''))}
-                                    className="w-32 rounded-lg border border-input bg-background px-3 py-1.5 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-red-300"
-                                  />
-                                  {smsUnenrollError && <p className="text-xs text-red-600 dark:text-red-400">{smsUnenrollError}</p>}
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); handleUnenrollSms() }}
-                                    disabled={smsUnenrollCode.length !== 6 || smsUnenrollVerifying}
-                                    className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
-                                  >
-                                    {smsUnenrollVerifying ? 'Verwijderen…' : 'Bevestig verwijderen'}
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Enrollment flow */}
-                  {smsEnrolling && (
-                    <div onClick={(e) => e.stopPropagation()} className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700 space-y-3">
-                      {!smsChallengeId ? (
-                        <>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Voer je telefoonnummer in inclusief landcode (bijv. +31612345678).</p>
-                          <input
-                            type="tel"
-                            placeholder="+31612345678"
-                            value={smsPhone}
-                            onChange={(e) => setSmsPhone(e.target.value)}
-                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/30"
-                          />
-                          {smsError && <p className="text-sm text-red-600 dark:text-red-400">{smsError}</p>}
-                          <div className="flex gap-2">
-                            <button
-                              onClick={handleSendSmsCode}
-                              disabled={smsSending || !smsPhone.trim()}
-                              className="px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#356258] rounded-lg transition-colors disabled:opacity-50"
-                            >
-                              {smsSending ? 'Bezig…' : 'Stuur code'}
-                            </button>
-                            <button
-                              onClick={() => { setSmsEnrolling(false); setSmsPhone(''); setSmsError('') }}
-                              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                            >
-                              Annuleren
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Voer de 6-cijferige code in die naar {smsPhone} is gestuurd.</p>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={6}
-                            placeholder="000000"
-                            value={smsCode}
-                            onChange={(e) => setSmsCode(e.target.value.replace(/\D/g, ''))}
-                            className="w-36 rounded-lg border border-input bg-background px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#163300]/30"
-                          />
-                          {smsError && <p className="text-sm text-red-600 dark:text-red-400">{smsError}</p>}
-                          <div className="flex gap-2">
-                            <button
-                              onClick={handleVerifySms}
-                              disabled={smsVerifying || smsCode.length !== 6}
-                              className="px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#356258] rounded-lg transition-colors disabled:opacity-50"
-                            >
-                              {smsVerifying ? 'Verifiëren…' : 'Bevestigen'}
-                            </button>
-                            <button
-                              onClick={() => { setSmsEnrolling(false); setSmsPhone(''); setSmsCode(''); setSmsFactorId(''); setSmsChallengeId(''); setSmsError('') }}
-                              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                            >
-                              Annuleren
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Card: Authenticator app */}
                 <div
