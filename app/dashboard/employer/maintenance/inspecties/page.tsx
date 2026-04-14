@@ -18,10 +18,12 @@ import {
   ClipboardCheck, Calendar, Ticket, Plus, Search,
   CheckCircle2, Clock, AlertTriangle, MapPin, Camera,
 } from 'lucide-react'
+import { MetricCard } from '@/components/finance/MetricCard'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
+import { mockProperties } from '@/lib/mock-data/vastgoed'
 import { nl } from 'date-fns/locale'
 
 const getMaintenanceNav = (basePath: string) => [
@@ -62,9 +64,9 @@ const mockInspecties: Inspection[] = [
 
 function getStatusBadge(status: InspectionStatus) {
   switch (status) {
-    case 'gepland': return <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-0 gap-1"><Clock className="h-3 w-3" />Gepland</Badge>
-    case 'afgerond': return <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-0 gap-1"><CheckCircle2 className="h-3 w-3" />Afgerond</Badge>
-    case 'uitgesteld': return <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-0 gap-1"><AlertTriangle className="h-3 w-3" />Uitgesteld</Badge>
+    case 'gepland': return <Badge className="bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 border-0 gap-1"><Clock className="h-3 w-3" />Gepland</Badge>
+    case 'afgerond': return <Badge className="bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 gap-1"><CheckCircle2 className="h-3 w-3" />Afgerond</Badge>
+    case 'uitgesteld': return <Badge className="bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-500 border-0 gap-1"><AlertTriangle className="h-3 w-3" />Uitgesteld</Badge>
   }
 }
 
@@ -73,7 +75,7 @@ export default function InspectiesPage() {
   const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   const [search, setSearch] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
-  const [newAddress, setNewAddress] = useState('')
+  const [newPropertyId, setNewPropertyId] = useState('')
   const [newType, setNewType] = useState<InspectionType>('tussentijds')
   const [newDate, setNewDate] = useState('')
   const [newInspector, setNewInspector] = useState('')
@@ -88,11 +90,14 @@ export default function InspectiesPage() {
   const afgerondCount = inspecties.filter((i) => i.status === 'afgerond').length
   const uitgesteldCount = inspecties.filter((i) => i.status === 'uitgesteld').length
 
+  const propertyOptions = isDemo ? mockProperties : []
+  const selectedProperty = propertyOptions.find((p) => p.id === newPropertyId)
+
   const handleCreate = () => {
-    if (!newAddress.trim() || !newDate) return
+    if (!newPropertyId || !newDate) return
     const insp: Inspection = {
       id: `${Date.now()}`,
-      address: newAddress.trim(),
+      address: selectedProperty ? `${selectedProperty.name} — ${selectedProperty.address}` : newPropertyId,
       type: newType,
       status: 'gepland',
       date: newDate,
@@ -101,7 +106,7 @@ export default function InspectiesPage() {
     }
     setInspecties((prev) => [insp, ...prev])
     setCreateOpen(false)
-    setNewAddress(''); setNewType('tussentijds'); setNewDate(''); setNewInspector(''); setNewNotes('')
+    setNewPropertyId(''); setNewType('tussentijds'); setNewDate(''); setNewInspector(''); setNewNotes('')
   }
 
   const tableBleed = filtered.length > 0
@@ -111,25 +116,10 @@ export default function InspectiesPage() {
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-content-blocks">
-        {[
-          { label: 'Gepland', value: geplandCount, icon: Clock, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-500/10' },
-          { label: 'Afgerond', value: afgerondCount, icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-          { label: 'Uitgesteld', value: uitgesteldCount, icon: AlertTriangle, color: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-        ].map((m) => {
-          const Icon = m.icon
-          return (
-            <Card key={m.label} className={dashboardCardClass()}>
-              <CardContent className="p-5">
-                <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center mb-3', m.bg)}>
-                  <Icon className={cn('h-5 w-5', m.color)} />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">{m.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{m.label}</div>
-              </CardContent>
-            </Card>
-          )
-        })}
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
+        <MetricCard label="Gepland" value={String(geplandCount)} icon={<Clock />} />
+        <MetricCard label="Afgerond" value={String(afgerondCount)} icon={<CheckCircle2 />} />
+        <MetricCard label="Uitgesteld" value={String(uitgesteldCount)} icon={<AlertTriangle />} />
       </div>
 
       {/* Table */}
@@ -203,8 +193,22 @@ export default function InspectiesPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Adres</Label>
-              <Input placeholder="bijv. Keizersgracht 12-A" value={newAddress} onChange={(e) => setNewAddress(e.target.value)} className="rounded-xl" />
+              <Label>Pand</Label>
+              {propertyOptions.length > 0 ? (
+                <Select value={newPropertyId} onValueChange={setNewPropertyId}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Kies een pand..." /></SelectTrigger>
+                  <SelectContent>
+                    {propertyOptions.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        <span className="font-medium">{p.name}</span>
+                        <span className="text-gray-400 ml-1.5 text-xs">{p.address}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-sm text-gray-400 dark:text-gray-500 py-2">Geen panden beschikbaar. Voeg eerst panden toe.</p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>Type inspectie</Label>
@@ -233,7 +237,7 @@ export default function InspectiesPage() {
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-full" onClick={() => setCreateOpen(false)}>Annuleren</Button>
             <Button className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
-              disabled={!newAddress.trim() || !newDate} onClick={handleCreate}>
+              disabled={!newPropertyId || !newDate} onClick={handleCreate}>
               <ClipboardCheck className="h-4 w-4 mr-2" />
               Inspectie aanmaken
             </Button>

@@ -9,6 +9,7 @@ import {
   AlertTriangle, BarChart3, Calculator, CheckCircle2,
   ArrowRight, ShieldCheck,
 } from 'lucide-react'
+import { MetricCard } from '@/components/finance/MetricCard'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
@@ -39,25 +40,10 @@ export default function ComplianceAlertsPage() {
       <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-content-blocks">
-        {[
-          { label: 'Hoge urgentie', value: isDemo ? hoogCount : 0, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-500/10', icon: AlertTriangle },
-          { label: 'Middel urgentie', value: isDemo ? middenCount : 0, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-500/10', icon: AlertTriangle },
-          { label: 'Opgelost', value: isDemo ? dismissed.size : 0, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-500/10', icon: CheckCircle2 },
-        ].map((m) => {
-          const Icon = m.icon
-          return (
-            <Card key={m.label} className={dashboardCardClass()}>
-              <CardContent className="p-5">
-                <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center mb-3', m.bg)}>
-                  <Icon className={cn('h-5 w-5', m.color)} />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">{m.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{m.label}</div>
-              </CardContent>
-            </Card>
-          )
-        })}
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
+        <MetricCard label="Hoge urgentie" value={String(isDemo ? hoogCount : 0)} icon={<AlertTriangle />} />
+        <MetricCard label="Middel urgentie" value={String(isDemo ? middenCount : 0)} icon={<AlertTriangle />} />
+        <MetricCard label="Opgelost" value={String(isDemo ? dismissed.size : 0)} icon={<CheckCircle2 />} />
       </div>
 
       {/* Alert list */}

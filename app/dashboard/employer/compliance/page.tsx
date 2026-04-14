@@ -32,6 +32,7 @@ import {
   Clock,
   ChevronRight,
 } from 'lucide-react'
+import { MetricCard } from '@/components/finance/MetricCard'
 import {
   mockWwsObjects,
   mockWwsAlerts,
@@ -211,55 +212,11 @@ export default function CompliancePage() {
       <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-content-blocks">
-        {[
-          {
-            label: 'Compliant',
-            value: isDemo ? `${compliantPercent}%` : '—',
-            sub: isDemo ? `${compliantCount} van ${totalCount} objecten` : undefined,
-            icon: ShieldCheck,
-            color: 'text-emerald-600 dark:text-emerald-400',
-            bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-          },
-          {
-            label: 'Acties vereist',
-            value: isDemo ? String(actieVereist) : '—',
-            sub: isDemo && actieVereist > 0 ? `${wwsAlerts.length} alertmelding${wwsAlerts.length === 1 ? '' : 'en'}` : 'Alles in orde',
-            icon: AlertTriangle,
-            color: actieVereist > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400',
-            bg: actieVereist > 0 ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10',
-          },
-          {
-            label: 'Gem. punten',
-            value: isDemo ? String(gemiddeldPunten) : '—',
-            sub: isDemo ? (trendDiff >= 0 ? `+${trendDiff} t.o.v. vorig jaar` : `${trendDiff} t.o.v. vorig jaar`) : undefined,
-            icon: Calculator,
-            color: 'text-[#163300] dark:text-[#9FE870]',
-            bg: 'bg-[#163300]/5 dark:bg-[#9FE870]/10',
-          },
-          {
-            label: 'Vrije sector',
-            value: isDemo ? String(vrijeSectorCount) : '—',
-            sub: isDemo ? `${Math.round(vrijeSectorCount / totalCount * 100)}% van portefeuille` : undefined,
-            icon: BarChart3,
-            color: 'text-blue-600 dark:text-blue-400',
-            bg: 'bg-blue-50 dark:bg-blue-500/10',
-          },
-        ].map((m) => {
-          const Icon = m.icon
-          return (
-            <Card key={m.label} className={dashboardCardClass(undefined, isDemo)}>
-              <CardContent className="p-5">
-                <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center mb-3', m.bg)}>
-                  <Icon className={cn('h-5 w-5', m.color)} />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">{m.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{m.label}</div>
-                {m.sub && <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{m.sub}</div>}
-              </CardContent>
-            </Card>
-          )
-        })}
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard label="Compliant" value={isDemo ? `${compliantPercent}%` : '0%'} subtitle={isDemo ? `${compliantCount} van ${totalCount} objecten` : undefined} icon={<ShieldCheck />} />
+        <MetricCard label="Acties vereist" value={isDemo ? String(actieVereist) : '0'} subtitle={isDemo && actieVereist > 0 ? `${wwsAlerts.length} alertmeldingen` : 'Geen acties vereist'} icon={<AlertTriangle />} />
+        <MetricCard label="Gem. punten" value={isDemo ? String(gemiddeldPunten) : '0'} subtitle={isDemo ? (trendDiff >= 0 ? `+${trendDiff} t.o.v. vorig jaar` : `${trendDiff} t.o.v. vorig jaar`) : undefined} icon={<Calculator />} />
+        <MetricCard label="Vrije sector" value={isDemo ? String(vrijeSectorCount) : '0'} subtitle={isDemo ? `${Math.round(vrijeSectorCount / totalCount * 100)}% van portefeuille` : undefined} icon={<BarChart3 />} />
       </div>
 
       {/* Sector verdeling + Alerts */}

@@ -14,9 +14,11 @@ import {
   Calendar, ClipboardCheck, Ticket, Plus, Euro,
   Wrench, Paintbrush, Zap, Droplets, TreePine, ChevronRight,
 } from 'lucide-react'
+import { MetricCard } from '@/components/finance/MetricCard'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
+import { mockProperties } from '@/lib/mock-data/vastgoed'
 
 const getMaintenanceNav = (basePath: string) => [
   { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
@@ -70,9 +72,9 @@ const mockTasks: PlanningTask[] = [
 
 function getStatusBadge(status: TaskStatus) {
   switch (status) {
-    case 'gepland': return <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-0">Gepland</Badge>
-    case 'in_uitvoering': return <Badge className="bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-0">In uitvoering</Badge>
-    case 'afgerond': return <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-0">Afgerond</Badge>
+    case 'gepland': return <Badge className="bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400 border-0">Gepland</Badge>
+    case 'in_uitvoering': return <Badge className="bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300 border-0">In uitvoering</Badge>
+    case 'afgerond': return <Badge className="bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-500 border-0 line-through">Afgerond</Badge>
   }
 }
 
@@ -82,7 +84,7 @@ export default function PlanningPage() {
   const [tasks, setTasks] = useState<PlanningTask[]>(isDemo ? mockTasks : [])
   const [createOpen, setCreateOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
-  const [newAddress, setNewAddress] = useState('')
+  const [newPropertyId, setNewPropertyId] = useState('')
   const [newCategory, setNewCategory] = useState<TaskCategory>('overig')
   const [newYear, setNewYear] = useState(String(new Date().getFullYear() + 1))
   const [newBudget, setNewBudget] = useState('')
@@ -92,12 +94,15 @@ export default function PlanningPage() {
   const totalBudget = tasks.filter((t) => t.status !== 'afgerond').reduce((s, t) => s + t.budget, 0)
   const inUitvoering = tasks.filter((t) => t.status === 'in_uitvoering').length
 
+  const propertyOptions = isDemo ? mockProperties : []
+  const selectedProperty = propertyOptions.find((p) => p.id === newPropertyId)
+
   const handleCreate = () => {
-    if (!newTitle.trim() || !newAddress.trim()) return
+    if (!newTitle.trim() || !newPropertyId) return
     const task: PlanningTask = {
       id: `${Date.now()}`,
       title: newTitle.trim(),
-      address: newAddress.trim(),
+      address: selectedProperty ? `${selectedProperty.name} — ${selectedProperty.address}` : newPropertyId,
       category: newCategory,
       status: 'gepland',
       plannedYear: parseInt(newYear) || new Date().getFullYear(),
@@ -106,7 +111,7 @@ export default function PlanningPage() {
     }
     setTasks((prev) => [...prev, task].sort((a, b) => a.plannedYear - b.plannedYear))
     setCreateOpen(false)
-    setNewTitle(''); setNewAddress(''); setNewCategory('overig'); setNewYear(String(new Date().getFullYear() + 1)); setNewBudget(''); setNewDesc('')
+    setNewTitle(''); setNewPropertyId(''); setNewCategory('overig'); setNewYear(String(new Date().getFullYear() + 1)); setNewBudget(''); setNewDesc('')
   }
 
   return (
@@ -114,34 +119,10 @@ export default function PlanningPage() {
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-content-blocks">
-        <Card className={dashboardCardClass()}>
-          <CardContent className="p-5">
-            <div className="h-10 w-10 rounded-xl bg-[#163300]/5 dark:bg-[#9FE870]/10 flex items-center justify-center mb-3">
-              <Calendar className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-            </div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">{tasks.filter((t) => t.status !== 'afgerond').length}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Geplande taken</div>
-          </CardContent>
-        </Card>
-        <Card className={dashboardCardClass()}>
-          <CardContent className="p-5">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center mb-3">
-              <Wrench className="h-5 w-5 text-amber-500 dark:text-amber-400" />
-            </div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">{inUitvoering}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">In uitvoering</div>
-          </CardContent>
-        </Card>
-        <Card className={dashboardCardClass()}>
-          <CardContent className="p-5">
-            <div className="h-10 w-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center mb-3">
-              <Euro className="h-5 w-5 text-orange-500 dark:text-orange-400" />
-            </div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">€{totalBudget.toLocaleString('nl-NL')}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Totaalbudget gepland</div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
+        <MetricCard label="Geplande taken" value={String(tasks.filter((t) => t.status !== 'afgerond').length)} icon={<Calendar />} />
+        <MetricCard label="In uitvoering" value={String(inUitvoering)} icon={<Wrench />} />
+        <MetricCard label="Totaalbudget gepland" value={`€${totalBudget.toLocaleString('nl-NL')}`} icon={<Euro />} />
       </div>
 
       {/* Per year */}
@@ -220,8 +201,22 @@ export default function PlanningPage() {
               <Input placeholder="bijv. Buitenschilderwerk" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} className="rounded-xl" />
             </div>
             <div className="space-y-1.5">
-              <Label>Adres</Label>
-              <Input placeholder="bijv. Keizersgracht 12" value={newAddress} onChange={(e) => setNewAddress(e.target.value)} className="rounded-xl" />
+              <Label>Pand</Label>
+              {propertyOptions.length > 0 ? (
+                <Select value={newPropertyId} onValueChange={setNewPropertyId}>
+                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Kies een pand..." /></SelectTrigger>
+                  <SelectContent>
+                    {propertyOptions.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        <span className="font-medium">{p.name}</span>
+                        <span className="text-gray-400 ml-1.5 text-xs">{p.address}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-sm text-gray-400 dark:text-gray-500 py-2">Geen panden beschikbaar. Voeg eerst panden toe.</p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -252,7 +247,7 @@ export default function PlanningPage() {
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-full" onClick={() => setCreateOpen(false)}>Annuleren</Button>
             <Button className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
-              disabled={!newTitle.trim() || !newAddress.trim()} onClick={handleCreate}>
+              disabled={!newTitle.trim() || !newPropertyId} onClick={handleCreate}>
               <Calendar className="h-4 w-4 mr-2" />
               Inplannen
             </Button>

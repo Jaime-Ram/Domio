@@ -5,10 +5,12 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
   User, Shield, CreditCard, Settings,
   CheckCircle2, Pencil, X, Check, Loader2, Mail, Phone, Building2,
+  Globe, Bell, Trash2, AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getProfile, updateProfile } from '@/lib/supabase/profile'
-import { resetPassword, enrollMfa, enrollPhoneMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
+import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
+import { resetPassword, enrollMfa, enrollPhoneMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail, deleteAccount } from '@/lib/supabase/auth'
+import { Switch } from '@/components/ui/switch'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'koppelingen'
@@ -144,6 +146,18 @@ export default function SettingsPage() {
   const [smsUnenrollSending, setSmsUnenrollSending] = useState(false)
   const [smsUnenrollVerifying, setSmsUnenrollVerifying] = useState(false)
 
+  // Voorkeuren
+  const [language, setLanguage] = useState<'nl' | 'en'>('nl')
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(getDefaultNotificationPrefs())
+  const [prefsSaving, setPrefsSaving] = useState(false)
+  const [prefsSaved, setPrefsSaved] = useState(false)
+
+  // Account verwijderen
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('')
+  const [deleteWorking, setDeleteWorking] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
   // TOTP MFA
   const [totpFactors, setTotpFactors] = useState<{ id: string; friendly_name?: string }[]>([])
   const [totpEnrolling, setTotpEnrolling] = useState(false)
@@ -189,6 +203,8 @@ export default function SettingsPage() {
         setAccountForm(formData)
         setOriginalForm(formData)
         setMfaMethod(p.mfa_method ?? 'none')
+        setLanguage(p.language ?? 'nl')
+        setNotifPrefs(p.notification_prefs ?? getDefaultNotificationPrefs())
       }
     } finally {
       setAccountDataReady(true)
@@ -215,6 +231,8 @@ export default function SettingsPage() {
       }
       setAccountForm(formData)
       setOriginalForm(formData)
+      setLanguage(dashProfile.language ?? 'nl')
+      setNotifPrefs(dashProfile.notification_prefs ?? getDefaultNotificationPrefs())
       setAccountDataReady(true)
     } else if (!userCtxLoading) {
       setAccountDataReady(true)
@@ -327,6 +345,30 @@ export default function SettingsPage() {
     }
     
     setEmailChangeStatus('sent')
+  }
+
+  const handleSavePrefs = async (newLang?: 'nl' | 'en', newPrefs?: NotificationPrefs) => {
+    if (isDemo || !user?.id) return
+    setPrefsSaving(true)
+    await updateProfile(user.id, {
+      language: newLang ?? language,
+      notification_prefs: newPrefs ?? notifPrefs,
+    })
+    setPrefsSaving(false)
+    setPrefsSaved(true)
+    setTimeout(() => setPrefsSaved(false), 2000)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!deleteConfirmEmail.trim() || deleteConfirmEmail.trim().toLowerCase() !== (user?.email ?? '').toLowerCase()) {
+      setDeleteError('E-mailadres komt niet overeen')
+      return
+    }
+    setDeleteWorking(true)
+    setDeleteError('')
+    const { error } = await deleteAccount()
+    if (error) { setDeleteError(error.message); setDeleteWorking(false); return }
+    window.location.href = '/login'
   }
 
   const handleSelectMethod = async (method: 'none' | 'sms' | 'totp') => {
@@ -514,9 +556,9 @@ export default function SettingsPage() {
       )}
 
       {accountDataReady && activeTab === 'account' && (
-        <div className={cn(sCard, 'mt-6 p-6 space-y-6')}>
+        <div className="mt-4 space-y-3">
           {/* Persoonlijke gegevens */}
-          <div className="border-b border-gray-100 dark:border-neutral-800 pb-6">
+          <div className={cn(sCard, 'overflow-hidden')}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-[#163300]/5 dark:bg-[#9FE870]/10 flex items-center justify-center">
@@ -848,6 +890,154 @@ export default function SettingsPage() {
                       </>
                     ) : '—'}
                   </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Taalvoorkeur */}
+          <div className="border-t border-gray-100 dark:border-neutral-800 pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-9 w-9 rounded-lg bg-[#163300]/5 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
+                <Globe className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">Taalvoorkeur</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Kies de taal van de interface</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {(['nl', 'en'] as const).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={async () => { setLanguage(lang); await handleSavePrefs(lang) }}
+                  className={cn(
+                    'px-5 py-2 rounded-full text-sm font-medium border transition-colors',
+                    language === lang
+                      ? 'bg-[#9FE870] text-[#163300] border-[#9FE870]'
+                      : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-neutral-700 hover:border-[#163300]/30'
+                  )}
+                >
+                  {lang === 'nl' ? '🇳🇱 Nederlands' : '🇬🇧 English'}
+                </button>
+              ))}
+              {prefsSaving && <span className="flex items-center gap-1 text-xs text-gray-400 ml-2"><Loader2 className="h-3 w-3 animate-spin" />Opslaan…</span>}
+              {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#163300] dark:text-[#9FE870] ml-2"><Check className="h-3 w-3" />Opgeslagen</span>}
+            </div>
+          </div>
+
+          {/* Notificatievoorkeuren */}
+          <div className="border-t border-gray-100 dark:border-neutral-800 pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-9 w-9 rounded-lg bg-[#163300]/5 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
+                <Bell className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">Notificaties</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Kies hoe en waarover je meldingen ontvangt</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {/* Kanalen */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Kanalen</p>
+                {[
+                  { key: 'email' as const, label: 'E-mail notificaties', sub: 'Ontvang meldingen via e-mail' },
+                  { key: 'in_app' as const, label: 'In-app meldingen', sub: 'Meldingen binnen het dashboard' },
+                ].map(({ key, label, sub }) => (
+                  <label key={key} className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-neutral-800 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{sub}</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs[key]}
+                      onChange={async (e) => {
+                        const next = { ...notifPrefs, [key]: e.target.checked }
+                        setNotifPrefs(next)
+                        await handleSavePrefs(undefined, next)
+                      }}
+                      className="h-4 w-4 rounded accent-[#163300]"
+                    />
+                  </label>
+                ))}
+              </div>
+              {/* Categorieën */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Categorieën</p>
+                {[
+                  { key: 'new_payment' as const, label: 'Nieuwe betaling ontvangen' },
+                  { key: 'payment_overdue' as const, label: 'Betaling te laat' },
+                  { key: 'maintenance_request' as const, label: 'Nieuw onderhoudsverzoek' },
+                  { key: 'document_expiring' as const, label: 'Document verloopt binnenkort' },
+                ].map(({ key, label }) => (
+                  <label key={key} className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-neutral-800 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors">
+                    <p className="text-sm text-gray-700 dark:text-gray-200">{label}</p>
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs[key]}
+                      onChange={async (e) => {
+                        const next = { ...notifPrefs, [key]: e.target.checked }
+                        setNotifPrefs(next)
+                        await handleSavePrefs(undefined, next)
+                      }}
+                      className="h-4 w-4 rounded accent-[#163300]"
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Gevarenzone — account verwijderen */}
+          <div className="border-t border-red-100 dark:border-red-900/30 pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-9 w-9 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-red-600 dark:text-red-400">Gevarenzone</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Onomkeerbare acties voor je account</p>
+              </div>
+            </div>
+            {!deleteOpen ? (
+              <button
+                onClick={() => { setDeleteOpen(true); setDeleteConfirmEmail(''); setDeleteError('') }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+                Account verwijderen (AVG)
+              </button>
+            ) : (
+              <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10 p-4 space-y-3">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Dit verwijdert <strong>permanent</strong> je account en alle bijbehorende data. Dit is niet terugdraaien.
+                  Bevestig door je e-mailadres in te typen: <span className="font-mono font-medium">{user?.email ?? ''}</span>
+                </p>
+                <input
+                  type="email"
+                  value={deleteConfirmEmail}
+                  onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                  placeholder={user?.email ?? 'jouw@email.nl'}
+                  className="w-full rounded-lg border border-red-200 dark:border-red-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                />
+                {deleteError && <p className="text-xs text-red-600 dark:text-red-400">{deleteError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleDeleteAccount}
+                    disabled={deleteWorking || deleteConfirmEmail.trim().toLowerCase() !== (user?.email ?? '').toLowerCase()}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium disabled:opacity-40 transition-colors"
+                  >
+                    {deleteWorking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                    Definitief verwijderen
+                  </button>
+                  <button
+                    onClick={() => setDeleteOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+                  >
+                    Annuleren
+                  </button>
                 </div>
               </div>
             )}

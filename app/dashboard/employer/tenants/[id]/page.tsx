@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table'
 import { DashboardTableHead, DashboardTableCell } from '@/components/dashboard/dashboard-table'
 import { Textarea } from '@/components/ui/textarea'
-import { 
+import {
   ArrowLeft,
   User,
   Phone,
@@ -34,6 +34,13 @@ import {
   Clock,
   AlertCircle,
   FileText,
+  Download,
+  Wrench,
+  Shield,
+  Briefcase,
+  Tag,
+  ExternalLink,
+  Plus,
 } from 'lucide-react'
 import { mockPayments } from '@/lib/mock-data/vastgoed'
 import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
@@ -51,6 +58,8 @@ export default function TenantDetailPage() {
   const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState('Betrouwbare huurder, betaalt altijd op tijd.')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [tags, setTags] = useState<string[]>(isDemo ? ['Langdurige huurder'] : [])
+  const [newTag, setNewTag] = useState('')
 
   useEffect(() => {
     const loadTenant = async () => {
@@ -126,6 +135,21 @@ export default function TenantDetailPage() {
     .filter(p => p.status === 'Openstaand')
     .reduce((sum, p) => sum + p.amount, 0)
 
+  const mockDocuments = isDemo ? [
+    { id: '1', name: 'Huurovereenkomst 2023', category: 'Contract', date: '2023-01-01', sharedWithTenant: true },
+    { id: '2', name: 'Borgovereenkomst', category: 'Borg', date: '2023-01-01', sharedWithTenant: true },
+    { id: '3', name: 'Kopie ID-bewijs', category: 'Identificatie', date: '2023-01-03', sharedWithTenant: false },
+    { id: '4', name: 'Salarisstrook jan 2023', category: 'Inkomen', date: '2023-01-05', sharedWithTenant: false },
+    { id: '5', name: 'Plaatsbeschrijving intrede', category: 'Inspectie', date: '2023-01-05', sharedWithTenant: true },
+    { id: '6', name: 'Jaarafrekening servicekosten 2025', category: 'Financieel', date: '2026-02-01', sharedWithTenant: true },
+  ] : []
+
+  const mockTickets = isDemo ? [
+    { id: '1', title: 'Lekkage badkamer', category: 'Loodgieterswerk', status: 'in_behandeling', priority: 'hoog', date: '2026-04-02' },
+    { id: '2', title: 'Kapotte CV-ketel', category: 'Verwarming', status: 'afgerond', priority: 'urgent', date: '2026-01-15' },
+    { id: '3', title: 'Tochtige ramen woonkamer', category: 'Ramen/deuren', status: 'open', priority: 'normaal', date: '2025-11-10' },
+  ] : []
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Betaald':
@@ -187,8 +211,17 @@ export default function TenantDetailPage() {
                       Up-to-date
                     </Badge>
                   )}
-                  <Button 
+                  <Button
                     variant="outline"
+                    className="rounded-full gap-2 text-sm"
+                    onClick={() => window.open(`/portal/huurder/${tenantId}`, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Portaal
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="rounded-full text-sm"
                     onClick={() => router.push(`${basePath}/tenants/${tenantId}/edit`)}
                   >
                     Bewerken
@@ -200,8 +233,17 @@ export default function TenantDetailPage() {
             {/* Tabs */}
             <Tabs defaultValue="details" className="w-full">
               <TabsList className="flex w-fit gap-1 bg-gray-100 dark:bg-neutral-800 rounded-full p-1 mb-6">
-                <TabsTrigger value="details" className="px-4 py-1.5 rounded-full text-sm data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-[#163300] dark:data-[state=active]:text-[#9FE870] data-[state=active]:shadow-sm">Gegevens</TabsTrigger>
-                <TabsTrigger value="payments" className="px-4 py-1.5 rounded-full text-sm data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-[#163300] dark:data-[state=active]:text-[#9FE870] data-[state=active]:shadow-sm">Betalingen</TabsTrigger>
+                {[
+                  { value: 'details', label: 'Gegevens' },
+                  { value: 'payments', label: 'Betalingen' },
+                  { value: 'documents', label: 'Documenten' },
+                  { value: 'tickets', label: 'Tickets' },
+                ].map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value}
+                    className="px-4 py-1.5 rounded-full text-sm data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-[#163300] dark:data-[state=active]:text-[#9FE870] data-[state=active]:shadow-sm">
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               {/* Tab 1: Gegevens */}
@@ -241,6 +283,45 @@ export default function TenantDetailPage() {
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-gray-400" />
                             <p className="font-medium text-gray-900 dark:text-white">{tenant.date_of_birth || '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Extra profiel velden */}
+                      <div className="border-t pt-4">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Extra gegevens</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">IBAN (incasso)</p>
+                            <div className="flex items-center gap-2">
+                              <Euro className="h-4 w-4 text-gray-400" />
+                              <p className="font-medium text-gray-900 dark:text-white">{isDemo ? 'NL91 ABNA 0417 1643 00' : '-'}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Werkgever</p>
+                            <div className="flex items-center gap-2">
+                              <Briefcase className="h-4 w-4 text-gray-400" />
+                              <p className="font-medium text-gray-900 dark:text-white">{isDemo ? 'Acme BV — vast dienstverband' : '-'}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Noodcontact</p>
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-4 w-4 text-gray-400" />
+                              <p className="font-medium text-gray-900 dark:text-white">{isDemo ? 'A. Jansen (partner) · +31 6 98765432' : '-'}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Labels</p>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {tags.map((t) => (
+                                <span key={t} className="inline-flex items-center gap-1 text-xs bg-[#163300]/5 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] px-2 py-0.5 rounded-full">
+                                  <Tag className="h-2.5 w-2.5" />{t}
+                                </span>
+                              ))}
+                              {tags.length === 0 && <span className="text-sm text-gray-400">—</span>}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -387,6 +468,112 @@ export default function TenantDetailPage() {
                       </TableBody>
                     </Table>
                     </DashboardTableBlock>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              {/* Tab 3: Documenten */}
+              <TabsContent value="documents">
+                <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+                  <CardHeader className="px-5 pt-5 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Documenten</CardTitle>
+                        <CardDescription>Dossier van deze huurder</CardDescription>
+                      </div>
+                      <Button className="rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] h-9 px-4 text-sm font-medium gap-2">
+                        <Plus className="h-4 w-4" />Document toevoegen
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 pb-2">
+                    {mockDocuments.length === 0 ? (
+                      <div className="py-12 text-center text-sm text-gray-400 dark:text-gray-500">
+                        <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+                        Nog geen documenten opgeslagen.
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-50 dark:divide-neutral-800/80">
+                        {mockDocuments.map((doc) => (
+                          <div key={doc.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50/60 dark:hover:bg-neutral-800/40">
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-lg border border-gray-200 dark:border-neutral-700 flex items-center justify-center shrink-0">
+                                <FileText className="h-4 w-4 text-gray-400" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">{doc.name}</p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                  {doc.category} · {new Date(doc.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {doc.sharedWithTenant && (
+                                <span className="text-xs text-gray-400 dark:text-gray-500">Zichtbaar voor huurder</span>
+                              )}
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full text-gray-400 hover:text-gray-700">
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Tab 4: Tickets */}
+              <TabsContent value="tickets">
+                <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+                  <CardHeader className="px-5 pt-5 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Onderhoudsmeldingen</CardTitle>
+                        <CardDescription>Tickets gekoppeld aan deze huurder</CardDescription>
+                      </div>
+                      <Button
+                        className="rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] h-9 px-4 text-sm font-medium gap-2"
+                        onClick={() => router.push(`${basePath}/maintenance`)}
+                      >
+                        <Plus className="h-4 w-4" />Nieuw ticket
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 pb-2">
+                    {mockTickets.length === 0 ? (
+                      <div className="py-12 text-center text-sm text-gray-400 dark:text-gray-500">
+                        <Wrench className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+                        Geen meldingen voor deze huurder.
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-50 dark:divide-neutral-800/80">
+                        {mockTickets.map((ticket) => {
+                          const statusMap: Record<string, { label: string; cls: string }> = {
+                            open: { label: 'Open', cls: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' },
+                            in_behandeling: { label: 'In behandeling', cls: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400' },
+                            afgerond: { label: 'Afgerond', cls: 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-500' },
+                          }
+                          const s = statusMap[ticket.status] ?? statusMap.open
+                          return (
+                            <div key={ticket.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 cursor-pointer"
+                              onClick={() => router.push(`${basePath}/maintenance`)}>
+                              <div className="flex items-center gap-3">
+                                <div className="h-9 w-9 rounded-lg border border-gray-200 dark:border-neutral-700 flex items-center justify-center shrink-0">
+                                  <Wrench className="h-4 w-4 text-gray-400" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900 dark:text-white">{ticket.title}</p>
+                                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                    {ticket.category} · {new Date(ticket.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium border-0', s.cls)}>{s.label}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

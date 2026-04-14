@@ -42,7 +42,9 @@ import {
   HelpCircle,
   Ticket,
   CalendarClock,
-  Percent
+  Percent,
+  Workflow,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -86,7 +88,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
       { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`] },
-      { id: 'contracten-accordion', paths: [`${basePath}/contracts`] },
     ]
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
@@ -161,13 +162,14 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       ],
     },
     {
-      label: 'Contracten',
-      icon: FileText,
-      children: [
-        { label: 'Huurcontracten', href: `${basePath}/contracts/leases`, icon: FileText },
-        { label: 'Leveranciers', href: `${basePath}/contracts/suppliers`, icon: Briefcase },
-        { label: 'Sjablonen', href: `${basePath}/contracts/templates`, icon: BookOpen },
-      ],
+      label: 'Flow',
+      href: `${basePath}/flow`,
+      icon: Workflow,
+    },
+    {
+      label: 'Domio Assist',
+      href: `${basePath}/assist`,
+      icon: Sparkles,
     },
     {
       label: 'Communicatie',
@@ -178,16 +180,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Drive',
       href: `${basePath}/documents`,
       icon: HardDrive,
-    },
-    {
-      label: 'VvE',
-      href: `${basePath}/vve`,
-      icon: Building2,
-    },
-    {
-      label: 'Rapportages',
-      href: `${basePath}/reports`,
-      icon: BarChart3,
     },
     {
       label: 'Accountinstellingen',
@@ -229,7 +221,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         data-vastgoed-sidebar
         className={cn(
           "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] dark:bg-neutral-800 transform rounded-tr-3xl rounded-br-3xl",
-          
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
@@ -242,6 +233,11 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
           willChange: 'width'
         }}
       >
+        {/* Depth gradient — simuleert dat de sidebar achter de content ligt */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-5 rounded-tr-3xl rounded-br-3xl bg-gradient-to-l from-black/[0.035] to-transparent dark:from-black/[0.10] z-10"
+        />
         <div className="relative flex flex-col h-full max-h-full">
           <div className={cn(
             "h-16 flex items-center transition-all duration-300",
