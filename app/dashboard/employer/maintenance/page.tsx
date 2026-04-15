@@ -57,7 +57,15 @@ import {
   ChevronsUpDown,
   MapPin,
   Ban,
+  ChevronRight,
 } from 'lucide-react'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
 import { mockMaintenanceRequests } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
@@ -122,6 +130,38 @@ export default function MaintenancePage() {
   const [newTitle, setNewTitle] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [newPriority, setNewPriority] = useState<'laag' | 'normaal' | 'hoog' | 'urgent'>('normaal')
+
+  // Detail panel
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const [detailTicketId, setDetailTicketId] = useState<string | null>(() => searchParams?.get('ticket') ?? null)
+  const detailTicket = tickets.find(t => t.id === detailTicketId) ?? null
+  const [updatingStatus, setUpdatingStatus] = useState(false)
+
+  const openDetail = (id: string) => {
+    setDetailTicketId(id)
+    const url = new URL(window.location.href)
+    url.searchParams.set('ticket', id)
+    window.history.replaceState({}, '', url.toString())
+  }
+
+  const closeDetail = () => {
+    setDetailTicketId(null)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('ticket')
+    window.history.replaceState({}, '', url.toString())
+  }
+
+  const handleStatusChange = async (ticketId: string, newStatus: string) => {
+    setUpdatingStatus(true)
+    try {
+      if (!isDemo && user?.id) {
+        await ticketQueries.updateStatus(ticketId, newStatus)
+      }
+      setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: newStatus } : t))
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -347,7 +387,7 @@ export default function MaintenancePage() {
         className={cn('rounded-full', layout === 'stack' && 'w-full justify-center')}
         onClick={(e) => {
           e.stopPropagation()
-          router.push(`${basePath}/maintenance?ticket=${t.id}`)
+          openDetail(t.id)
         }}
       >
         <Eye className="h-4 w-4 mr-1" />
@@ -503,7 +543,7 @@ export default function MaintenancePage() {
                     dashboardCardClass('transition-colors cursor-pointer', isDemo),
                     'rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 hover:border-[#163300] dark:hover:border-[#9FE870]'
                   )}
-                  onClick={() => router.push(`${basePath}/maintenance?ticket=${t.id}`)}
+                  onClick={() => openDetail(t.id)}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-start gap-3 min-w-0">
@@ -578,7 +618,7 @@ export default function MaintenancePage() {
                       <TableRow
                         key={t.id}
                         className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer"
-                        onClick={() => router.push(`${basePath}/maintenance?ticket=${t.id}`)}
+                        onClick={() => openDetail(t.id)}
                       >
                         <TableCell className="py-4 px-4">
                           <div className="flex items-center gap-3 min-w-0">
@@ -682,6 +722,103 @@ export default function MaintenancePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Ticket detail panel */}
+      <Sheet open={!!detailTicket} onOpenChange={(open) => { if (!open) closeDetail() }}>
+        <SheetContent side="right" className="flex flex-col w-full max-w-lg overflow-y-auto">
+          {detailTicket && (
+            <>
+              <SheetHeader className="border-b border-gray-100 dark:border-neutral-800 pb-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="h-9 w-9 rounded-lg bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
+                    <Ticket className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                  </div>
+                  <SheetTitle className="text-base">{detailTicket.title}</SheetTitle>
+                </div>
+                {detailTicket.unitLabel && (
+                  <SheetDescription className="flex items-center gap-1 text-xs mt-1">
+                    <MapPin className="h-3 w-3" />{detailTicket.unitLabel}
+                  </SheetDescription>
+                )}
+              </SheetHeader>
+
+              <div className="flex-1 px-6 py-5 space-y-6">
+                {/* Status & prioriteit */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</p>
+                    <Select
+                      value={detailTicket.status}
+                      onValueChange={(v) => handleStatusChange(detailTicket.id, v)}
+                      disabled={updatingStatus}
+                    >
+                      <SelectTrigger className="rounded-xl h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="in_behandeling">In behandeling</SelectItem>
+                        <SelectItem value="gepland">Gepland</SelectItem>
+                        <SelectItem value="afgerond">Afgerond</SelectItem>
+                        <SelectItem value="geannuleerd">Geannuleerd</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Prioriteit</p>
+                    <div className="mt-1">{getPriorityBadge(detailTicket.priority)}</div>
+                  </div>
+                </div>
+
+                {/* Metadata */}
+                <div className="space-y-3">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Details</p>
+                  <div className="rounded-xl border border-gray-100 dark:border-neutral-800 divide-y divide-gray-50 dark:divide-neutral-800">
+                    {[
+                      { label: 'Aangemaakt', value: format(new Date(detailTicket.created_at), 'd MMMM yyyy', { locale: nl }) },
+                      { label: 'Ticket ID', value: `#${detailTicket.id.slice(0, 8)}` },
+                      ...(detailTicket.unitLabel ? [{ label: 'Eenheid', value: detailTicket.unitLabel }] : []),
+                    ].map((row) => (
+                      <div key={row.label} className="flex items-center justify-between px-4 py-2.5">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{row.label}</span>
+                        <span className="text-xs font-medium text-gray-900 dark:text-white">{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Acties */}
+                <div className="space-y-2 pt-2">
+                  <Button
+                    type="button"
+                    className="w-full rounded-xl bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] gap-2"
+                    onClick={() => {
+                      closeDetail()
+                      router.push(`${basePath}/messages?ticket=${detailTicket.id}`)
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Open chat over dit ticket
+                    <ChevronRight className="h-4 w-4 ml-auto" />
+                  </Button>
+                  {detailTicket.status !== 'afgerond' && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-xl gap-2"
+                      disabled={updatingStatus}
+                      onClick={() => handleStatusChange(detailTicket.id, 'afgerond')}
+                    >
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      Markeer als afgerond
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </>
   )
 }

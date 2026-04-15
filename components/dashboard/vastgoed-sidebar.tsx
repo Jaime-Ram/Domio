@@ -84,8 +84,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   useEffect(() => {
     const menuItemsWithChildren = [
       { id: 'portefeuille-accordion', paths: [`${basePath}/portfolio`, `${basePath}/tenants`] },
-      { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
+      { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
       { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`] },
     ]
     const toOpen = menuItemsWithChildren
@@ -118,72 +118,54 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     )
   }
 
-  const menuItems: SidebarItem[] = [
-    {
-      label: 'Dashboard',
-      href: basePath,
-      icon: LayoutDashboard,
-    },
-    {
-      label: 'Portefeuille',
-      icon: Building2,
-      children: [
-        { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
-        { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
-      ],
-    },
-    {
-      label: 'Compliance',
-      icon: ShieldCheck,
-      children: [
-        { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-        { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-        { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-      ],
-    },
-    {
-      label: 'Financieel',
-      icon: Euro,
-      children: [
-        { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-        { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-        { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
-      ],
-    },
-    {
-      label: 'Onderhoud',
-      icon: Wrench,
-      children: [
-        { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
-        { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
-        { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
-      ],
-    },
-    {
-      label: 'Flow',
-      href: `${basePath}/flow`,
-      icon: Workflow,
-    },
-    {
-      label: 'Domio Assist',
-      href: `${basePath}/assist`,
-      icon: Sparkles,
-    },
-    {
-      label: 'Communicatie',
-      href: `${basePath}/messages`,
-      icon: MessageSquare,
-    },
-    {
-      label: 'Drive',
-      href: `${basePath}/documents`,
-      icon: HardDrive,
-    },
-    {
-      label: 'Accountinstellingen',
-      href: `${basePath}/settings`,
-      icon: Settings,
-    },
+  const menuGroups: SidebarItem[][] = [
+    [
+      { label: 'Dashboard', href: basePath, icon: LayoutDashboard },
+      {
+        label: 'Portefeuille',
+        icon: Building2,
+        children: [
+          { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
+          { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
+        ],
+      },
+      {
+        label: 'Financieel',
+        icon: Euro,
+        children: [
+          { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
+          { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
+          { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
+        ],
+      },
+      {
+        label: 'Compliance',
+        icon: ShieldCheck,
+        children: [
+          { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
+          { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
+          { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
+        ],
+      },
+      {
+        label: 'Onderhoud',
+        icon: Wrench,
+        children: [
+          { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
+          { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
+          { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
+        ],
+      },
+    ],
+    [
+      { label: 'Flow', href: `${basePath}/flow`, icon: Workflow },
+      { label: 'Domio Assist', href: `${basePath}/assist`, icon: Sparkles },
+    ],
+    [
+      { label: 'Communicatie', href: `${basePath}/messages`, icon: MessageSquare },
+      { label: 'Documenten', href: `${basePath}/documents`, icon: HardDrive },
+      { label: 'Accountinstellingen', href: `${basePath}/settings`, icon: Settings },
+    ],
   ]
 
   const isActive = (href?: string) => {
@@ -287,29 +269,103 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                 if (link && onClose) onClose()
               }}
             >
-              <ul className="flex flex-col space-y-1">
-                {menuItems.map((item) => {
-                  const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
-                  const isOpen = openItems.includes(itemId)
-                  const hasActiveChild = isParentActive(item.children)
-                  const Icon = item.icon
+              <div className="flex flex-col">
+                {menuGroups.map((group, groupIndex) => {
+                  const renderItem = (item: SidebarItem) => {
+                    const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
+                    const isOpen = openItems.includes(itemId)
+                    const hasActiveChild = isParentActive(item.children)
+                    const Icon = item.icon
 
-                  if (item.children) {
+                    if (item.children) {
+                      return (
+                        <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isOpen) {
+                                toggleItem(itemId)
+                              } else {
+                                router.push(item.children![0].href)
+                              }
+                            }}
+                            className={cn(
+                              "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                              collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
+                              hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
+                            )}
+                            title={collapsed ? item.label : undefined}
+                          >
+                            <Icon className="shrink-0 size-5 w-5 h-5" />
+                            <span className={cn(
+                              "flex-1 ml-3.5 min-w-0 transition-all duration-300 ease-in-out",
+                              collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
+                            )}>{item.label}</span>
+                            {item.badge && (
+                              <span className={cn(
+                                "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
+                                collapsed && "opacity-0 max-w-0 overflow-hidden"
+                              )}>
+                                {item.badge}
+                              </span>
+                            )}
+                            <ChevronDown
+                              className={cn(
+                                "ms-auto shrink-0 size-5 w-5 h-5 transition-all duration-300 ease-in-out",
+                                isOpen && "rotate-180",
+                                collapsed && "opacity-0 max-w-0 overflow-hidden w-0 ms-0"
+                              )}
+                            />
+                          </button>
+                          {collapsed && (
+                            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                              {item.label}
+                            </div>
+                          )}
+                          <div
+                            className={cn(
+                              "w-full overflow-hidden transition-all duration-300 ease-in-out",
+                              isOpen && !collapsed ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                            )}
+                          >
+                            <ul className="ps-8 pt-1 space-y-1">
+                              {item.children.map((child) => {
+                                const ChildIcon = child.icon || FileText
+                                const active = getActiveChildHref(item.children) === child.href
+                                return (
+                                  <li key={child.label}>
+                                    <Link
+                                      href={child.href}
+                                      className={cn(
+                                        "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
+                                        active
+                                          ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+                                          : "text-gray-800 dark:text-neutral-200"
+                                      )}
+                                    >
+                                      <ChildIcon className="shrink-0 size-5 w-5 h-5" />
+                                      <span className="ml-3.5">{child.label}</span>
+                                    </Link>
+                                  </li>
+                                )
+                              })}
+                            </ul>
+                          </div>
+                        </li>
+                      )
+                    }
+
+                    const active = isActive(item.href)
                     return (
-                      <li key={item.label} id={itemId} className={cn("relative group", collapsed && "flex")}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isOpen) {
-                              toggleItem(itemId)
-                            } else {
-                              router.push(item.children![0].href)
-                            }
-                          }}
+                      <li key={item.label} className={cn("relative group", collapsed && "flex")}>
+                        <Link
+                          href={item.href || '#'}
                           className={cn(
-                            "text-start flex items-center py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 dark:text-neutral-200 transition-all duration-150",
+                            "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
                             collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
-                            hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
+                            active
+                              ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+                              : "text-gray-800 dark:text-neutral-200"
                           )}
                           title={collapsed ? item.label : undefined}
                         >
@@ -326,94 +382,34 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                               {item.badge}
                             </span>
                           )}
-                          <ChevronDown 
-                            className={cn(
-                              "ms-auto shrink-0 size-5 w-5 h-5 transition-all duration-300 ease-in-out",
-                              isOpen && "rotate-180",
-                              collapsed && "opacity-0 max-w-0 overflow-hidden w-0 ms-0"
-                            )}
-                          />
-                        </button>
-                        {/* Tooltip wanneer ingeklapt */}
+                          {item.badge && collapsed && (
+                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
+                          )}
+                        </Link>
                         {collapsed && (
                           <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
                             {item.label}
                           </div>
                         )}
-                        <div 
-                          className={cn(
-                            "w-full overflow-hidden transition-all duration-300 ease-in-out",
-                            isOpen && !collapsed ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                          )}
-                        >
-                          <ul className="ps-8 pt-1 space-y-1">
-                            {item.children.map((child) => {
-                              const ChildIcon = child.icon || FileText
-                              const active = getActiveChildHref(item.children) === child.href
-                              return (
-                                <li key={child.label}>
-                                  <Link
-                                    href={child.href}
-                                    className={cn(
-                                      "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
-                                      active 
-                                        ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
-                                        : "text-gray-800 dark:text-neutral-200"
-                                    )}
-                                  >
-                                    <ChildIcon className="shrink-0 size-5 w-5 h-5" />
-                                    <span className="ml-3.5">{child.label}</span>
-                                  </Link>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        </div>
                       </li>
                     )
                   }
 
-                  const active = isActive(item.href)
                   return (
-                    <li key={item.label} className={cn("relative group", collapsed && "flex")}>
-                      <Link
-                        href={item.href || '#'}
-                        className={cn(
-                          "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:focus:bg-neutral-700 transition-all duration-150",
-                          collapsed ? "w-10 h-10 min-w-0 shrink-0 p-2.5" : "w-full",
-                          active 
-                            ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]" 
-                            : "text-gray-800 dark:text-neutral-200"
-                        )}
-                        title={collapsed ? item.label : undefined}
-                      >
-                        <Icon className="shrink-0 size-5 w-5 h-5" />
-                        <span className={cn(
-                          "flex-1 ml-3.5 min-w-0 transition-all duration-300 ease-in-out",
-                          collapsed ? "opacity-0 max-w-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
-                        )}>{item.label}</span>
-                        {item.badge && (
-                          <span className={cn(
-                            "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
-                            collapsed && "opacity-0 max-w-0 overflow-hidden"
-                          )}>
-                            {item.badge}
-                          </span>
-                        )}
-                        {item.badge && collapsed && (
-                          <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
-                        )}
-                      </Link>
-                      {/* Tooltip wanneer ingeklapt */}
-                      {collapsed && (
-                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                          {item.label}
-                        </div>
+                    <div key={groupIndex}>
+                      {groupIndex > 0 && (
+                        <hr className={cn(
+                          "my-2 border-gray-200 dark:border-neutral-700",
+                          collapsed && "mx-1"
+                        )} />
                       )}
-                    </li>
+                      <ul className="flex flex-col space-y-1">
+                        {group.map(renderItem)}
+                      </ul>
+                    </div>
                   )
                 })}
-              </ul>
+              </div>
             </nav>
           </div>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { VastgoedSidebar } from '@/components/dashboard/vastgoed-sidebar'
 import { ContentHeader } from '@/components/dashboard/content-header'
 import { cn } from '@/lib/utils'
@@ -21,6 +22,8 @@ export default function DemoAppLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [enterDone, setEnterDone] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const pathname = usePathname()
+  const isChatShell = pathname.includes('/messages') || pathname.includes('/assist')
 
   useEffect(() => {
     const t = requestAnimationFrame(() => {
@@ -97,17 +100,24 @@ export default function DemoAppLayout({
             >
               <ContentHeader onMenuClick={() => setSidebarOpen(true)} basePath={DEMO_BASE_PATH} />
               <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
-                <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 py-4 sm:py-6 lg:py-10 pb-16 flex flex-col gap-content-blocks">
-                  {children}
-                  <div className="flex justify-center items-center mt-16 pt-8">
-                    <Logo
-                      width={80}
-                      height={24}
-                      href="/demo/app"
-                      className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
-                      imgClassName="grayscale brightness-90 dark:brightness-110"
-                    />
-                  </div>
+                <div
+                  className={cn(
+                    'mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 py-4 sm:py-6 lg:py-10 flex flex-col gap-content-blocks h-full min-h-0',
+                    isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
+                  )}
+                >
+                  <div className="flex min-h-0 flex-1 flex-col gap-content-blocks">{children}</div>
+                  {!isChatShell && (
+                    <div className="flex justify-center items-center mt-16 pt-8">
+                      <Logo
+                        width={80}
+                        height={24}
+                        href="/demo/app"
+                        className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
+                        imgClassName="grayscale brightness-90 dark:brightness-110"
+                      />
+                    </div>
+                  )}
                 </div>
               </main>
             </div>

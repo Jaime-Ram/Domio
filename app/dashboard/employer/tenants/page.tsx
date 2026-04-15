@@ -58,6 +58,7 @@ import {
 } from '@/app/dashboard/employer/dashboard-ui'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
 
 type TenantRow = {
   id: string
@@ -100,6 +101,7 @@ export default function TenantsPage() {
   const pastRef = useRef<HTMLButtonElement | null>(null)
   const [indicator, setIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null)
   const [balanceFilter, setBalanceFilter] = useState({
     opPeil: true,
     openstaand: true,
@@ -613,16 +615,11 @@ export default function TenantsPage() {
                           <TableCell className="w-px text-right pr-3">
                             <button
                               type="button"
-                              onClick={() => setExpandedId(expandedId === tenant.id ? null : tenant.id)}
+                              onClick={() => setSelectedTenantId(tenant.id)}
                               className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors"
-                              aria-label={expandedId === tenant.id ? 'Details verbergen' : 'Details tonen'}
+                              aria-label="Details bekijken"
                             >
-                              <ChevronRight
-                                className={cn(
-                                  'h-4 w-4 transition-transform duration-200',
-                                  expandedId === tenant.id ? 'rotate-90' : 'rotate-0'
-                                )}
-                              />
+                              <ChevronRight className="h-4 w-4" />
                             </button>
                           </TableCell>
                         </TableRow>
@@ -729,6 +726,12 @@ export default function TenantsPage() {
                   </>
                 )}
             </Card>
+
+      <TenantDetailSheet
+        tenantId={selectedTenantId}
+        open={!!selectedTenantId}
+        onClose={() => setSelectedTenantId(null)}
+      />
     </>
   )
 }

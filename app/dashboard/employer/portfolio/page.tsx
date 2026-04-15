@@ -52,6 +52,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu'
+import { NewPropertyDialog } from '@/components/portfolio/new-property-dialog'
+import { PropertyDetailSheet } from '@/components/portfolio/property-detail-sheet'
 
 export default function PortfolioPage() {
   const router = useRouter()
@@ -74,6 +76,8 @@ export default function PortfolioPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [newPropertyOpen, setNewPropertyOpen] = useState(false)
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
 
   type SortColumn = 'name' | 'type' | 'units' | 'income'
   const [sort, setSort] = useState<{ column: SortColumn | null; direction: 'asc' | 'desc' | null }>({
@@ -404,35 +408,12 @@ export default function PortfolioPage() {
                     )}
                   </Button>
                   <Button
-                    onClick={async () => {
-                      if (isDemo) {
-                        router.push(`${basePath}/portfolio/properties/new`)
-                        return
-                      }
-                      setCreating(true)
-                      try {
-                        const { user } = await getUser()
-                        if (!user) {
-                          router.push('/login')
-                          return
-                        }
-                        const newProperty = await propertyQueries.create({
-                          owner_id: user.id,
-                          name: 'Nieuw pand',
-                          address: '',
-                          type: 'appartement',
-                        })
-                        router.push(`${basePath}/portfolio/properties/${newProperty.id}?edit=true&new=true`)
-                      } catch (error) {
-                        console.error('Failed to create property:', error)
-                        setCreating(false)
-                      }
-                    }}
+                    onClick={() => setNewPropertyOpen(true)}
                     disabled={creating}
                     className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    {creating ? 'Aanmaken...' : 'Nieuw Pand'}
+                    Nieuw Pand
                   </Button>
                 </>
               ) : null}
@@ -550,7 +531,7 @@ export default function PortfolioPage() {
                       dashboardCardClass('transition-colors cursor-pointer', isDemo),
                       'rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 hover:border-[#163300] dark:hover:border-[#9FE870]'
                     )}
-                    onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
+                    onClick={() => setSelectedPropertyId(group.property.id)}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
@@ -651,7 +632,7 @@ export default function PortfolioPage() {
                       <Fragment key={group.property.id}>
                         <TableRow
                           className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer"
-                          onClick={() => router.push(`${basePath}/portfolio/properties/${group.property.id}`)}
+                          onClick={() => setSelectedPropertyId(group.property.id)}
                         >
                           <TableCell className="py-4 px-4">
                             <div className="flex items-center gap-3">
@@ -746,6 +727,55 @@ export default function PortfolioPage() {
             )}
         </CardContent>
       </Card>
+
+      <NewPropertyDialog
+        open={newPropertyOpen}
+        onOpenChange={setNewPropertyOpen}
+        onCreated={async (formData) => {
+          if (isDemo) {
+            // Demo: navigeer naar de demo new-property pagina
+            setNewPropertyOpen(false)
+            router.push(`${basePath}/portfolio/properties/new`)
+            return
+          }
+          setCreating(true)
+          try {
+            const { user } = await getUser()
+            if (!user) { router.push('/login'); return }
+            const newProperty = await propertyQueries.create({
+              owner_id: user.id,
+              name: formData.name || formData.address || 'Nieuw pand',
+              address: formData.address,
+              postcode: formData.postcode || null,
+              city: formData.city || null,
+              type: formData.type,
+              build_year: formData.build_year ? parseInt(formData.build_year) : null,
+              woz_value: formData.woz_value ? parseFloat(formData.woz_value) : null,
+              energy_label: formData.energy_label || null,
+            } as never)
+            setNewPropertyOpen(false)
+            setSelectedPropertyId(newProperty.id)
+          } catch (err) {
+            console.error('Pand aanmaken mislukt:', err)
+          } finally {
+            setCreating(false)
+          }
+        }}
+      />
+
+      <PropertyDetailSheet
+        propertyId={selectedPropertyId}
+        open={!!selectedPropertyId}
+        onClose={() => setSelectedPropertyId(null)}
+        onDeleted={() => {
+          setSelectedPropertyId(null)
+          // Refresh property list
+          getUser().then(({ user }) => {
+            if (!user) return
+            propertyQueries.getByOwner(user.id).then(setProperties).catch(console.error)
+          })
+        }}
+      />
     </>
   )
 }

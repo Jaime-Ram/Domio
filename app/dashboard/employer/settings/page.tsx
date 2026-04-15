@@ -6,10 +6,11 @@ import {
   User, Shield, CreditCard, Settings,
   CheckCircle2, Pencil, X, Check, Loader2, Mail, Building2,
   Landmark, BookOpen, RefreshCw, ExternalLink,
+  Globe, Bell, Trash2, AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getProfile, updateProfile } from '@/lib/supabase/profile'
-import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail } from '@/lib/supabase/auth'
+import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
+import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail, deleteAccount } from '@/lib/supabase/auth'
 import { supabase } from '@/lib/supabase/client'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
@@ -146,6 +147,18 @@ export default function SettingsPage() {
   const [totpResetCode, setTotpResetCode] = useState('')
   const [totpResetError, setTotpResetError] = useState('')
   const [totpResetWorking, setTotpResetWorking] = useState(false)
+
+  // Voorkeuren
+  const [language, setLanguage] = useState<'nl' | 'en'>('nl')
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(getDefaultNotificationPrefs())
+  const [prefsSaving, setPrefsSaving] = useState(false)
+  const [prefsSaved, setPrefsSaved] = useState(false)
+
+  // Account verwijderen
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('')
+  const [deleteWorking, setDeleteWorking] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   // Koppelingen
   interface BankConnection { iban: string | null; last_synced_at: string | null }
@@ -335,6 +348,30 @@ export default function SettingsPage() {
     }
     
     setEmailChangeStatus('sent')
+  }
+
+  const handleSavePrefs = async (newLang?: 'nl' | 'en', newPrefs?: NotificationPrefs) => {
+    if (isDemo || !user?.id) return
+    setPrefsSaving(true)
+    await updateProfile(user.id, {
+      language: newLang ?? language,
+      notification_prefs: newPrefs ?? notifPrefs,
+    })
+    setPrefsSaving(false)
+    setPrefsSaved(true)
+    setTimeout(() => setPrefsSaved(false), 2000)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!deleteConfirmEmail.trim() || deleteConfirmEmail.trim().toLowerCase() !== (user?.email ?? '').toLowerCase()) {
+      setDeleteError('E-mailadres komt niet overeen')
+      return
+    }
+    setDeleteWorking(true)
+    setDeleteError('')
+    const { error } = await deleteAccount()
+    if (error) { setDeleteError(error.message); setDeleteWorking(false); return }
+    window.location.href = '/login'
   }
 
   const handleSelectMethod = async (method: 'none' | 'totp') => {

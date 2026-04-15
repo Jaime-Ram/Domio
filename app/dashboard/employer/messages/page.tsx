@@ -2,8 +2,14 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Search, Send, ChevronRight, MessageSquareDashed, Plus, TicketPlus, UserPlus, Ticket, FileText, Users, X, UsersRound, Paperclip, MessageCircle, MoreHorizontal, BellOff, Archive, Trash2, MessageCircleMore } from 'lucide-react'
+import { Search, Send, ChevronRight, MessageSquareDashed, Plus, TicketPlus, UserPlus, Ticket, FileText, Users, X, UsersRound, MessageCircle, MoreHorizontal, BellOff, Archive, Trash2, MessageCircleMore } from 'lucide-react'
 import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
+import { AttachmentSourceDropdown } from '@/components/dashboard/attachment-source-dropdown'
+import { DomioDocumentPickerDialog } from '@/components/dashboard/domio-document-picker-dialog'
+import { GoogleDriveComingSoonDialog } from '@/components/dashboard/google-drive-coming-soon-dialog'
+import { renderComposerWithDocumentMentions, renderMessageWithDocumentMentions } from '@/components/dashboard/composer-mention-render'
+import type { ComposerAttachment, MentionItem } from '@/lib/dashboard/chat-composer'
+import { getMentionContext } from '@/lib/dashboard/chat-composer'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -28,127 +34,12 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { documentQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
 
-type MentionItem = {
-  id: string
-  kind: 'ticket' | 'document' | 'contact'
-  label: string
-  search: string
-  sourceId?: string
-}
-
-type ComposerAttachment = {
-  id: string
-  source: 'upload' | 'mention-document'
-  name: string
-  sizeKb?: number
-  previewUrl?: string
-  file?: File
-  documentId?: string
-}
-
 type ChatMessage = {
   id: string
   from: 'me' | 'them'
   text: string
   createdAt: string
   attachments: ComposerAttachment[]
-}
-
-function renderMessageWithDocumentMentions(text: string, attachments: ComposerAttachment[]) {
-  const docMentions = attachments
-    .filter((a) => a.source === 'mention-document')
-    .map((a) => `@${a.name}`)
-    .filter(Boolean)
-
-  if (!text || docMentions.length === 0) return <>{text}</>
-
-  let cursor = 0
-  const out: React.ReactNode[] = []
-
-  while (cursor < text.length) {
-    let matchToken: string | null = null
-    let matchIndex = -1
-    for (const token of docMentions) {
-      const idx = text.indexOf(token, cursor)
-      if (idx !== -1 && (matchIndex === -1 || idx < matchIndex)) {
-        matchIndex = idx
-        matchToken = token
-      }
-    }
-
-    if (!matchToken || matchIndex === -1) {
-      out.push(text.slice(cursor))
-      break
-    }
-
-    if (matchIndex > cursor) out.push(text.slice(cursor, matchIndex))
-    out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#163300] dark:text-[#9FE870]">
-        {matchToken}
-      </span>
-    )
-    cursor = matchIndex + matchToken.length
-  }
-
-  return <>{out}</>
-}
-
-function renderComposerWithDocumentMentions(text: string, attachments: ComposerAttachment[]) {
-  if (!text) return <span className="text-gray-500 dark:text-gray-400">Typ een bericht…</span>
-
-  const docMentions = attachments
-    .filter((a) => a.source === 'mention-document')
-    .map((a) => `@${a.name}`)
-    .filter(Boolean)
-
-  if (docMentions.length === 0) return <span className="text-gray-900 dark:text-gray-100">{text}</span>
-
-  let cursor = 0
-  const out: React.ReactNode[] = []
-
-  while (cursor < text.length) {
-    let matchToken: string | null = null
-    let matchIndex = -1
-    for (const token of docMentions) {
-      const idx = text.indexOf(token, cursor)
-      if (idx !== -1 && (matchIndex === -1 || idx < matchIndex)) {
-        matchIndex = idx
-        matchToken = token
-      }
-    }
-
-    if (!matchToken || matchIndex === -1) {
-      out.push(<span key={`plain-${cursor}`} className="text-gray-900 dark:text-gray-100">{text.slice(cursor)}</span>)
-      break
-    }
-
-    if (matchIndex > cursor) {
-      out.push(
-        <span key={`plain-${cursor}`} className="text-gray-900 dark:text-gray-100">
-          {text.slice(cursor, matchIndex)}
-        </span>
-      )
-    }
-    out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#163300] dark:text-[#9FE870]">
-        {matchToken}
-      </span>
-    )
-    cursor = matchIndex + matchToken.length
-  }
-
-  return <>{out}</>
-}
-
-function getMentionContext(value: string, cursor: number) {
-  const prefix = value.slice(0, cursor)
-  const at = prefix.lastIndexOf('@')
-  if (at < 0) return null
-  const prev = at === 0 ? ' ' : prefix[at - 1]
-  if (!/\s|[(\[{]/.test(prev)) return null
-  const query = prefix.slice(at + 1)
-  if (query.includes(' ') || query.includes('\n')) return null
-  return { at, query: query.toLowerCase() }
 }
 
 export default function MessagesPage() {
@@ -176,14 +67,53 @@ export default function MessagesPage() {
   const [threads, setThreads] = useState<Record<string, ChatMessage[]>>({})
   const [sendAnimKey, setSendAnimKey] = useState(0)
   const [mutedChatIds, setMutedChatIds] = useState<string[]>([])
+  const [googleDriveDialogOpen, setGoogleDriveDialogOpen] = useState(false)
+  const [domioDocPickerOpen, setDomioDocPickerOpen] = useState(false)
+
+  const domioDocumentsForPicker = useMemo(
+    () =>
+      documents.map((d: any) => ({
+        id: String(d.id),
+        name: String(d?.name || d?.file_name || 'Document'),
+      })),
+    [documents]
+  )
 
   useEffect(() => {
     if (isDemo) {
-      // Demo: toon alleen contacten zodra er echte chat/ticketdata is.
-      setChatContacts([])
-      setAllTenants([])
-      setTickets([])
-      setDocuments([])
+      const demoContacts = [
+        { id: 'demo-1', name: 'Jan Jansen', handle: '@jan.jansen' },
+        { id: 'demo-2', name: 'Lisa de Vries', handle: '@lisa.devries' },
+        { id: 'demo-3', name: 'Ahmed El Amrani', handle: '@ahmed.elamrani' },
+        { id: 'demo-4', name: 'Sophie Bakker', handle: '@sophie.bakker' },
+      ]
+      const demoThreads: Record<string, ChatMessage[]> = {
+        'demo-1': [
+          { id: 'm1', from: 'them', text: 'Goedemiddag, de lekkage in de badkamer is nog steeds niet verholpen. Kunt u hier snel naar kijken?', createdAt: '2026-04-10T10:15:00', attachments: [] },
+          { id: 'm2', from: 'me', text: 'Goedemiddag Jan, de loodgieter komt aanstaande vrijdag 14:00–16:00. Kunt u thuis zijn?', createdAt: '2026-04-10T13:22:00', attachments: [] },
+          { id: 'm3', from: 'them', text: 'Ja, dat is prima. Ik ben thuis.', createdAt: '2026-04-10T14:05:00', attachments: [] },
+        ],
+        'demo-2': [
+          { id: 'm4', from: 'them', text: 'Hallo, ik wil graag mijn huurcontract verlengen. Wat zijn de mogelijkheden?', createdAt: '2026-04-08T09:30:00', attachments: [] },
+          { id: 'm5', from: 'me', text: 'Goedemorgen Lisa, ik stuur u deze week een verlengingsvoorstel toe.', createdAt: '2026-04-08T11:00:00', attachments: [] },
+        ],
+        'demo-3': [
+          { id: 'm6', from: 'them', text: 'De CV-ketel doet het niet meer. Het is heel koud in huis.', createdAt: '2026-04-12T08:00:00', attachments: [] },
+        ],
+        'demo-4': [],
+      }
+      setChatContacts(demoContacts)
+      setAllTenants(demoContacts)
+      setThreads(demoThreads)
+      setActiveContactId('demo-1')
+      setTickets([
+        { id: 'demo-t1', title: 'Lekkage badkamer' },
+        { id: 'demo-t2', title: 'CV-ketel storing' },
+      ])
+      setDocuments([
+        { id: 'demo-doc-1', name: 'Huurcontract Keizersgracht 12.pdf' },
+        { id: 'demo-doc-2', name: 'Inspectierapport 2025.pdf' },
+      ])
       return
     }
     if (!user?.id) {
@@ -296,6 +226,41 @@ export default function MessagesPage() {
     setMentionQuery(ctx.query)
   }
 
+  const addDocumentMentionAttachment = (label: string, sourceId: string) => {
+    setAttachments((prev) => {
+      const already = prev.some((a) => a.source === 'mention-document' && a.documentId === sourceId)
+      if (already) return prev
+      return [
+        ...prev,
+        {
+          id: `mention-doc-${sourceId}`,
+          source: 'mention-document' as const,
+          name: label,
+          documentId: sourceId,
+        },
+      ]
+    })
+  }
+
+  const appendDomioDocumentFromPicker = (doc: { id: string; name: string }) => {
+    addDocumentMentionAttachment(doc.name, doc.id)
+    setMessage((prev) => {
+      const needSpace = prev.length > 0 && !/\s$/.test(prev)
+      return prev + (needSpace ? ' ' : '') + `@${doc.name} `
+    })
+    setMentionOpen(false)
+    setMentionStart(null)
+    setMentionQuery('')
+    setMentionIndex(0)
+    requestAnimationFrame(() => {
+      const el = messageInputRef.current
+      if (!el) return
+      el.focus()
+      const pos = el.value.length
+      el.setSelectionRange(pos, pos)
+    })
+  }
+
   const applyMention = (item: MentionItem) => {
     if (mentionStart == null) return
     const cursor = messageInputRef.current?.selectionStart ?? message.length
@@ -314,19 +279,7 @@ export default function MessagesPage() {
     })
 
     if (item.kind === 'document' && item.sourceId) {
-      setAttachments((prev) => {
-        const already = prev.some((a) => a.source === 'mention-document' && a.documentId === item.sourceId)
-        if (already) return prev
-        return [
-          ...prev,
-          {
-            id: `mention-doc-${item.sourceId}`,
-            source: 'mention-document',
-            name: item.label,
-            documentId: item.sourceId,
-          },
-        ]
-      })
+      addDocumentMentionAttachment(item.label, item.sourceId)
     }
   }
 
@@ -827,16 +780,12 @@ export default function MessagesPage() {
               </div>
             )}
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="icon"
-                variant="outline"
-                className="size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Document toevoegen"
-              >
-                <Paperclip className="h-4 w-4" />
-              </Button>
+              <AttachmentSourceDropdown
+                disabled={!activeContact}
+                onPickComputer={() => fileInputRef.current?.click()}
+                onPickDomioDocuments={() => setDomioDocPickerOpen(true)}
+                onPickGoogleDrive={() => setGoogleDriveDialogOpen(true)}
+              />
               <div className="relative flex-1 rounded-2xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
                 <div className="absolute inset-0 px-4 py-2.5 text-sm whitespace-pre-wrap break-words pointer-events-none">
                   {renderComposerWithDocumentMentions(message, attachments)}
@@ -845,7 +794,7 @@ export default function MessagesPage() {
                   ref={messageInputRef}
                   placeholder=""
                   rows={1}
-                  className="min-h-[40px] max-h-32 w-full resize-none rounded-2xl border-0 bg-transparent text-transparent caret-[#163300] dark:caret-[#9FE870] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto"
+                  className="min-h-[40px] max-h-32 w-full resize-none rounded-2xl border-0 bg-transparent text-transparent caret-[#163300] dark:caret-[#9FE870] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={message}
                   disabled={!activeContact}
                   onChange={(e) => {
@@ -1014,6 +963,14 @@ export default function MessagesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <GoogleDriveComingSoonDialog open={googleDriveDialogOpen} onOpenChange={setGoogleDriveDialogOpen} />
+      <DomioDocumentPickerDialog
+        open={domioDocPickerOpen}
+        onOpenChange={setDomioDocPickerOpen}
+        documents={domioDocumentsForPicker}
+        onPick={appendDomioDocumentFromPicker}
+      />
     </div>
   )
 }

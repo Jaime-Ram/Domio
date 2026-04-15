@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, Bell, User, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
@@ -43,8 +42,6 @@ function clearDemoCookie() {
 export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/employer' }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
 
   const notifications = isDemo ? mockNotifications : []
   const userName = profile?.full_name || user?.email?.split('@')[0] || (loading ? 'Laden...' : 'Gebruiker')
@@ -85,9 +82,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
 
         {/* Right: Notificaties + Profiel */}
         <div className="flex items-center gap-3 ml-auto shrink-0">
-          {mounted ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -142,20 +138,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-10 w-10 rounded-full text-[#163300] dark:text-[#9FE870] bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800/50"
-              aria-hidden
-              tabIndex={-1}
-            >
-              <Bell className="h-5 w-5" />
-            </Button>
-          )}
 
-          {mounted ? (
-            <DropdownMenu>
+          <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -267,19 +251,6 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button
-              variant="ghost"
-              className="h-10 pl-2 pr-3 rounded-full gap-2 bg-transparent"
-              aria-hidden
-              tabIndex={-1}
-            >
-              <span className="h-7 w-7 rounded-full bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] text-[10px] font-semibold flex items-center justify-center flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
-                {userName}
-              </span>
-            </Button>
-          )}
         </div>
       </div>
     </header>
