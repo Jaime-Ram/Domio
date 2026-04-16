@@ -121,6 +121,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const menuGroups: SidebarItem[][] = [
     [
       { label: 'Dashboard', href: basePath, icon: LayoutDashboard },
+      { label: 'Taken', href: `${basePath}/tasks`, icon: ClipboardCheck },
       {
         label: 'Portefeuille',
         icon: Building2,

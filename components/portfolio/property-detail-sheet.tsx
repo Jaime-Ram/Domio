@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -51,6 +47,7 @@ import {
   Euro,
   Building2,
   CircleDot,
+  Search,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { propertyQueries, unitQueries, leaseQueries, documentQueries } from '@/lib/supabase/queries'
@@ -121,7 +118,13 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
   const [editForm, setEditForm] = useState({
     name: '', address: '', postcode: '', city: '',
     type: 'appartement', build_year: '', woz_value: '', energy_label: '',
+    ean_electricity: '', ean_gas: '',
   })
+
+  // EAN lookup state
+  const [lookupHuisnummer, setLookupHuisnummer] = useState('')
+  const [lookingUp, setLookingUp] = useState(false)
+  const [lookupError, setLookupError] = useState<string | null>(null)
 
   // Unit edit state
   const [editingUnits, setEditingUnits] = useState<Set<string>>(new Set())
@@ -134,13 +137,19 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
   const [savingNewUnit, setSavingNewUnit] = useState(false)
   const [newUnitError, setNewUnitError] = useState<string | null>(null)
 
-  const initEditForm = (p: any) => setEditForm({
-    name: p.name || '', address: p.address || '', postcode: p.postcode || '',
-    city: p.city || '', type: p.type || 'appartement',
-    build_year: p.build_year ? String(p.build_year) : '',
-    woz_value: p.woz_value ? String(p.woz_value) : '',
-    energy_label: p.energy_label || '',
-  })
+  const initEditForm = (p: any) => {
+    setEditForm({
+      name: p.name || '', address: p.address || '', postcode: p.postcode || '',
+      city: p.city || '', type: p.type || 'appartement',
+      build_year: p.build_year ? String(p.build_year) : '',
+      woz_value: p.woz_value ? String(p.woz_value) : '',
+      energy_label: p.energy_label || '',
+      ean_electricity: p.ean_electricity || '',
+      ean_gas: p.ean_gas || '',
+    })
+    setLookupHuisnummer('')
+    setLookupError(null)
+  }
 
   const initUnitForm = (u: any) => ({
     unit_number: u.unit_number || '', rooms: u.rooms ? String(u.rooms) : '',
@@ -203,6 +212,8 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
         build_year: editForm.build_year ? parseInt(editForm.build_year) : null,
         woz_value: editForm.woz_value ? parseFloat(editForm.woz_value) : null,
         energy_label: editForm.energy_label || null,
+        ean_electricity: editForm.ean_electricity || null,
+        ean_gas: editForm.ean_gas || null,
       } as never)
       setProperty((p: any) => ({ ...p, ...updated }))
       setIsEditing(false)
@@ -275,6 +286,33 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
     } catch (err) {
       setNewUnitError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
     } finally { setSavingNewUnit(false) }
+  }
+
+  const handleLookup = async () => {
+    if (!editForm.postcode || !lookupHuisnummer) return
+    setLookingUp(true); setLookupError(null)
+    try {
+      const res = await fetch('/api/ean-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postcode: editForm.postcode, huisnummer: lookupHuisnummer }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setLookupError(data.error || 'Adres niet gevonden'); return }
+      setEditForm(f => ({
+        ...f,
+        ...(data.address     && { address:         data.address }),
+        ...(data.city        && { city:             data.city }),
+        ...(data.postcode    && { postcode:         data.postcode }),
+        ...(data.woz_value   != null && { woz_value:      String(data.woz_value) }),
+        ...(data.energy_label && { energy_label:    data.energy_label }),
+        ...(data.build_year  && { build_year:       String(data.build_year) }),
+        ...(data.ean_electricity && { ean_electricity: data.ean_electricity }),
+        ...(data.ean_gas         && { ean_gas:         data.ean_gas }),
+      }))
+    } catch {
+      setLookupError('Verbinding mislukt')
+    } finally { setLookingUp(false) }
   }
 
   return (
@@ -420,98 +458,104 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
               </TabsList>
             </div>
 
-            {/* ── INFO TAB — view mode ── */}
+            {/* ── INFO TAB ── */}
             <TabsContent value="info" className="flex-1 overflow-y-auto px-6 py-5 mt-0">
               {isEditing ? (
-                /* ── EDIT FORM in tab content ── */
+                /* ── EDIT MODE ── */
                 <div className="space-y-5">
                   {editError && (
-                    <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
-                      {editError}
-                    </p>
+                    <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">{editError}</p>
                   )}
 
-                  {/* Field tiles — same gray-50 rounded-xl style as KPI widgets */}
+                  {/* Locatie */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Locatie</p>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Locatie</p>
                     <div className="grid grid-cols-2 gap-2.5">
-                      {[
-                        { label: 'Naam *', key: 'name' as const, placeholder: 'Herenhuis Centrum', span: 2 },
-                        { label: 'Adres *', key: 'address' as const, placeholder: 'Keizersgracht 100', span: 2 },
-                        { label: 'Postcode', key: 'postcode' as const, placeholder: '1015 AA', span: 1 },
-                        { label: 'Stad', key: 'city' as const, placeholder: 'Amsterdam', span: 1 },
-                      ].map(({ label, key, placeholder, span }) => (
-                        <div key={key} className={cn('bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3', span === 2 && 'col-span-2')}>
-                          <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">{label}</p>
+                      <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Naam *</p>
+                        <input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} placeholder="Herenhuis Centrum" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
+                      </div>
+                      <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Adres *</p>
+                        <input value={editForm.address} onChange={e => setEditForm(f => ({ ...f, address: e.target.value }))} placeholder="Keizersgracht 100" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Postcode</p>
+                        <input value={editForm.postcode} onChange={e => setEditForm(f => ({ ...f, postcode: e.target.value }))} placeholder="1015 AA" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Stad</p>
+                        <input value={editForm.city} onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))} placeholder="Amsterdam" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
+                      </div>
+                      {/* Adres + EAN opzoeken */}
+                      <div className="col-span-2 flex items-center gap-2">
+                        <div className="flex items-center gap-2.5 flex-1 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-2.5">
+                          <Search className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                           <input
-                            value={editForm[key]}
-                            onChange={e => setEditForm(f => ({ ...f, [key]: e.target.value }))}
-                            placeholder={placeholder}
-                            className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0"
+                            value={lookupHuisnummer}
+                            onChange={e => setLookupHuisnummer(e.target.value)}
+                            placeholder="Huisnummer om adres + EAN op te zoeken"
+                            className="flex-1 bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0 min-w-0"
                           />
                         </div>
-                      ))}
+                        <button type="button" onClick={handleLookup} disabled={lookingUp || !editForm.postcode || !lookupHuisnummer} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 disabled:opacity-40 text-gray-600 dark:text-gray-400 text-xs font-medium px-3 py-1.5 transition-colors shrink-0">
+                          {lookingUp ? 'Zoeken…' : 'Opzoeken'}
+                        </button>
+                      </div>
+                      {lookupError && <p className="col-span-2 text-xs text-amber-600 dark:text-amber-400 px-1">{lookupError}</p>}
                     </div>
                   </div>
 
+                  {/* Kenmerken */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Kenmerken</p>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Kenmerken</p>
                     <div className="grid grid-cols-2 gap-2.5">
-                      {/* Type select tile */}
                       <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
                         <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Type</p>
                         <Select value={editForm.type} onValueChange={v => setEditForm(f => ({ ...f, type: v }))}>
-                          <SelectTrigger className="h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400">
-                            <SelectValue />
-                          </SelectTrigger>
+                          <SelectTrigger className="h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400"><SelectValue /></SelectTrigger>
                           <SelectContent>{PROPERTY_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
-                      {/* Bouwjaar tile */}
                       <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
                         <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Bouwjaar</p>
-                        <input
-                          type="number"
-                          value={editForm.build_year}
-                          onChange={e => setEditForm(f => ({ ...f, build_year: e.target.value }))}
-                          placeholder="1920"
-                          className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0"
-                        />
+                        <input type="number" value={editForm.build_year} onChange={e => setEditForm(f => ({ ...f, build_year: e.target.value }))} placeholder="1920" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
                       </div>
-                      {/* Energielabel select tile */}
                       <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
                         <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">Energielabel</p>
                         <Select value={editForm.energy_label || 'none'} onValueChange={v => setEditForm(f => ({ ...f, energy_label: v === 'none' ? '' : v }))}>
-                          <SelectTrigger className="h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400">
-                            <SelectValue placeholder="Geen" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">Geen</SelectItem>
-                            {ENERGY_LABELS.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
-                          </SelectContent>
+                          <SelectTrigger className="h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400"><SelectValue placeholder="Geen" /></SelectTrigger>
+                          <SelectContent><SelectItem value="none">Geen</SelectItem>{ENERGY_LABELS.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
-                      {/* WOZ tile */}
                       <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
                         <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">WOZ-waarde (€)</p>
-                        <input
-                          type="number"
-                          value={editForm.woz_value}
-                          onChange={e => setEditForm(f => ({ ...f, woz_value: e.target.value }))}
-                          placeholder="350000"
-                          className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0"
-                        />
+                        <input type="number" value={editForm.woz_value} onChange={e => setEditForm(f => ({ ...f, woz_value: e.target.value }))} placeholder="350000" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Delete danger zone */}
-                  <div className="pt-2">
+                  {/* Energie-aansluiting (EAN) */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Energie-aansluiting</p>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">EAN Elektriciteit</p>
+                        <input value={editForm.ean_electricity} onChange={e => setEditForm(f => ({ ...f, ean_electricity: e.target.value }))} placeholder="871686130000000000" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0 font-mono" />
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5">EAN Gas</p>
+                        <input value={editForm.ean_gas} onChange={e => setEditForm(f => ({ ...f, ean_gas: e.target.value }))} placeholder="871686130000000000" className="w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0 font-mono" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Verwijderen */}
+                  <div className="pt-1">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <button type="button" disabled={deleting} className="inline-flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-600 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 px-2 py-1.5 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5" />
-                          {deleting ? 'Verwijderen…' : 'Pand verwijderen'}
+                          <Trash2 className="h-3.5 w-3.5" />{deleting ? 'Verwijderen…' : 'Pand verwijderen'}
                         </button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -529,48 +573,97 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                 </div>
               ) : (
                 /* ── VIEW MODE ── */
-                <div className="space-y-6">
-                  {/* Location block */}
-                  <section>
-                    <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Locatie</h3>
-                    <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 divide-y divide-gray-100 dark:divide-neutral-700/60">
-                      {[
-                        { label: 'Adres', value: property.address },
-                        { label: 'Postcode', value: property.postcode || '—' },
-                        { label: 'Stad', value: property.city || '—' },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="flex items-center justify-between px-4 py-3">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
-                        </div>
-                      ))}
+                <div className="space-y-5">
+                  {/* Locatie */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Locatie</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Adres</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{property.address}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Postcode</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{property.postcode || '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Stad</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{property.city || '—'}</p>
+                      </div>
                     </div>
-                  </section>
+                  </div>
 
-                  {/* Financial block */}
-                  <section>
-                    <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Financieel</h3>
-                    <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 divide-y divide-gray-100 dark:divide-neutral-700/60">
-                      {[
-                        { label: 'WOZ-waarde', value: property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '—' },
-                        { label: 'Totale maandhuur', value: `€${totalRent.toLocaleString('nl-NL')}` },
-                        { label: 'Jaarhuur', value: `€${(totalRent * 12).toLocaleString('nl-NL')}` },
-                        { label: 'Bruto rendement', value: property.woz_value && totalRent > 0 ? `${((totalRent * 12 / property.woz_value) * 100).toFixed(1)}%` : '—' },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="flex items-center justify-between px-4 py-3">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}</span>
-                        </div>
-                      ))}
+                  {/* Kenmerken */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Kenmerken</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Type</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">{property.type}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Bouwjaar</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{property.build_year || '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Energielabel</p>
+                        {property.energy_label ? (
+                          <span className={cn('inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full', ENERGY_LABEL_COLORS[property.energy_label] ?? 'bg-gray-200 text-gray-700')}>
+                            <Zap className="h-3 w-3" />{property.energy_label}
+                          </span>
+                        ) : (
+                          <p className="text-sm font-medium text-gray-400 dark:text-gray-500">—</p>
+                        )}
+                      </div>
                     </div>
-                  </section>
+                  </div>
 
-                  {/* Bezetting bar */}
+                  {/* EAN — alleen tonen als gevuld */}
+                  {(property.ean_electricity || property.ean_gas) && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Energie-aansluiting</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">EAN Elektriciteit</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white font-mono tracking-wide">{property.ean_electricity || '—'}</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">EAN Gas</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white font-mono tracking-wide">{property.ean_gas || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Financieel */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Financieel</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">WOZ-waarde</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Bruto rendement</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{property.woz_value && totalRent > 0 ? `${((totalRent * 12 / property.woz_value) * 100).toFixed(1)}%` : '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Maandhuur</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">€{totalRent.toLocaleString('nl-NL')}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Jaarhuur</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">€{(totalRent * 12).toLocaleString('nl-NL')}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bezetting */}
                   {totalUnits > 0 && (
-                    <section>
-                      <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Bezetting</h3>
-                      <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 px-4 py-4">
-                        <div className="flex rounded-full overflow-hidden h-2.5 mb-3 gap-px">
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Bezetting</p>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-4">
+                        <div className="flex rounded-full overflow-hidden h-2 mb-3 gap-px">
                           {property.units.map((u: any) => {
                             const cfg = UNIT_STATUS_CONFIG[u.status] ?? UNIT_STATUS_CONFIG.leegstand
                             return <div key={u.id} className={cn('flex-1 rounded-sm', cfg.dot)} />
@@ -585,16 +678,16 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                             const cfg = UNIT_STATUS_CONFIG[status] ?? UNIT_STATUS_CONFIG.leegstand
                             return (
                               <div key={status} className="flex items-center gap-1.5">
-                                <span className={cn('inline-block h-2 w-2 rounded-full', cfg.dot)} />
-                                <span className="text-xs text-gray-600 dark:text-gray-400">{cfg.label}</span>
-                            <span className="text-xs font-semibold text-gray-900 dark:text-white">{count as number}</span>
-                          </div>
-                        )
-                      })}
+                                <span className={cn('h-2 w-2 rounded-full shrink-0', cfg.dot)} />
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{cfg.label}</span>
+                                <span className="text-xs font-semibold text-gray-900 dark:text-white">{count as number}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </section>
-              )}
+                  )}
                 </div>
               )}
             </TabsContent>

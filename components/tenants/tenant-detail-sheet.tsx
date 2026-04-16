@@ -303,67 +303,78 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
                   </div>
                 </div>
               ) : (
-                /* View mode */
-                <div className="space-y-6">
+                /* ── VIEW MODE ── */
+                <div className="space-y-5">
                   {/* Contact */}
-                  <section>
-                    <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Contact</h3>
-                    <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 divide-y divide-gray-100 dark:divide-neutral-700/60">
-                      {[
-                        { icon: User,     label: 'Naam',          value: tenant.full_name },
-                        { icon: Mail,     label: 'E-mail',        value: tenant.email || '—' },
-                        { icon: Phone,    label: 'Telefoon',      value: tenant.phone || '—' },
-                        { icon: Calendar, label: 'Geboortedatum', value: tenant.date_of_birth ? new Date(tenant.date_of_birth).toLocaleDateString('nl-NL') : '—' },
-                      ].map(({ icon: Icon, label, value }) => (
-                        <div key={label} className="flex items-center justify-between px-4 py-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                            <Icon className="h-3.5 w-3.5" />
-                            <span>{label}</span>
-                          </div>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
-                        </div>
-                      ))}
+                  <div>
+                    <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Contact</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Naam</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.full_name}</p>
+                      </div>
+                      <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">E-mail</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.email || '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Telefoon</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.phone || '—'}</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Geboortedatum</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{tenant.date_of_birth ? new Date(tenant.date_of_birth).toLocaleDateString('nl-NL') : '—'}</p>
+                      </div>
                     </div>
-                  </section>
+                  </div>
 
                   {/* Contract */}
                   {activeLease && (
-                    <section>
-                      <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Huurcontract</h3>
-                      <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 divide-y divide-gray-100 dark:divide-neutral-700/60">
-                        {[
-                          { label: 'Startdatum',  value: activeLease.start_date ? new Date(activeLease.start_date).toLocaleDateString('nl-NL') : '—' },
-                          { label: 'Einddatum',   value: activeLease.end_date   ? new Date(activeLease.end_date).toLocaleDateString('nl-NL')   : 'Lopend' },
-                          { label: 'Huurprijs',   value: activeLease.monthly_rent ? `€${activeLease.monthly_rent.toLocaleString('nl-NL')}/mnd` : '—' },
-                          { label: 'Borgsom',     value: activeLease.monthly_rent ? `€${(activeLease.monthly_rent * 2).toLocaleString('nl-NL')}` : '—' },
-                        ].map(({ label, value }) => (
-                          <div key={label} className="flex items-center justify-between px-4 py-3">
-                            <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}</span>
-                          </div>
-                        ))}
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Huurcontract</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Startdatum</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{activeLease.start_date ? new Date(activeLease.start_date).toLocaleDateString('nl-NL') : '—'}</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Einddatum</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{activeLease.end_date ? new Date(activeLease.end_date).toLocaleDateString('nl-NL') : 'Lopend'}</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Huurprijs</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{activeLease.monthly_rent ? `€${activeLease.monthly_rent.toLocaleString('nl-NL')}/mnd` : '—'}</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Borgsom</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{activeLease.monthly_rent ? `€${(activeLease.monthly_rent * 2).toLocaleString('nl-NL')}` : '—'}</p>
+                        </div>
                       </div>
-                    </section>
+                    </div>
                   )}
 
                   {/* Extra */}
-                  <section>
-                    <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Extra</h3>
-                    <div className="rounded-xl bg-gray-50 dark:bg-neutral-800/60 divide-y divide-gray-100 dark:divide-neutral-700/60">
-                      {[
-                        { icon: Euro,     label: 'IBAN (incasso)', value: isDemo ? 'NL91 ABNA 0417 1643 00' : '—' },
-                        { icon: Briefcase,label: 'Werkgever',      value: isDemo ? 'Acme BV — vast dienstverband' : '—' },
-                        { icon: Shield,   label: 'Noodcontact',    value: isDemo ? 'A. Jansen (partner) · +31 6 98765432' : '—' },
-                      ].map(({ icon: Icon, label, value }) => (
-                        <div key={label} className="flex items-center justify-between px-4 py-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                            <Icon className="h-3.5 w-3.5" /><span>{label}</span>
-                          </div>
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{value}</span>
+                  {isDemo && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Extra</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="col-span-2 bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">IBAN (incasso)</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white font-mono">NL91 ABNA 0417 1643 00</p>
                         </div>
-                      ))}
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Werkgever</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">Acme BV</p>
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">Vast dienstverband</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3">
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Noodcontact</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">A. Jansen</p>
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">+31 6 98765432</p>
+                        </div>
+                      </div>
                     </div>
-                  </section>
+                  )}
                 </div>
               )}
             </TabsContent>

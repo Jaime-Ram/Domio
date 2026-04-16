@@ -826,7 +826,57 @@ export const paymentQueries = {
       .from('payments')
       .delete()
       .eq('id', paymentId);
-    
+
     if (error) throw error;
   },
 };
+
+// ============================================================================
+// TASKS
+// ============================================================================
+
+export const taskQueries = {
+  async getByOwner(ownerId: string) {
+    // @ts-ignore - tasks table not yet in generated types
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*, properties(id, name), tenants(id, full_name)')
+      .eq('owner_id', ownerId)
+      .order('due_date', { ascending: true, nullsFirst: false });
+    if (error) throw error;
+    return (data ?? []) as any[];
+  },
+
+  async create(task: Record<string, any>) {
+    // @ts-ignore - tasks table not yet in generated types
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert(task as any)
+      .select('*, properties(id, name), tenants(id, full_name)')
+      .single();
+    if (error) throw error;
+    return data as any;
+  },
+
+  async update(taskId: string, updates: Record<string, any>) {
+    // @ts-ignore - tasks table not yet in generated types
+    const { data, error } = await (supabase as any)
+      .from('tasks')
+      .update(updates)
+      .eq('id', taskId)
+      .select('*, properties(id, name), tenants(id, full_name)')
+      .single();
+    if (error) throw error;
+    return data as any;
+  },
+
+  async delete(taskId: string) {
+    // @ts-ignore - tasks table not yet in generated types
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', taskId);
+    if (error) throw error;
+  },
+};
+
