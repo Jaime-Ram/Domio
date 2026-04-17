@@ -488,15 +488,15 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
                           isSelected ? 'border-l-[#163300] dark:border-l-[#9FE870]' : 'border-l-transparent'
                         )}>
                           <div className="flex items-center gap-2 min-w-0">
-                            <p className="font-medium text-gray-900 dark:text-white truncate">{tx.sender_name || '—'}</p>
+                            <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.sender_name || '—'}</p>
                             {tx.is_manual_transaction && (
                               <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                                 Handmatig
                               </span>
                             )}
                           </div>
-                          {tx.description && (
-                            <p className="text-xs text-gray-400 truncate mt-0.5">{tx.description}</p>
+                          {tx.sender_name && (
+                            <p className="text-xs text-gray-400 truncate mt-0.5">{tx.sender_name}</p>
                           )}
                         </td>
 
