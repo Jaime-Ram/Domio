@@ -44,13 +44,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   overig: 'Overig',
 }
 
-const METHOD_LABELS: Record<string, string> = {
-  iban: 'IBAN',
-  reference: 'Referentie',
-  amount_date: 'Bedrag+datum',
-  historical: 'Historisch',
-  manual: 'Handmatig',
-}
 
 const EXPENSE_CATEGORIES_SET = new Set(['onderhoud', 'verzekering', 'belasting', 'energie', 'vve', 'hypotheek', 'beheer'])
 
@@ -130,11 +123,14 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
 
   // Manual payment state
   const [showManualPayForm, setShowManualPayForm] = useState(false)
+  const [payStep, setPayStep] = useState<1 | 2>(1)
+  const [payDirection, setPayDirection] = useState<'inkomsten' | 'uitgaven'>('inkomsten')
   const [payDate, setPayDate] = useState(todayISODate())
   const [payAmount, setPayAmount] = useState('')
-  const [paySender, setPaySender] = useState('')
-  const [payIban, setPayIban] = useState('')
   const [payDescription, setPayDescription] = useState('')
+  const [payCategory, setPayCategory] = useState<string | null>(null)
+  const [payPropertyId, setPayPropertyId] = useState<string | null>(null)
+  const [payUnitId, setPayUnitId] = useState<string | null>(null)
   const [savingPayment, setSavingPayment] = useState(false)
   const [paymentError, setPaymentError] = useState('')
 
@@ -244,7 +240,14 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
 
   function handleShowManualPaymentForm() {
     setPaymentError('')
-    setPayDate(todayISODate()); setPayAmount(''); setPaySender(''); setPayIban(''); setPayDescription('')
+    setPayStep(1)
+    setPayDirection('inkomsten')
+    setPayDate(todayISODate())
+    setPayAmount('')
+    setPayDescription('')
+    setPayCategory(null)
+    setPayPropertyId(null)
+    setPayUnitId(null)
     setShowManualPayForm(true)
   }
 
@@ -252,28 +255,46 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
     if (!user?.id) return
     setPaymentError('')
     const raw = payAmount.replace(',', '.').trim()
-    const amountNum = Number(raw)
-    if (!Number.isFinite(amountNum) || amountNum === 0) {
+    const absAmount = Number(raw)
+    if (!Number.isFinite(absAmount) || absAmount === 0) {
       setPaymentError('Vul een geldig bedrag in (niet nul).')
       return
     }
+    const amountNum = payDirection === 'uitgaven' ? -Math.abs(absAmount) : Math.abs(absAmount)
     setSavingPayment(true)
     try {
       const connId = await ensureManualBankConnection(user.id)
-      const { error } = await supabase.from('raw_transactions').insert({
+      const { data: inserted, error } = await supabase.from('raw_transactions').insert({
         owner_id: user.id,
         bank_connection_id: connId,
         external_id: `manual-${crypto.randomUUID()}`,
         value_date: payDate || null,
         amount: amountNum,
         currency: 'EUR',
-        sender_name: paySender.trim() || null,
-        sender_iban: payIban.trim() || null,
+        sender_name: null,
+        sender_iban: null,
         description: payDescription.trim() || null,
-      } as never)
+      } as never).select('id').single()
       if (error) throw error
+
+      // If category or property was selected in step 2, assign immediately
+      const txId = (inserted as { id: string } | null)?.id
+      if (txId && (payCategory || payPropertyId)) {
+        const res = await fetch(`/api/finance/transactions/${txId}/assign`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            property_id: payPropertyId ?? null,
+            unit_id: payUnitId ?? null,
+            tenant_id: null,
+            lease_id: null,
+            category: payCategory ?? null,
+          }),
+        })
+        if (!res.ok) throw new Error('Toewijzing mislukt.')
+      }
+
       setShowManualPayForm(false)
-      setPayDate(todayISODate()); setPayAmount(''); setPaySender(''); setPayIban(''); setPayDescription('')
       onRefresh()
     } catch (e: unknown) {
       setPaymentError(e instanceof Error ? e.message : 'Opslaan mislukt.')
@@ -532,99 +553,108 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
 
         {/* ─── Right detail panel ─── */}
         {rightMode === 'detail' && selectedTx && (
-          <div ref={detailRef} className="lg:w-[380px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-neutral-800 overflow-y-auto">
+          <div ref={detailRef} className="lg:w-[360px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-neutral-800 overflow-y-auto">
 
-            {/* Transaction detail card */}
-            <div className="px-5 py-4 border-b border-gray-100 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-800/30">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Transactie</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{formatEur(selectedTx.amount)}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {selectedTx.is_manual_transaction && (
-                    <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-700 px-2.5 py-0.5 text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Handmatig
-                    </span>
-                  )}
-                  <span className={cn(
-                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                    selectedTx.assignment
-                      ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
-                        ? 'bg-gray-100 dark:bg-neutral-700 text-gray-600 dark:text-gray-300'
-                        : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                      : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-                  )}>
-                    {selectedTx.assignment
-                      ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
-                        ? CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category
-                        : 'Gekoppeld'
-                      : 'Niet gekoppeld'
-                    }
-                  </span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                <div>
-                  <span className="text-gray-400 text-xs">Datum</span>
-                  <p className="font-medium text-gray-900 dark:text-white">{formatDate(selectedTx.value_date)}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400 text-xs">Afzender</span>
-                  <p className="font-medium text-gray-900 dark:text-white">{selectedTx.sender_name || '—'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-400 text-xs">IBAN</span>
-                  <p className="font-mono text-xs text-gray-600 dark:text-gray-400">{selectedTx.sender_iban || '—'}</p>
-                </div>
-                {selectedTx.description && (
-                  <div className="col-span-2">
-                    <span className="text-gray-400 text-xs">Omschrijving</span>
-                    <p className="text-gray-700 dark:text-gray-300">{selectedTx.description}</p>
-                  </div>
-                )}
-              </div>
+            {/* Close button */}
+            <div className="flex justify-end px-4 pt-3">
+              <button
+                onClick={() => { setRightMode('empty'); setSelectedTxId(null) }}
+                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            {/* Assignment info or form */}
-            {selectedTx.assignment && !showAssignForm ? (
-              <div className="px-5 py-4 flex-1">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Toewijzing</h3>
-                  <button
-                    onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
-                  >
-                    <Pencil className="h-3 w-3" />
-                    Wijzigen
-                  </button>
-                </div>
-                <div className="rounded-lg border border-gray-200 dark:border-neutral-700 p-4 space-y-2 text-sm">
-                  {selectedTx.assignment.property_name && (
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
-                      <span className="text-gray-900 dark:text-white font-medium">{selectedTx.assignment.property_name}</span>
-                      {selectedTx.assignment.property_address && <span className="text-gray-400">{selectedTx.assignment.property_address}</span>}
-                    </div>
-                  )}
-                  {selectedTx.assignment.tenant_name && (
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400 shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{selectedTx.assignment.tenant_name}</span>
-                    </div>
-                  )}
-                  {selectedTx.assignment.category && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-xs">Categorie:</span>
-                      <span className="text-gray-700 dark:text-gray-300">{CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-4 text-xs text-gray-400 pt-1 border-t border-gray-100 dark:border-neutral-800">
-                    <span>Score: {selectedTx.assignment.confidence_score}%</span>
-                    <span>Methode: {METHOD_LABELS[selectedTx.assignment.match_method] ?? selectedTx.assignment.match_method}</span>
-                  </div>
-                </div>
+            {/* Hero header */}
+            <div className="flex flex-col items-center text-center px-6 pt-2 pb-6 border-b border-gray-100 dark:border-neutral-800">
+              {/* Icon circle */}
+              <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-3">
+                {selectedTx.amount >= 0
+                  ? <User className="h-6 w-6 text-gray-400" />
+                  : <Building2 className="h-6 w-6 text-gray-400" />
+                }
               </div>
+              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                {selectedTx.sender_name || selectedTx.description || '—'}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">{formatDate(selectedTx.value_date)}</p>
+              <p className={cn(
+                'text-3xl font-bold mt-3',
+                selectedTx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'
+              )}>
+                {formatEur(selectedTx.amount)}
+              </p>
+            </div>
+
+            {/* Key-value rows */}
+            <div className="divide-y divide-gray-100 dark:divide-neutral-800 border-b border-gray-100 dark:border-neutral-800">
+              <div className="flex items-center justify-between px-5 py-3 text-sm">
+                <span className="text-gray-400">Status</span>
+                <span className={cn(
+                  'font-medium',
+                  selectedTx.assignment ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-400'
+                )}>
+                  {selectedTx.assignment ? 'Gekoppeld' : 'Niet gekoppeld'}
+                </span>
+              </div>
+              {selectedTx.is_manual_transaction && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">Bron</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Handmatig</span>
+                </div>
+              )}
+              {selectedTx.sender_name && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">Afzender</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{selectedTx.sender_name}</span>
+                </div>
+              )}
+              {selectedTx.sender_iban && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">IBAN</span>
+                  <span className="font-mono text-xs text-gray-600 dark:text-gray-400">{selectedTx.sender_iban}</span>
+                </div>
+              )}
+              {selectedTx.description && selectedTx.sender_name && (
+                <div className="flex items-start justify-between px-5 py-3 text-sm gap-4">
+                  <span className="text-gray-400 shrink-0">Omschrijving</span>
+                  <span className="text-gray-700 dark:text-gray-300 text-right">{selectedTx.description}</span>
+                </div>
+              )}
+              {selectedTx.assignment?.category && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">Categorie</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category}
+                  </span>
+                </div>
+              )}
+              {selectedTx.assignment?.property_name && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">Pand</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{selectedTx.assignment.property_name}</span>
+                </div>
+              )}
+              {selectedTx.assignment?.tenant_name && (
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-gray-400">Huurder</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{selectedTx.assignment.tenant_name}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Assignment action row */}
+            {selectedTx.assignment && !showAssignForm ? (
+              <button
+                onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
+                className="flex items-center justify-between w-full px-5 py-3.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors border-b border-gray-100 dark:border-neutral-800"
+              >
+                <span className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4 text-gray-400" />
+                  Toewijzing wijzigen
+                </span>
+                <span className="text-gray-300 dark:text-neutral-600">›</span>
+              </button>
             ) : (
               <div className="flex-1 flex flex-col">
                 <div className="flex text-sm border-b border-gray-200 dark:border-neutral-700 px-5">
@@ -746,95 +776,195 @@ export function GeldstromenPanel({ transactions, properties, onRefresh }: Geldst
       </div>
     </div>
 
-    {/* ─── Manual payment popup ─── */}
+    {/* ─── Manual payment wizard ─── */}
     {showManualPayForm && (
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-200 w-full max-w-xl px-4">
-        <div className="rounded-2xl bg-gray-900 dark:bg-white px-5 py-4 shadow-2xl">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-200 w-full max-w-md px-4">
+        <div className="rounded-2xl bg-gray-900 px-5 py-4 shadow-2xl">
+
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-white dark:text-gray-900">Betaling toevoegen</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-sm font-semibold text-white">
+              {payStep === 1 ? 'Betalingsdetails' : 'Categorisatie'}
+            </p>
             <button
               onClick={() => setShowManualPayForm(false)}
-              className="text-gray-500 hover:text-gray-300 dark:text-gray-400 dark:hover:text-gray-600 transition-colors"
+              className="text-gray-500 hover:text-gray-300 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Fields */}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Datum *</label>
-              <input
-                type="date"
-                value={payDate}
-                onChange={e => setPayDate(e.target.value)}
-                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Bedrag (€) *</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                placeholder="0,00"
-                value={payAmount}
-                onChange={e => setPayAmount(e.target.value)}
-                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Naam afzender</label>
-              <input
-                type="text"
-                placeholder="Optioneel"
-                value={paySender}
-                onChange={e => setPaySender(e.target.value)}
-                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">IBAN</label>
-              <input
-                type="text"
-                placeholder="Optioneel"
-                value={payIban}
-                onChange={e => setPayIban(e.target.value)}
-                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 font-mono focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
-              />
-            </div>
-          </div>
-          <div className="space-y-1 mb-4">
-            <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Omschrijving</label>
-            <input
-              type="text"
-              placeholder="Optioneel"
-              value={payDescription}
-              onChange={e => setPayDescription(e.target.value)}
-              className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
-            />
+          {/* Step indicator */}
+          <div className="flex items-center gap-1.5 mb-4">
+            <span className={cn('h-1.5 rounded-full transition-all', payStep === 1 ? 'w-6 bg-[#9FE870]' : 'w-3 bg-white/20')} />
+            <span className={cn('h-1.5 rounded-full transition-all', payStep === 2 ? 'w-6 bg-[#9FE870]' : 'w-3 bg-white/20')} />
+            <span className="ml-1 text-xs text-gray-500">Stap {payStep} van 2</span>
           </div>
 
-          {paymentError && (
-            <p className="text-xs text-red-400 dark:text-red-500 mb-3">{paymentError}</p>
+          {/* ── Step 1 ── */}
+          {payStep === 1 && (
+            <div className="space-y-3">
+              {/* Direction toggle */}
+              <div className="flex rounded-lg overflow-hidden border border-white/10 p-0.5 gap-0.5 bg-white/5">
+                <button
+                  onClick={() => setPayDirection('inkomsten')}
+                  className={cn(
+                    'flex-1 py-1.5 text-sm font-medium rounded-md transition-colors',
+                    payDirection === 'inkomsten'
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'text-gray-400 hover:text-gray-200'
+                  )}
+                >
+                  Inkomsten
+                </button>
+                <button
+                  onClick={() => setPayDirection('uitgaven')}
+                  className={cn(
+                    'flex-1 py-1.5 text-sm font-medium rounded-md transition-colors',
+                    payDirection === 'uitgaven'
+                      ? 'bg-red-500/20 text-red-400'
+                      : 'text-gray-400 hover:text-gray-200'
+                  )}
+                >
+                  Uitgaven
+                </button>
+              </div>
+
+              {/* Datum + Bedrag */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-400">Datum *</label>
+                  <input
+                    type="date"
+                    value={payDate}
+                    onChange={e => setPayDate(e.target.value)}
+                    className="w-full h-9 rounded-lg bg-white/10 border border-white/15 text-white text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-400">Bedrag (€) *</label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    value={payAmount}
+                    onChange={e => setPayAmount(e.target.value)}
+                    className="w-full h-9 rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-gray-600 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30"
+                  />
+                </div>
+              </div>
+
+              {/* Omschrijving */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-400">Omschrijving *</label>
+                <textarea
+                  rows={2}
+                  placeholder="Bijv. huurinkomsten januari"
+                  value={payDescription}
+                  onChange={e => setPayDescription(e.target.value)}
+                  className="w-full rounded-lg bg-white/10 border border-white/15 text-white placeholder:text-gray-600 text-sm px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-white/30"
+                />
+              </div>
+            </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3">
-            <button
-              onClick={() => setShowManualPayForm(false)}
-              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-200 dark:hover:text-gray-700 transition-colors"
-            >
-              Annuleren
-            </button>
-            <button
-              onClick={handleSaveManualPayment}
-              disabled={savingPayment || !payDate || !payAmount}
-              className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-4 py-1.5 text-sm font-medium hover:bg-[#8AD45F] transition-colors disabled:opacity-40"
-            >
-              {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Opslaan
-            </button>
+          {/* ── Step 2 ── */}
+          {payStep === 2 && (
+            <div className="space-y-3">
+              {/* Categorie */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-400">Categorie</label>
+                <select
+                  value={payCategory ?? ''}
+                  onChange={e => setPayCategory(e.target.value || null)}
+                  className="w-full h-9 rounded-lg bg-white/10 border border-white/15 text-white text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 appearance-none"
+                >
+                  <option value="">— Geen categorie —</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat.key} value={cat.key}>{cat.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Pand */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-400">Koppel aan pand <span className="text-gray-600">(optioneel)</span></label>
+                <select
+                  value={payPropertyId ?? ''}
+                  onChange={e => { setPayPropertyId(e.target.value || null); setPayUnitId(null) }}
+                  className="w-full h-9 rounded-lg bg-white/10 border border-white/15 text-white text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 appearance-none"
+                >
+                  <option value="">— Geen pand —</option>
+                  {properties.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Eenheid — only when a property is selected and it has units */}
+              {payPropertyId && (() => {
+                const prop = properties.find(p => p.id === payPropertyId)
+                const units = prop?.units ?? []
+                if (units.length === 0) return null
+                return (
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-400">Eenheid <span className="text-gray-600">(optioneel)</span></label>
+                    <select
+                      value={payUnitId ?? ''}
+                      onChange={e => setPayUnitId(e.target.value || null)}
+                      className="w-full h-9 rounded-lg bg-white/10 border border-white/15 text-white text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 appearance-none"
+                    >
+                      <option value="">— Geen eenheid —</option>
+                      {units.map(u => (
+                        <option key={u.id} value={u.id}>{u.unit_number}</option>
+                      ))}
+                    </select>
+                  </div>
+                )
+              })()}
+            </div>
+          )}
+
+          {paymentError && (
+            <p className="text-xs text-red-400 mt-3">{paymentError}</p>
+          )}
+
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-4">
+            {payStep === 1 ? (
+              <button
+                onClick={() => setShowManualPayForm(false)}
+                className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                Annuleren
+              </button>
+            ) : (
+              <button
+                onClick={() => setPayStep(1)}
+                className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                ← Terug
+              </button>
+            )}
+
+            {payStep === 1 ? (
+              <button
+                disabled={!payDate || !payAmount || !payDescription.trim()}
+                onClick={() => setPayStep(2)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] px-4 py-1.5 text-sm font-medium hover:bg-[#8AD45F] transition-colors disabled:opacity-40"
+              >
+                Volgende →
+              </button>
+            ) : (
+              <button
+                onClick={handleSaveManualPayment}
+                disabled={savingPayment}
+                className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-4 py-1.5 text-sm font-medium hover:bg-[#8AD45F] transition-colors disabled:opacity-40"
+              >
+                {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Opslaan
+              </button>
+            )}
           </div>
         </div>
       </div>
