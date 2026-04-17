@@ -221,7 +221,7 @@ function OverzichtTable({
                     value={r.description}
                     onChange={(e) => onUpdateExpense?.(r.id, 'description', e.target.value)}
                     placeholder="Omschrijving"
-                    className="h-8 text-xs"
+                    className="h-8 text-sm"
                   />
                 ) : (
                   <span className="text-gray-900 dark:text-white">
@@ -246,7 +246,7 @@ function OverzichtTable({
                       onUpdateExpense?.(r.id, 'total', -val)
                     }}
                     placeholder="0,00"
-                    className="h-8 text-xs w-28 text-right"
+                    className="h-8 text-sm w-28 text-right"
                     min="0"
                     step="0.01"
                   />

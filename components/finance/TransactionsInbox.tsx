@@ -56,6 +56,7 @@ export interface TransactionRow {
   sender_name: string | null
   sender_iban: string | null
   description: string | null
+  is_manual_transaction?: boolean
   assignment: {
     id: string
     confidence_score: number

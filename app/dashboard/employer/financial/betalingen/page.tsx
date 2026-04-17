@@ -28,6 +28,7 @@ export default function GeldstromenPage() {
           sender_name,
           sender_iban,
           description,
+          bank_connections ( provider ),
           payment_assignments (
             id,
             confidence_score,
@@ -75,6 +76,7 @@ export default function GeldstromenPage() {
       sender_name: tx.sender_name,
       sender_iban: tx.sender_iban,
       description: tx.description,
+      is_manual_transaction: tx.bank_connections?.provider === 'manual',
       assignment: tx.payment_assignments ? {
         ...tx.payment_assignments,
         tenant_name: tx.payment_assignments.tenants?.full_name ?? null,
@@ -110,8 +112,6 @@ export default function GeldstromenPage() {
     fetchData()
   }, [])
 
-  const achterstandenUrl = `${basePath}/financial/geldstromen/achterstanden`
-
   return (
     <div className="space-y-content-blocks">
       <SectionNavDashboard
@@ -134,7 +134,7 @@ export default function GeldstromenPage() {
           transactions={transactions}
           properties={properties}
           onRefresh={fetchData}
-          achterstandenUrl={achterstandenUrl}
+
         />
       )}
     </div>
