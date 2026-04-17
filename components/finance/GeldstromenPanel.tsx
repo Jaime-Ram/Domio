@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import {
   Search,
   Building2,
@@ -8,9 +8,8 @@ import {
   User,
   Check,
   Loader2,
-  ArrowRight,
-  CalendarClock,
   Plus,
+  X,
   Wrench,
   Shield,
   Landmark,
@@ -19,25 +18,18 @@ import {
   Briefcase,
   UserX,
   MoreHorizontal,
-  FileText,
   Pencil,
+  ChevronsUpDown,
 } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { supabase } from '@/lib/supabase/client'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import type { TransactionRow, PropertyHierarchy } from './TransactionsInbox'
 
 // ─── Constants ────────────────────────────────────────────────────────
 
 type Filter = 'all' | 'inkomsten' | 'kosten' | 'unmatched'
-type RightPanelMode = 'empty' | 'detail' | 'expense'
+type RightPanelMode = 'empty' | 'detail'
 
 const CATEGORY_LABELS: Record<string, string> = {
   huur: 'Huur',
@@ -74,10 +66,6 @@ const CATEGORIES = [
   { key: 'overig', label: 'Overig', icon: MoreHorizontal },
 ] as const
 
-const MANUAL_EXPENSE_CATEGORIES = [
-  'onderhoud', 'verzekering', 'belasting', 'energie', 'vve', 'hypotheek', 'beheer', 'overig',
-] as const
-
 // ─── Helpers ──────────────────────────────────────────────────────────
 
 const formatEur = (amount: number) =>
@@ -88,16 +76,44 @@ const formatDate = (date: string | null) => {
   return new Date(date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────
+
+function todayISODate() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+async function ensureManualBankConnection(ownerId: string): Promise<string> {
+  const { data: existingRaw } = await supabase
+    .from('bank_connections')
+    .select('id')
+    .eq('owner_id', ownerId)
+    .eq('provider', 'manual')
+    .maybeSingle()
+  const existing = existingRaw as { id: string } | null
+  if (existing?.id) return existing.id
+
+  const { data: inserted, error } = await supabase
+    .from('bank_connections')
+    .insert({ owner_id: ownerId, provider: 'manual', access_token: '', refresh_token: null } as never)
+    .select('id')
+    .single()
+  if (error) throw error
+  const insertedRow = inserted as { id: string } | null
+  if (!insertedRow?.id) throw new Error('Kon handmatige bankkoppeling niet aanmaken')
+  return insertedRow.id
+}
+
 // ─── Component ────────────────────────────────────────────────────────
 
 interface GeldstromenPanelProps {
   transactions: TransactionRow[]
   properties: PropertyHierarchy[]
   onRefresh: () => void
-  achterstandenUrl: string
 }
 
-export function GeldstromenPanel({ transactions, properties, onRefresh, achterstandenUrl }: GeldstromenPanelProps) {
+export function GeldstromenPanel({ transactions, properties, onRefresh }: GeldstromenPanelProps) {
+  const { user } = useDashboardUser()
   const [filter, setFilter] = useState<Filter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null)
@@ -112,14 +128,15 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
   const [submitting, setSubmitting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Manual expense state
-  const [expPropertyId, setExpPropertyId] = useState('')
-  const [expCategory, setExpCategory] = useState('')
-  const [expAmount, setExpAmount] = useState('')
-  const [expDate, setExpDate] = useState('')
-  const [expDescription, setExpDescription] = useState('')
-  const [savingExpense, setSavingExpense] = useState(false)
-  const [expenseSuccess, setExpenseSuccess] = useState(false)
+  // Manual payment state
+  const [showManualPayForm, setShowManualPayForm] = useState(false)
+  const [payDate, setPayDate] = useState(todayISODate())
+  const [payAmount, setPayAmount] = useState('')
+  const [paySender, setPaySender] = useState('')
+  const [payIban, setPayIban] = useState('')
+  const [payDescription, setPayDescription] = useState('')
+  const [savingPayment, setSavingPayment] = useState(false)
+  const [paymentError, setPaymentError] = useState('')
 
   // Mobile detail ref
   const detailRef = useRef<HTMLDivElement>(null)
@@ -176,6 +193,23 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
     return list
   }, [transactions, filter, searchQuery])
 
+  // Stats for summary bar
+  const stats = useMemo(() => {
+    let totalIncome = 0
+    let totalExpenses = 0
+    let minDate: string | null = null
+    let maxDate: string | null = null
+    for (const tx of filteredTx) {
+      if (tx.amount > 0) totalIncome += tx.amount
+      else totalExpenses += tx.amount
+      if (tx.value_date) {
+        if (!minDate || tx.value_date < minDate) minDate = tx.value_date
+        if (!maxDate || tx.value_date > maxDate) maxDate = tx.value_date
+      }
+    }
+    return { totalIncome, totalExpenses, minDate, maxDate }
+  }, [filteredTx])
+
   function handleSelectTx(tx: TransactionRow) {
     setSelectedTxId(tx.id)
     setRightMode('detail')
@@ -208,11 +242,44 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
     }
   }
 
-  function handleShowExpenseForm() {
-    setSelectedTxId(null)
-    setRightMode('expense')
-    setExpenseSuccess(false)
-    setExpPropertyId(''); setExpCategory(''); setExpAmount(''); setExpDate(''); setExpDescription('')
+  function handleShowManualPaymentForm() {
+    setPaymentError('')
+    setPayDate(todayISODate()); setPayAmount(''); setPaySender(''); setPayIban(''); setPayDescription('')
+    setShowManualPayForm(true)
+  }
+
+  async function handleSaveManualPayment() {
+    if (!user?.id) return
+    setPaymentError('')
+    const raw = payAmount.replace(',', '.').trim()
+    const amountNum = Number(raw)
+    if (!Number.isFinite(amountNum) || amountNum === 0) {
+      setPaymentError('Vul een geldig bedrag in (niet nul).')
+      return
+    }
+    setSavingPayment(true)
+    try {
+      const connId = await ensureManualBankConnection(user.id)
+      const { error } = await supabase.from('raw_transactions').insert({
+        owner_id: user.id,
+        bank_connection_id: connId,
+        external_id: `manual-${crypto.randomUUID()}`,
+        value_date: payDate || null,
+        amount: amountNum,
+        currency: 'EUR',
+        sender_name: paySender.trim() || null,
+        sender_iban: payIban.trim() || null,
+        description: payDescription.trim() || null,
+      } as never)
+      if (error) throw error
+      setShowManualPayForm(false)
+      setPayDate(todayISODate()); setPayAmount(''); setPaySender(''); setPayIban(''); setPayDescription('')
+      onRefresh()
+    } catch (e: unknown) {
+      setPaymentError(e instanceof Error ? e.message : 'Opslaan mislukt.')
+    } finally {
+      setSavingPayment(false)
+    }
   }
 
   // Filtered properties for rent assignment
@@ -258,26 +325,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
     }
   }
 
-  // Manual expense submit
-  async function handleSaveExpense() {
-    if (!expPropertyId || !expCategory || !expAmount || !expDate) return
-    setSavingExpense(true)
-    try {
-      const res = await fetch('/api/finance/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property_id: expPropertyId, category: expCategory, amount: parseFloat(expAmount.replace(',', '.')), date: expDate, description: expDescription || null }),
-      })
-      if (res.ok) {
-        setExpenseSuccess(true)
-        setExpPropertyId(''); setExpCategory(''); setExpAmount(''); setExpDate(''); setExpDescription('')
-        onRefresh()
-      }
-    } finally {
-      setSavingExpense(false)
-    }
-  }
-
   const tabs: { key: Filter; label: string; count: number }[] = [
     { key: 'all', label: 'Alle', count: counts.all },
     { key: 'inkomsten', label: 'Inkomsten', count: counts.inkomsten },
@@ -288,17 +335,18 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
   const showAssignForm = !selectedTx?.assignment || isEditing
 
   return (
-    <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-180px)] min-h-[500px] rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
-      {/* ─── Left panel ─── */}
-      <div className="lg:w-[40%] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-neutral-800 min-h-[400px] lg:min-h-0">
-        {/* Filter tabs */}
-        <div className="flex gap-1 px-3 pt-3 pb-2 flex-wrap">
+    <>
+    <div className="flex flex-col lg:h-[calc(100vh-180px)] min-h-[500px] rounded-xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-hidden">
+
+      {/* ─── Toolbar ─── */}
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200 dark:border-neutral-800 flex-wrap">
+        <div className="flex gap-1 flex-1 flex-wrap min-w-0">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
               className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap',
+                'px-3 py-1.5 text-sm font-medium rounded-full transition-all whitespace-nowrap',
                 filter === tab.key
                   ? 'bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300]'
                   : 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700'
@@ -306,7 +354,7 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
             >
               {tab.label}
               <span className={cn(
-                'ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full text-[10px] font-semibold px-1',
+                'ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full text-xs font-semibold px-1',
                 filter === tab.key
                   ? 'bg-white/20 dark:bg-[#163300]/20 text-white dark:text-[#163300]'
                   : 'bg-gray-200 dark:bg-neutral-700 text-gray-500 dark:text-gray-400'
@@ -317,103 +365,175 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
           ))}
         </div>
 
-        {/* Search */}
-        <div className="px-3 pb-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Zoek op bedrag, huurder, pand..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 pl-9 pr-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
-            />
-          </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Zoek op bedrag, huurder, pand..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="h-8 w-56 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 pl-9 pr-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+          />
         </div>
 
-        {/* Transaction list */}
-        <div className="flex-1 overflow-y-auto">
-          {filteredTx.length === 0 ? (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-gray-400">Geen transacties gevonden</p>
-            </div>
-          ) : filteredTx.map(tx => {
-            const isSelected = selectedTxId === tx.id && rightMode === 'detail'
-            const isMatched = !!tx.assignment
-            const isExpenseCat = tx.assignment?.category && EXPENSE_CATEGORIES_SET.has(tx.assignment.category)
-            const catLabel = tx.assignment?.category ? CATEGORY_LABELS[tx.assignment.category] ?? tx.assignment.category : null
+        <div className="w-px h-5 bg-gray-200 dark:bg-neutral-700" />
 
-            return (
-              <button
-                key={tx.id}
-                onClick={() => handleSelectTx(tx)}
-                className={cn(
-                  'w-full text-left px-3 py-2.5 border-b border-gray-50 dark:border-neutral-800/50 transition-colors',
-                  isSelected
-                    ? 'bg-[#163300]/5 dark:bg-[#9FE870]/5 border-l-2 border-l-[#163300] dark:border-l-[#9FE870]'
-                    : 'hover:bg-gray-50 dark:hover:bg-neutral-800/30 border-l-2 border-l-transparent'
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      {/* Status dot */}
-                      <span className={cn(
-                        'inline-block h-2 w-2 rounded-full shrink-0',
-                        !isMatched ? 'bg-amber-400' : isExpenseCat ? 'bg-gray-400' : 'bg-green-500'
-                      )} />
-                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {tx.sender_name || '—'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-0.5 ml-4 truncate">
-                      {formatDate(tx.value_date)}
-                      {catLabel && <span className="ml-2 text-gray-500 dark:text-gray-400">{catLabel}</span>}
-                    </p>
-                  </div>
-                  <span className={cn(
-                    'text-sm font-semibold whitespace-nowrap shrink-0',
-                    tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  )}>
-                    {formatEur(tx.amount)}
-                  </span>
-                </div>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Bottom links */}
-        <div className="px-3 py-2.5 border-t border-gray-100 dark:border-neutral-800 flex items-center justify-between gap-2">
-          <button
-            onClick={() => window.location.href = achterstandenUrl}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
-          >
-            <CalendarClock className="h-3.5 w-3.5" />
-            Bekijk achterstanden
-            <ArrowRight className="h-3 w-3" />
-          </button>
-          <button
-            onClick={handleShowExpenseForm}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Kosten toevoegen
-          </button>
-        </div>
+        <button
+          onClick={handleShowManualPaymentForm}
+          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:bg-[#163300]/5 dark:hover:bg-[#9FE870]/10 transition-colors whitespace-nowrap"
+        >
+          <Plus className="h-4 w-4" />
+          Betaling toevoegen
+        </button>
       </div>
 
-      {/* ─── Right panel ─── */}
-      <div ref={detailRef} className="lg:w-[60%] flex flex-col overflow-y-auto">
-        {rightMode === 'empty' && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 p-8">
-            <FileText className="h-10 w-10 text-gray-300 dark:text-gray-600" />
-            <p className="text-sm text-gray-400">Selecteer een transactie om details te bekijken</p>
-          </div>
-        )}
+      {/* ─── Body: table + optional detail panel ─── */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
 
+        {/* ─── Table panel ─── */}
+        <div className="flex flex-col flex-1 overflow-hidden">
+
+          {/* Summary bar */}
+          <div className="flex items-stretch divide-x divide-gray-100 dark:divide-neutral-800 border-b border-gray-100 dark:border-neutral-800 bg-gray-50/60 dark:bg-neutral-800/30">
+            <div className="px-5 py-2.5 flex-1">
+              <p className="text-xs text-gray-400 mb-0.5">Totaal transacties</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{filteredTx.length.toLocaleString('nl-NL')}</p>
+            </div>
+            {(stats.minDate || stats.maxDate) && (
+              <div className="px-5 py-2.5 flex-[2] hidden sm:block">
+                <p className="text-xs text-gray-400 mb-0.5">Periode</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {stats.minDate ? formatDate(stats.minDate) : '—'} – {stats.maxDate ? formatDate(stats.maxDate) : '—'}
+                </p>
+              </div>
+            )}
+            <div className="px-5 py-2.5 flex-1">
+              <p className="text-xs text-gray-400 mb-0.5">Totaal kosten</p>
+              <p className="text-sm font-semibold text-red-600 dark:text-red-400">{formatEur(stats.totalExpenses)}</p>
+            </div>
+            <div className="px-5 py-2.5 flex-1">
+              <p className="text-xs text-gray-400 mb-0.5">Totaal inkomsten</p>
+              <p className="text-sm font-semibold text-green-600 dark:text-green-400">{formatEur(stats.totalIncome)}</p>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredTx.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <p className="text-sm text-gray-400">Geen transacties gevonden</p>
+              </div>
+            ) : (
+              <table className="w-full text-sm border-collapse">
+                <thead className="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-gray-100 dark:border-neutral-800">
+                  <tr>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-[30%]">
+                      <span className="flex items-center gap-1">Omschrijving <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
+                    </th>
+                    <th className="text-left px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-[20%]">
+                      <span className="flex items-center gap-1">Categorie <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
+                    </th>
+                    <th className="text-left px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hidden md:table-cell">
+                      <span className="flex items-center gap-1">Pand / Huurder <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
+                    </th>
+                    <th className="text-left px-3 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-[15%] hidden sm:table-cell">
+                      <span className="flex items-center gap-1">Datum <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
+                    </th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-[12%]">
+                      <span className="flex items-center justify-end gap-1">Bedrag <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 dark:divide-neutral-800/60">
+                  {filteredTx.map(tx => {
+                    const isSelected = selectedTxId === tx.id && rightMode === 'detail'
+                    const isMatched = !!tx.assignment
+                    const isExpenseCat = tx.assignment?.category && EXPENSE_CATEGORIES_SET.has(tx.assignment.category)
+                    const catLabel = tx.assignment?.category ? CATEGORY_LABELS[tx.assignment.category] ?? tx.assignment.category : null
+
+                    return (
+                      <tr
+                        key={tx.id}
+                        onClick={() => handleSelectTx(tx)}
+                        className={cn(
+                          'cursor-pointer transition-colors',
+                          isSelected
+                            ? 'bg-[#163300]/[0.04] dark:bg-[#9FE870]/[0.04]'
+                            : 'hover:bg-gray-50/80 dark:hover:bg-neutral-800/30'
+                        )}
+                      >
+                        <td className={cn(
+                          'px-4 py-3 border-l-2',
+                          isSelected ? 'border-l-[#163300] dark:border-l-[#9FE870]' : 'border-l-transparent'
+                        )}>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <p className="font-medium text-gray-900 dark:text-white truncate">{tx.sender_name || '—'}</p>
+                            {tx.is_manual_transaction && (
+                              <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                                Handmatig
+                              </span>
+                            )}
+                          </div>
+                          {tx.description && (
+                            <p className="text-xs text-gray-400 truncate mt-0.5">{tx.description}</p>
+                          )}
+                        </td>
+
+                        <td className="px-3 py-3">
+                          <span className={cn(
+                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap',
+                            !isMatched
+                              ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
+                              : isExpenseCat
+                              ? 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400'
+                              : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                          )}>
+                            <span className={cn(
+                              'h-1.5 w-1.5 rounded-full shrink-0',
+                              !isMatched ? 'bg-amber-400' : isExpenseCat ? 'bg-gray-400' : 'bg-green-500'
+                            )} />
+                            {catLabel || (!isMatched ? 'Niet gekoppeld' : 'Huur')}
+                          </span>
+                        </td>
+
+                        <td className="px-3 py-3 hidden md:table-cell">
+                          {tx.assignment?.property_name ? (
+                            <>
+                              <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{tx.assignment.property_name}</p>
+                              {tx.assignment.tenant_name && (
+                                <p className="text-xs text-gray-400 truncate">{tx.assignment.tenant_name}</p>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-gray-300 dark:text-neutral-600">—</span>
+                          )}
+                        </td>
+
+                        <td className="px-3 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap hidden sm:table-cell">
+                          {formatDate(tx.value_date)}
+                        </td>
+
+                        <td className="px-4 py-3 text-right">
+                          <span className={cn(
+                            'font-semibold whitespace-nowrap',
+                            tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                          )}>
+                            {formatEur(tx.amount)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* ─── Right detail panel ─── */}
         {rightMode === 'detail' && selectedTx && (
-          <div className="flex flex-col h-full">
+          <div ref={detailRef} className="lg:w-[380px] shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-neutral-800 overflow-y-auto">
+
             {/* Transaction detail card */}
             <div className="px-5 py-4 border-b border-gray-100 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-800/30">
               <div className="flex items-start justify-between mb-3">
@@ -421,21 +541,28 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                   <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Transactie</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{formatEur(selectedTx.amount)}</p>
                 </div>
-                <span className={cn(
-                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                  selectedTx.assignment
-                    ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
-                      ? 'bg-gray-100 dark:bg-neutral-700 text-gray-600 dark:text-gray-300'
-                      : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-                )}>
-                  {selectedTx.assignment
-                    ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
-                      ? CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category
-                      : 'Gekoppeld'
-                    : 'Niet gekoppeld'
-                  }
-                </span>
+                <div className="flex items-center gap-2">
+                  {selectedTx.is_manual_transaction && (
+                    <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-700 px-2.5 py-0.5 text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Handmatig
+                    </span>
+                  )}
+                  <span className={cn(
+                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                    selectedTx.assignment
+                      ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
+                        ? 'bg-gray-100 dark:bg-neutral-700 text-gray-600 dark:text-gray-300'
+                        : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                      : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
+                  )}>
+                    {selectedTx.assignment
+                      ? selectedTx.assignment.category && selectedTx.assignment.category !== 'huur'
+                        ? CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category
+                        : 'Gekoppeld'
+                      : 'Niet gekoppeld'
+                    }
+                  </span>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
@@ -459,9 +586,8 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
               </div>
             </div>
 
-            {/* Assignment info or assignment form */}
+            {/* Assignment info or form */}
             {selectedTx.assignment && !showAssignForm ? (
-              /* State 3: Show current assignment */
               <div className="px-5 py-4 flex-1">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Toewijzing</h3>
@@ -500,9 +626,7 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                 </div>
               </div>
             ) : (
-              /* State 2: Assignment form */
               <div className="flex-1 flex flex-col">
-                {/* Tabs */}
                 <div className="flex text-sm border-b border-gray-200 dark:border-neutral-700 px-5">
                   <button
                     onClick={() => setAssignTab('rent')}
@@ -520,7 +644,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
 
                 {assignTab === 'rent' ? (
                   <div className="flex-1 flex flex-col overflow-hidden">
-                    {/* Search */}
                     <div className="px-5 py-3">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
@@ -533,8 +656,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                         />
                       </div>
                     </div>
-
-                    {/* Property list */}
                     <div className="flex-1 overflow-y-auto px-5 pb-3 space-y-2">
                       {filteredProperties.length === 0 && (
                         <p className="text-sm text-gray-400 text-center py-6">Geen resultaten gevonden</p>
@@ -571,7 +692,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                   </div>
                 ) : (
                   <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-                    {/* Category grid */}
                     <div>
                       <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Categorie</p>
                       <div className="grid grid-cols-3 gap-2">
@@ -589,7 +709,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                         })}
                       </div>
                     </div>
-                    {/* Optional property picker */}
                     <div>
                       <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Pand (optioneel)</p>
                       <div className="space-y-1">
@@ -610,7 +729,6 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
                   </div>
                 )}
 
-                {/* Submit button */}
                 <div className="px-5 py-3 border-t border-gray-100 dark:border-neutral-800">
                   <button
                     onClick={handleAssign}
@@ -625,65 +743,102 @@ export function GeldstromenPanel({ transactions, properties, onRefresh, achterst
             )}
           </div>
         )}
-
-        {rightMode === 'expense' && (
-          <div className="flex-1 flex flex-col p-5">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Kosten toevoegen</h3>
-
-            {expenseSuccess ? (
-              <div className="flex-1 flex flex-col items-center justify-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
-                  <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Kosten opgeslagen</p>
-                <button
-                  onClick={() => setExpenseSuccess(false)}
-                  className="text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
-                >
-                  Nieuwe kosten toevoegen
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Pand *</Label>
-                  <Select value={expPropertyId} onValueChange={setExpPropertyId}>
-                    <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Selecteer een pand" /></SelectTrigger>
-                    <SelectContent>{properties.map(p => (<SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>))}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Categorie *</Label>
-                  <Select value={expCategory} onValueChange={setExpCategory}>
-                    <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Selecteer een categorie" /></SelectTrigger>
-                    <SelectContent>{MANUAL_EXPENSE_CATEGORIES.map(cat => (<SelectItem key={cat} value={cat}>{CATEGORY_LABELS[cat]}</SelectItem>))}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Bedrag (&euro;) *</Label>
-                  <Input type="text" inputMode="decimal" placeholder="0,00" value={expAmount} onChange={e => setExpAmount(e.target.value)} className="h-9 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Datum *</Label>
-                  <Input type="date" value={expDate} onChange={e => setExpDate(e.target.value)} className="h-9 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Omschrijving</Label>
-                  <Input type="text" placeholder="Optioneel..." value={expDescription} onChange={e => setExpDescription(e.target.value)} className="h-9 text-sm" />
-                </div>
-                <button
-                  onClick={handleSaveExpense}
-                  disabled={savingExpense || !expPropertyId || !expCategory || !expAmount || !expDate}
-                  className="w-full py-2 rounded-lg bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {savingExpense && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {savingExpense ? 'Opslaan...' : 'Opslaan'}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
+
+    {/* ─── Manual payment popup ─── */}
+    {showManualPayForm && (
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-200 w-full max-w-xl px-4">
+        <div className="rounded-2xl bg-gray-900 dark:bg-white px-5 py-4 shadow-2xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-semibold text-white dark:text-gray-900">Betaling toevoegen</p>
+            <button
+              onClick={() => setShowManualPayForm(false)}
+              className="text-gray-500 hover:text-gray-300 dark:text-gray-400 dark:hover:text-gray-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Fields */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Datum *</label>
+              <input
+                type="date"
+                value={payDate}
+                onChange={e => setPayDate(e.target.value)}
+                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Bedrag (€) *</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                placeholder="0,00"
+                value={payAmount}
+                onChange={e => setPayAmount(e.target.value)}
+                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Naam afzender</label>
+              <input
+                type="text"
+                placeholder="Optioneel"
+                value={paySender}
+                onChange={e => setPaySender(e.target.value)}
+                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-400 dark:text-gray-500">IBAN</label>
+              <input
+                type="text"
+                placeholder="Optioneel"
+                value={payIban}
+                onChange={e => setPayIban(e.target.value)}
+                className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 font-mono focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
+              />
+            </div>
+          </div>
+          <div className="space-y-1 mb-4">
+            <label className="text-xs font-medium text-gray-400 dark:text-gray-500">Omschrijving</label>
+            <input
+              type="text"
+              placeholder="Optioneel"
+              value={payDescription}
+              onChange={e => setPayDescription(e.target.value)}
+              className="w-full h-9 rounded-lg bg-white/10 dark:bg-gray-100 border border-white/15 dark:border-gray-200 text-white dark:text-gray-900 placeholder:text-gray-500 text-sm px-3 focus:outline-none focus:ring-1 focus:ring-white/30 dark:focus:ring-gray-400"
+            />
+          </div>
+
+          {paymentError && (
+            <p className="text-xs text-red-400 dark:text-red-500 mb-3">{paymentError}</p>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3">
+            <button
+              onClick={() => setShowManualPayForm(false)}
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-200 dark:hover:text-gray-700 transition-colors"
+            >
+              Annuleren
+            </button>
+            <button
+              onClick={handleSaveManualPayment}
+              disabled={savingPayment || !payDate || !payAmount}
+              className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-4 py-1.5 text-sm font-medium hover:bg-[#8AD45F] transition-colors disabled:opacity-40"
+            >
+              {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Opslaan
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
