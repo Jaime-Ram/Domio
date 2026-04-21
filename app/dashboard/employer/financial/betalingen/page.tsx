@@ -134,7 +134,7 @@ export default function GeldstromenPage() {
           transactions={transactions}
           properties={properties}
           onRefresh={fetchData}
-
+          achterstandenUrl="/dashboard/employer/financial/betalingen/achterstanden"
         />
       )}
     </div>

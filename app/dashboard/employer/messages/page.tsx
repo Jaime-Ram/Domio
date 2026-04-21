@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Search, Send, ChevronRight, MessageSquareDashed, Plus, TicketPlus, UserPlus, Ticket, FileText, Users, X, UsersRound, MessageCircle, MoreHorizontal, BellOff, Archive, Trash2, MessageCircleMore } from 'lucide-react'
-import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 import { AttachmentSourceDropdown } from '@/components/dashboard/attachment-source-dropdown'
 import { DomioDocumentPickerDialog } from '@/components/dashboard/domio-document-picker-dialog'
 import { GoogleDriveComingSoonDialog } from '@/components/dashboard/google-drive-coming-soon-dialog'
@@ -443,9 +442,7 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-full flex-1 min-h-0 overflow-hidden">
-      <SectionHeroHeader title="Communicatie" className="mb-0" />
-
-      <div className="mt-4 flex min-h-0 flex-1 gap-4 overflow-hidden">
+      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
         {/* Linkerblok: type + lijst in één witte kaart */}
         <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col min-h-0 h-full">
           <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
@@ -786,7 +783,7 @@ export default function MessagesPage() {
                 onPickDomioDocuments={() => setDomioDocPickerOpen(true)}
                 onPickGoogleDrive={() => setGoogleDriveDialogOpen(true)}
               />
-              <div className="relative flex-1 rounded-2xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
+              <div className="relative flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
                 <div className="absolute inset-0 px-4 py-2.5 text-sm whitespace-pre-wrap break-words pointer-events-none">
                   {renderComposerWithDocumentMentions(message, attachments)}
                 </div>
@@ -794,7 +791,7 @@ export default function MessagesPage() {
                   ref={messageInputRef}
                   placeholder=""
                   rows={1}
-                  className="min-h-[40px] max-h-32 w-full resize-none rounded-2xl border-0 bg-transparent text-transparent caret-[#163300] dark:caret-[#9FE870] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="min-h-[40px] max-h-32 w-full resize-none rounded-3xl border-0 bg-transparent text-transparent caret-[#163300] dark:caret-[#9FE870] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={message}
                   disabled={!activeContact}
                   onChange={(e) => {

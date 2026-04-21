@@ -57,10 +57,10 @@ export async function signInWithGoogle() {
   return { data, error }
 }
 
-export async function signInWithMicrosoft() {
+export async function signInWithApple() {
   const origin = getAppOrigin()
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'azure',
+    provider: 'apple',
     options: { redirectTo: origin ? `${origin}/auth/callback` : undefined },
   })
   return { data, error }

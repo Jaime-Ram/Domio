@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,6 +31,15 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  ADD_DIALOG_BODY_SCROLL_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_FOOTER_SPLIT_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,7 +56,7 @@ interface PdokAdres {
   pandidentificatie?: string
 }
 
-interface PropertyForm {
+export interface PropertyForm {
   name: string
   address: string
   postcode: string
@@ -60,6 +68,9 @@ interface PropertyForm {
   energy_label: string
   surface: string
   bag_pand_id: string
+  ean_electricity: string
+  ean_gas: string
+  portfolio_id: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -103,6 +114,9 @@ const EMPTY_FORM: PropertyForm = {
   energy_label: '',
   surface: '',
   bag_pand_id: '',
+  ean_electricity: '',
+  ean_gas: '',
+  portfolio_id: '',
 }
 
 // ─── PDOK Locatieserver ───────────────────────────────────────────────────────
@@ -130,15 +144,44 @@ async function fetchBagData(pandId: string): Promise<{ bouwjaar?: number; opperv
   }
 }
 
+/** WOZ, energielabel, EAN (EDSN), bouwjaar (als BAG-key); PDOK-adres in body. Oppervlakte alleen via /api/bag. */
+async function fetchAddressEnrichment(postcode: string, huisnummer: string): Promise<{
+  address?: string
+  postcode?: string
+  city?: string
+  woz_value?: number | null
+  energy_label?: string | null
+  build_year?: number | null
+  ean_electricity?: string | null
+  ean_gas?: string | null
+} | null> {
+  try {
+    const res = await fetch('/api/ean-lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        postcode: postcode.replace(/\s/g, '').toUpperCase(),
+        huisnummer: huisnummer.trim(),
+      }),
+    })
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface NewPropertyDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onCreated: (data: PropertyForm) => Promise<void>
+  portfolios?: { id: string; name: string }[]
+  defaultPortfolioId?: string
 }
 
-export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewPropertyDialogProps) {
+export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, defaultPortfolioId }: NewPropertyDialogProps) {
   const [step, setStep] = useState<'search' | 'confirm'>('search')
   const [postcode, setPostcode] = useState('')
   const [huisnummer, setHuisnummer] = useState('')
@@ -146,10 +189,15 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
   const [results, setResults] = useState<PdokAdres[]>([])
   const [searchError, setSearchError] = useState('')
   const [selectedAdres, setSelectedAdres] = useState<PdokAdres | null>(null)
-  const [bagLoading, setBagLoading] = useState(false)
+  const [enrichmentLoading, setEnrichmentLoading] = useState(false)
   const [form, setForm] = useState<PropertyForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Set portfolio pre-selection when dialog opens
+  useEffect(() => {
+    if (open) setForm((f) => ({ ...f, portfolio_id: defaultPortfolioId || '' }))
+  }, [open, defaultPortfolioId])
 
   const resetDialog = () => {
     setStep('search')
@@ -236,19 +284,38 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
     setForm(baseForm)
     setStep('confirm')
 
-    // Probeer BAG data op te halen voor bouwjaar / oppervlak
+    const pc = adres.postcode.replace(/\s/g, '').toUpperCase()
+    const hn = adres.huis_nlt?.trim() || huisnummer.trim()
+    setEnrichmentLoading(true)
+
+    const enriched = await fetchAddressEnrichment(pc, hn)
+    if (enriched) {
+      setForm((prev) => ({
+        ...prev,
+        address: enriched.address?.trim() || prev.address,
+        postcode: enriched.postcode || prev.postcode,
+        city: enriched.city || prev.city,
+        woz_value: enriched.woz_value != null ? String(enriched.woz_value) : prev.woz_value,
+        energy_label: enriched.energy_label || prev.energy_label,
+        build_year:
+          enriched.build_year != null ? String(enriched.build_year) : prev.build_year,
+        ean_electricity: enriched.ean_electricity || prev.ean_electricity,
+        ean_gas: enriched.ean_gas || prev.ean_gas,
+      }))
+    }
+
     if (adres.pandidentificatie) {
-      setBagLoading(true)
       const bagData = await fetchBagData(adres.pandidentificatie)
       if (bagData) {
-        setForm(prev => ({
+        setForm((prev) => ({
           ...prev,
           build_year: bagData.bouwjaar ? String(bagData.bouwjaar) : prev.build_year,
           surface: bagData.oppervlakte ? String(bagData.oppervlakte) : prev.surface,
         }))
       }
-      setBagLoading(false)
     }
+
+    setEnrichmentLoading(false)
   }
 
   const handleSave = async () => {
@@ -264,48 +331,50 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg border border-gray-100 dark:border-neutral-700 rounded-[28px] p-0 overflow-hidden">
+      <DialogContent
+        className={addDialogContentClassName('max-w-md')}
+        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+      >
 
-        {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-50 dark:border-neutral-800">
-          <div className="flex items-center gap-3">
-            {step === 'confirm' && (
-              <button
-                type="button"
-                onClick={() => setStep('search')}
-                className="h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors shrink-0"
-              >
-                <ArrowLeft className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-              </button>
-            )}
-            <div>
-              <DialogTitle className="text-gray-900 dark:text-white">
-                {step === 'search' ? 'Pand toevoegen' : 'Bevestig gegevens'}
-              </DialogTitle>
-              <DialogDescription className="mt-0.5">
-                {step === 'search'
-                  ? 'Voer een postcode in om het adres automatisch op te zoeken via de BAG.'
-                  : 'Controleer en vul de gegevens aan. BAG-data is automatisch ingevuld.'}
+        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+          <div className="min-w-0 w-full">
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
+              {step === 'search' ? 'Pand toevoegen' : 'Bevestig gegevens'}
+            </DialogTitle>
+            {step !== 'search' && (
+              <DialogDescription className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                Controleer de gegevens. EAN, WOZ en energielabel worden automatisch ingevuld waar beschikbaar.
               </DialogDescription>
-            </div>
+            )}
           </div>
 
-          {/* Stap-indicator */}
-          <div className="flex items-center gap-2 mt-3">
-            {(['search', 'confirm'] as const).map((s, i) => (
-              <div key={s} className="flex items-center gap-2">
-                <div className={cn(
-                  'h-1.5 rounded-full transition-all duration-300',
-                  s === step ? 'w-6 bg-[#163300] dark:bg-[#9FE870]' : step === 'confirm' && s === 'search' ? 'w-4 bg-[#163300]/30 dark:bg-[#9FE870]/30' : 'w-4 bg-gray-200 dark:bg-neutral-700'
-                )} />
-              </div>
-            ))}
-            <span className="text-xs text-gray-400 ml-1">Stap {step === 'search' ? '1' : '2'} van 2</span>
+          {/* Stap-indicator: volle breedte, tekst eronder */}
+          <div className="w-full mt-3 space-y-2">
+            <div className="flex gap-2 sm:gap-3 w-full">
+              <div
+                className={cn(
+                  'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
+                  step === 'search'
+                    ? 'bg-[#163300] dark:bg-[#9FE870]'
+                    : 'bg-[#163300]/35 dark:bg-[#9FE870]/35'
+                )}
+              />
+              <div
+                className={cn(
+                  'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
+                  step === 'confirm'
+                    ? 'bg-[#163300] dark:bg-[#9FE870]'
+                    : 'bg-gray-200 dark:bg-neutral-700'
+                )}
+              />
+            </div>
+            <p className="text-xs text-left text-gray-400 dark:text-gray-500">
+              Stap {step === 'search' ? '1' : '2'} van 2
+            </p>
           </div>
         </DialogHeader>
 
-        {/* Body */}
-        <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+        <div className={cn(ADD_DIALOG_BODY_SCROLL_CLASS, 'space-y-5')}>
 
           {/* ── Stap 1: Adres zoeken ── */}
           {step === 'search' && (
@@ -357,7 +426,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                 <div className="space-y-1.5">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                     <Sparkles className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-                    {results.length} adres{results.length !== 1 ? 'sen' : ''} gevonden via BAG
+                    {results.length} adres{results.length !== 1 ? 'sen' : ''} gevonden (PDOK)
                   </p>
                   <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 divide-y divide-gray-50 dark:divide-neutral-800 overflow-hidden">
                     {results.map((adres) => (
@@ -420,14 +489,21 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {selectedAdres.postcode} {selectedAdres.woonplaatsnaam} · {selectedAdres.gemeentenaam}
                     </p>
-                    {bagLoading && (
+                    {enrichmentLoading && (
                       <p className="text-xs text-[#163300] dark:text-[#9FE870] mt-1 flex items-center gap-1">
-                        <Loader2 className="h-3 w-3 animate-spin" />BAG-data ophalen…
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Gegevens ophalen (EAN, WOZ, energielabel)…
                       </p>
                     )}
-                    {!bagLoading && form.build_year && (
+                    {!enrichmentLoading &&
+                      (form.ean_electricity ||
+                        form.ean_gas ||
+                        form.woz_value ||
+                        form.energy_label ||
+                        form.build_year) && (
                       <p className="text-xs text-[#163300] dark:text-[#9FE870] mt-1 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />BAG-data ingeladen
+                        <CheckCircle2 className="h-3 w-3" />
+                        Beschikbare gegevens automatisch ingevuld
                       </p>
                     )}
                   </div>
@@ -488,12 +564,33 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                 </Select>
               </div>
 
+              {/* Portefeuille */}
+              {(portfolios?.length ?? 0) > 0 && (
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-600 dark:text-gray-400">Portefeuille</Label>
+                  <Select
+                    value={form.portfolio_id || '__geen'}
+                    onValueChange={(v) => setForm((f) => ({ ...f, portfolio_id: v === '__geen' ? '' : v }))}
+                  >
+                    <SelectTrigger className="rounded-xl">
+                      <SelectValue placeholder="Geen (niet ingedeeld)" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="__geen">Geen (niet ingedeeld)</SelectItem>
+                      {portfolios?.map((pf) => (
+                        <SelectItem key={pf.id} value={pf.id}>{pf.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Bouwjaar + Oppervlak */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     Bouwjaar
-                    {form.build_year && !bagLoading && (
+                    {form.build_year && !enrichmentLoading && (
                       <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">BAG</Badge>
                     )}
                   </Label>
@@ -501,7 +598,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                     type="number"
                     value={form.build_year}
                     onChange={e => setForm(f => ({ ...f, build_year: e.target.value }))}
-                    placeholder={bagLoading ? 'Laden…' : '1990'}
+                    placeholder={enrichmentLoading ? 'Laden…' : '1990'}
                     className="rounded-xl"
                     min="1500"
                     max="2100"
@@ -510,7 +607,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     Oppervlak (m²)
-                    {form.surface && !bagLoading && (
+                    {form.surface && !enrichmentLoading && (
                       <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">BAG</Badge>
                     )}
                   </Label>
@@ -518,7 +615,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                     type="number"
                     value={form.surface}
                     onChange={e => setForm(f => ({ ...f, surface: e.target.value }))}
-                    placeholder={bagLoading ? 'Laden…' : '85'}
+                    placeholder={enrichmentLoading ? 'Laden…' : '85'}
                     className="rounded-xl"
                     min="1"
                   />
@@ -560,42 +657,88 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated }: NewProperty
                   />
                 </div>
               </div>
+
+              {/* EAN (automatisch uit EDSN / koppelregister waar mogelijk) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                    EAN elektriciteit
+                    {form.ean_electricity && !enrichmentLoading && (
+                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">
+                        auto
+                      </Badge>
+                    )}
+                  </Label>
+                  <Input
+                    value={form.ean_electricity}
+                    onChange={e => setForm(f => ({ ...f, ean_electricity: e.target.value }))}
+                    placeholder={enrichmentLoading ? 'Laden…' : '8716861…'}
+                    className="rounded-xl font-mono text-sm"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                    EAN gas
+                    {form.ean_gas && !enrichmentLoading && (
+                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">
+                        auto
+                      </Badge>
+                    )}
+                  </Label>
+                  <Input
+                    value={form.ean_gas}
+                    onChange={e => setForm(f => ({ ...f, ean_gas: e.target.value }))}
+                    placeholder={enrichmentLoading ? 'Laden…' : '8716861…'}
+                    className="rounded-xl font-mono text-sm"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
             </>
           )}
         </div>
 
-        {/* Footer */}
-        <DialogFooter className="px-6 py-4 border-t border-gray-50 dark:border-neutral-800 flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-full flex-1"
-            onClick={() => handleOpenChange(false)}
-          >
-            Annuleren
-          </Button>
+        {/* Geen DialogFooter: die heeft sm:justify-end en zet “Terug” + CTA allebei rechts. */}
+        <footer
+          className={
+            step === 'confirm'
+              ? ADD_DIALOG_FOOTER_SPLIT_CLASS
+              : ADD_DIALOG_FOOTER_CLASS
+          }
+        >
+          {step === 'confirm' && (
+            <button
+              type="button"
+              onClick={() => setStep('search')}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4 shrink-0" />
+              Terug
+            </button>
+          )}
           {step === 'search' ? (
             <Button
               type="button"
-              className="rounded-full flex-1 bg-[#163300] hover:bg-[#163300]/90 text-white dark:bg-[#9FE870] dark:text-[#163300]"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
               onClick={handleSearch}
               disabled={searching || !postcode.trim()}
             >
-              {searching ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
+              {searching ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Search className="h-4 w-4 shrink-0" />}
               Zoeken
             </Button>
           ) : (
             <Button
               type="button"
-              className="rounded-full flex-1 bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] font-semibold"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
               onClick={handleSave}
               disabled={saving || (!form.address && !selectedAdres)}
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Building2 className="h-4 w-4 mr-2" />}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Building2 className="h-4 w-4 shrink-0" />}
               {saving ? 'Aanmaken…' : 'Pand aanmaken'}
             </Button>
           )}
-        </DialogFooter>
+        </footer>
       </DialogContent>
     </Dialog>
   )

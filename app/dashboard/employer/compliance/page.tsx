@@ -150,7 +150,6 @@ const getComplianceNav = (basePath: string) => [
 export default function CompliancePage() {
   const { isDemo, basePath } = useDashboardUser()
   const COMPLIANCE_NAV = getComplianceNav(basePath)
-  const [searchQuery, setSearchQuery] = useState('')
   const [sectorFilter, setSectorFilter] = useState<Record<WWSSector, boolean>>({ sociaal: true, midden: true, vrij: true })
   const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({ compliant: true, verlopen: true, te_hoog: true, pdf_mist: true })
   const [sortKey, setSortKey] = useState<SortKey>('address')
@@ -171,7 +170,6 @@ export default function CompliancePage() {
 
   const filteredAndSorted = useMemo(() => {
     let list = wwsObjects.filter((o: WWSComplianceObject) => {
-      if (searchQuery && !o.address.toLowerCase().includes(searchQuery.toLowerCase())) return false
       if (!sectorFilter[o.sector]) return false
       if (!statusFilter[o.status]) return false
       return true
@@ -191,7 +189,7 @@ export default function CompliancePage() {
       return sortAsc ? cmp : -cmp
     })
     return list
-  }, [searchQuery, sectorFilter, statusFilter, sortKey, sortAsc, wwsObjects])
+  }, [sectorFilter, statusFilter, sortKey, sortAsc, wwsObjects])
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortAsc((v) => !v)
@@ -305,15 +303,6 @@ export default function CompliancePage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-              <div className="relative flex-1 sm:flex-initial sm:w-[200px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-                <Search className="h-4 w-4 text-gray-400 shrink-0" />
-                <Input
-                  placeholder="Zoek adres..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 h-8 px-2 text-sm bg-transparent"
-                />
-              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}>

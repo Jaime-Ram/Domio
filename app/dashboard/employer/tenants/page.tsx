@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, Fragment } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef, Fragment, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,6 +59,8 @@ import {
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
+import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
+import { HuurovereenkomstDialog } from '@/components/tenants/huurovereenkomst-dialog'
 
 type TenantRow = {
   id: string
@@ -73,17 +75,10 @@ type TenantRow = {
   balance?: number
 }
 
-const getPortfolioNav = (basePath: string) => [
-  { label: 'Objecten', href: `${basePath}/portfolio`, icon: Building2 },
-  { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
-]
-
-export default function TenantsPage() {
+function TenantsPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, isDemo, basePath } = useDashboardUser()
-
-  const PORTFOLIO_NAV = getPortfolioNav(basePath)
-  const [searchQuery, setSearchQuery] = useState('')
   const [tenants, setTenants] = useState<TenantRow[]>([])
   const [loading, setLoading] = useState(true)
   const [activeSegment, setActiveSegment] = useState<'upcoming' | 'current' | 'past'>('current')
@@ -107,6 +102,17 @@ export default function TenantsPage() {
     openstaand: true,
     teveelBetaald: true,
   })
+  const [newTenantOpen, setNewTenantOpen] = useState(false)
+  const [leaseDialogOpen, setLeaseDialogOpen] = useState(false)
+  const [leaseDialogTenant, setLeaseDialogTenant] = useState<{ id: string; name: string } | null>(null)
+  const [pendingTenantNav, setPendingTenantNav] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (searchParams.get('nieuw') === '1') {
+      setNewTenantOpen(true)
+      router.replace(`${basePath}/tenants`, { scroll: false })
+    }
+  }, [searchParams, router, basePath])
 
   useEffect(() => {
     if (isDemo) {
@@ -148,6 +154,32 @@ export default function TenantsPage() {
     }).catch(() => setLoading(false))
   }, [user?.id, isDemo])
 
+  const onTenantCreated = (t: CreatedTenantPayload) => {
+    if (isDemo) {
+      setTenants((prev) => [
+        {
+          id: t.id,
+          name: t.full_name,
+          email: t.email ?? '',
+          phone: t.phone ?? '',
+          propertyName: t.propertyName ?? '',
+          monthlyRent: t.monthlyRent ?? 0,
+          startDate: t.startDate ?? null,
+          endDate: null,
+          status: 'actief',
+          balance: 0,
+        },
+        ...prev,
+      ])
+    } else {
+      setPendingTenantNav(
+        `${basePath}/tenants/${t.id}${t.leaseLinkFailed ? '?koppeling=mislukt' : ''}`
+      )
+    }
+    setLeaseDialogTenant({ id: t.id, name: t.full_name })
+    setLeaseDialogOpen(true)
+  }
+
   const getBalanceCategory = (balance: number | undefined) => {
     const b = balance ?? 0
     if (b === 0) return 'opPeil' as const
@@ -156,15 +188,8 @@ export default function TenantsPage() {
   }
 
   const filteredTenants = tenants.filter((tenant) => {
-    const matchesSearch =
-      tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (tenant.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tenant.propertyName.toLowerCase().includes(searchQuery.toLowerCase())
-
     const cat = getBalanceCategory(tenant.balance)
-    const matchesBalance = balanceFilter[cat]
-
-    return matchesSearch && matchesBalance
+    return balanceFilter[cat]
   })
 
   const getTenantSegment = (tenant: TenantRow): 'upcoming' | 'current' | 'past' => {
@@ -292,7 +317,7 @@ export default function TenantsPage() {
   if (loading) {
     return (
       <>
-        <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
+        <SectionNavDashboard title="Huurders" items={[]} titleVariant="hero" />
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
@@ -368,16 +393,6 @@ export default function TenantsPage() {
                   </div>
                   {/* Controls: zoeken, filter, aanmaken (zelfde layout als Portefeuille) */}
                   <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0">
-                    {/* Zoekveld in pill-vorm */}
-                    <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-                      <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
-                      <Input
-                        placeholder="Zoek huurders..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-                      />
-                    </div>
                     {/* Filter – Wise-style pill */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -478,7 +493,7 @@ export default function TenantsPage() {
                       )}
                     </Button>
                     <Button
-                      onClick={() => router.push(`${basePath}/tenants/new`)}
+                      onClick={() => setNewTenantOpen(true)}
                       className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -490,7 +505,7 @@ export default function TenantsPage() {
 
   return (
     <>
-            <SectionNavDashboard title="Portefeuille" items={PORTFOLIO_NAV} titleVariant="hero" />
+            <SectionNavDashboard title="Huurders" items={[]} titleVariant="hero" />
             <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
               {viewMode === 'table' ? (
                 <>
@@ -727,12 +742,26 @@ export default function TenantsPage() {
                 )}
             </Card>
 
+      <NewTenantDialog
+        open={newTenantOpen}
+        onClose={() => setNewTenantOpen(false)}
+        onCreated={onTenantCreated}
+      />
+
       <TenantDetailSheet
         tenantId={selectedTenantId}
         open={!!selectedTenantId}
         onClose={() => setSelectedTenantId(null)}
       />
     </>
+  )
+}
+
+export default function TenantsPage() {
+  return (
+    <Suspense fallback={null}>
+      <TenantsPageContent />
+    </Suspense>
   )
 }
 

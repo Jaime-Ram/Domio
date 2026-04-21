@@ -30,7 +30,7 @@ const tiers = [
     id: 'tier-extended',
     href: '/signup',
     priceMonthly: '€249',
-    priceYearly: '€156',
+    priceYearly: '€199',
     description: 'Voor vastgoedbeheerders met een groeiende portefeuille.',
     features: [
       'Tot 50 panden',

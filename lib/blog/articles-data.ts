@@ -4,6 +4,25 @@ import { content as contentWetBetaalbareHuur } from './content/wet-betaalbare-hu
 import { content as contentHuurverhoging } from './content/huurverhogingsregels-2026'
 import { content as contentEnergielabel } from './content/energielabel-verplichtingen-verhuurders'
 import { content as contentGoedVerhuurderschap } from './content/wet-goed-verhuurderschap'
+import { content as contentServicekosten } from './content/servicekosten-regels-afrekening'
+import { content as contentRendement } from './content/rendement-berekenen-vastgoed'
+import { content as contentHuurindexatie } from './content/huurindexatie-automatiseren'
+import { content as contentBelastingen } from './content/belastingen-vastgoedbeleggers-2026'
+import { content as contentFacturatie } from './content/facturatie-betalingsverkeer'
+import { content as contentVerduurzaming } from './content/verduurzaming-huurwoningen-subsidies'
+import { content as contentZonnepanelen } from './content/zonnepanelen-huurwoningen'
+import { content as contentMjop } from './content/mjop-meerjarenonderhoudsplan'
+import { content as contentOnderhoud } from './content/onderhoud-uitbesteden'
+import { content as contentBrandveiligheid } from './content/brandveiligheid-huurwoningen-2026'
+import { content as contentInspecties } from './content/begin-eindinspecties'
+import { content as contentScreening } from './content/huurdersscreening-selectie'
+import { content as contentHuurcontracten } from './content/huurcontracten-soorten-valkuilen'
+import { content as contentCommunicatie } from './content/communicatie-huurders'
+import { content as contentVveBeheer } from './content/vve-beheer-gids'
+import { content as contentVveFinancien } from './content/vve-financien'
+import { content as contentVveVerduurzaming } from './content/vve-verduurzaming'
+import { content as contentVastgoedmarkt } from './content/vastgoedmarkt-2026'
+import { content as contentProptech } from './content/proptech-digitalisering'
 
 const articles: BlogArticle[] = [
   {
@@ -71,20 +90,18 @@ const articles: BlogArticle[] = [
     featured: false,
     relatedArticles: ['wet-betaalbare-huur-gids', 'huurcontracten-soorten-valkuilen', 'huurdersscreening-selectie'],
   },
-  // Placeholder artikelen
   {
     slug: 'servicekosten-regels-afrekening',
     title: 'Servicekosten — Regels, Afrekening en Valkuilen',
     summary: 'Wat servicekosten zijn, verschil kale en all-in huur, jaarlijkse afrekening, redelijkheidsvereiste en rol Huurcommissie.',
     category: 'wetgeving-compliance',
     tags: ['servicekosten', 'afrekening', 'Huurcommissie'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentServicekosten,
     publishDate: '2025-09-01',
     lastUpdated: '2025-09-01',
     readingTime: 4,
     featured: false,
     relatedArticles: ['wet-goed-verhuurderschap', 'huurcontracten-soorten-valkuilen'],
-    placeholder: true,
   },
   {
     slug: 'rendement-berekenen-vastgoed',
@@ -92,13 +109,12 @@ const articles: BlogArticle[] = [
     summary: 'Bruto en netto aanvangsrendement, cashflow, break-even en veelgemaakte fouten. Met rekenvoorbeeld en impact box 3.',
     category: 'financieel-beheer',
     tags: ['rendement', 'BAR', 'NAR', 'cashflow'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentRendement,
     publishDate: '2025-08-15',
     lastUpdated: '2025-08-15',
     readingTime: 6,
     featured: false,
     relatedArticles: ['belastingen-vastgoedbeleggers-2026', 'facturatie-betalingsverkeer'],
-    placeholder: true,
   },
   {
     slug: 'huurindexatie-automatiseren',
@@ -106,13 +122,12 @@ const articles: BlogArticle[] = [
     summary: 'Wettelijke basis, CBS-index, berekening, timing en communicatie. Automatisering via vastgoedsoftware.',
     category: 'financieel-beheer',
     tags: ['indexatie', 'huurverhoging', 'CBS'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentHuurindexatie,
     publishDate: '2025-08-01',
     lastUpdated: '2025-08-01',
     readingTime: 4,
     featured: false,
     relatedArticles: ['huurverhogingsregels-2026', 'facturatie-betalingsverkeer'],
-    placeholder: true,
   },
   {
     slug: 'belastingen-vastgoedbeleggers-2026',
@@ -120,13 +135,12 @@ const articles: BlogArticle[] = [
     summary: 'Box 3, overdrachtsbelasting 10,4%, vrijstelling 18-35 jaar tot €555.000, hypotheekrenteaftrek 37,56%. VvB-structuur.',
     category: 'financieel-beheer',
     tags: ['box 3', 'belasting', 'overdrachtsbelasting', 'VvB'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentBelastingen,
     publishDate: '2025-07-15',
     lastUpdated: '2025-07-15',
     readingTime: 5,
     featured: false,
     relatedArticles: ['rendement-berekenen-vastgoed', 'facturatie-betalingsverkeer'],
-    placeholder: true,
   },
   {
     slug: 'facturatie-betalingsverkeer',
@@ -134,13 +148,12 @@ const articles: BlogArticle[] = [
     summary: 'Huurincasso, aanmaningsprocedure, Wki, automatisering en bankimport.',
     category: 'financieel-beheer',
     tags: ['facturatie', 'incasso', 'Wki', 'MT940'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentFacturatie,
     publishDate: '2025-07-01',
     lastUpdated: '2025-07-01',
     readingTime: 4,
     featured: false,
     relatedArticles: ['huurindexatie-automatiseren', 'rendement-berekenen-vastgoed'],
-    placeholder: true,
   },
   {
     slug: 'verduurzaming-huurwoningen-subsidies',
@@ -148,13 +161,12 @@ const articles: BlogArticle[] = [
     summary: 'SVOH tot €15.000, ISDE, maatregelen met meeste impact, kosten-baten en terugverdientijd.',
     category: 'verduurzaming-energie',
     tags: ['verduurzaming', 'SVOH', 'ISDE', 'subsidie'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentVerduurzaming,
     publishDate: '2025-06-15',
     lastUpdated: '2025-06-15',
     readingTime: 5,
     featured: false,
     relatedArticles: ['energielabel-verplichtingen-verhuurders', 'zonnepanelen-huurwoningen'],
-    placeholder: true,
   },
   {
     slug: 'zonnepanelen-huurwoningen',
@@ -162,13 +174,12 @@ const articles: BlogArticle[] = [
     summary: 'Saldering, eigenaarschap, impact op label en WWS, VvE en financiering.',
     category: 'verduurzaming-energie',
     tags: ['zonnepanelen', 'saldering', 'energielabel'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentZonnepanelen,
     publishDate: '2025-06-01',
     lastUpdated: '2025-06-01',
     readingTime: 4,
     featured: false,
     relatedArticles: ['energielabel-verplichtingen-verhuurders', 'verduurzaming-huurwoningen-subsidies'],
-    placeholder: true,
   },
   {
     slug: 'mjop-meerjarenonderhoudsplan',
@@ -176,13 +187,12 @@ const articles: BlogArticle[] = [
     summary: 'Wat een MJOP is, drie kernonderdelen, reservefonds 0,5%, DMJOP, conditiemeting NEN 2767 en valkuilen.',
     category: 'onderhoud-inspecties',
     tags: ['MJOP', 'reservefonds', 'VvE', 'onderhoud'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentMjop,
     publishDate: '2025-05-15',
     lastUpdated: '2025-05-15',
     readingTime: 6,
     featured: false,
     relatedArticles: ['onderhoud-uitbesteden', 'vve-financien'],
-    placeholder: true,
   },
   {
     slug: 'onderhoud-uitbesteden',
@@ -190,13 +200,12 @@ const articles: BlogArticle[] = [
     summary: 'Klein vs groot onderhoud, wettelijke verplichtingen, preventief vs correctief en documentatie.',
     category: 'onderhoud-inspecties',
     tags: ['onderhoud', 'verhuurder', 'storingsmeldingen'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentOnderhoud,
     publishDate: '2025-05-01',
     lastUpdated: '2025-05-01',
     readingTime: 4,
     featured: false,
     relatedArticles: ['mjop-meerjarenonderhoudsplan', 'begin-eindinspecties'],
-    placeholder: true,
   },
   {
     slug: 'brandveiligheid-huurwoningen-2026',
@@ -204,13 +213,12 @@ const articles: BlogArticle[] = [
     summary: 'Rookmelders, vluchtwegen, verantwoordelijkheid en VvE.',
     category: 'onderhoud-inspecties',
     tags: ['brandveiligheid', 'rookmelders', 'Bouwbesluit'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentBrandveiligheid,
     publishDate: '2025-04-15',
     lastUpdated: '2025-04-15',
-    readingTime: 3,
+    readingTime: 4,
     featured: false,
     relatedArticles: ['onderhoud-uitbesteden', 'begin-eindinspecties'],
-    placeholder: true,
   },
   {
     slug: 'begin-eindinspecties',
@@ -218,13 +226,12 @@ const articles: BlogArticle[] = [
     summary: 'Waarom inspecties, wat vastleggen, digitaal rapport en normale slijtage vs schade.',
     category: 'onderhoud-inspecties',
     tags: ['inspectie', 'waarborgsom', 'schade'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentInspecties,
     publishDate: '2025-04-01',
     lastUpdated: '2025-04-01',
-    readingTime: 4,
+    readingTime: 5,
     featured: false,
     relatedArticles: ['onderhoud-uitbesteden', 'huurcontracten-soorten-valkuilen'],
-    placeholder: true,
   },
   {
     slug: 'huurdersscreening-selectie',
@@ -232,13 +239,12 @@ const articles: BlogArticle[] = [
     summary: 'Objectieve criteria, wat je wel en niet mag vragen, BKR, Rotterdam-wet en documentatie.',
     category: 'huurdersbeheer',
     tags: ['screening', 'selectie', 'Wet Goed Verhuurderschap'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentScreening,
     publishDate: '2025-03-15',
     lastUpdated: '2025-03-15',
     readingTime: 4,
     featured: false,
     relatedArticles: ['wet-goed-verhuurderschap', 'huurcontracten-soorten-valkuilen'],
-    placeholder: true,
   },
   {
     slug: 'huurcontracten-soorten-valkuilen',
@@ -246,13 +252,12 @@ const articles: BlogArticle[] = [
     summary: 'Onbepaalde vs tijdelijke tijd, verplichte bijlagen (puntentelling, energielabel), waarborgsom en opzegging.',
     category: 'huurdersbeheer',
     tags: ['huurcontract', 'puntentelling', 'waarborgsom'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentHuurcontracten,
     publishDate: '2025-03-01',
     lastUpdated: '2025-03-01',
     readingTime: 5,
     featured: false,
     relatedArticles: ['wet-goed-verhuurderschap', 'huurdersscreening-selectie', 'communicatie-huurders'],
-    placeholder: true,
   },
   {
     slug: 'communicatie-huurders',
@@ -260,13 +265,12 @@ const articles: BlogArticle[] = [
     summary: 'Huurdersportaal, storingsmeldingen, huurverhogingsbrief en conflicthantering.',
     category: 'huurdersbeheer',
     tags: ['communicatie', 'huurdersportaal', 'storingsmeldingen'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentCommunicatie,
     publishDate: '2025-02-15',
     lastUpdated: '2025-02-15',
     readingTime: 4,
     featured: false,
     relatedArticles: ['huurcontracten-soorten-valkuilen', 'onderhoud-uitbesteden'],
-    placeholder: true,
   },
   {
     slug: 'vve-beheer-gids',
@@ -274,13 +278,12 @@ const articles: BlogArticle[] = [
     summary: 'Wat een VvE is, rollen, reservefonds, vergaderingen en professioneel beheer.',
     category: 'vve-beheer',
     tags: ['VvE', 'bestuur', 'reservefonds'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentVveBeheer,
     publishDate: '2025-02-01',
     lastUpdated: '2025-02-01',
     readingTime: 5,
     featured: false,
     relatedArticles: ['vve-financien', 'vve-verduurzaming'],
-    placeholder: true,
   },
   {
     slug: 'vve-financien',
@@ -288,13 +291,12 @@ const articles: BlogArticle[] = [
     summary: 'Jaarlijkse begroting, breukdelen, reservefonds 0,5%, jaarrekening en achterstanden.',
     category: 'vve-beheer',
     tags: ['VvE', 'financien', 'reservefonds', 'begroting'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentVveFinancien,
     publishDate: '2025-01-15',
     lastUpdated: '2025-01-15',
     readingTime: 5,
     featured: false,
     relatedArticles: ['vve-beheer-gids', 'mjop-meerjarenonderhoudsplan'],
-    placeholder: true,
   },
   {
     slug: 'vve-verduurzaming',
@@ -302,13 +304,12 @@ const articles: BlogArticle[] = [
     summary: 'Gewone vs gekwalificeerde meerderheid, VvE Energiebespaarlening, subsidies en DMJOP.',
     category: 'vve-beheer',
     tags: ['VvE', 'verduurzaming', 'subsidie'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentVveVerduurzaming,
     publishDate: '2025-01-01',
     lastUpdated: '2025-01-01',
-    readingTime: 4,
+    readingTime: 5,
     featured: false,
     relatedArticles: ['vve-beheer-gids', 'verduurzaming-huurwoningen-subsidies'],
-    placeholder: true,
   },
   {
     slug: 'vastgoedmarkt-2026',
@@ -316,13 +317,12 @@ const articles: BlogArticle[] = [
     summary: 'Woningtekort, prijsontwikkeling, impact Wet Betaalbare Huur en institutionele vs particuliere beleggers.',
     category: 'markt-trends',
     tags: ['vastgoedmarkt', '2026', 'trends'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentVastgoedmarkt,
     publishDate: '2025-12-20',
     lastUpdated: '2025-12-20',
     readingTime: 5,
     featured: false,
     relatedArticles: ['proptech-digitalisering'],
-    placeholder: true,
   },
   {
     slug: 'proptech-digitalisering',
@@ -330,13 +330,12 @@ const articles: BlogArticle[] = [
     summary: 'AI, slimme meters, huurdersportalen, automatisering en waar op letten bij vastgoedsoftware.',
     category: 'markt-trends',
     tags: ['PropTech', 'digitalisering', 'AI'],
-    content: '*Dit artikel wordt binnenkort gepubliceerd.*',
+    content: contentProptech,
     publishDate: '2025-12-15',
     lastUpdated: '2025-12-15',
-    readingTime: 4,
+    readingTime: 5,
     featured: false,
     relatedArticles: ['vastgoedmarkt-2026', 'communicatie-huurders'],
-    placeholder: true,
   },
 ]
 

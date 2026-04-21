@@ -16,20 +16,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(msg)}`, requestUrl.origin))
     }
 
-    // Bepaal redirect op basis van rol in user metadata
     if (!next) {
       const { data: { user } } = await supabase.auth.getUser()
       const role = user?.user_metadata?.role as string | undefined
+      const fromRegistration = request.cookies.get('domio_from')?.value === 'registreren'
+
+      const clearCookies = (res: NextResponse) => {
+        res.cookies.set('domio_from', '', { path: '/', maxAge: 0 })
+        res.cookies.set('domio_demo', '', { path: '/', maxAge: 0 })
+        return res
+      }
+
+      if (!role && fromRegistration) {
+        // Nieuw account via registratiepagina → onboarding voor rolkeuze
+        return clearCookies(NextResponse.redirect(new URL('/onboarding', requestUrl.origin)))
+      }
+
+      if (!role && !fromRegistration) {
+        // Inlogpoging met onbekend account → bevestigingspagina
+        return clearCookies(NextResponse.redirect(new URL('/auth/bevestig', requestUrl.origin)))
+      }
+
+      if (role && fromRegistration) {
+        // Bestaand account probeerde te registreren → uitloggen + melding
+        await supabase.auth.signOut()
+        return clearCookies(NextResponse.redirect(new URL('/registreren?exists=1', requestUrl.origin)))
+      }
+
+      // Bestaand account logt normaal in
       const destination = role === 'huurder' ? '/portal' : '/dashboard/employer'
-      const res = NextResponse.redirect(new URL(destination, requestUrl.origin))
-      res.cookies.set('domio_demo', '', { path: '/', maxAge: 0 })
-      return res
+      return clearCookies(NextResponse.redirect(new URL(destination, requestUrl.origin)))
     }
   }
 
   const destination = next ?? '/dashboard/employer'
-  const redirectUrl = new URL(destination, request.url)
-  const res = NextResponse.redirect(redirectUrl)
+  const res = NextResponse.redirect(new URL(destination, request.url))
+  res.cookies.set('domio_from', '', { path: '/', maxAge: 0 })
   res.cookies.set('domio_demo', '', { path: '/', maxAge: 0 })
   return res
 }

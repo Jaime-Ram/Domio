@@ -31,7 +31,6 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
-import { SectionHeroHeader } from '@/components/dashboard/section-hero-header'
 import { Search, Filter, Grid3x3, Table2, Plus, Eye, Download, Trash2, Upload, X } from 'lucide-react'
 import {
   Dialog,
@@ -71,7 +70,6 @@ export default function DocumentsPage() {
   const { isDemo } = useDashboardUser()
   const { previewDocId, openPreview } = useDocumentPreview()
   const [mounted, setMounted] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [dropActive, setDropActive] = useState(false)
@@ -153,12 +151,8 @@ export default function DocumentsPage() {
   }, [selectionMode, selectedIds.length])
 
   const filteredDocuments = useMemo(() => {
-    return documents.filter((doc: any) => {
-      const matchesSearch = (doc.name || '').toLowerCase().includes(searchQuery.toLowerCase())
-      const typeOk = typeFilter[doc.type] !== false
-      return matchesSearch && typeOk
-    })
-  }, [documents, searchQuery, typeFilter])
+    return documents.filter((doc: any) => typeFilter[doc.type] !== false)
+  }, [documents, typeFilter])
 
   const sortedDocuments = useMemo(() => {
     const list = [...filteredDocuments]
@@ -431,11 +425,7 @@ export default function DocumentsPage() {
 
   return (
     <>
-      <div className="mb-8" ref={contentRef}>
-        <SectionHeroHeader title="Documenten" className="mb-0" />
-      </div>
-
-      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+      <Card ref={contentRef} className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
         <CardHeader
           className={cn(
             'space-y-3',
@@ -444,15 +434,6 @@ export default function DocumentsPage() {
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-wrap items-center gap-3 w-full min-w-0">
-              <div className="relative flex-1 min-w-[140px] max-w-[220px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-                <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
-                <Input
-                  placeholder="Zoek documenten..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-                />
-              </div>
               {mounted ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

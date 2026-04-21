@@ -13,6 +13,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Check, X, Trash2, RefreshCw, Bell, Calendar, Tag, Zap, Link2 } from 'lucide-react'
+import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { cn } from '@/lib/utils'
 import { taskQueries, propertyQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -206,6 +207,31 @@ export function TaskSheet({ open, onClose, task, onSaved, onDeleted }: TaskSheet
                 </Select>
               </div>
               <div className={tile}>
+                <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
+                <WiseDatePicker
+                  value={form.notification_date}
+                  onChange={v => set('notification_date', v)}
+                  placeholder="Optioneel"
+                  className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Planning */}
+          <div>
+            <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Planning</p>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className={tile}>
+                <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
+                <WiseDatePicker
+                  value={form.due_date}
+                  onChange={v => set('due_date', v)}
+                  placeholder="Kies datum"
+                  className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+                />
+              </div>
+              <div className={tile}>
                 <p className={label}><Zap className="inline h-3 w-3 mr-1" />Prioriteit</p>
                 <Select value={form.priority} onValueChange={v => set('priority', v)}>
                   <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
@@ -219,23 +245,6 @@ export function TaskSheet({ open, onClose, task, onSaved, onDeleted }: TaskSheet
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-          </div>
-
-          {/* Planning */}
-          <div>
-            <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">Planning</p>
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className={tile}>
-                <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
-                <input type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)}
-                  className={cn(inputCls, 'dark:[color-scheme:dark]')} />
-              </div>
-              <div className={tile}>
-                <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
-                <input type="date" value={form.notification_date} onChange={e => set('notification_date', e.target.value)}
-                  className={cn(inputCls, 'dark:[color-scheme:dark]')} />
               </div>
               <div className={cn(tile, 'col-span-2')}>
                 <p className={label}><RefreshCw className="inline h-3 w-3 mr-1" />Herhaling</p>

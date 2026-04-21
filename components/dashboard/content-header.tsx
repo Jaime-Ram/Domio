@@ -1,9 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, Bell, User, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
-import { GlobalSearch } from './global-search'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +40,48 @@ function clearDemoCookie() {
   document.cookie = 'domio_demo=; path=/; max-age=0'
 }
 
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h < 12) return 'Goedemorgen'
+  if (h < 18) return 'Goedemiddag'
+  return 'Goedenavond'
+}
+
+function getPageTitle(pathname: string, basePath: string, firstName: string): string {
+  const rel = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname
+  if (rel === '' || rel === '/') return `${getGreeting()}, ${firstName}`
+  if (rel.startsWith('/financial')) return 'Financieel'
+  if (rel.startsWith('/tenants')) return 'Huurders'
+  if (rel.startsWith('/portfolio')) return 'Portefeuille'
+  if (rel.startsWith('/maintenance')) return 'Onderhoud'
+  if (rel.startsWith('/compliance')) return 'Compliance'
+  if (rel.startsWith('/documents')) return 'Documenten'
+  if (rel.startsWith('/messages')) return 'Communicatie'
+  if (rel.startsWith('/tasks')) return 'Taken'
+  if (rel.startsWith('/assist')) return 'Assist'
+  if (rel.startsWith('/settings')) return 'Instellingen'
+  if (rel.startsWith('/accounting')) return 'Boekhouding'
+  if (rel.startsWith('/hulp')) return 'Hulp'
+  // Portal routes
+  if (rel.startsWith('/betalingen')) return 'Betalingen'
+  if (rel.startsWith('/onderhoud')) return 'Onderhoud'
+  if (rel.startsWith('/documenten')) return 'Documenten'
+  if (rel.startsWith('/berichten')) return 'Berichten'
+  if (rel.startsWith('/instellingen')) return 'Instellingen'
+  return ''
+}
+
 export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/employer' }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const router = useRouter()
+  const pathname = usePathname()
+  const firstName = (profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '').trim()
+  const pageTitle = getPageTitle(pathname, basePath, firstName)
+  /** Radix DropdownMenu gebruikt useId(); pas na mount renderen voorkomt SSR/client id-mismatch. */
+  const [menusReady, setMenusReady] = useState(false)
+  useEffect(() => {
+    setMenusReady(true)
+  }, [])
 
   const notifications = isDemo ? mockNotifications : []
   const userName = profile?.full_name || user?.email?.split('@')[0] || (loading ? 'Laden...' : 'Gebruiker')
@@ -54,12 +94,14 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
 
   return (
     <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
-      <div className="mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 h-16 flex items-center justify-between gap-3">
-        {/* Hamburger menu for mobile */}
-        <Button
+      <div className="relative mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 h-[5.25rem]">
+
+        {/* Hamburger — verticaal gecentreerd (mobile) */}
+        <div className="absolute inset-y-0 left-8 sm:left-12 lg:hidden flex items-center">
+          <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden h-10 w-10 min-h-[44px] min-w-[44px] rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 touch-manipulation"
+            className="h-10 w-10 min-h-[44px] min-w-[44px] rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 touch-manipulation"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -69,19 +111,53 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
             <Menu className="h-5 w-5" />
             <span className="sr-only">Menu openen</span>
           </Button>
-
-        {/* Search - Desktop */}
-        <div className="hidden md:flex flex-1 max-w-2xl items-center gap-3">
-          <GlobalSearch basePath={basePath} />
         </div>
 
-        {/* Search - Mobile */}
-        <div className="flex md:hidden items-center gap-3 flex-1 min-w-0">
-          <GlobalSearch basePath={basePath} />
-        </div>
+        {/* Paginatitel — aan de onderkant van de balk */}
+        {pageTitle && (
+          <h1 className="absolute bottom-4 left-8 sm:left-12 lg:left-20 right-48 text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870] truncate leading-none">
+            {pageTitle}
+          </h1>
+        )}
 
-        {/* Right: Notificaties + Profiel */}
-        <div className="flex items-center gap-3 ml-auto shrink-0">
+        {/* Bell + Profiel — verticaal gecentreerd in de balk */}
+        <div className="absolute inset-y-0 right-8 sm:right-12 lg:right-16 flex items-center gap-3">
+          {!menusReady ? (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                disabled
+                aria-hidden
+                tabIndex={-1}
+                className="relative h-10 w-10 rounded-full text-[#163300] dark:text-[#9FE870] bg-transparent opacity-80 pointer-events-none"
+              >
+                <Bell className="h-5 w-5" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled
+                aria-hidden
+                tabIndex={-1}
+                className="h-10 py-0 pl-2 pr-3 rounded-full gap-2 bg-transparent opacity-80 pointer-events-none"
+              >
+                <span
+                  className={cn(
+                    'h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0',
+                    loading ? 'bg-gray-300 dark:bg-neutral-600 animate-pulse' : 'bg-[#163300] dark:bg-[#9FE870] dark:text-[#163300]'
+                  )}
+                >
+                  {loading ? '' : avatarInitials}
+                </span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
+                  {userName}
+                </span>
+              </Button>
+            </>
+          ) : (
+            <>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
@@ -143,7 +219,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 pl-2 pr-3 rounded-full gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800/50 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="h-10 py-0 pl-2 pr-3 rounded-full gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800/50 focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
                   <span className={cn(
                     "h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0",
@@ -251,6 +327,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
+          )}
         </div>
       </div>
     </header>

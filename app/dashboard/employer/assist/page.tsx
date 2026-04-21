@@ -449,7 +449,7 @@ export default function AssistPage() {
               setMentionQuery('')
               setMentionIndex(0)
             }}
-            className="absolute right-2 top-1 rounded-full text-gray-400 hover:text-gray-600 h-8 px-2 sm:px-3 text-xs z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full text-gray-400 hover:text-gray-600 h-8 px-2 sm:px-3 text-xs z-10"
           >
             <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
             Nieuw gesprek

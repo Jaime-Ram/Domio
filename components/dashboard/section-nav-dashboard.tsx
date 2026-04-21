@@ -35,41 +35,38 @@ export function SectionNavDashboard({
     .filter((item) => pathname === item.href || pathname.startsWith(item.href + '/'))
     .sort((a, b) => b.href.length - a.href.length)[0]?.href
 
+  if (!widgetMenu && items.length === 0) return null
+
   return (
-    <div className={cn('mb-8', className)}>
-      {titleVariant === 'hero' ? (
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
-            {title}
-          </h1>
+    <div className={cn('mb-5', className)}>
+      {widgetMenu && (
+        <div className="flex flex-wrap items-center gap-3 mb-3">
           {widgetMenu}
         </div>
-      ) : (
-        <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-          {title} — kies een onderdeel
-        </h2>
       )}
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => {
-          const Icon = item.icon || FileText
-          const active = item.href === activeHref
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
-                active
-                  ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
-                  : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
-              )}
-            >
-              <Icon className="size-4 shrink-0 text-current" />
-              <span className="truncate">{item.label}</span>
-            </Link>
-          )
-        })}
-      </div>
+      {items.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {items.map((item) => {
+            const Icon = item.icon || FileText
+            const active = item.href === activeHref
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
+                  active
+                    ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
+                    : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
+                )}
+              >
+                <Icon className="size-4 shrink-0 text-current" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      ) : null}
     </div>
   )
 }

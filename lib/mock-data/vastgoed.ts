@@ -1,9 +1,41 @@
 // Mock data voor vastgoedbeheer dashboard
 // Dit wordt later vervangen door echte Supabase data
 
+// ─── Portefeuilles ────────────────────────────────────────────────────────────
+export const mockPortfolios = [
+  {
+    id: 'pf-1',
+    name: 'Privé — J.P. van der Berg',
+    description: 'Persoonlijk vastgoed',
+    entityType: 'Privé persoon',
+    owner: 'J.P. van der Berg',
+    kvk: null,
+    propertyIds: ['1', '3', '5'],
+  },
+  {
+    id: 'pf-2',
+    name: 'Vastgoed BV Amsterdam',
+    description: 'Bedrijfspanden in de regio Amsterdam',
+    entityType: 'Besloten Vennootschap',
+    owner: 'Vastgoed BV Amsterdam',
+    kvk: '12345678',
+    propertyIds: ['2'],
+  },
+  {
+    id: 'pf-3',
+    name: 'Smit Kantoren',
+    description: 'Commercieel vastgoed A.J.M. Smit',
+    entityType: 'Privé persoon',
+    owner: 'A.J.M. Smit',
+    kvk: null,
+    propertyIds: ['4'],
+  },
+]
+
 export const mockProperties = [
   {
     id: '1',
+    portfolioId: 'pf-1',
     name: 'Appartement 101',
     address: 'Hoofdstraat 123, Amsterdam',
     type: 'Appartement',
@@ -34,6 +66,7 @@ export const mockProperties = [
   },
   {
     id: '2',
+    portfolioId: 'pf-2',
     name: 'Appartement 102',
     address: 'Hoofdstraat 123, Amsterdam',
     type: 'Appartement',
@@ -64,6 +97,7 @@ export const mockProperties = [
   },
   {
     id: '3',
+    portfolioId: 'pf-1',
     name: 'Appartement 103',
     address: 'Hoofdstraat 123, Amsterdam',
     type: 'Appartement',
@@ -85,6 +119,7 @@ export const mockProperties = [
   },
   {
     id: '4',
+    portfolioId: 'pf-3',
     name: 'Kantoorruimte A',
     address: 'Zakenstraat 45, Rotterdam',
     type: 'Kantoor',
@@ -106,6 +141,7 @@ export const mockProperties = [
   },
   {
     id: '5',
+    portfolioId: 'pf-1',
     name: 'Lovehaven Jan Huisje',
     address: 'Coolhaven 22C, Rotterdam',
     type: 'Appartement',

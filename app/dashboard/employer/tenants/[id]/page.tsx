@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -46,6 +46,7 @@ import { mockPayments } from '@/lib/mock-data/vastgoed'
 import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { getUser } from '@/lib/supabase/auth'
+import { TenantLeaseLinkNotice } from '@/components/tenants/tenant-lease-link-notice'
 
 export default function TenantDetailPage() {
   const router = useRouter()
@@ -62,6 +63,10 @@ export default function TenantDetailPage() {
   const [newTag, setNewTag] = useState('')
 
   useEffect(() => {
+    if (tenantId === 'new') {
+      router.replace(`${basePath}/tenants?nieuw=1`)
+      return
+    }
     const loadTenant = async () => {
       try {
         const { user } = await getUser()
@@ -90,7 +95,11 @@ export default function TenantDetailPage() {
       }
     }
     loadTenant()
-  }, [tenantId, router])
+  }, [tenantId, router, basePath])
+
+  if (tenantId === 'new') {
+    return null
+  }
 
   if (loading) {
     return (
@@ -178,6 +187,9 @@ export default function TenantDetailPage() {
 
   return (
     <>
+            <Suspense fallback={null}>
+              <TenantLeaseLinkNotice />
+            </Suspense>
             {/* Header */}
             <div className="mb-8">
               <Button

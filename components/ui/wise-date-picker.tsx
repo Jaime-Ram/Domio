@@ -71,7 +71,7 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
         type="button"
         onClick={() => setOpen(v => !v)}
         className={cn(
-          'w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-input bg-background',
+          'w-full flex items-center justify-between px-3 py-2 text-sm rounded-xl border border-input bg-background',
           'hover:border-[#163300] focus:outline-none focus:ring-2 focus:ring-[#163300]/30 transition-colors',
           !displayValue && 'text-muted-foreground'
         )}
@@ -85,7 +85,7 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
 
       {/* Dropdown calendar */}
       {open && (
-        <div className="absolute z-50 mt-1 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-100 dark:border-neutral-800 p-4 w-72">
+        <div className="absolute z-[100] mt-1 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-100 dark:border-neutral-800 p-4 w-72">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <button

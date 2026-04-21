@@ -8,6 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
 import { Input } from '@/components/ui/input'
 import { FileText } from 'lucide-react'
 
@@ -35,11 +41,15 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-gray-200 dark:border-neutral-700 sm:max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Domio documenten</DialogTitle>
-          <DialogDescription>Kies een document uit je bibliotheek om toe te voegen.</DialogDescription>
+      <DialogContent
+        className={addDialogContentClassName('max-w-md flex flex-col max-h-[80vh]')}
+        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+      >
+        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Domio documenten</DialogTitle>
+          <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-1">Kies een document uit je bibliotheek om toe te voegen.</DialogDescription>
         </DialogHeader>
+        <div className="px-6 py-5 space-y-3 flex flex-col flex-1 min-h-0">
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -64,6 +74,7 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
           {filtered.length === 0 && (
             <p className="text-xs text-gray-500 px-2 py-3 text-center">Geen documenten gevonden.</p>
           )}
+        </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -508,6 +508,25 @@ export interface Database {
         Args: { p_email: string }
         Returns: boolean
       }
+      /** Adres → stroom/gas-EAN uit ean_adressen (alleen service_role). */
+      lookup_ean_adres: {
+        Args: {
+          p_postcode_normalized: string
+          p_huisnummer: string
+          p_huisletter?: string | null
+          p_toevoeging?: string | null
+        }
+        Returns: {
+          ean: string | null
+          gas_ean: string | null
+          straat: string
+          plaats: string
+          postcode: string
+          huisnummer: string
+          huisletter: string | null
+          toevoeging: string | null
+        }
+      }
     }
     Enums: {
       [_ in never]: never

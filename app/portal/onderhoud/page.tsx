@@ -8,6 +8,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import {
+  ADD_DIALOG_BODY_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
 import { Wrench, Clock, CheckCircle2, Plus, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -147,23 +155,34 @@ export default function OnderhoudPage() {
 
       {/* Dialog nieuwe melding */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md border border-gray-200 rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-gray-900">Nieuwe melding</DialogTitle>
-            <DialogDescription>Beschrijf het probleem zo duidelijk mogelijk.</DialogDescription>
-          </DialogHeader>
-
+        <DialogContent
+          className={addDialogContentClassName('sm:max-w-md')}
+          closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+        >
           {submitted ? (
-            <div className="py-8 text-center">
-              <div className="h-12 w-12 rounded-full bg-[#9FE870] flex items-center justify-center mx-auto mb-3">
-                <CheckCircle2 className="h-6 w-6 text-[#163300]" />
+            <>
+              <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+                <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Melding verstuurd</DialogTitle>
+                <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+                  We nemen zo snel mogelijk contact op.
+                </DialogDescription>
+              </DialogHeader>
+              <div className={cn(ADD_DIALOG_BODY_CLASS, 'py-8 text-center')}>
+                <div className="h-12 w-12 rounded-full bg-[#9FE870] flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="h-6 w-6 text-[#163300]" />
+                </div>
+                <p className="font-semibold text-gray-900 dark:text-white">Bedankt!</p>
               </div>
-              <p className="font-semibold text-gray-900">Melding verstuurd!</p>
-              <p className="text-sm text-gray-500 mt-1">We nemen zo snel mogelijk contact op.</p>
-            </div>
+            </>
           ) : (
             <>
-              <div className="space-y-4">
+              <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+                <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe melding</DialogTitle>
+                <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+                  Beschrijf het probleem zo duidelijk mogelijk.
+                </DialogDescription>
+              </DialogHeader>
+              <div className={cn(ADD_DIALOG_BODY_CLASS, 'space-y-4')}>
                 <div className="space-y-1.5">
                   <Label>Onderwerp</Label>
                   <Input placeholder="bijv. Lekkage badkamer" value={title} onChange={e => setTitle(e.target.value)} className="rounded-xl" />
@@ -173,7 +192,7 @@ export default function OnderhoudPage() {
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300] dark:bg-neutral-900 dark:border-neutral-700"
                   >
                     {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                   </select>
@@ -183,14 +202,14 @@ export default function OnderhoudPage() {
                   <Textarea placeholder="Beschrijf het probleem zo uitgebreid mogelijk..." value={desc} onChange={e => setDesc(e.target.value)} rows={4} className="rounded-xl resize-none" />
                 </div>
               </div>
-              <DialogFooter className="gap-2">
-                <Button variant="outline" className="rounded-full" onClick={() => setDialogOpen(false)}>Annuleren</Button>
+              <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
                 <Button
-                  className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] gap-1.5"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
                   disabled={!title.trim() || !desc.trim()}
                   onClick={handleSubmit}
                 >
-                  <Send className="h-4 w-4" />Versturen
+                  <Send className="h-4 w-4 shrink-0" />
+                  Versturen
                 </Button>
               </DialogFooter>
             </>

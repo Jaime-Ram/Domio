@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import {
-  CheckCircle2, Circle, Clock, AlertCircle, Plus, Search,
-  Calendar, Bell, RefreshCw, Building2, ChevronRight, ListTodo,
-  Tag, Zap, Pencil, Filter, Check,
+  Clock, AlertCircle, Plus, Search,
+  Calendar, Bell, RefreshCw, Building2, ListTodo,
+  Pencil, Check, Filter, Grid3x3, Table2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { taskQueries } from '@/lib/supabase/queries'
@@ -12,6 +12,36 @@ import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { TaskSheet } from '@/components/tasks/task-sheet'
 import { NewTaskDialog } from '@/components/tasks/new-task-dialog'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { MetricCard } from '@/components/finance/MetricCard'
+import { AddTaskTile } from '@/components/tasks/add-task-tile'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
+  DASHBOARD_FILTER_MENU_CONTENT_CLASS,
+  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -94,15 +124,9 @@ function fmtDate(dateStr: string | null): string {
   return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function isThisMonth(dateStr: string | null): boolean {
-  if (!dateStr) return false
-  const d = new Date(dateStr), now = new Date()
-  return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-}
-
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-type FilterKey = 'alle' | 'open' | 'actie_nodig' | 'te_laat' | 'afgerond'
+type FilterKey = 'alle' | 'open' | 'afgerond'
 
 export default function TasksPage() {
   const { isDemo } = useDashboardUser()
@@ -111,9 +135,16 @@ export default function TasksPage() {
   const [loading, setLoading]     = useState(true)
   const [filter, setFilter]       = useState<FilterKey>('alle')
   const [search, setSearch]       = useState('')
+  const tabsContainerRef = useRef<HTMLDivElement>(null)
+  const filterButtonRefs = useRef<Partial<Record<FilterKey, HTMLButtonElement | null>>>({})
+  const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [sheetOpen, setSheetOpen]   = useState(false)
   const [editing, setEditing]       = useState<any | null>(null)
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
+  const [categoryFilter, setCategoryFilter] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(Object.keys(CATEGORY_CONFIG).map((k) => [k, true]))
+  )
 
   // Load
   useEffect(() => {
@@ -131,18 +162,20 @@ export default function TasksPage() {
   const overdue      = useMemo(() => tasks.filter(t => t.status !== 'afgerond' && t.due_date && daysUntil(t.due_date) < 0), [tasks])
   const actionNeeded = useMemo(() => tasks.filter(t => t.status !== 'afgerond' && t.due_date && daysUntil(t.due_date) >= 0 && daysUntil(t.due_date) <= 7), [tasks])
   const openTasks    = useMemo(() => tasks.filter(t => t.status !== 'afgerond' && t.status !== 'geannuleerd'), [tasks])
-  const doneMonth    = useMemo(() => tasks.filter(t => t.status === 'afgerond' && isThisMonth(t.updated_at ?? t.due_date)), [tasks])
+  const afgerondCount = useMemo(() => tasks.filter(t => t.status === 'afgerond').length, [tasks])
 
   // Filtered list
   const filtered = useMemo(() => {
     let list = tasks
-    if (filter === 'open')        list = openTasks
-    else if (filter === 'te_laat')     list = overdue
-    else if (filter === 'actie_nodig') list = actionNeeded
-    else if (filter === 'afgerond')    list = tasks.filter(t => t.status === 'afgerond')
-    if (search) list = list.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
+    if (filter === 'open') list = openTasks
+    else if (filter === 'afgerond') list = tasks.filter((t) => t.status === 'afgerond')
+    list = list.filter((t) => {
+      const cat = t.category && t.category in categoryFilter ? t.category : 'overig'
+      return categoryFilter[cat] !== false
+    })
+    if (search) list = list.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
     return list
-  }, [tasks, filter, search, overdue, actionNeeded, openTasks])
+  }, [tasks, filter, search, openTasks, categoryFilter])
 
   const toggleDone = async (task: any) => {
     const newStatus = task.status === 'afgerond' ? 'open' : 'afgerond'
@@ -169,224 +202,417 @@ export default function TasksPage() {
   const openNew  = () => setDialogOpen(true)
   const openEdit = (task: any) => { setEditing(task); setSheetOpen(true) }
 
-  // ── KPI tiles ────────────────────────────────────────────────────────────
-
-  const KPI_TILES = [
-    {
-      icon: AlertCircle, label: 'Verlopen',
-      value: overdue.length,
-      sub: overdue.length === 1 ? 'taak' : 'taken',
-      accent: overdue.length > 0 ? 'text-red-600 dark:text-red-400' : undefined,
-      bg: overdue.length > 0 ? 'bg-red-50 dark:bg-red-500/10' : undefined,
-    },
-    {
-      icon: Clock, label: 'Actie nodig',
-      value: actionNeeded.length,
-      sub: 'binnen 7 dagen',
-      accent: actionNeeded.length > 0 ? 'text-amber-600 dark:text-amber-400' : undefined,
-      bg: actionNeeded.length > 0 ? 'bg-amber-50 dark:bg-amber-500/10' : undefined,
-    },
-    {
-      icon: ListTodo, label: 'Open taken',
-      value: openTasks.length,
-      sub: 'totaal',
-    },
-    {
-      icon: CheckCircle2, label: 'Afgerond',
-      value: doneMonth.length,
-      sub: 'deze maand',
-      accent: 'text-[#163300] dark:text-[#9FE870]',
-    },
-  ]
-
   const FILTERS: { key: FilterKey; label: string; count?: number }[] = [
-    { key: 'alle',        label: 'Alle',          count: tasks.length },
-    { key: 'open',        label: 'Open',          count: openTasks.length },
-    { key: 'actie_nodig', label: 'Actie nodig',   count: actionNeeded.length },
-    { key: 'te_laat',     label: 'Te laat',       count: overdue.length },
-    { key: 'afgerond',    label: 'Afgerond' },
+    { key: 'alle', label: 'Alle', count: tasks.length },
+    { key: 'open', label: 'Open', count: openTasks.length },
+    { key: 'afgerond', label: 'Afgerond', count: afgerondCount },
   ]
+
+  // Onderstreep onder actieve filter — zelfde patroon als huurders (Huidig / Aankomend / Oud)
+  useEffect(() => {
+    const container = tabsContainerRef.current
+    const btn = filterButtonRefs.current[filter]
+    if (!container || !btn) return
+    const containerRect = container.getBoundingClientRect()
+    const btnRect = btn.getBoundingClientRect()
+    setTabIndicator({
+      left: btnRect.left - containerRect.left,
+      width: btnRect.width,
+    })
+  }, [filter, tasks.length, openTasks.length, afgerondCount])
+
+  const tasksToolbar = (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div
+        ref={tabsContainerRef}
+        className="relative flex w-full sm:w-auto min-w-0 overflow-x-auto text-sm border-b border-gray-200 dark:border-neutral-700 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {FILTERS.map((f, index) => (
+          <button
+            key={f.key}
+            type="button"
+            ref={(el) => {
+              filterButtonRefs.current[f.key] = el
+            }}
+            onClick={() => setFilter(f.key)}
+            className={cn(
+              'shrink-0 flex-1 sm:flex-initial pb-2 text-left sm:text-center whitespace-nowrap transition-colors duration-200 font-semibold',
+              index < FILTERS.length - 1 ? 'mr-4 sm:mr-6' : '',
+              filter === f.key
+                ? 'text-[#163300] dark:text-[#9FE870]'
+                : 'text-gray-500 dark:text-gray-400'
+            )}
+          >
+            <span>{f.label}</span>
+            {f.count !== undefined && (
+              <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]">
+                {f.count}
+              </span>
+            )}
+          </button>
+        ))}
+        <div
+          className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
+          style={{ left: tabIndicator.left, width: tabIndicator.width }}
+        />
+      </div>
+
+      <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0 flex-wrap">
+        <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
+          <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
+          <Input
+            placeholder="Zoek taken..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" variant="outline" className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}>
+              <Filter className="h-4 w-4 md:mr-1.5" />
+              <span className="hidden md:inline">Filter</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8} className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}>
+            <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              Categorie
+            </DropdownMenuLabel>
+            <div className="space-y-1">
+              {(Object.entries(CATEGORY_CONFIG) as [string, { label: string }][]).map(([key, { label }]) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={categoryFilter[key] !== false}
+                  onCheckedChange={(v) => setCategoryFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+                >
+                  {label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className={cn(
+            'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
+            'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
+          )}
+          onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
+          aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
+        >
+          {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
+        </Button>
+        <Button
+          type="button"
+          onClick={openNew}
+          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Nieuwe taak
+        </Button>
+      </div>
+    </div>
+  )
 
   return (
     <div className="space-y-6">
 
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Taken</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Beheer en volg al je actiepunten op één plek</p>
-        </div>
-        <button type="button" onClick={openNew}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-sm font-semibold px-4 py-2 transition-colors shrink-0">
-          <Plus className="h-4 w-4" />Nieuwe taak
-        </button>
+      {/* KPI’s — zelfde patroon als financieel: icoon + bedrag + één onderzin (geen extra subtitle) */}
+      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          label="Verlopen"
+          value={String(overdue.length)}
+          icon={<AlertCircle />}
+        />
+        <MetricCard
+          label="Actie binnen 7 dagen"
+          value={String(actionNeeded.length)}
+          icon={<Clock />}
+        />
+        <MetricCard
+          label="Open taken"
+          value={String(openTasks.length)}
+          icon={<ListTodo />}
+        />
+        <AddTaskTile className="h-full min-h-[160px]" onClick={openNew} />
       </div>
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-4 gap-3">
-        {KPI_TILES.map(({ icon: Icon, label, value, sub, accent, bg }) => (
-          <div key={label} className={cn('rounded-2xl px-4 py-4', bg ?? 'bg-gray-50 dark:bg-neutral-800/60')}>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Icon className={cn('h-4 w-4', accent ?? 'text-[#163300] dark:text-[#9FE870]')} />
-              <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{label}</span>
-            </div>
-            <p className={cn('text-2xl font-bold leading-none', accent ?? 'text-gray-900 dark:text-white')}>{value}</p>
-            {sub && <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{sub}</p>}
-          </div>
-        ))}
-      </div>
-
-      {/* Toolbar: filters + search */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {/* Filter pills */}
-        <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-neutral-800 rounded-full p-1">
-          {FILTERS.map(f => (
-            <button key={f.key} type="button" onClick={() => setFilter(f.key)}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
-                filter === f.key
-                  ? 'bg-white dark:bg-neutral-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-              )}>
-              {f.label}
-              {f.count !== undefined && f.count > 0 && (
-                <span className={cn('text-[11px] font-semibold px-1.5 py-0.5 rounded-full',
-                  filter === f.key
-                    ? 'bg-[#9FE870]/30 text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]'
-                    : 'bg-gray-200 dark:bg-neutral-600 text-gray-600 dark:text-gray-300'
-                )}>
-                  {f.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Search */}
-        <div className="flex items-center gap-2 flex-1 max-w-xs bg-gray-50 dark:bg-neutral-800/60 rounded-full px-3 py-2">
-          <Search className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Zoeken…"
-            className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 outline-none border-0 p-0" />
-        </div>
-      </div>
-
-      {/* Task list */}
-      {loading ? (
-        <div className="space-y-2 animate-pulse">
-          {[0,1,2,3].map(i => (
-            <div key={i} className="h-16 bg-gray-100 dark:bg-neutral-800 rounded-2xl" />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="py-20 text-center">
-          <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}
-          </p>
-          {!search && filter === 'alle' && (
-            <button type="button" onClick={openNew}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors">
-              <Plus className="h-3.5 w-3.5" />Eerste taak aanmaken
-            </button>
+      {/* Toolbar + tabel (zelfde patroon als huurders / DashboardTableBlock) */}
+      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
+        <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
+          {tasksToolbar}
+        </CardHeader>
+        <CardContent
+          className={cn(
+            !loading && viewMode === 'grid' && filtered.length > 0 ? 'px-5 pb-5 pt-2' : 'p-0 px-0 pb-0',
+            (loading || (!loading && viewMode === 'table' && filtered.length > 0)) &&
+              DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
           )}
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          {filtered.map(task => {
-            const done = task.status === 'afgerond'
-            const days = task.due_date ? daysUntil(task.due_date) : null
-            const isOverdue = days !== null && days < 0 && !done
-            const isUrgent  = days !== null && days <= 7 && days >= 0 && !done
-            const cat  = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
-            const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
-            const rec  = RECURRING_LABEL[task.recurring] ?? ''
-
-            return (
-              <div key={task.id}
-                className={cn(
-                  'group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors',
-                  done
-                    ? 'bg-gray-50/50 dark:bg-neutral-800/30'
-                    : 'bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 hover:border-gray-200 dark:hover:border-neutral-700'
-                )}>
-
-                {/* Checkbox */}
-                <button type="button" onClick={() => toggleDone(task)}
-                  className={cn(
-                    'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
-                    done
-                      ? 'border-[#163300] bg-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]'
-                      : isOverdue
-                        ? 'border-red-400 hover:border-red-500'
-                        : 'border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870]'
-                  )}>
-                  {done && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" />}
+        >
+          {loading ? (
+            <DashboardTableBlock empty={false}>
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-14')} />
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Taak</TableHead>
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand</TableHead>
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Einddatum</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Prioriteit</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Herinnering</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-12')} />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[0, 1, 2, 3].map((i) => (
+                    <TableRow key={i}>
+                      <TableCell colSpan={7} className="py-3">
+                        <div className="h-4 w-full max-w-xl animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </DashboardTableBlock>
+          ) : filtered.length === 0 ? (
+            <div className="py-20 text-center px-4">
+              <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}
+              </p>
+              {!search && filter === 'alle' && (
+                <button
+                  type="button"
+                  onClick={openNew}
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Eerste taak aanmaken
                 </button>
-
-                {/* Main content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={cn('text-sm font-medium', done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white')}>
-                      {task.title}
-                    </span>
-                    <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full', cat.color)}>{cat.label}</span>
-                    {task.priority !== 'normaal' && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                        <span className={cn('h-1.5 w-1.5 rounded-full', prio.dot)} />{prio.label}
-                      </span>
+              )}
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((task) => {
+                const done = task.status === 'afgerond'
+                const days = task.due_date ? daysUntil(task.due_date) : null
+                const isOverdue = days !== null && days < 0 && !done
+                const isUrgent = days !== null && days <= 7 && days >= 0 && !done
+                const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
+                return (
+                  <Card
+                    key={task.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openEdit(task)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        openEdit(task)
+                      }
+                    }}
+                    className={cn(
+                      dashboardCardClass('transition-colors cursor-pointer', isDemo),
+                      'rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 shadow-none hover:border-[#163300] dark:hover:border-[#9FE870]'
                     )}
-                    {rec && (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
-                        <RefreshCw className="h-3 w-3" />{rec}
-                      </span>
-                    )}
-                  </div>
-                  {/* Sub-row: property link + description snippet */}
-                  {(task.properties || task.description) && (
-                    <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <ListTodo className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <CardTitle
+                            className={cn(
+                              'text-base font-semibold text-[#163300] dark:text-[#9FE870] mb-1 line-clamp-2',
+                              done && 'line-through text-gray-400 dark:text-gray-600'
+                            )}
+                          >
+                            {task.title}
+                          </CardTitle>
+                          <span className={cn('inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1', cat.color)}>
+                            {cat.label}
+                          </span>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-2">
                       {task.properties && (
-                        <span className="flex items-center gap-1">
-                          <Building2 className="h-3 w-3" />{task.properties.name}
-                        </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
+                          <span className="truncate">{task.properties.name}</span>
+                        </div>
                       )}
-                      {task.description && !task.properties && (
-                        <span className="truncate max-w-xs">{task.description}</span>
+                      {task.due_date && (
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 text-sm font-medium',
+                            isOverdue
+                              ? 'text-red-600 dark:text-red-400'
+                              : isUrgent
+                                ? 'text-amber-600 dark:text-amber-400'
+                                : done
+                                  ? 'text-gray-400 dark:text-gray-600'
+                                  : 'text-gray-700 dark:text-gray-300'
+                          )}
+                        >
+                          <Calendar className="h-4 w-4 shrink-0" />
+                          {fmtDate(task.due_date)}
+                        </div>
                       )}
-                    </div>
-                  )}
-                </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          ) : (
+            <DashboardTableBlock empty={false}>
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-14 text-center')}>
+                      <span className="sr-only">Afgerond</span>
+                    </TableHead>
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Taak</TableHead>
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand</TableHead>
+                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Einddatum</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Prioriteit</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Herinnering</TableHead>
+                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-12 text-right')}>
+                      <span className="sr-only">Acties</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((task) => {
+                    const done = task.status === 'afgerond'
+                    const days = task.due_date ? daysUntil(task.due_date) : null
+                    const isOverdue = days !== null && days < 0 && !done
+                    const isUrgent = days !== null && days <= 7 && days >= 0 && !done
+                    const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
+                    const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
+                    const rec = RECURRING_LABEL[task.recurring] ?? ''
 
-                {/* Right: dates */}
-                <div className="shrink-0 flex items-center gap-5 text-xs">
-                  {task.notification_date && (
-                    <span className="hidden sm:flex items-center gap-1 text-gray-400 dark:text-gray-500">
-                      <Bell className="h-3 w-3" />{fmtDate(task.notification_date)}
-                    </span>
-                  )}
-                  {task.due_date && (
-                    <span className={cn('flex items-center gap-1 font-medium',
-                      isOverdue ? 'text-red-600 dark:text-red-400' :
-                      isUrgent  ? 'text-amber-600 dark:text-amber-400' :
-                      done      ? 'text-gray-400 dark:text-gray-600' :
-                                  'text-gray-600 dark:text-gray-300'
-                    )}>
-                      {isOverdue && <AlertCircle className="h-3 w-3" />}
-                      <Calendar className="h-3 w-3" />
-                      {fmtDate(task.due_date)}
-                    </span>
-                  )}
-                  {/* Edit pencil */}
-                  <button type="button" onClick={() => openEdit(task)}
-                    className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-full bg-[#9FE870]/20 hover:bg-[#9FE870]/40 text-[#163300] dark:text-[#9FE870] px-2.5 py-1 text-[11px] font-medium transition-all">
-                    <Pencil className="h-3 w-3" />Bewerken
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+                    return (
+                      <TableRow key={task.id} className="group">
+                        <TableCell className="align-middle w-14">
+                          <div className="flex justify-center">
+                            <button
+                              type="button"
+                              onClick={() => toggleDone(task)}
+                              aria-label={done ? 'Taak heropenen' : 'Taak afronden'}
+                              className={cn(
+                                'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
+                                done
+                                  ? 'border-[#163300] bg-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]'
+                                  : isOverdue
+                                    ? 'border-red-400 hover:border-red-500'
+                                    : 'border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870]'
+                              )}
+                            >
+                              {done && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" />}
+                            </button>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap items-center gap-2 min-w-0">
+                            <span
+                              className={cn(
+                                'text-sm font-medium',
+                                done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
+                              )}
+                            >
+                              {task.title}
+                            </span>
+                            <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0', cat.color)}>
+                              {cat.label}
+                            </span>
+                            {rec && (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
+                                <RefreshCw className="h-3 w-3 shrink-0" />
+                                {rec}
+                              </span>
+                            )}
+                          </div>
+                          {task.description && !task.properties && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-md">
+                              {task.description}
+                            </p>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {task.properties ? (
+                            <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 min-w-0">
+                              <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
+                              <span className="truncate">{task.properties.name}</span>
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {task.due_date ? (
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 text-sm font-medium',
+                                isOverdue
+                                  ? 'text-red-600 dark:text-red-400'
+                                  : isUrgent
+                                    ? 'text-amber-600 dark:text-amber-400'
+                                    : done
+                                      ? 'text-gray-400 dark:text-gray-600'
+                                      : 'text-gray-700 dark:text-gray-300'
+                              )}
+                            >
+                              {isOverdue && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+                              <Calendar className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              {fmtDate(task.due_date)}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {task.priority && task.priority !== 'normaal' ? (
+                            <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                              <span className={cn('h-2 w-2 rounded-full shrink-0', prio.dot)} />
+                              {prio.label}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {task.notification_date ? (
+                            <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                              <Bell className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              {fmtDate(task.notification_date)}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right align-middle">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(task)}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+                            aria-label="Bewerken"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </DashboardTableBlock>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Create dialog */}
       <NewTaskDialog

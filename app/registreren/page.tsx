@@ -1,23 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Mail, AlertCircle, Building2, Home, ChevronRight, ArrowLeft } from 'lucide-react'
-import { signUp, signInWithGoogle, signInWithMicrosoft } from '@/lib/supabase/auth'
+import { signUp, signInWithGoogle, signInWithApple } from '@/lib/supabase/auth'
 import { translateAuthError } from '@/lib/auth-errors'
 import { ConfirmationBlock } from '@/components/ui/confirmation-block'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
 const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
 
-export default function RegistrerenPage() {
+function RegistrerenContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -28,6 +29,13 @@ export default function RegistrerenPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [emailExists, setEmailExists] = useState(false)
+
+  // Detect redirect back from OAuth when account already exists
+  useEffect(() => {
+    if (searchParams.get('exists') === '1') {
+      setEmailExists(true)
+    }
+  }, [searchParams])
 
   const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,7 +91,6 @@ export default function RegistrerenPage() {
         return
       }
 
-      // Proactief controleren of e-mail al bestaat (voorkomt registratie met bestaand account)
       try {
         const checkRes = await fetch('/api/auth/check-email', {
           method: 'POST',
@@ -99,7 +106,7 @@ export default function RegistrerenPage() {
           }
         }
       } catch {
-        // Bij netwerkfout (Load failed etc.) doorgaan met signup – Supabase vangt duplicaat
+        // Bij netwerkfout doorgaan met signup – Supabase vangt duplicaat
       }
 
       const supaRole = role === 'employer' ? 'verhuurder' : 'huurder'
@@ -111,7 +118,6 @@ export default function RegistrerenPage() {
         phone.trim() || undefined
       )
 
-      // Fallback: Supabase retourneert soms succes met lege identities bij bestaand e-mail
       const isDuplicateEmail =
         (authError && /already|exists|registered|eerder|duplicate/i.test(authError.message)) ||
         (data?.user && (!data.user.identities || data.user.identities.length === 0))
@@ -130,11 +136,15 @@ export default function RegistrerenPage() {
     }
   }
 
-  const handleSocialSignup = async () => {
+  const handleSocialRegistration = async (provider: 'google' | 'apple') => {
     setLoading(true)
     setError(null)
+    // Mark that we came from the registration page so the callback can detect existing accounts
+    document.cookie = 'domio_from=registreren; path=/; max-age=300; SameSite=Lax'
     try {
-      const { error: authError } = await signInWithGoogle()
+      const { error: authError } = provider === 'apple'
+        ? await signInWithApple()
+        : await signInWithGoogle()
       if (authError) throw authError
     } catch (err: unknown) {
       setError(translateAuthError(err instanceof Error ? err.message : 'Registreren mislukt'))
@@ -148,7 +158,7 @@ export default function RegistrerenPage() {
             <button
               type="button"
               onClick={handleBack}
-              className="mb-4 p-2 -ml-2 rounded-full bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors"
+              className="mb-8 p-2 -ml-2 rounded-full bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors"
               aria-label="Terug"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -181,11 +191,17 @@ export default function RegistrerenPage() {
               >
                 <ConfirmationBlock
                   icon={AlertCircle}
-                  title="Dit e-mailadres is al bij ons bekend"
+                  title="Dit account is al bekend bij ons"
                   description={
-                    <>
-                      Er is al een account gekoppeld aan <strong className="text-gray-900">{email}</strong>. Log in met je wachtwoord of vraag een nieuw wachtwoord aan.
-                    </>
+                    email ? (
+                      <>
+                        Er is al een account gekoppeld aan <strong className="text-gray-900">{email}</strong>. Log in met je wachtwoord of vraag een nieuw wachtwoord aan.
+                      </>
+                    ) : (
+                      <>
+                        Dit e-mailadres of account is al bij ons geregistreerd. Log in met je bestaande account.
+                      </>
+                    )
                   }
                   primaryButton={{ label: 'Ga naar inloggen', href: '/login' }}
                   secondaryButton={{ label: 'Wachtwoord vergeten', href: '/forgot-password' }}
@@ -252,13 +268,13 @@ export default function RegistrerenPage() {
                   <span className="bg-white dark:bg-gray-900 px-3 text-sm text-gray-500">Of registreer met</span>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <SocialButton
                   type="button"
                   variant="default"
                   size="lg"
                   className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                  onClick={handleSocialSignup}
+                  onClick={() => handleSocialRegistration('google')}
                   disabled={loading}
                   aria-label="Registreren met Google"
                 >
@@ -274,26 +290,7 @@ export default function RegistrerenPage() {
                   variant="default"
                   size="lg"
                   className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                  onClick={async () => {
-                    setLoading(true); setError(null)
-                    try { const { error: e } = await signInWithMicrosoft(); if (e) throw e } catch (err: unknown) { setError(translateAuthError(err instanceof Error ? err.message : 'Registreren met Microsoft mislukt')); setLoading(false) }
-                  }}
-                  disabled={loading}
-                  aria-label="Registreren met Microsoft"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
-                    <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
-                    <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
-                    <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
-                    <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
-                  </svg>
-                </SocialButton>
-                <SocialButton
-                  type="button"
-                  variant="default"
-                  size="lg"
-                  className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                  onClick={handleSocialSignup}
+                  onClick={() => handleSocialRegistration('apple')}
                   disabled={loading}
                   aria-label="Registreren met Apple"
                 >
@@ -422,5 +419,13 @@ export default function RegistrerenPage() {
             .
           </p>
     </AuthPageShell>
+  )
+}
+
+export default function RegistrerenPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegistrerenContent />
+    </Suspense>
   )
 }

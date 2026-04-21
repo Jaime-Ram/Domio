@@ -11,7 +11,7 @@ import { HeroSection } from '@/components/marketing/hero-section'
 import { SupportSection } from '@/components/marketing/support-section'
 import { FAQSection } from '@/components/marketing/faq-section'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle, MessageCircle, Ticket } from 'lucide-react'
+import { ArrowRight, Menu, X, ArrowUpRight, User, ChevronDown, Mail, Phone, Copy, Search, Building2, Users, FileText, Percent, Euro, Calculator, BarChart3, Wrench, ClipboardCheck, Scan, Home as HomeIcon, Briefcase, HelpCircle, MessageCircle, Ticket, Settings } from 'lucide-react'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CONTACT_EMAIL } from '@/lib/site-config'
@@ -45,7 +45,10 @@ export default function Home() {
   const lastScrollY = useRef(0)
   const scrollThreshold = 80
   const [userName, setUserName] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -54,8 +57,10 @@ export default function Home() {
         const profile = await getProfile(user.id)
         const name = profile?.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? user.email?.split('@')[0] ?? 'daar'
         setUserName(name)
+        setUserEmail(user.email ?? null)
       } else {
         setUserName(null)
+        setUserEmail(null)
       }
       setAuthLoading(false)
     }
@@ -65,6 +70,17 @@ export default function Home() {
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  // Sluit gebruikersmenu bij klik buiten
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    if (userMenuOpen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [userMenuOpen])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -163,12 +179,78 @@ export default function Home() {
             {/* Desktop: Auth / User (Right) */}
             <div className="hidden md:flex items-center gap-3 ml-auto">
               {!authLoading && userName ? (
-                <>
-                  <span className="text-sm font-medium text-gray-700">Hallo, {userName}</span>
-                  <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
-                    <Link href="/mijn-domio">Mijn Domio</Link>
-                  </Button>
-                </>
+                <div ref={userMenuRef} className="relative">
+                  {/* Avatar button */}
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen(v => !v)}
+                    className="flex items-center gap-2.5 rounded-full pl-1 pr-3 py-1 hover:bg-gray-100 transition-colors focus:outline-none"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center shrink-0">
+                      <span className="text-xs font-semibold text-white select-none leading-none">
+                        {userName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">{userName}</span>
+                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white shadow-soft-lg overflow-hidden z-50 p-0 border-0">
+                      {/* User info */}
+                      <div className="px-3 pt-3 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => { setUserMenuOpen(false); router.push('/dashboard/employer/settings?tab=account') }}
+                          className="flex items-center gap-3 w-full rounded-lg px-2 py-1.5 transition-colors hover:bg-[#f4f4f4] text-left"
+                        >
+                          <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center">
+                            {userName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+                            {userEmail && <p className="text-xs text-gray-500 truncate mt-0.5">{userEmail}</p>}
+                          </div>
+                        </button>
+                      </div>
+                      {/* Menu items */}
+                      <div className="px-1.5 py-1">
+                        <Link
+                          href="/dashboard/employer"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
+                        >
+                          <Building2 className="h-4 w-4 shrink-0" />
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/dashboard/employer/settings"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
+                        >
+                          <Settings className="h-4 w-4 shrink-0" />
+                          Instellingen
+                        </Link>
+                      </div>
+                      <div className="mx-3 my-0.5 h-px bg-[#e8e8e8]" />
+                      <div className="px-1.5 pt-1 pb-1.5">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setUserMenuOpen(false)
+                            await supabase.auth.signOut()
+                            router.refresh()
+                          }}
+                          className="flex w-full items-center gap-3 py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#f4f4f4] hover:text-red-600 transition-colors"
+                        >
+                          <ArrowRight className="h-4 w-4 shrink-0 rotate-180" />
+                          Uitloggen
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#163300] rounded-full px-4 py-2">
@@ -183,9 +265,16 @@ export default function Home() {
           
             {/* Mobile: Account / User (Right) */}
           {!authLoading && userName ? (
-            <Button asChild variant="secondary" size="sm" className="md:hidden rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold">
-              <Link href="/mijn-domio">Mijn Domio</Link>
-            </Button>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center shrink-0"
+              aria-label="Menu openen"
+            >
+              <span className="text-xs font-semibold text-white select-none leading-none">
+                {userName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+              </span>
+            </button>
           ) : (
             <Button asChild variant="ghost" size="icon" className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0" aria-label="Account">
               <Link href="/login"><User className="h-6 w-6" /></Link>
@@ -550,20 +639,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* App Section */}
+      {/* App Section — tijdelijk uitgeschakeld, activeren zodra de app live is
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="rounded-3xl bg-[#163300] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
-            {/* Geometric decorative element - same style as 30 dagen gratis section, 2x larger, bottom right */}
-            <GeometricShapes 
-              variant="trapezoid" 
+            <GeometricShapes
+              variant="trapezoid"
               className="right-0 bottom-0 w-[112px] h-[112px] lg:w-[144px] lg:h-[144px]"
               color="#9FE870"
               opacity={0.18}
               layers={2}
             />
             <div className="flex flex-col-reverse gap-8 lg:flex-row lg:items-center relative z-10">
-              {/* Left Side - Mobile Mockup (Half, aligned to bottom of block) */}
               <div className="flex justify-center items-end lg:justify-start lg:flex-[0_0_auto] relative w-full lg:w-auto">
                 <div className="relative lg:ml-12" style={{ maxWidth: '100%' }}>
                   <Image
@@ -580,17 +667,14 @@ export default function Home() {
                   />
                 </div>
               </div>
-
-              {/* Right Side - Content */}
               <div className="flex flex-col gap-6 lg:max-w-2xl lg:flex-1 lg:pl-[80px] lg:-mt-16">
                 <h2 className="text-base font-semibold leading-7 text-white/90">App</h2>
                 <h2 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-6xl">
-                  Beheer je vastgoed <span className="text-[#9FE870]">waar je ook bent</span>
+                  Beheer je vastgoed <span className="text-white">waar je ook bent</span>
                 </h2>
                 <p className="text-lg text-white/90">
                   Met de Domio app heb je altijd en overal toegang tot je portefeuille. Bekijk panden, beheer huurders en volg financiën direct vanaf je telefoon.
                 </p>
-                {/* App Store & Google Play Buttons - Smaller on mobile to fit side by side */}
                 <div className="flex flex-row gap-2 sm:gap-3 mt-4 flex-nowrap justify-center lg:justify-start">
                   <GooglePlayButton
                     size="sm"
@@ -608,6 +692,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Pricing Section */}
         <Suspense fallback={<div className="min-h-[400px]" />}>

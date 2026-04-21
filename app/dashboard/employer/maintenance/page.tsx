@@ -17,6 +17,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import {
+  ADD_DIALOG_BODY_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
+import {
   Table,
   TableBody,
   TableCell,
@@ -112,7 +120,6 @@ export default function MaintenancePage() {
   const [tickets, setTickets] = useState<TicketRow[]>([])
   const [loading, setLoading] = useState(true)
 
-  const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(STATUS_KEYS.map((k) => [k, true]))
@@ -260,24 +267,14 @@ export default function MaintenancePage() {
   const normalizePriority = (p: string) => (p === 'spoed' ? 'urgent' : p)
 
   const filteredTickets = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
     return tickets.filter((t) => {
-      const matchesSearch =
-        !q ||
-        t.title.toLowerCase().includes(q) ||
-        (t.unitLabel && t.unitLabel.toLowerCase().includes(q)) ||
-        t.status.toLowerCase().includes(q) ||
-        normalizePriority(t.priority).includes(q)
-
       const st = t.status === 'gepland' ? 'gepland' : t.status
       const matchesStatus = statusFilter[st] !== false
-
       const pr = normalizePriority(t.priority)
       const matchesPriority = priorityFilter[pr] !== false
-
-      return matchesSearch && matchesStatus && matchesPriority
+      return matchesStatus && matchesPriority
     })
-  }, [tickets, searchQuery, statusFilter, priorityFilter])
+  }, [tickets, statusFilter, priorityFilter])
 
   const toggleSort = (column: SortColumn) => {
     setSort((prev) => {
@@ -432,15 +429,6 @@ export default function MaintenancePage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto min-w-0">
-              <div className="relative flex-1 sm:flex-initial sm:min-w-[160px] sm:max-w-[240px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-                <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
-                <Input
-                  placeholder="Zoek tickets..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-                />
-              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -665,12 +653,17 @@ export default function MaintenancePage() {
           if (!open) resetCreateForm()
         }}
       >
-        <DialogContent className="border border-gray-200 dark:border-neutral-700 sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Nieuw ticket</DialogTitle>
-            <DialogDescription>Beschrijf kort het probleem. Je kunt later vanuit het ticket chatten en details toevoegen.</DialogDescription>
+        <DialogContent
+          className={addDialogContentClassName('sm:max-w-md')}
+          closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+        >
+          <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuw ticket</DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+              Beschrijf kort het probleem. Je kunt later vanuit het ticket chatten en details toevoegen.
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className={cn(ADD_DIALOG_BODY_CLASS, 'space-y-4')}>
             <div className="space-y-2">
               <Label htmlFor="ticket-title">Titel</Label>
               <Input
@@ -707,13 +700,10 @@ export default function MaintenancePage() {
               </Select>
             </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" className="rounded-full" onClick={() => setCreateOpen(false)}>
-              Annuleren
-            </Button>
+          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
             <Button
               type="button"
-              className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
               disabled={!newTitle.trim() || creating || (!isDemo && !user?.id)}
               onClick={handleCreateTicket}
             >

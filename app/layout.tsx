@@ -18,21 +18,10 @@ export const metadata: Metadata = {
   description: "Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders, huurders en verhuurders",
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/images/offerla.png', sizes: 'any', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
     ],
     apple: [
-      { url: '/images/offerla.png', sizes: '180x180', type: 'image/png' },
-    ],
-    shortcut: [
-      { url: '/images/offerla.png', type: 'image/png' },
-    ],
-    other: [
-      {
-        rel: 'mask-icon',
-        url: '/images/offerla.png',
-        color: '#9FE870',
-      },
+      { url: '/icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
 };
@@ -52,8 +41,6 @@ export default function RootLayout({
       <head>
         {/* Theme color for browser chrome */}
         <meta name="theme-color" content="#ffffff" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="mask-icon" href="/images/offerla.png" color="#9FE870" />
         {process.env.NODE_ENV === 'production' && (
           <>
             <link rel="preconnect" href="https://consent.cookiebot.com" />

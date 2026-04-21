@@ -2,12 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  ADD_DIALOG_BODY_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import { X, Check, Tag, Zap, Calendar, Link2 } from 'lucide-react'
+import { Check, Tag, Zap, Calendar, Link2, Bell } from 'lucide-react'
+import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { cn } from '@/lib/utils'
 import { taskQueries, propertyQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -34,6 +43,7 @@ const EMPTY = {
   category: 'overig',
   priority: 'normaal',
   due_date: '',
+  notification_date: '',
   property_id: '',
 }
 
@@ -77,7 +87,7 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
           description: null,
           status: 'open',
           recurring: 'geen',
-          notification_date: null,
+          notification_date: form.notification_date || null,
           tenant_id: null,
           property_id: form.property_id || null,
           properties: form.property_id
@@ -98,7 +108,7 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
         due_date:    form.due_date || null,
         property_id: form.property_id || null,
         description: null,
-        notification_date: null,
+        notification_date: form.notification_date || null,
         recurring:   'geen',
         tenant_id:   null,
         owner_id:    user.id,
@@ -118,29 +128,16 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) onClose() }}>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+      <DialogContent
+        className={addDialogContentClassName('max-w-md')}
+        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+      >
 
-        {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-5 border-b border-gray-100 dark:border-neutral-800">
-          <div className="flex items-center justify-between gap-4 pr-6">
-            <DialogTitle className="text-xl font-bold text-[#163300] dark:text-[#9FE870]">
-              Nieuwe taak
-            </DialogTitle>
-            <div className="flex items-center gap-2">
-              <button type="button" onClick={onClose}
-                className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400 text-xs font-medium px-3 py-1.5 transition-colors">
-                <X className="h-3.5 w-3.5" />Annuleren
-              </button>
-              <button type="button" onClick={handleCreate} disabled={saving || !form.title.trim()}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors">
-                <Check className="h-3.5 w-3.5" />{saving ? 'Aanmaken…' : 'Aanmaken'}
-              </button>
-            </div>
-          </div>
+        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe taak</DialogTitle>
         </DialogHeader>
 
-        {/* Body */}
-        <div className="px-6 py-5 space-y-3">
+        <div className={ADD_DIALOG_BODY_CLASS}>
           {error && (
             <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">{error}</p>
           )}
@@ -158,7 +155,7 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
             />
           </div>
 
-          {/* Category + Priority */}
+          {/* Categorie + Herinnering */}
           <div className="grid grid-cols-2 gap-3">
             <div className={tile}>
               <p className={label}><Tag className="inline h-3 w-3 mr-1" />Categorie</p>
@@ -168,6 +165,28 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
                   {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div className={tile}>
+              <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
+              <WiseDatePicker
+                value={form.notification_date}
+                onChange={v => set('notification_date', v)}
+                placeholder="Optioneel"
+                className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Einddatum + Prioriteit */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className={tile}>
+              <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
+              <WiseDatePicker
+                value={form.due_date}
+                onChange={v => set('due_date', v)}
+                placeholder="Kies datum"
+                className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+              />
             </div>
             <div className={tile}>
               <p className={label}><Zap className="inline h-3 w-3 mr-1" />Prioriteit</p>
@@ -186,33 +205,34 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
             </div>
           </div>
 
-          {/* Due date + Property */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className={tile}>
-              <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
-              <input
-                type="date"
-                value={form.due_date}
-                onChange={e => set('due_date', e.target.value)}
-                className={cn(inputCls, 'dark:[color-scheme:dark]')}
-              />
-            </div>
-            <div className={tile}>
-              <p className={label}><Link2 className="inline h-3 w-3 mr-1" />Gekoppeld pand</p>
-              <Select value={form.property_id || 'geen'} onValueChange={v => set('property_id', v === 'geen' ? '' : v)}>
-                <SelectTrigger className={selectTrigger}><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="geen">Geen koppeling</SelectItem>
-                  {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Gekoppeld pand */}
+          <div className={tile}>
+            <p className={label}><Link2 className="inline h-3 w-3 mr-1" />Gekoppeld pand</p>
+            <Select value={form.property_id || 'geen'} onValueChange={v => set('property_id', v === 'geen' ? '' : v)}>
+              <SelectTrigger className={selectTrigger}><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="geen">Geen koppeling</SelectItem>
+                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
 
           <p className="text-[11px] text-gray-400 dark:text-gray-500 pb-1">
-            Details zoals beschrijving, herhaling en herinneringen kun je na aanmaken instellen.
+            Details zoals beschrijving en herhaling kun je na aanmaken instellen.
           </p>
         </div>
+
+        <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
+          <button
+            type="button"
+            onClick={handleCreate}
+            disabled={saving || !form.title.trim()}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 transition-colors"
+          >
+            <Check className="h-4 w-4 shrink-0" />
+            {saving ? 'Aanmaken…' : 'Aanmaken'}
+          </button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

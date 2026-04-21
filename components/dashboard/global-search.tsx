@@ -34,7 +34,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
     { id: 'property-edit', label: 'Pand bewerken', category: 'Panden', keywords: ['pand', 'bewerken', 'edit', 'wijzigen', 'aanpassen'], icon: Edit, action: () => router.push(`${basePath}/portfolio`), description: 'Bewerk pand details' },
     
     // Huurders
-    { id: 'tenant-add', label: 'Nieuwe huurder aanmaken', category: 'Huurders', keywords: ['huurder', 'aanmaken', 'toevoegen', 'nieuw', 'tenant', 'add', 'create'], icon: Plus, action: () => router.push(`${basePath}/tenants/new`), description: 'Maak een nieuwe huurder aan' },
+    { id: 'tenant-add', label: 'Nieuwe huurder aanmaken', category: 'Huurders', keywords: ['huurder', 'aanmaken', 'toevoegen', 'nieuw', 'tenant', 'add', 'create'], icon: Plus, action: () => router.push(`${basePath}/tenants?nieuw=1`), description: 'Maak een nieuwe huurder aan' },
     { id: 'tenant-view', label: 'Huurders bekijken', category: 'Huurders', keywords: ['huurder', 'bekijken', 'tenants', 'view', 'overzicht'], icon: Users, action: () => router.push(`${basePath}/tenants`), description: 'Bekijk alle huurders' },
     { id: 'tenant-edit', label: 'Huurder bewerken', category: 'Huurders', keywords: ['huurder', 'bewerken', 'edit', 'wijzigen'], icon: Edit, action: () => router.push(`${basePath}/tenants`), description: 'Bewerk huurder informatie' },
     

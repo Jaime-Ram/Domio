@@ -7,6 +7,7 @@ import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-bloc
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -14,6 +15,14 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import {
+  ADD_DIALOG_BODY_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
 import {
   ClipboardCheck, Calendar, Ticket, Plus, Search,
   CheckCircle2, Clock, AlertTriangle, MapPin, Camera,
@@ -186,12 +195,17 @@ export default function InspectiesPage() {
       </Card>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-md border border-gray-200 dark:border-neutral-700">
-          <DialogHeader>
-            <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Nieuwe inspectie plannen</DialogTitle>
-            <DialogDescription>Voeg een inspectie toe voor een object.</DialogDescription>
+        <DialogContent
+          className={addDialogContentClassName('sm:max-w-md')}
+          closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+        >
+          <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe inspectie plannen</DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+              Voeg een inspectie toe voor een object.
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className={cn(ADD_DIALOG_BODY_CLASS, 'space-y-4')}>
             <div className="space-y-1.5">
               <Label>Pand</Label>
               {propertyOptions.length > 0 ? (
@@ -223,7 +237,12 @@ export default function InspectiesPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Datum</Label>
-              <Input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className="rounded-xl" />
+              <WiseDatePicker
+                value={newDate}
+                onChange={setNewDate}
+                placeholder="Kies datum"
+                className="[&_button]:rounded-xl"
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Inspecteur</Label>
@@ -234,11 +253,13 @@ export default function InspectiesPage() {
               <Textarea placeholder="Extra informatie..." value={newNotes} onChange={(e) => setNewNotes(e.target.value)} rows={2} className="rounded-xl resize-none" />
             </div>
           </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" className="rounded-full" onClick={() => setCreateOpen(false)}>Annuleren</Button>
-            <Button className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
-              disabled={!newPropertyId || !newDate} onClick={handleCreate}>
-              <ClipboardCheck className="h-4 w-4 mr-2" />
+          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
+            <Button
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+              disabled={!newPropertyId || !newDate}
+              onClick={handleCreate}
+            >
+              <ClipboardCheck className="h-4 w-4 shrink-0" />
               Inspectie aanmaken
             </Button>
           </DialogFooter>

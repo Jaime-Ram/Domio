@@ -147,6 +147,169 @@ export const propertyQueries = {
 };
 
 // ============================================================================
+// PORTFOLIOS
+// ============================================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabaseAny = supabase as any
+
+export const portfolioQueries = {
+  // Get portfolios by owner (with their properties + units for derived stats)
+  async getByOwner(ownerId: string) {
+    const { data, error } = await supabaseAny
+      .from('portfolios')
+      .select(`
+        *,
+        legal_entities(id, name, kvk_number),
+        properties(
+          id, name, address, postcode, city, type,
+          units(id, monthly_rent, status)
+        )
+      `)
+      .eq('owner_id', ownerId)
+      .order('name', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  // Get single portfolio
+  async getById(portfolioId: string) {
+    const { data, error } = await supabaseAny
+      .from('portfolios')
+      .select('*, legal_entities(id, name)')
+      .eq('id', portfolioId)
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // Create portfolio
+  async create(portfolio: {
+    owner_id: string
+    name: string
+    description?: string | null
+    legal_entity_id?: string | null
+  }) {
+    const { data, error } = await supabaseAny
+      .from('portfolios')
+      .insert(portfolio)
+      .select()
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // Update portfolio
+  async update(portfolioId: string, updates: {
+    name?: string
+    description?: string | null
+    legal_entity_id?: string | null
+  }) {
+    const { data, error } = await supabaseAny
+      .from('portfolios')
+      .update(updates)
+      .eq('id', portfolioId)
+      .select()
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // Delete portfolio (properties keep portfolio_id = null via ON DELETE SET NULL)
+  async delete(portfolioId: string) {
+    const { error } = await supabaseAny
+      .from('portfolios')
+      .delete()
+      .eq('id', portfolioId)
+    if (error) throw error
+  },
+
+  // Assign (or unassign) multiple properties to a portfolio
+  async assignProperties(portfolioId: string | null, propertyIds: string[]) {
+    if (!propertyIds.length) return
+    const { error } = await supabaseAny
+      .from('properties')
+      .update({ portfolio_id: portfolioId })
+      .in('id', propertyIds)
+    if (error) throw error
+  },
+}
+
+// ============================================================================
+// LEGAL ENTITIES (rechtspersonen)
+// ============================================================================
+
+export const legalEntityQueries = {
+  // Get all legal entities accessible to this user (via profile_legal_entities)
+  async getByUser(userId: string) {
+    const { data, error } = await supabaseAny
+      .from('profile_legal_entities')
+      .select('legal_entities(*)')
+      .eq('profile_id', userId)
+    if (error) throw error
+    return ((data ?? []) as any[]).map((row: any) => row.legal_entities).filter(Boolean) as any[]
+  },
+
+  // Create a legal entity and link it to the user
+  async create(userId: string, entity: {
+    name: string
+    short_name?: string | null
+    kvk_number?: string | null
+    btw_number?: string | null
+    address?: string | null
+    postcode?: string | null
+    city?: string | null
+    email?: string | null
+    phone?: string | null
+    notes?: string | null
+  }) {
+    const { data, error } = await supabaseAny
+      .from('legal_entities')
+      .insert(entity)
+      .select()
+      .single()
+    if (error) throw error
+    // Koppel de maker als beheerder
+    await supabaseAny
+      .from('profile_legal_entities')
+      .insert({ profile_id: userId, legal_entity_id: data.id, role: 'beheerder' })
+    return data as any
+  },
+
+  // Update
+  async update(entityId: string, updates: {
+    name?: string
+    short_name?: string | null
+    kvk_number?: string | null
+    btw_number?: string | null
+    address?: string | null
+    postcode?: string | null
+    city?: string | null
+    email?: string | null
+    phone?: string | null
+    notes?: string | null
+  }) {
+    const { data, error } = await supabaseAny
+      .from('legal_entities')
+      .update(updates)
+      .eq('id', entityId)
+      .select()
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // Delete
+  async delete(entityId: string) {
+    const { error } = await supabaseAny
+      .from('legal_entities')
+      .delete()
+      .eq('id', entityId)
+    if (error) throw error
+  },
+}
+
+// ============================================================================
 // UNITS
 // ============================================================================
 

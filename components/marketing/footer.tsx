@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
-import { AppStoreButton } from '@/components/ui/app-store-button'
-import { 
+import {
   Twitter, 
   Linkedin, 
   Facebook, 
@@ -39,7 +38,7 @@ export function Footer() {
     <footer className="bg-white dark:bg-gray-900">
       <div className="mx-auto max-w-7xl px-4 py-12 md:px-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:gap-12">
           {/* Left Side - Company Info */}
           <div className="flex flex-col gap-4">
             <div className="py-2">
@@ -61,22 +60,6 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Right Side - App Downloads */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-sm font-semibold text-primary-600 dark:text-primary-400">
-              Get the app
-            </h3>
-            <div className="flex flex-col gap-3">
-              <AppStoreButton 
-                platform="apple" 
-                href="https://apps.apple.com" 
-              />
-              <AppStoreButton 
-                platform="google" 
-                href="https://play.google.com" 
-              />
-            </div>
-          </div>
         </div>
 
         {/* Divider */}

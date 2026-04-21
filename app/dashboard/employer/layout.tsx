@@ -170,10 +170,12 @@ function EmployerLayoutInner({
         <DashboardUserProvider>
           <Require2FaRedirect />
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
+          {/* Vaste witruimte onder de header — consistent op alle pagina's */}
+          <div className="h-12 shrink-0" aria-hidden="true" />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
-                'mx-auto max-w-7xl px-8 sm:px-12 lg:pl-12 lg:pr-16 py-4 sm:py-6 lg:py-10 flex flex-col gap-content-blocks h-full min-h-0',
+                'mx-auto max-w-7xl px-8 sm:px-12 lg:pl-12 lg:pr-16 pb-10 flex flex-col gap-content-blocks h-full min-h-0',
                 isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
               )}
             >

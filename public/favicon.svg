@@ -1,9 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <defs>
-    <clipPath id="rounded">
-      <rect width="32" height="32" rx="8" ry="8" fill="white"/>
-    </clipPath>
-  </defs>
-  <rect width="32" height="32" rx="8" ry="8" fill="#163300"/>
-  <text x="16" y="22" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="white" text-anchor="middle">D</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#9FE870"/>
+  <path fill="#163300" d="M 8,6.5 L 11.7,6.5 L 15.7,4 L 24,11.2 L 24,21.5 L 19.5,21.5 L 19.5,25.5 L 8,25.5 Z"/>
+  <path fill="#9FE870" d="M 15.7,10.5 L 11.7,13.8 L 11.7,21.5 L 19.5,21.5 L 19.5,13.8 Z"/>
 </svg>

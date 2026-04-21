@@ -3,18 +3,22 @@
 import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { motion, AnimatePresence } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SocialButton } from '@/components/ui/social-button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { KeyRound, ArrowLeft } from 'lucide-react'
-import { signIn, signInWithGoogle, signInWithMicrosoft, getMfaAssuranceLevel, listMfaFactors, verifyMfa, getUser } from '@/lib/supabase/auth'
+import { signIn, signInWithGoogle, signInWithApple, getMfaAssuranceLevel, listMfaFactors, verifyMfa, getUser } from '@/lib/supabase/auth'
 import { translateAuthError } from '@/lib/auth-errors'
 import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
 type Step = 'login' | 'totp' | 'email-2fa'
+
+const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
+const slideIn = { initial: { opacity: 0, x: 32 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -32 }, transition }
 
 function LoginContent() {
   const router = useRouter()
@@ -235,108 +239,98 @@ function LoginContent() {
     )
   }
 
-  if (step === 'totp') {
-    return (
-      <>
-        <button
-          onClick={() => { setStep('login'); setTotpCode(''); setError(null) }}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Terug
-        </button>
-        <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Voer de 6-cijferige code uit je authenticator-app in.
-        </p>
-
-        {error && (
-          <Alert variant="destructive" className="mt-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleVerifyTotp} className="mt-8 space-y-6">
-          <Input
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="000000"
-            maxLength={6}
-            value={totpCode}
-            onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
-            autoFocus
-          />
-          <Button
-            type="submit"
-            disabled={loading || totpCode.length !== 6}
-            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
-          >
-            {loading ? 'Controleren…' : 'Bevestigen'}
-          </Button>
-        </form>
-      </>
-    )
-  }
-
-  if (step === 'email-2fa') {
-    return (
-      <>
-        <button
-          onClick={() => { setStep('login'); setEmailCode(''); setError(null) }}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Terug
-        </button>
-        <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          We hebben een 6-cijferige code naar je e-mailadres gestuurd. Voer die hieronder in.
-        </p>
-
-        {error && (
-          <Alert variant="destructive" className="mt-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleVerifyEmail} className="mt-8 space-y-6">
-          <Input
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            placeholder="000000"
-            maxLength={6}
-            value={emailCode}
-            onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
-            autoFocus
-          />
-          <Button
-            type="submit"
-            disabled={loading || emailCode.length !== 6}
-            className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
-          >
-            {loading ? 'Controleren…' : 'Bevestigen'}
-          </Button>
-        </form>
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
-            onClick={sendEmailCode}
-            disabled={sending}
-          >
-            {sending ? 'Bezig…' : 'Code opnieuw versturen'}
-          </button>
-        </div>
-      </>
-    )
-  }
-
   return (
-    <>
+    <AnimatePresence mode="wait" initial={false}>
+      {step === 'totp' ? (
+        <motion.div key="totp" {...slideIn}>
+          <button
+            onClick={() => { setStep('login'); setTotpCode(''); setError(null) }}
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Terug
+          </button>
+          <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Voer de 6-cijferige code uit je authenticator-app in.
+          </p>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleVerifyTotp} className="mt-8 space-y-6">
+            <Input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="000000"
+              maxLength={6}
+              value={totpCode}
+              onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+              autoFocus
+            />
+            <Button
+              type="submit"
+              disabled={loading || totpCode.length !== 6}
+              className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+            >
+              {loading ? 'Controleren…' : 'Bevestigen'}
+            </Button>
+          </form>
+        </motion.div>
+      ) : step === 'email-2fa' ? (
+        <motion.div key="email-2fa" {...slideIn}>
+          <button
+            onClick={() => { setStep('login'); setEmailCode(''); setError(null) }}
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Terug
+          </button>
+          <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            We hebben een 6-cijferige code naar je e-mailadres gestuurd. Voer die hieronder in.
+          </p>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleVerifyEmail} className="mt-8 space-y-6">
+            <Input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="000000"
+              maxLength={6}
+              value={emailCode}
+              onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+              autoFocus
+            />
+            <Button
+              type="submit"
+              disabled={loading || emailCode.length !== 6}
+              className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+            >
+              {loading ? 'Controleren…' : 'Bevestigen'}
+            </Button>
+          </form>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
+              onClick={sendEmailCode}
+              disabled={sending}
+            >
+              {sending ? 'Bezig…' : 'Code opnieuw versturen'}
+            </button>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div key="login" {...slideIn}>
           <h1 className="text-4xl font-bold text-[#163300]">
             Welkom terug!
           </h1>
@@ -346,13 +340,11 @@ function LoginContent() {
               Registreren
             </Link>
           </p>
-
           {error && (
             <Alert variant="destructive" className="mt-4">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -368,7 +360,6 @@ function LoginContent() {
                 required
               />
             </div>
-
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="text-sm font-medium text-gray-700">
@@ -391,7 +382,6 @@ function LoginContent() {
                 required
               />
             </div>
-
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="remember"
@@ -405,7 +395,6 @@ function LoginContent() {
                 Onthoud mij
               </label>
             </div>
-
             <Button
               type="submit"
               disabled={loading}
@@ -413,7 +402,6 @@ function LoginContent() {
             >
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>
-
             <div className="relative pt-2">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-200" />
@@ -422,7 +410,7 @@ function LoginContent() {
                 <span className="bg-white dark:bg-gray-900 px-3 text-sm text-gray-500">Of log in met</span>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <SocialButton
                 type="button"
                 variant="default"
@@ -446,24 +434,8 @@ function LoginContent() {
                 className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
                 onClick={async () => {
                   setLoading(true); setError(null)
-                  try { const { error: e } = await signInWithMicrosoft(); if (e) throw e } catch (err: unknown) { setError(translateAuthError(err instanceof Error ? err.message : 'Inloggen met Microsoft mislukt')); setLoading(false) }
+                  try { const { error: e } = await signInWithApple(); if (e) throw e } catch (err: unknown) { setError(translateAuthError(err instanceof Error ? err.message : 'Inloggen met Apple mislukt')); setLoading(false) }
                 }}
-                disabled={loading}
-                aria-label="Inloggen met Microsoft"
-              >
-                <svg className="h-5 w-5" viewBox="0 0 21 21" fill="none">
-                  <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
-                  <rect x="11" y="1" width="9" height="9" fill="#7FBA00"/>
-                  <rect x="1" y="11" width="9" height="9" fill="#00A4EF"/>
-                  <rect x="11" y="11" width="9" height="9" fill="#FFB900"/>
-                </svg>
-              </SocialButton>
-              <SocialButton
-                type="button"
-                variant="default"
-                size="lg"
-                className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
-                onClick={handleSocialLogin}
                 disabled={loading}
                 aria-label="Inloggen met Apple"
               >
@@ -487,7 +459,9 @@ function LoginContent() {
               </SocialButton>
             </div>
           </form>
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 

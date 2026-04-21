@@ -11,6 +11,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import {
+  ADD_DIALOG_BODY_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
+import {
   Calendar, ClipboardCheck, Ticket, Plus, Euro,
   Wrench, Paintbrush, Zap, Droplets, TreePine, ChevronRight,
 } from 'lucide-react'
@@ -190,12 +198,17 @@ export default function PlanningPage() {
       )}
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-md border border-gray-200 dark:border-neutral-700">
-          <DialogHeader>
-            <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Onderhoudstaak inplannen</DialogTitle>
-            <DialogDescription>Voeg een toekomstige onderhoudstaak toe aan je planning.</DialogDescription>
+        <DialogContent
+          className={addDialogContentClassName('sm:max-w-md')}
+          closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+        >
+          <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Onderhoudstaak inplannen</DialogTitle>
+            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+              Voeg een toekomstige onderhoudstaak toe aan je planning.
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className={cn(ADD_DIALOG_BODY_CLASS, 'space-y-4')}>
             <div className="space-y-1.5">
               <Label>Taak</Label>
               <Input placeholder="bijv. Buitenschilderwerk" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} className="rounded-xl" />
@@ -244,11 +257,13 @@ export default function PlanningPage() {
               <Textarea rows={2} placeholder="Extra context..." value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="rounded-xl resize-none" />
             </div>
           </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" className="rounded-full" onClick={() => setCreateOpen(false)}>Annuleren</Button>
-            <Button className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
-              disabled={!newTitle.trim() || !newPropertyId} onClick={handleCreate}>
-              <Calendar className="h-4 w-4 mr-2" />
+          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
+            <Button
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+              disabled={!newTitle.trim() || !newPropertyId}
+              onClick={handleCreate}
+            >
+              <Calendar className="h-4 w-4 shrink-0" />
               Inplannen
             </Button>
           </DialogFooter>
