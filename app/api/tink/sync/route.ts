@@ -22,7 +22,7 @@ export async function GET() {
   // Look up the user's bank connection
   const { data: connection, error: connError } = await supabaseAdmin
     .from("bank_connections")
-    .select("id, access_token")
+    .select("id, access_token, refresh_token")
     .eq("owner_id", user.id)
     .eq("provider", "tink")
     .single();
@@ -38,14 +38,19 @@ export async function GET() {
     const result = await fetchTransactions(
       connection.id,
       connection.access_token,
-      user.id
+      user.id,
+      connection.refresh_token
     );
     return NextResponse.json(result);
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error("Tink sync error:", err);
-    return NextResponse.json(
-      { error: "Sync failed" },
-      { status: 500 }
-    );
+
+    // 401 from Tink means tokens are fully expired — user must re-link
+    if (msg.includes("401")) {
+      return NextResponse.json({ error: "reauth_required" }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: "Sync failed" }, { status: 500 });
   }
 }

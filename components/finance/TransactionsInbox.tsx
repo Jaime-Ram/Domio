@@ -54,23 +54,29 @@ export interface TransactionRow {
   value_date: string | null
   amount: number
   currency: string
-  sender_name: string | null
-  sender_iban: string | null
+  counterparty_name: string | null
+  counterparty_iban: string | null
   description: string | null
   is_manual_transaction?: boolean
   assignment: {
     id: string
-    confidence_score: number
+    amount_assigned: number
+    confidence_score: number | null
     match_method: string
-    is_manual: boolean
-    property_id: string | null
-    unit_id: string | null
-    tenant_id: string | null
+    rent_expectation_id: string
+    // resolved from rent_expectations → leases
     lease_id: string | null
+    tenant_id: string | null
+    unit_id: string | null
+    property_id: string | null
     category: string | null
+    tenant_name: string | null
     tenant_name: string | null
     property_name: string | null
     property_address: string | null
+    // kept for backward-compat (always false / null with new schema)
+    is_manual: boolean
+    category: string | null
   } | null
 }
 
@@ -181,8 +187,8 @@ export function TransactionsInbox({
   const [addForm, setAddForm] = useState({
     value_date: todayISODate(),
     amount: '',
-    sender_name: '',
-    sender_iban: '',
+    counterparty_name: '',
+    counterparty_iban: '',
     description: '',
   })
 
@@ -190,8 +196,8 @@ export function TransactionsInbox({
     setAddForm({
       value_date: todayISODate(),
       amount: '',
-      sender_name: '',
-      sender_iban: '',
+      counterparty_name: '',
+      counterparty_iban: '',
       description: '',
     })
     setAddError('')
@@ -217,8 +223,8 @@ export function TransactionsInbox({
         value_date: addForm.value_date || null,
         amount: amountNum,
         currency: 'EUR',
-        sender_name: addForm.sender_name.trim() || null,
-        sender_iban: addForm.sender_iban.trim() || null,
+        counterparty_name: addForm.counterparty_name.trim() || null,
+        counterparty_iban: addForm.counterparty_iban.trim() || null,
         description: addForm.description.trim() || null,
       }
       const { error } = await supabase.from('raw_transactions').insert(row as never)
@@ -321,8 +327,8 @@ export function TransactionsInbox({
     }
 
     return (
-      (tx.sender_name ?? '').toLowerCase().includes(q) ||
-      (tx.sender_iban ?? '').toLowerCase().includes(q) ||
+      (tx.counterparty_name ?? '').toLowerCase().includes(q) ||
+      (tx.counterparty_iban ?? '').toLowerCase().includes(q) ||
       (tx.description ?? '').toLowerCase().includes(q) ||
       amountStr.includes(q) ||
       rawAmount.includes(q) ||
@@ -363,7 +369,7 @@ export function TransactionsInbox({
         case 'amount':
           return dir * (a.amount - b.amount)
         case 'sender':
-          return dir * ((a.sender_name ?? '').localeCompare(b.sender_name ?? '', 'nl'))
+          return dir * ((a.counterparty_name ?? '').localeCompare(b.counterparty_name ?? '', 'nl'))
         case 'status': {
           const statusA = a.assignment ? 1 : 0
           const statusB = b.assignment ? 1 : 0
@@ -494,12 +500,12 @@ export function TransactionsInbox({
                   </DashboardTableCell>
                   <DashboardTableCell className="max-w-[160px]">
                     <span className="text-sm text-gray-900 dark:text-white truncate block">
-                      {tx.sender_name || '—'}
+                      {tx.counterparty_name || '—'}
                     </span>
                   </DashboardTableCell>
                   <DashboardTableCell className="hidden lg:table-cell">
                     <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
-                      {tx.sender_iban || '—'}
+                      {tx.counterparty_iban || '—'}
                     </span>
                   </DashboardTableCell>
                   <DashboardTableCell className="hidden md:table-cell max-w-[200px]">
@@ -618,8 +624,8 @@ export function TransactionsInbox({
               <Input
                 id="add-pay-sender"
                 placeholder="Optioneel"
-                value={addForm.sender_name}
-                onChange={(e) => setAddForm((f) => ({ ...f, sender_name: e.target.value }))}
+                value={addForm.counterparty_name}
+                onChange={(e) => setAddForm((f) => ({ ...f, counterparty_name: e.target.value }))}
                 className="rounded-xl"
               />
             </div>
@@ -628,8 +634,8 @@ export function TransactionsInbox({
               <Input
                 id="add-pay-iban"
                 placeholder="Optioneel"
-                value={addForm.sender_iban}
-                onChange={(e) => setAddForm((f) => ({ ...f, sender_iban: e.target.value }))}
+                value={addForm.counterparty_iban}
+                onChange={(e) => setAddForm((f) => ({ ...f, counterparty_iban: e.target.value }))}
                 className="rounded-xl font-mono text-sm"
               />
             </div>

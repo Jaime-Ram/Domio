@@ -995,14 +995,14 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
       const res = await fetch(`/api/finance/settlements/_/costs?${qs}`)
       if (res.ok) {
         const data: {
-          income: { id: string; source: string; date: string; description: string; sender_name: string; amount: number }[]
+          income: { id: string; source: string; date: string; description: string; counterparty_name: string; amount: number }[]
           expenses: { id: string; source: string; date: string; description: string; category: string; amount: number }[]
         } = await res.json()
 
         setIncomeRows(
           data.income.map((p) => {
-            const label = p.sender_name
-              ? `Betaling ${fmtDate(p.date)} — ${p.sender_name}`
+            const label = p.counterparty_name
+              ? `Betaling ${fmtDate(p.date)} — ${p.counterparty_name}`
               : p.description
                 ? `Betaling ${fmtDate(p.date)} — ${p.description}`
                 : `Betaling ${fmtDate(p.date)}`

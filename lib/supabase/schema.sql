@@ -164,8 +164,8 @@ CREATE TABLE IF NOT EXISTS public.raw_transactions (
     value_date DATE,
     amount NUMERIC(12,2) NOT NULL,
     currency TEXT NOT NULL DEFAULT 'EUR',
-    sender_iban TEXT,
-    sender_name TEXT,
+    counterparty_iban TEXT,
+    counterparty_name TEXT,
     description TEXT,
     raw_data JSONB, -- full Tink response stored for debugging
     imported_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

@@ -46,7 +46,7 @@ export async function GET(
     source: string;
     date: string;
     description: string;
-    sender_name: string;
+    counterparty_name: string;
     amount: number;
   }[] = [];
 
@@ -65,7 +65,7 @@ export async function GET(
           value_date,
           amount,
           description,
-          sender_name
+          counterparty_name
         )
       `
       )
@@ -104,7 +104,7 @@ export async function GET(
         source: "payment" as const,
         date: a.raw_transactions?.value_date,
         description: a.raw_transactions?.description ?? "",
-        sender_name: a.raw_transactions?.sender_name ?? "",
+        counterparty_name: a.raw_transactions?.counterparty_name ?? "",
         amount: Number(a.raw_transactions?.amount ?? 0),
       }))
       .sort(

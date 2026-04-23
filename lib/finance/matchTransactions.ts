@@ -22,8 +22,8 @@ interface RawTransaction {
   id: string;
   amount: number;
   value_date: string | null;
-  sender_iban: string | null;
-  sender_name: string | null;
+  counterparty_iban: string | null;
+  counterparty_name: string | null;
   description: string | null;
 }
 
@@ -70,7 +70,7 @@ export async function matchTransactions(
   // 1. Fetch unmatched transactions (left join via NOT IN)
   const { data: allTx, error: txErr } = await supabaseAdmin
     .from("raw_transactions")
-    .select("id, amount, value_date, sender_iban, sender_name, description")
+    .select("id, amount, value_date, counterparty_iban, counterparty_name, description")
     .eq("owner_id", ownerId);
 
   if (txErr) throw txErr;
@@ -122,7 +122,7 @@ export async function matchTransactions(
 
   if (histErr) throw histErr;
 
-  // Build historical sender_iban → assignment lookup
+  // Build historical counterparty_iban → assignment lookup
   const historicalByIban = new Map<
     string,
     { tenant_id: string; property_id: string; unit_id: string; lease_id: string }
@@ -130,8 +130,8 @@ export async function matchTransactions(
   if (historicalAssignments) {
     for (const ha of historicalAssignments) {
       const matchedTx = (allTx ?? []).find((t) => t.id === ha.transaction_id);
-      if (matchedTx?.sender_iban && ha.tenant_id) {
-        historicalByIban.set(matchedTx.sender_iban, {
+      if (matchedTx?.counterparty_iban && ha.tenant_id) {
+        historicalByIban.set(matchedTx.counterparty_iban, {
           tenant_id: ha.tenant_id,
           property_id: ha.property_id,
           unit_id: ha.unit_id,
@@ -162,8 +162,8 @@ export async function matchTransactions(
     let matched = false;
 
     // --- Match 1: IBAN match (confidence 95) ---
-    if (tx.sender_iban) {
-      const tenant = tenantByIban.get(tx.sender_iban.toUpperCase());
+    if (tx.counterparty_iban) {
+      const tenant = tenantByIban.get(tx.counterparty_iban.toUpperCase());
       if (tenant) {
         const exp = pendingExpectations.find(
           (e) =>
@@ -183,8 +183,8 @@ export async function matchTransactions(
     }
 
     // --- Match 2: Reference match (confidence 80) ---
-    if (!matched && (tx.description || tx.sender_name)) {
-      const searchText = [tx.description, tx.sender_name]
+    if (!matched && (tx.description || tx.counterparty_name)) {
+      const searchText = [tx.description, tx.counterparty_name]
         .filter(Boolean)
         .join(" ");
 
@@ -235,8 +235,8 @@ export async function matchTransactions(
     }
 
     // --- Match 4: Historical pattern (confidence 85) ---
-    if (!matched && tx.sender_iban) {
-      const hist = historicalByIban.get(tx.sender_iban);
+    if (!matched && tx.counterparty_iban) {
+      const hist = historicalByIban.get(tx.counterparty_iban);
       if (hist) {
         const exp = pendingExpectations.find(
           (e) =>

@@ -464,8 +464,8 @@ export interface Database {
           value_date: string | null
           amount: number
           currency: string
-          sender_iban: string | null
-          sender_name: string | null
+          counterparty_iban: string | null
+          counterparty_name: string | null
           description: string | null
           raw_data: Json | null
           imported_at: string
@@ -478,8 +478,8 @@ export interface Database {
           value_date?: string | null
           amount: number
           currency?: string
-          sender_iban?: string | null
-          sender_name?: string | null
+          counterparty_iban?: string | null
+          counterparty_name?: string | null
           description?: string | null
           raw_data?: Json | null
           imported_at?: string
@@ -492,8 +492,8 @@ export interface Database {
           value_date?: string | null
           amount?: number
           currency?: string
-          sender_iban?: string | null
-          sender_name?: string | null
+          counterparty_iban?: string | null
+          counterparty_name?: string | null
           description?: string | null
           raw_data?: Json | null
           imported_at?: string

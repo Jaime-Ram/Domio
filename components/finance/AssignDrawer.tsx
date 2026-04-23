@@ -14,8 +14,8 @@ interface Transaction {
   value_date: string | null
   amount: number
   currency: string
-  sender_name: string | null
-  sender_iban: string | null
+  counterparty_name: string | null
+  counterparty_iban: string | null
   description: string | null
 }
 
@@ -241,11 +241,11 @@ export function AssignDrawer({
             </div>
             <div>
               <span className="text-muted-foreground">Afzender</span>
-              <p className="font-medium">{transaction.sender_name || '—'}</p>
+              <p className="font-medium">{transaction.counterparty_name || '—'}</p>
             </div>
             <div>
               <span className="text-muted-foreground">IBAN</span>
-              <p className="font-mono text-xs">{transaction.sender_iban || '—'}</p>
+              <p className="font-mono text-xs">{transaction.counterparty_iban || '—'}</p>
             </div>
             {transaction.description && (
               <div className="col-span-2">

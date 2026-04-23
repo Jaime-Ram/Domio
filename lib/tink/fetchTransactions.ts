@@ -1,11 +1,48 @@
 import { createClient } from "@supabase/supabase-js";
 
 const TINK_TRANSACTIONS_URL = "https://api.tink.com/data/v2/transactions";
+const TINK_TOKEN_URL = "https://api.tink.com/api/v1/oauth/token";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+async function refreshAccessToken(
+  bankConnectionId: string,
+  refreshToken: string
+): Promise<string> {
+  const res = await fetch(TINK_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: process.env.TINK_CLIENT_ID!,
+      client_secret: process.env.TINK_CLIENT_SECRET!,
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }).toString(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Tink token refresh failed: ${res.status} ${text}`);
+  }
+
+  const data = (await res.json()) as {
+    access_token: string;
+    refresh_token?: string;
+  };
+
+  await supabaseAdmin
+    .from("bank_connections")
+    .update({
+      access_token: data.access_token,
+      ...(data.refresh_token ? { refresh_token: data.refresh_token } : {}),
+    })
+    .eq("id", bankConnectionId);
+
+  return data.access_token;
+}
 
 interface TinkTransaction {
   id: string;
@@ -35,8 +72,10 @@ export interface SyncResult {
 export async function fetchTransactions(
   bankConnectionId: string,
   accessToken: string,
-  ownerId: string
+  ownerId: string,
+  refreshToken?: string | null
 ): Promise<SyncResult> {
+  let token = accessToken;
   const allTransactions: TinkTransaction[] = [];
   let pageToken: string | undefined;
 
@@ -45,9 +84,18 @@ export async function fetchTransactions(
     const url = new URL(TINK_TRANSACTIONS_URL);
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-    const res = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${accessToken}` },
+    let res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${token}` },
     });
+
+    // Refresh and retry once on 401
+    if (res.status === 401 && refreshToken) {
+      token = await refreshAccessToken(bankConnectionId, refreshToken);
+      refreshToken = null; // don't retry more than once
+      res = await fetch(url.toString(), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
 
     if (!res.ok) {
       const text = await res.text();
@@ -80,9 +128,10 @@ export async function fetchTransactions(
       external_id: txn.id,
       amount,
       currency: txn.amount.currencyCode,
+      booking_date: txn.dates.booked ?? new Date().toISOString().slice(0, 10),
       value_date: txn.dates.booked ?? null,
-      sender_iban: counterparty?.identifiers?.iban?.iban ?? null,
-      sender_name: counterparty?.name ?? null,
+      counterparty_iban: counterparty?.identifiers?.iban?.iban ?? null,
+      counterparty_name: counterparty?.name ?? null,
       description: txn.descriptions.original ?? null,
       raw_data: txn,
     };

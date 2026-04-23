@@ -65,22 +65,6 @@ const inputCls =
 type Filter = 'all' | 'inkomsten' | 'kosten' | 'unmatched'
 type RightPanelMode = 'empty' | 'detail'
 
-const CATEGORY_LABELS: Record<string, string> = {
-  huur: 'Huur',
-  onderhoud: 'Onderhoud',
-  verzekering: 'Verzekering',
-  belasting: 'Belasting',
-  energie: 'Energie',
-  vve: 'VvE',
-  hypotheek: 'Hypotheek',
-  beheer: 'Beheer',
-  prive: 'Privé',
-  overig: 'Overig',
-}
-
-
-const EXPENSE_CATEGORIES_SET = new Set(['onderhoud', 'verzekering', 'belasting', 'energie', 'vve', 'hypotheek', 'beheer'])
-
 const CATEGORIES = [
   { key: 'onderhoud', label: 'Onderhoud', icon: Wrench },
   { key: 'verzekering', label: 'Verzekering', icon: Shield },
@@ -137,13 +121,14 @@ interface GeldstromenPanelProps {
   transactions: TransactionRow[]
   properties: PropertyHierarchy[]
   onRefresh: () => void
+  headerActions?: React.ReactNode
 }
 
 export interface GeldstromenPanelRef {
   openPaymentForm: () => void
 }
 
-export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanelProps>(function GeldstromenPanel({ transactions, properties, onRefresh }, ref) {
+export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanelProps>(function GeldstromenPanel({ transactions, properties, onRefresh, headerActions }, ref) {
   const { user, isDemo } = useDashboardUser()
   const [filter, setFilter] = useState<Filter>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -204,11 +189,9 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
   const counts = useMemo(() => {
     let inkomsten = 0, kosten = 0, unmatched = 0
     for (const tx of transactions) {
-      if (!tx.assignment) { unmatched++; continue }
-      const cat = tx.assignment.category
-      if (!cat || cat === 'huur') { inkomsten++ }
-      else if (EXPENSE_CATEGORIES_SET.has(cat)) { kosten++ }
-      else { inkomsten++ } // prive/overig count as other
+      if (!tx.assignment) { unmatched++ }
+      if (Number(tx.amount) >= 0) { inkomsten++ }
+      else { kosten++ }
     }
     return { all: transactions.length, inkomsten, kosten, unmatched }
   }, [transactions])
@@ -219,9 +202,9 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
 
     // Tab filter
     if (filter === 'inkomsten') {
-      list = list.filter(tx => tx.assignment && (!tx.assignment.category || tx.assignment.category === 'huur'))
+      list = list.filter(tx => Number(tx.amount) >= 0)
     } else if (filter === 'kosten') {
-      list = list.filter(tx => tx.assignment?.category && EXPENSE_CATEGORIES_SET.has(tx.assignment.category))
+      list = list.filter(tx => Number(tx.amount) < 0)
     } else if (filter === 'unmatched') {
       list = list.filter(tx => !tx.assignment)
     }
@@ -232,14 +215,13 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
       list = list.filter(tx => {
         const amountStr = formatEur(tx.amount).toLowerCase()
         return (
-          (tx.sender_name ?? '').toLowerCase().includes(q) ||
-          (tx.sender_iban ?? '').toLowerCase().includes(q) ||
+          (tx.counterparty_name ?? '').toLowerCase().includes(q) ||
+          (tx.counterparty_iban ?? '').toLowerCase().includes(q) ||
           (tx.description ?? '').toLowerCase().includes(q) ||
           amountStr.includes(q) ||
           String(tx.amount).includes(q) ||
           (tx.assignment?.tenant_name ?? '').toLowerCase().includes(q) ||
-          (tx.assignment?.property_name ?? '').toLowerCase().includes(q) ||
-          (tx.assignment?.category ? (CATEGORY_LABELS[tx.assignment.category] ?? '').toLowerCase().includes(q) : false)
+          (tx.assignment?.property_name ?? '').toLowerCase().includes(q)
         )
       })
     }
@@ -267,22 +249,14 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
   function resetAssignState(tx: TransactionRow | null) {
     setAssignSearch('')
     setSubmitting(false)
-    if (tx?.assignment?.category && tx.assignment.category !== 'huur') {
-      setAssignTab('category')
-      setSelectedCategory(tx.assignment.category)
-      setSelectedCategoryProperty(tx.assignment.property_id)
-      setSelectedRent(null)
-    } else if (tx?.assignment?.lease_id && tx.assignment.unit_id && tx.assignment.property_id) {
-      setAssignTab('rent')
+    setAssignTab('rent')
+    if (tx?.assignment?.lease_id && tx.assignment.unit_id && tx.assignment.property_id) {
       setSelectedRent({ property_id: tx.assignment.property_id, unit_id: tx.assignment.unit_id, tenant_id: tx.assignment.tenant_id, lease_id: tx.assignment.lease_id })
-      setSelectedCategory(null)
-      setSelectedCategoryProperty(null)
     } else {
-      setAssignTab('rent')
       setSelectedRent(null)
-      setSelectedCategory(null)
-      setSelectedCategoryProperty(null)
     }
+    setSelectedCategory(null)
+    setSelectedCategoryProperty(null)
   }
 
   function handleShowManualPaymentForm() {
@@ -320,8 +294,8 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
         value_date: payDate || null,
         amount: amountNum,
         currency: 'EUR',
-        sender_name: null,
-        sender_iban: null,
+        counterparty_name: null,
+        counterparty_iban: null,
         description: payDescription.trim() || null,
       } as never).select('id').single()
       if (error) throw error
@@ -373,19 +347,13 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
 
   // Assignment submit
   async function handleAssign() {
-    if (!selectedTx) return
-    const canSubmit = assignTab === 'rent' ? !!selectedRent : !!selectedCategory
-    if (!canSubmit) return
+    if (!selectedTx || !selectedRent) return
     setSubmitting(true)
     try {
-      const body = assignTab === 'rent'
-        ? { ...selectedRent, category: 'huur' }
-        : { property_id: selectedCategoryProperty, unit_id: null, tenant_id: null, lease_id: null, category: selectedCategory }
-
       const res = await fetch(`/api/finance/transactions/${selectedTx.id}/assign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify(selectedRent),
       })
       if (res.ok) {
         setIsEditing(false)
@@ -442,14 +410,17 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
             />
           </div>
 
-          <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
-            <Search className="h-4 w-4 text-gray-400 shrink-0" />
-            <Input
-              placeholder="Zoek op bedrag, huurder, pand..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
+              <Search className="h-4 w-4 text-gray-400 shrink-0" />
+              <Input
+                placeholder="Zoek op bedrag, huurder, pand..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
+              />
+            </div>
+            {headerActions}
           </div>
         </div>
       </CardHeader>
@@ -492,8 +463,6 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                     {filteredTx.map(tx => {
                       const isSelected = selectedTxId === tx.id && rightMode === 'detail'
                       const isMatched = !!tx.assignment
-                      const isExpenseCat = tx.assignment?.category && EXPENSE_CATEGORIES_SET.has(tx.assignment.category)
-                      const catLabel = tx.assignment?.category ? CATEGORY_LABELS[tx.assignment.category] ?? tx.assignment.category : null
 
                       return (
                         <TableRow
@@ -511,15 +480,15 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                             isSelected ? 'border-l-[#163300] dark:border-l-[#9FE870]' : 'border-l-transparent'
                           )}>
                             <div className="flex items-center gap-2 min-w-0">
-                              <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.sender_name || '—'}</p>
+                              <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
                               {tx.is_manual_transaction && (
                                 <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                                   Handmatig
                                 </span>
                               )}
                             </div>
-                            {tx.sender_name && (
-                              <p className="text-xs text-gray-400 truncate mt-0.5">{tx.sender_name}</p>
+                            {tx.counterparty_name && (
+                              <p className="text-xs text-gray-400 truncate mt-0.5">{tx.counterparty_name}</p>
                             )}
                           </TableCell>
 
@@ -528,15 +497,13 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                               'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap',
                               !isMatched
                                 ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-                                : isExpenseCat
-                                ? 'bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400'
                                 : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
                             )}>
                               <span className={cn(
                                 'h-1.5 w-1.5 rounded-full shrink-0',
-                                !isMatched ? 'bg-amber-400' : isExpenseCat ? 'bg-gray-400' : 'bg-green-500'
+                                !isMatched ? 'bg-amber-400' : 'bg-green-500'
                               )} />
-                              {catLabel || (!isMatched ? 'Niet gekoppeld' : 'Huur')}
+                              {!isMatched ? 'Niet gekoppeld' : 'Huur'}
                             </span>
                           </TableCell>
 
@@ -588,7 +555,7 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
           <>
             <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
               <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
-                {selectedTx.description || selectedTx.sender_name || 'Betaling'}
+                {selectedTx.description || selectedTx.counterparty_name || 'Betaling'}
               </DialogTitle>
               <p className={cn(
                 'text-2xl font-bold mt-1',
@@ -624,21 +591,21 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                 )}
 
                 {/* Sender */}
-                {selectedTx.sender_name && (
+                {selectedTx.counterparty_name && (
                   <div className={tile}>
                     <p className={fieldLabel}>Afzender</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedTx.sender_name}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedTx.counterparty_name}</p>
                   </div>
                 )}
 
-                {selectedTx.sender_iban && (
+                {selectedTx.counterparty_iban && (
                   <div className={tile}>
                     <p className={fieldLabel}>IBAN</p>
-                    <p className="text-sm font-mono text-gray-600 dark:text-gray-400">{selectedTx.sender_iban}</p>
+                    <p className="text-sm font-mono text-gray-600 dark:text-gray-400">{selectedTx.counterparty_iban}</p>
                   </div>
                 )}
 
-                {selectedTx.description && selectedTx.sender_name && (
+                {selectedTx.description && selectedTx.counterparty_name && (
                   <div className={tile}>
                     <p className={fieldLabel}>Omschrijving</p>
                     <p className="text-sm text-gray-700 dark:text-gray-300">{selectedTx.description}</p>
@@ -646,15 +613,6 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                 )}
 
                 {/* Assignment info */}
-                {selectedTx.assignment?.category && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Categorie</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {CATEGORY_LABELS[selectedTx.assignment.category] ?? selectedTx.assignment.category}
-                    </p>
-                  </div>
-                )}
-
                 {selectedTx.assignment?.property_name && (
                   <div className={tile}>
                     <p className={fieldLabel}>Pand</p>

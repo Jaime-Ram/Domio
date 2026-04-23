@@ -12,8 +12,10 @@ export async function GET(request: NextRequest) {
   const userId = searchParams.get("state");
   const error = searchParams.get("error");
 
+  const betalingenUrl = "/dashboard/employer/financial/betalingen"
+
   if (error || !code || !userId) {
-    return NextResponse.redirect(new URL("/finances?tink_error=true", request.url));
+    return NextResponse.redirect(new URL(`${betalingenUrl}?tink_error=true`, request.url));
   }
 
   // Exchange code for tokens
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
   if (!tokenResponse.ok) {
     const errorText = await tokenResponse.text();
     console.error("Tink token exchange failed:", errorText);
-    return NextResponse.redirect(new URL("/finances?tink_error=true", request.url));
+    return NextResponse.redirect(new URL(`${betalingenUrl}?tink_error=true`, request.url));
   }
 
   const { access_token, refresh_token } = await tokenResponse.json();
@@ -65,8 +67,8 @@ export async function GET(request: NextRequest) {
     console.log("Tink bank connection saved:", { userId, iban });
   } catch (dbErr) {
     console.error("Tink DB save failed:", dbErr);
-    return NextResponse.redirect(new URL("/finances?tink_error=true", request.url));
+    return NextResponse.redirect(new URL(`${betalingenUrl}?tink_error=true`, request.url));
   }
 
-  return NextResponse.redirect(new URL("/finances?tink_connected=true", request.url));
+  return NextResponse.redirect(new URL(`${betalingenUrl}?tink_connected=true`, request.url));
 }

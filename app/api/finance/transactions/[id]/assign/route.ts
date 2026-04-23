@@ -12,22 +12,22 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id: transactionId } = await params;
-  const { property_id, unit_id, tenant_id, lease_id, category } = await request.json();
-  const isRent = !category || category === 'huur';
+  const { lease_id } = await request.json();
+
+  if (!lease_id) {
+    return NextResponse.json({ error: "lease_id is verplicht" }, { status: 400 });
+  }
 
   // Verify the transaction belongs to this user
   const { data: tx, error: txErr } = await supabaseAdmin
     .from("raw_transactions")
-    .select("id, amount, value_date")
+    .select("id, amount, booking_date, value_date, owner_id")
     .eq("id", transactionId)
     .eq("owner_id", user.id)
     .single();
@@ -36,100 +36,73 @@ export async function POST(
     return NextResponse.json({ error: "Transactie niet gevonden" }, { status: 404 });
   }
 
-  // Check if an assignment already exists for this transaction
+  // Derive the due_period: first day of the transaction's month
+  const txDate = new Date(tx.booking_date ?? tx.value_date);
+  const due_period = `${txDate.getFullYear()}-${String(txDate.getMonth() + 1).padStart(2, "0")}-01`;
+
+  // Find or create the rent_expectation for this lease + period
+  let rentExpectationId: string;
+
   const { data: existing } = await supabaseAdmin
-    .from("payment_assignments")
-    .select("id, lease_id")
-    .eq("transaction_id", transactionId)
+    .from("rent_expectations")
+    .select("id")
+    .eq("lease_id", lease_id)
+    .eq("due_period", due_period)
     .single();
 
-  let assignment;
-
   if (existing) {
-    // Reset the old rent expectation back to 'pending'
-    if (existing.lease_id && tx.value_date) {
-      const d = new Date(tx.value_date);
-      const periodLabel = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      await supabaseAdmin
-        .from("rent_expectations")
-        .update({ status: "pending" })
-        .eq("lease_id", existing.lease_id)
-        .eq("period_label", periodLabel)
-        .in("status", ["paid", "partial"]);
-    }
-
-    // Update existing assignment
-    const { data, error } = await supabaseAdmin
-      .from("payment_assignments")
-      .update({
-        property_id: property_id ?? null,
-        unit_id: unit_id ?? null,
-        tenant_id: tenant_id ?? null,
-        lease_id: lease_id ?? null,
-        category: category ?? null,
-        confidence_score: 100,
-        match_method: "manual",
-        is_manual: true,
-        assigned_by: user.id,
-        assigned_at: new Date().toISOString(),
-      })
-      .eq("id", existing.id)
-      .select()
+    rentExpectationId = existing.id;
+  } else {
+    // Get the lease's expected rent amount
+    const { data: lease } = await supabaseAdmin
+      .from("leases")
+      .select("monthly_rent")
+      .eq("id", lease_id)
       .single();
 
-    if (error) {
-      console.error("Reassignment failed:", error);
-      return NextResponse.json({ error: "Hertoewijzing mislukt" }, { status: 500 });
-    }
-    assignment = data;
-  } else {
-    // Insert new assignment
-    const { data, error } = await supabaseAdmin
-      .from("payment_assignments")
+    const { data: created, error: createErr } = await supabaseAdmin
+      .from("rent_expectations")
       .insert({
         owner_id: user.id,
-        transaction_id: transactionId,
-        property_id: property_id ?? null,
-        unit_id: unit_id ?? null,
-        tenant_id: tenant_id ?? null,
-        lease_id: lease_id ?? null,
-        category: category ?? null,
-        confidence_score: 100,
-        match_method: "manual",
-        is_manual: true,
-        assigned_by: user.id,
+        lease_id,
+        due_period,
+        amount_expected: lease?.monthly_rent ?? Math.abs(Number(tx.amount)),
       })
-      .select()
+      .select("id")
       .single();
 
-    if (error) {
-      console.error("Assignment failed:", error);
-      return NextResponse.json({ error: "Toewijzing mislukt" }, { status: 500 });
+    if (createErr || !created) {
+      console.error("Failed to create rent_expectation:", createErr);
+      return NextResponse.json({ error: "Verwachting aanmaken mislukt" }, { status: 500 });
     }
-    assignment = data;
+    rentExpectationId = created.id;
   }
 
-  // Update the new rent expectation to paid/partial (only for rent assignments)
-  if (isRent && lease_id && tx.value_date) {
-    const d = new Date(tx.value_date);
-    const periodLabel = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  // Remove any existing assignment for this transaction
+  await supabaseAdmin
+    .from("payment_assignments")
+    .delete()
+    .eq("raw_transaction_id", transactionId)
+    .eq("owner_id", user.id);
 
-    const { data: exp } = await supabaseAdmin
-      .from("rent_expectations")
-      .select("id, expected_amount")
-      .eq("lease_id", lease_id)
-      .eq("period_label", periodLabel)
-      .eq("status", "pending")
-      .single();
+  // Create the new assignment
+  const { data: assignment, error: assignErr } = await supabaseAdmin
+    .from("payment_assignments")
+    .insert({
+      owner_id: user.id,
+      raw_transaction_id: transactionId,
+      rent_expectation_id: rentExpectationId,
+      amount_assigned: Math.abs(Number(tx.amount)),
+      match_method: "manual",
+      confidence_score: null,
+      assigned_by: user.id,
+    })
+    .select()
+    .single();
 
-    if (exp) {
-      const status =
-        Number(tx.amount) >= Number(exp.expected_amount) ? "paid" : "partial";
-      await supabaseAdmin
-        .from("rent_expectations")
-        .update({ status })
-        .eq("id", exp.id);
-    }
+  if (assignErr) {
+    console.error("Assignment failed:", assignErr);
+    return NextResponse.json({ error: "Toewijzing mislukt" }, { status: 500 });
   }
 
   return NextResponse.json(assignment);
