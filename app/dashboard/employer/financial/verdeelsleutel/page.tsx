@@ -45,6 +45,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
   AlertCircle,
+  Scale,
 } from 'lucide-react'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
@@ -366,8 +367,6 @@ export default function VerdeelsleutelPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
-      <SectionNavDashboard title="Financieel" items={FINANCIAL_NAV} titleVariant="hero" />
-
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -379,7 +378,10 @@ export default function VerdeelsleutelPage() {
             <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900 dark:text-white">Verdeelsleutels</h2>
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Scale className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                    Verdeelsleutels
+                  </h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                     Definieer hoe gedeelde kosten worden verdeeld over eenheden
                   </p>
@@ -488,7 +490,7 @@ export default function VerdeelsleutelPage() {
           <div className="rounded-card border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-5 py-4 flex items-start gap-3">
             <AlertCircle className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-medium text-gray-700 dark:text-gray-300">Hoe werkt het?</span> Wijs een verdeelsleutel toe aan een pand als standaard, of kies een sleutel per transactie om kosten automatisch te splitsen over eenheden.
+              <span className="font-medium text-gray-700 dark:text-gray-300">Hoe werkt het?</span> Met verdeelsleutels kan je kosten voor een pand splitsen over eenheden. Voeg bij elk pand een standaard verdeerlsleutel toe die automatisch wordt toegepast. Je kan altijd nog voor losse betalingen kiezen om die via een andere sleutel te verdelen.
             </p>
           </div>
         </div>

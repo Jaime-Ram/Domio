@@ -1,21 +1,32 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
 import {
-  ArrowLeft,
   Plus,
-  Check,
   Loader2,
   Trash2,
-  ChevronRight,
   Ban,
   Send,
+  FileText,
+  Search,
+  Table2,
+  Columns3,
 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
@@ -34,7 +45,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  ADD_DIALOG_BODY_SCROLL_CLASS,
+  ADD_DIALOG_CLOSE_BUTTON_CLASS,
+  ADD_DIALOG_FOOTER_SPLIT_CLASS,
+  ADD_DIALOG_HEADER_CLASS,
+  ADD_DIALOG_TITLE_CLASS,
+  addDialogContentClassName,
+} from '@/components/ui/add-dialog-layout'
+import {
+  dashboardCardClass,
+  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+} from '@/app/dashboard/employer/dashboard-ui'
 import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { supabase } from '@/lib/supabase/client'
 
@@ -308,12 +338,38 @@ function OverzichtTable({
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export function HuurafrekeningPanel() {
-  const [view, setView] = useState<'list' | 'wizard' | 'detail'>('list')
+export interface HuurafrekeningPanelRef {
+  openNew: () => void
+}
+
+interface HuurafrekeningPanelProps {
+  onMetrics?: (m: { betaald: number; verzonden: number; concept: number }) => void
+}
+
+export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, HuurafrekeningPanelProps>(
+  function HuurafrekeningPanel({ onMetrics }, ref) {
   const [editId, setEditId] = useState<string | null>(null)
   const [detailSettlement, setDetailSettlement] = useState<Settlement | null>(null)
   const [settlements, setSettlements] = useState<Settlement[]>([])
   const [loading, setLoading] = useState(true)
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'table' | 'board'>('board')
+
+  const filteredSettlements = settlements.filter(s => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    return (
+      (s.properties?.name ?? '').toLowerCase().includes(q) ||
+      (s.properties?.address ?? '').toLowerCase().includes(q) ||
+      (s.units?.unit_number ?? '').toLowerCase().includes(q) ||
+      (s.tenants?.full_name ?? '').toLowerCase().includes(q) ||
+      (STATUS_CONFIG[s.status]?.label ?? '').toLowerCase().includes(q) ||
+      s.period_start.includes(q) ||
+      s.period_end.includes(q)
+    )
+  })
 
   const fetchSettlements = async () => {
     setLoading(true)
@@ -333,85 +389,188 @@ export function HuurafrekeningPanel() {
     fetchSettlements()
   }, [])
 
+  useImperativeHandle(ref, () => ({ openNew }))
+
+  useEffect(() => {
+    if (!loading) {
+      onMetrics?.({
+        concept: settlements.filter(s => s.status === 'concept').length,
+        verzonden: settlements.filter(s => s.status === 'verzonden').length,
+        betaald: settlements.filter(s => s.status === 'verrekend').length,
+      })
+    }
+  }, [settlements, loading])
+
   const openNew = () => {
     setEditId(null)
-    setView('wizard')
+    setWizardOpen(true)
   }
 
   const openSettlement = (s: Settlement) => {
     if (s.status === 'concept') {
       setEditId(s.id)
-      setView('wizard')
+      setWizardOpen(true)
     } else {
       setDetailSettlement(s)
-      setView('detail')
+      setDetailOpen(true)
     }
   }
 
-  const closeView = () => {
-    setView('list')
-    setEditId(null)
+  const closeDetail = () => {
+    setDetailOpen(false)
     setDetailSettlement(null)
     fetchSettlements()
   }
 
-  if (view === 'wizard') {
-    return <SettlementWizard settlementId={editId} onClose={closeView} />
-  }
-
-  if (view === 'detail' && detailSettlement) {
-    return (
-      <SettlementDetail
-        settlement={detailSettlement}
-        onClose={closeView}
-      />
-    )
+  const closeWizard = () => {
+    setWizardOpen(false)
+    setEditId(null)
+    fetchSettlements()
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Huurafrekeningen</h2>
-        <Button onClick={openNew} className="bg-[#163300] hover:bg-[#356258]">
-          <Plus className="h-4 w-4 mr-2" />
-          Nieuwe afrekening
-        </Button>
-      </div>
-
-      {loading ? (
-        <div className="flex items-center justify-center min-h-[200px]">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-        </div>
-      ) : settlements.length === 0 ? (
-        <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-          <CardContent className="py-12 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nog geen afrekeningen aangemaakt.
+    <>
+    <Card className={dashboardCardClass()}>
+      <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+              Huurafrekeningen
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              Periodieke afrekening van servicekosten per huurder
             </p>
-            <Button onClick={openNew} variant="outline" className="mt-4">
-              <Plus className="h-4 w-4 mr-2" />
-              Maak je eerste afrekening
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
+              <Search className="h-4 w-4 text-gray-400 shrink-0" />
+              <Input
+                placeholder="Zoek op pand, huurder..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 shrink-0"
+              onClick={() => setViewMode(v => v === 'table' ? 'board' : 'table')}
+              aria-label={viewMode === 'table' ? 'Toon als bord' : 'Toon als lijst'}
+            >
+              {viewMode === 'table' ? <Columns3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
             </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800 overflow-hidden')}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-neutral-800 text-left">
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Pand</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Eenheid</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Huurder</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Periode</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-right">Voorschot</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-right">Werkelijk</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-right">Saldo</th>
-                  <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {settlements.map((s) => {
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className={cn(
+        'p-0 px-0 pb-0',
+        !loading && viewMode === 'board' ? 'px-5 pb-5 pt-2' : DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
+      )}>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+          </div>
+        ) : viewMode === 'board' ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {([
+              { key: 'concept',   label: 'Concepten',  statuses: ['concept'] as SettlementStatus[] },
+              { key: 'verzonden', label: 'Verzonden',   statuses: ['definitief', 'verzonden'] as SettlementStatus[] },
+              { key: 'betaald',   label: 'Betaald',    statuses: ['verrekend'] as SettlementStatus[] },
+              { key: 'nietig',    label: 'Nietig',     statuses: ['nietig'] as SettlementStatus[] },
+            ] as const).map((col) => {
+              const colItems = filteredSettlements.filter(s => (col.statuses as readonly string[]).includes(s.status))
+              return (
+                <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-gray-100/80 dark:bg-neutral-800/50 p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{col.label}</span>
+                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/15 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870] px-1.5">
+                      {colItems.length}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2 min-h-[80px]">
+                    {colItems.length === 0 && (
+                      <div className="rounded-xl px-4 py-5 text-center">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">Geen</p>
+                      </div>
+                    )}
+                    {colItems.map(s => {
+                      const isVoided = s.status === 'nietig'
+                      const balanceColor = isVoided
+                        ? 'text-gray-400 dark:text-gray-500'
+                        : s.balance > 0.01
+                          ? 'text-green-600 dark:text-green-400'
+                          : s.balance < -0.01
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => openSettlement(s)}
+                          className={cn(
+                            'w-full text-left rounded-2xl bg-white dark:bg-neutral-900 px-4 py-4 flex flex-col gap-1.5 shadow-sm',
+                            'transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#163300]',
+                            isVoided && 'opacity-50'
+                          )}
+                        >
+                          <p className={cn('text-sm font-semibold leading-tight', isVoided ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white')}>
+                            {s.properties?.name ?? '—'}
+                          </p>
+                          {s.tenants?.full_name && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{s.tenants.full_name}</p>
+                          )}
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            {fmtDate(s.period_start)} — {fmtDate(s.period_end)}
+                          </p>
+                          <p className={cn('text-base font-bold tabular-nums', balanceColor)}>
+                            {fmt(s.balance)}
+                          </p>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <DashboardTableBlock empty={filteredSettlements.length === 0}>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand</TableHead>
+                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Eenheid</TableHead>
+                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Huurder</TableHead>
+                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Periode</TableHead>
+                  <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>Voorschot</TableHead>
+                  <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>Werkelijk</TableHead>
+                  <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>Saldo</TableHead>
+                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredSettlements.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="py-12 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <FileText className="h-8 w-8 text-gray-300 dark:text-neutral-600" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {searchQuery ? 'Geen afrekeningen gevonden' : 'Nog geen afrekeningen aangemaakt'}
+                        </p>
+                        {!searchQuery && (
+                          <Button onClick={openNew} variant="outline" size="sm" className="rounded-full text-xs mt-1">
+                            <Plus className="h-3.5 w-3.5 mr-1" />Maak je eerste afrekening
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {filteredSettlements.map((s) => {
                   const isVoided = s.status === 'nietig'
                   const balanceColor = isVoided
                     ? 'text-gray-400 dark:text-gray-500'
@@ -422,57 +581,74 @@ export function HuurafrekeningPanel() {
                         : 'text-gray-500 dark:text-gray-400'
                   const cfg = STATUS_CONFIG[s.status]
                   return (
-                    <tr
+                    <TableRow
                       key={s.id}
-                      className={`border-b border-gray-50 dark:border-neutral-800/50 hover:bg-gray-50 dark:hover:bg-neutral-800/30 cursor-pointer transition-colors ${
-                        isVoided ? 'opacity-50' : ''
-                      }`}
+                      className={cn('cursor-pointer', isVoided && 'opacity-50')}
                       onClick={() => openSettlement(s)}
                     >
-                      <td className={`px-4 py-3 ${isVoided ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-white'}`}>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-white')}>
                         {s.properties?.name ?? '—'}
-                      </td>
-                      <td className={`px-4 py-3 ${isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
                         {s.units?.unit_number ?? '—'}
-                      </td>
-                      <td className={`px-4 py-3 ${isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
                         {s.tenants?.full_name ?? '—'}
-                      </td>
-                      <td className={`px-4 py-3 ${isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
                         {fmtDate(s.period_start)} — {fmtDate(s.period_end)}
-                      </td>
-                      <td className={`px-4 py-3 text-right ${isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
                         {fmt(s.total_voorschot)}
-                      </td>
-                      <td className={`px-4 py-3 text-right ${isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
                         {fmt(s.total_actual_costs)}
-                      </td>
-                      <td className={`px-4 py-3 text-right font-medium ${balanceColor}`}>{fmt(s.balance)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${cfg.classes}`}>
+                      </TableCell>
+                      <TableCell className={cn('px-3.5 py-3 text-right font-medium', balanceColor)}>
+                        {fmt(s.balance)}
+                      </TableCell>
+                      <TableCell className="px-3.5 py-3">
+                        <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', cfg.classes)}>
                           {cfg.label}
                         </span>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )
                 })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-    </div>
+              </TableBody>
+            </Table>
+          </DashboardTableBlock>
+        )}
+      </CardContent>
+    </Card>
+    <SettlementWizard
+      key={`${wizardOpen}-${editId ?? 'new'}`}
+      open={wizardOpen}
+      onOpenChange={(v) => { if (!v) closeWizard() }}
+      settlementId={editId}
+      onClose={closeWizard}
+    />
+    <SettlementDetail
+      open={detailOpen}
+      onOpenChange={(v) => { if (!v) closeDetail() }}
+      settlement={detailSettlement}
+      onClose={closeDetail}
+    />
+    </>
   )
-}
+})
 
 // ── Read-only detail view (for published / sent / voided settlements) ────────
 
 interface DetailProps {
-  settlement: Settlement
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  settlement: Settlement | null
   onClose: () => void
 }
 
-function SettlementDetail({ settlement, onClose }: DetailProps) {
+function SettlementDetail({ open, onOpenChange, settlement, onClose }: DetailProps) {
+  if (!settlement) return null
   const [voidOpen, setVoidOpen] = useState(false)
   const [voiding, setVoiding] = useState(false)
   const [currentStatus, setCurrentStatus] = useState(settlement.status)
@@ -507,47 +683,41 @@ function SettlementDetail({ settlement, onClose }: DetailProps) {
   const cfg = STATUS_CONFIG[currentStatus]
 
   return (
-    <div className={`space-y-6 ${isVoided ? 'opacity-60' : ''}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onClose}
-            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Terug
-          </button>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Huurafrekening
-          </h2>
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.classes}`}>
-            {cfg.label}
-          </span>
-        </div>
-      </div>
-
-      {/* Voided banner */}
-      {isVoided && (
-        <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-900/10 px-4 py-3 flex items-center gap-3">
-          <Ban className="h-4 w-4 text-red-500 shrink-0" />
-          <div className="text-sm">
-            <span className="font-medium text-red-700 dark:text-red-400">
-              Deze afrekening is nietig verklaard
+    <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={addDialogContentClassName('sm:max-w-2xl')}
+        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+      >
+        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+          <div className="flex items-center gap-3">
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
+              Huurafrekening
+            </DialogTitle>
+            <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', cfg.classes)}>
+              {cfg.label}
             </span>
-            {settlement.voided_at && (
-              <span className="text-red-600/70 dark:text-red-400/70 ml-1">
-                op {fmtDateTime(settlement.voided_at)}
-              </span>
-            )}
           </div>
-        </div>
-      )}
+        </DialogHeader>
 
-      {/* Info header */}
-      <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-        <CardContent className="pt-6 space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className={cn(ADD_DIALOG_BODY_SCROLL_CLASS, isVoided && 'opacity-60')}>
+          <div className="space-y-4">
+
+          {/* Voided banner */}
+          {isVoided && (
+            <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-900/10 px-4 py-3 flex items-center gap-3">
+              <Ban className="h-4 w-4 text-red-500 shrink-0" />
+              <div className="text-sm">
+                <span className="font-medium text-red-700 dark:text-red-400">Deze afrekening is nietig verklaard</span>
+                {settlement.voided_at && (
+                  <span className="text-red-600/70 dark:text-red-400/70 ml-1">op {fmtDateTime(settlement.voided_at)}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Info */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-gray-50 dark:bg-neutral-800/50 rounded-2xl p-4">
             <div>
               <span className="text-gray-500 dark:text-gray-400 block">Huurder</span>
               <span className="font-medium text-gray-900 dark:text-white">{settlement.tenants?.full_name ?? '—'}</span>
@@ -571,152 +741,123 @@ function SettlementDetail({ settlement, onClose }: DetailProps) {
           </div>
 
           {/* Lifecycle timestamps */}
-          <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 flex flex-wrap gap-x-8 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
-            {settlement.published_at && (
-              <span>Gepubliceerd: {fmtDateTime(settlement.published_at)}</span>
-            )}
-            {settlement.sent_at && (
-              <span>Verzonden: {fmtDateTime(settlement.sent_at)}</span>
-            )}
-            {settlement.voided_at && (
-              <span className="text-red-500 dark:text-red-400">Nietig verklaard: {fmtDateTime(settlement.voided_at)}</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          {(settlement.published_at || settlement.sent_at || settlement.voided_at) && (
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 dark:text-gray-400 px-1">
+              {settlement.published_at && <span>Gepubliceerd: {fmtDateTime(settlement.published_at)}</span>}
+              {settlement.sent_at && <span>Verzonden: {fmtDateTime(settlement.sent_at)}</span>}
+              {settlement.voided_at && <span className="text-red-500 dark:text-red-400">Nietig verklaard: {fmtDateTime(settlement.voided_at)}</span>}
+            </div>
+          )}
 
-      {/* Read-only unified table */}
-      <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-        <CardContent className="pt-6">
+          {/* Breakdown table */}
           <OverzichtTable
             incomeRows={incomeRows.map((r) => ({ ...r, selected: true }))}
             expenseRows={expenseRows.map((r) => ({ ...r, selected: true }))}
             editable={false}
           />
-        </CardContent>
-      </Card>
 
-      {/* Summary */}
-      <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-        <CardContent className="pt-6 space-y-3">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen</span>
-            <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
-            <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
-            <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
-          </div>
-          <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Voorschot</span>
-            <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_voorschot)}</span>
-            <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
-            <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_actual_costs)}</span>
-          </div>
-          <div className="border-t border-gray-200 dark:border-neutral-700 pt-3">
-            <div className="flex items-center justify-between">
+          {/* Summary */}
+          <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen</span>
+              <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
+              <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
+              <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
+            </div>
+            <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+              <span className="text-gray-500 dark:text-gray-400">Voorschot</span>
+              <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_voorschot)}</span>
+              <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
+              <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_actual_costs)}</span>
+            </div>
+            <div className="border-t border-gray-200 dark:border-neutral-700 pt-3 flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">Saldo servicekosten</span>
-              <span
-                className={`text-lg font-bold ${
-                  settlement.balance > 0.01
-                    ? 'text-green-600 dark:text-green-400'
-                    : settlement.balance < -0.01
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-gray-500'
-                }`}
-              >
+              <span className={cn(
+                'text-lg font-bold',
+                settlement.balance > 0.01 ? 'text-green-600 dark:text-green-400'
+                  : settlement.balance < -0.01 ? 'text-red-600 dark:text-red-400'
+                  : 'text-gray-500'
+              )}>
                 {fmt(settlement.balance)}
               </span>
             </div>
-            <p
-              className={`text-xs mt-1 ${
-                settlement.balance > 0.01
-                  ? 'text-green-600 dark:text-green-400'
-                  : settlement.balance < -0.01
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-gray-500'
-              }`}
-            >
-              {settlement.balance > 0.01
-                ? `Terug te betalen aan huurder: ${fmt(settlement.balance)}`
-                : settlement.balance < -0.01
-                  ? `Bij te betalen door huurder: ${fmt(Math.abs(settlement.balance))}`
-                  : 'Geen verschil'}
-            </p>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Notes (read-only) */}
-      {settlement.notes && (
-        <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-          <CardContent className="pt-6 space-y-2">
-            <Label>Notities</Label>
-            <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{settlement.notes}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Actions */}
-      {!isVoided && (
-        <div className="flex items-center justify-between">
-          <div />
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              disabled
-              className="gap-2"
-              title="Binnenkort beschikbaar"
-            >
-              <Send className="h-4 w-4" />
-              Versturen
-            </Button>
-            {canVoid && (
-              <Button
-                variant="outline"
-                onClick={() => setVoidOpen(true)}
-                className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20"
-              >
-                <Ban className="h-4 w-4" />
-                Nietig verklaren
-              </Button>
-            )}
+          {/* Notes */}
+          {settlement.notes && (
+            <div className="space-y-1">
+              <Label>Notities</Label>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{settlement.notes}</p>
+            </div>
+          )}
           </div>
         </div>
-      )}
 
-      {/* Void confirmation */}
-      <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Afrekening nietig verklaren</AlertDialogTitle>
-            <AlertDialogDescription>
-              Weet je zeker dat je deze afrekening nietig wilt verklaren? De afrekening blijft zichtbaar maar wordt als ongeldig gemarkeerd. Dit kan niet ongedaan worden gemaakt.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleVoid}
-              disabled={voiding}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              {voiding ? 'Bezig...' : 'Nietig verklaren'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+        <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            Sluiten
+          </button>
+          {!isVoided && (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" disabled className="gap-2 rounded-full" title="Binnenkort beschikbaar">
+                <Send className="h-4 w-4" />
+                Versturen
+              </Button>
+              {canVoid && (
+                <Button
+                  variant="outline"
+                  onClick={() => setVoidOpen(true)}
+                  className="gap-2 rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20"
+                >
+                  <Ban className="h-4 w-4" />
+                  Nietig verklaren
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Afrekening nietig verklaren</AlertDialogTitle>
+          <AlertDialogDescription>
+            Weet je zeker dat je deze afrekening nietig wilt verklaren? De afrekening blijft zichtbaar maar wordt als ongeldig gemarkeerd. Dit kan niet ongedaan worden gemaakt.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleVoid}
+            disabled={voiding}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            {voiding ? 'Bezig...' : 'Nietig verklaren'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }
 
 // ── Wizard (concept settlements only) ────────────────────────────────────────
 
 interface WizardProps {
+  open: boolean
+  onOpenChange: (v: boolean) => void
   settlementId: string | null
   onClose: () => void
 }
 
-function SettlementWizard({ settlementId, onClose }: WizardProps) {
+function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardProps) {
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -736,7 +877,6 @@ function SettlementWizard({ settlementId, onClose }: WizardProps) {
   const tenantName = activeLease?.tenant_name ?? null
   const tenantId = activeLease?.tenant_id ?? null
   const leaseId = activeLease?.id ?? null
-  const monthlyRent = activeLease?.monthly_rent ?? 0
   const voorschotPerMonth = activeLease?.servicekosten_voorschot ?? 0
 
   // Compute months in period
@@ -754,7 +894,6 @@ function SettlementWizard({ settlementId, onClose }: WizardProps) {
     return months
   }, [periodStart, periodEnd])
 
-  const expectedRentForPeriod = (monthlyRent + voorschotPerMonth) * monthsInPeriod.length
   const expectedVoorschotForPeriod = voorschotPerMonth * monthsInPeriod.length
 
   // Step 2 state — income and expense rows (both fetched from API)
@@ -996,162 +1135,86 @@ function SettlementWizard({ settlementId, onClose }: WizardProps) {
   const step1Valid = propertyId && unitId && periodStart && periodEnd
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onClose}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          className={addDialogContentClassName('sm:max-w-2xl')}
+          closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
         >
-          <ArrowLeft className="h-4 w-4" />
-          Terug
-        </button>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {settlementId ? 'Afrekening bewerken' : 'Nieuwe afrekening'}
-        </h2>
-      </div>
+          <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+            <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
+              {settlementId ? 'Afrekening bewerken' : 'Nieuwe afrekening'}
+            </DialogTitle>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 1 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 2 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 3 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className="ml-1 text-xs text-gray-400">
+                {step === 1 ? 'Eenheid & periode' : step === 2 ? 'Overzicht' : 'Samenvatting'}
+              </span>
+            </div>
+          </DialogHeader>
 
-      {/* Progress */}
-      <div className="flex items-center gap-2">
-        {[1, 2, 3].map((s) => (
-          <div key={s} className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                if (s < step) setStep(s)
-                if (s === 2 && step === 1 && step1Valid) goToStep2()
-              }}
-              className={`h-8 w-8 rounded-full text-xs font-medium flex items-center justify-center transition-colors ${
-                s === step
-                  ? 'bg-[#163300] text-white'
-                  : s < step
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-gray-100 text-gray-400 dark:bg-neutral-800'
-              }`}
-            >
-              {s < step ? <Check className="h-4 w-4" /> : s}
-            </button>
-            {s < 3 && (
-              <div className={`w-12 h-0.5 ${s < step ? 'bg-green-300 dark:bg-green-700' : 'bg-gray-200 dark:bg-neutral-700'}`} />
+          <div className={ADD_DIALOG_BODY_SCROLL_CLASS}>
+
+            {/* ── Step 1 ── */}
+            {step === 1 && (
+              loadingProps ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Pand *</Label>
+                      <Select value={propertyId} onValueChange={setPropertyId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer pand" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {properties.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Eenheid *</Label>
+                      <Select value={unitId} onValueChange={setUnitId} disabled={!propertyId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer eenheid" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(selectedProperty?.units ?? []).map((u) => (
+                            <SelectItem key={u.id} value={u.id}>{u.unit_number}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Startdatum periode *</Label>
+                      <WiseDatePicker value={periodStart} onChange={setPeriodStart} placeholder="Kies startdatum" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Einddatum periode *</Label>
+                      <WiseDatePicker value={periodEnd} onChange={setPeriodEnd} placeholder="Kies einddatum" />
+                    </div>
+                  </div>
+                </div>
+              )
             )}
-          </div>
-        ))}
-        <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">
-          {step === 1 ? 'Eenheid & periode' : step === 2 ? 'Overzicht' : 'Samenvatting'}
-        </span>
-      </div>
 
-      {/* Step 1 — Unit & period */}
-      {step === 1 && (
-        <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-          <CardContent className="pt-6 space-y-5">
-            {loadingProps ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Pand *</Label>
-                    <Select value={propertyId} onValueChange={setPropertyId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer pand" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {properties.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            {p.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Eenheid *</Label>
-                    <Select value={unitId} onValueChange={setUnitId} disabled={!propertyId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer eenheid" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(selectedProperty?.units ?? []).map((u) => (
-                          <SelectItem key={u.id} value={u.id}>
-                            {u.unit_number}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            {/* ── Step 2 ── */}
+            {step === 2 && (
+              loadingCosts ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                 </div>
-
-                {activeLease && (
-                  <div className="rounded-lg bg-gray-50 dark:bg-neutral-800/50 p-3 text-sm text-gray-600 dark:text-gray-300">
-                    <span className="font-medium text-gray-900 dark:text-white">Huurder:</span>{' '}
-                    {tenantName ?? '—'}
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Startdatum periode *</Label>
-                    <WiseDatePicker
-                      value={periodStart}
-                      onChange={setPeriodStart}
-                      placeholder="Kies startdatum"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Einddatum periode *</Label>
-                    <WiseDatePicker
-                      value={periodEnd}
-                      onChange={setPeriodEnd}
-                      placeholder="Kies einddatum"
-                    />
-                  </div>
-                </div>
-
-                {unitId && periodStart && periodEnd && (
-                  <div className="rounded-lg border border-gray-100 dark:border-neutral-800 p-4 space-y-1">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Kale huur per maand:{' '}
-                      <span className="font-medium text-gray-900 dark:text-white">{fmt(monthlyRent)}</span>
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Voorschot servicekosten per maand:{' '}
-                      <span className="font-medium text-gray-900 dark:text-white">{fmt(voorschotPerMonth)}</span>
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Totaal voorschot voor deze periode ({monthsInPeriod.length} maanden):{' '}
-                      <span className="font-medium text-gray-900 dark:text-white">{fmt(expectedVoorschotForPeriod)}</span>
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex justify-end pt-2">
-                  <Button
-                    onClick={goToStep2}
-                    disabled={!step1Valid}
-                    className="bg-[#163300] hover:bg-[#356258]"
-                  >
-                    Volgende
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 2 — Overzicht (unified income + expense table) */}
-      {step === 2 && (
-        <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-          <CardContent className="pt-6 space-y-4">
-            {loadingCosts ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-              </div>
-            ) : (
-              <>
+              ) : (
                 <OverzichtTable
                   incomeRows={incomeRows}
                   expenseRows={expenseRows}
@@ -1161,181 +1224,171 @@ function SettlementWizard({ settlementId, onClose }: WizardProps) {
                   onRemoveExpense={removeExpense}
                   onAddExpense={addInlineExpense}
                 />
+              )
+            )}
 
-                <div className="flex items-center justify-end border-t border-gray-100 dark:border-neutral-800 pt-4">
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(1)}>
-                      Vorige
-                    </Button>
-                    <Button
-                      onClick={() => setStep(3)}
-                      className="bg-[#163300] hover:bg-[#356258]"
-                    >
-                      Volgende
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
+            {/* ── Step 3 ── */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-gray-50 dark:bg-neutral-800/50 rounded-2xl p-4">
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400 block">Huurder</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{tenantName ?? '—'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400 block">Eenheid</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {selectedProperty?.name}, {selectedUnit?.unit_number}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400 block">Periode</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {fmtDate(periodStart)} — {fmtDate(periodEnd)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400 block">Maanden</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{monthsInPeriod.length}</span>
                   </div>
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Step 3 — Review & confirm */}
-      {step === 3 && (
-        <div className="space-y-4">
-          {/* Info header */}
-          <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-            <CardContent className="pt-6 space-y-2">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400 block">Huurder</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{tenantName ?? '—'}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400 block">Eenheid</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {selectedProperty?.name}, {selectedUnit?.unit_number}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400 block">Periode</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {fmtDate(periodStart)} — {fmtDate(periodEnd)}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500 dark:text-gray-400 block">Aantal maanden</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{monthsInPeriod.length}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                <OverzichtTable
+                  incomeRows={incomeRows}
+                  expenseRows={selectedExpenses}
+                  editable={false}
+                />
 
-          {/* Read-only unified table */}
-          <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-            <CardContent className="pt-6">
-              <OverzichtTable
-                incomeRows={incomeRows}
-                expenseRows={selectedExpenses}
-                editable={false}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Servicekosten saldo summary */}
-          <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-            <CardContent className="pt-6 space-y-3">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen (werkelijk)</span>
-                <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
-                <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
-                <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
-                <span className="text-gray-400 dark:text-gray-500 italic">Verwachte huur voor deze periode</span>
-                <span className="text-right text-gray-400 dark:text-gray-500 italic">{fmt(expectedRentForPeriod)}</span>
-              </div>
-              <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Totaal voorschot betaald</span>
-                <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(expectedVoorschotForPeriod)}</span>
-                <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
-                <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(totalExpenses)}</span>
-              </div>
-              <div className="border-t border-gray-200 dark:border-neutral-700 pt-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Saldo servicekosten</span>
-                  <span
-                    className={`text-lg font-bold ${
-                      servicekostenSaldo > 0.01
-                        ? 'text-green-600 dark:text-green-400'
-                        : servicekostenSaldo < -0.01
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-gray-500'
-                    }`}
-                  >
-                    {fmt(servicekostenSaldo)}
-                  </span>
-                </div>
-                <p
-                  className={`text-xs mt-1 ${
-                    servicekostenSaldo > 0.01
-                      ? 'text-green-600 dark:text-green-400'
-                      : servicekostenSaldo < -0.01
-                        ? 'text-red-600 dark:text-red-400'
+                <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 space-y-3">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen (werkelijk)</span>
+                    <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
+                    <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
+                    <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
+                  </div>
+                  <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Totaal voorschot betaald</span>
+                    <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(expectedVoorschotForPeriod)}</span>
+                    <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
+                    <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(totalExpenses)}</span>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-neutral-700 pt-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Saldo servicekosten</span>
+                    <span className={cn(
+                      'text-lg font-bold',
+                      servicekostenSaldo > 0.01 ? 'text-green-600 dark:text-green-400'
+                        : servicekostenSaldo < -0.01 ? 'text-red-600 dark:text-red-400'
                         : 'text-gray-500'
-                  }`}
-                >
-                  {servicekostenSaldo > 0.01
-                    ? `Terug te betalen aan huurder: ${fmt(servicekostenSaldo)}`
-                    : servicekostenSaldo < -0.01
-                      ? `Bij te betalen door huurder: ${fmt(Math.abs(servicekostenSaldo))}`
-                      : 'Geen verschil'}
-                </p>
+                    )}>
+                      {fmt(servicekostenSaldo)}
+                    </span>
+                  </div>
+                  <p className={cn(
+                    'text-xs',
+                    servicekostenSaldo > 0.01 ? 'text-green-600 dark:text-green-400'
+                      : servicekostenSaldo < -0.01 ? 'text-red-600 dark:text-red-400'
+                      : 'text-gray-500'
+                  )}>
+                    {servicekostenSaldo > 0.01
+                      ? `Terug te betalen aan huurder: ${fmt(servicekostenSaldo)}`
+                      : servicekostenSaldo < -0.01
+                        ? `Bij te betalen door huurder: ${fmt(Math.abs(servicekostenSaldo))}`
+                        : 'Geen verschil'}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notities (optioneel)</Label>
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Eventuele opmerkingen bij deze afrekening..."
+                    rows={3}
+                  />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            )}
 
-          {/* Notes */}
-          <Card className={dashboardCardClass('border border-gray-100 dark:border-neutral-800')}>
-            <CardContent className="pt-6 space-y-2">
-              <Label>Notities (optioneel)</Label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Eventuele opmerkingen bij deze afrekening..."
-                rows={3}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex items-center justify-between">
-            <Button variant="outline" onClick={() => setStep(2)}>
-              Vorige
-            </Button>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => save('concept')}
-                disabled={saving}
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Opslaan als concept
-              </Button>
-              <Button
-                onClick={() => setConfirmOpen(true)}
-                disabled={saving}
-                className="bg-[#163300] hover:bg-[#356258]"
-              >
-                Publiceren
-              </Button>
-            </div>
           </div>
 
-          {/* Confirmation dialog */}
-          <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Afrekening publiceren</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Weet je zeker dat je deze afrekening wilt publiceren? Na publicatie kan de inhoud niet meer worden gewijzigd.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => save('definitief')}
+          <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+            {step === 1 ? (
+              <button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                Annuleren
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
+                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                ← Vorige
+              </button>
+            )}
+
+            {step === 1 && (
+              <button
+                type="button"
+                disabled={!step1Valid}
+                onClick={goToStep2}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+              >
+                Volgende →
+              </button>
+            )}
+            {step === 2 && (
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors"
+              >
+                Volgende →
+              </button>
+            )}
+            {step === 3 && (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => save('concept')} disabled={saving}>
+                  {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Opslaan als concept
+                </Button>
+                <Button
+                  onClick={() => setConfirmOpen(true)}
                   disabled={saving}
                   className="bg-[#163300] hover:bg-[#356258]"
                 >
-                  {saving ? 'Bezig...' : 'Publiceren'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )}
-    </div>
+                  Publiceren
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Afrekening publiceren</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je deze afrekening wilt publiceren? Na publicatie kan de inhoud niet meer worden gewijzigd.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => save('definitief')}
+              disabled={saving}
+              className="bg-[#163300] hover:bg-[#356258]"
+            >
+              {saving ? 'Bezig...' : 'Publiceren'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

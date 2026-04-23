@@ -7,7 +7,17 @@ import { DASHBOARD_SURFACE_PADDING } from '@/app/dashboard/employer/dashboard-ui
 /**
  * Groene actie-tegel (Domio-accent): zelfde padding, kolomlayout en icoonafstand als MetricCard.
  */
-export function AddPaymentTile({ onClick, className }: { onClick: () => void; className?: string }) {
+export function AddPaymentTile({
+  onClick,
+  className,
+  title = 'Betaling',
+  subtitle = 'Handmatig registreren',
+}: {
+  onClick: () => void
+  className?: string
+  title?: string
+  subtitle?: string
+}) {
   return (
     <button
       type="button"
@@ -31,9 +41,9 @@ export function AddPaymentTile({ onClick, className }: { onClick: () => void; cl
       </div>
       <div className="min-w-0 space-y-1 pt-4">
         <p className="text-2xl font-extrabold tracking-tight text-[#163300] sm:text-[1.75rem] leading-tight">
-          Betaling
+          {title}
         </p>
-        <p className="text-sm font-medium text-[#163300]/80">Handmatig registreren</p>
+        <p className="text-sm font-medium text-[#163300]/80">{subtitle}</p>
       </div>
     </button>
   )

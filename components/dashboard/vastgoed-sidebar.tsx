@@ -117,7 +117,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         children: [
           { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
           { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-          { label: 'Huurbeleid', href: `${basePath}/financial/huurbeleid`, icon: Percent },
+          { label: 'Huurafrekeningen', href: `${basePath}/financial/huurafrekening`, icon: Percent },
           { label: 'Betaalflow', href: `${basePath}/financial/betaalflow`, icon: Workflow },
           { label: 'Verdeelsleutel', href: `${basePath}/financial/verdeelsleutel`, icon: BookOpen },
         ],

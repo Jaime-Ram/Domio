@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/employer/financial/huurbeleid/page'
+export { default } from '@/app/dashboard/employer/financial/huurafrekening/page'

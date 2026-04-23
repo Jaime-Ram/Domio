@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { format, parse, isValid, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isSameMonth } from 'date-fns'
+import { format, parse, isValid, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 
@@ -25,7 +26,6 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
     }
     return startOfMonth(new Date())
   })
-  const ref = useRef<HTMLDivElement>(null)
 
   const selected = value ? parse(value, 'yyyy-MM-dd', new Date()) : null
 
@@ -37,23 +37,11 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
     }
   }, [value])
 
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
-
   // Build calendar grid (Mon-start)
   const firstDay = startOfMonth(viewDate)
   const lastDay = endOfMonth(viewDate)
   const days = eachDayOfInterval({ start: firstDay, end: lastDay })
-
-  // getDay returns 0=Sun,1=Mon,...,6=Sat → shift so Mon=0
-  const startOffset = (getDay(firstDay) + 6) % 7
+  const startOffset = (getDay(firstDay) + 6) % 7 // Mon=0
 
   const handleSelect = (day: Date) => {
     onChange(format(day, 'yyyy-MM-dd'))
@@ -65,28 +53,33 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
     : ''
 
   return (
-    <div ref={ref} className={cn('relative', className)}>
-      {/* Trigger */}
-      <button
-        type="button"
-        onClick={() => setOpen(v => !v)}
-        className={cn(
-          'w-full flex items-center justify-between px-3 py-2 text-sm rounded-xl border border-input bg-background',
-          'hover:border-[#163300] focus:outline-none focus:ring-2 focus:ring-[#163300]/30 transition-colors',
-          !displayValue && 'text-muted-foreground'
-        )}
-      >
-        <span>{displayValue || placeholder}</span>
-        <svg className="h-4 w-4 text-gray-400 shrink-0" viewBox="0 0 16 16" fill="none">
-          <rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M5 1v3M11 1v3M1 7h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      </button>
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverPrimitive.Trigger asChild>
+        <button
+          type="button"
+          className={cn(
+            'w-full flex items-center justify-between px-3 py-2 text-sm rounded-xl border border-input bg-background',
+            'hover:border-[#163300] focus:outline-none focus:ring-2 focus:ring-[#163300]/30 transition-colors',
+            !displayValue && 'text-muted-foreground',
+            className
+          )}
+        >
+          <span>{displayValue || placeholder}</span>
+          <svg className="h-4 w-4 text-gray-400 shrink-0" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M5 1v3M11 1v3M1 7h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </button>
+      </PopoverPrimitive.Trigger>
 
-      {/* Dropdown calendar */}
-      {open && (
-        <div className="absolute z-[100] mt-1 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-100 dark:border-neutral-800 p-4 w-72">
-          {/* Header */}
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+          sideOffset={4}
+          align="start"
+          className="z-[9999] bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-100 dark:border-neutral-800 p-4 w-72 outline-none"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          {/* Month navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
@@ -126,17 +119,14 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
 
           {/* Day grid */}
           <div className="grid grid-cols-7">
-            {/* Empty offset cells */}
             {Array.from({ length: startOffset }).map((_, i) => (
               <div key={`offset-${i}`} />
             ))}
-
             {days.map((day) => {
-              const dayOfWeek = (getDay(day) + 6) % 7 // Mon=0
+              const dayOfWeek = (getDay(day) + 6) % 7
               const isWeekend = dayOfWeek >= 5
               const isSelected = selected ? isSameDay(day, selected) : false
               const isToday = isSameDay(day, new Date())
-
               return (
                 <button
                   key={day.toISOString()}
@@ -158,8 +148,8 @@ export function WiseDatePicker({ value, onChange, placeholder = 'Kies datum', cl
               )
             })}
           </div>
-        </div>
-      )}
-    </div>
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   )
 }
