@@ -12,12 +12,12 @@ import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
   CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
-import { Building2, Calendar, Euro, FileText, User, StickyNote } from 'lucide-react'
+import { Building2, Calendar, Euro, FileText, StickyNote, Send, CheckCircle2, Loader2, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { leaseQueries, propertyQueries, unitQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { mockProperties } from '@/lib/mock-data/vastgoed'
+import { mockProperties, mockLegalEntities } from '@/lib/mock-data/vastgoed'
 
 export type CreatedLeasePayload = {
   id: string
@@ -35,8 +35,10 @@ interface HuurovereenkomstDialogProps {
   onClose: () => void
   onCreated: (lease: CreatedLeasePayload) => void
   /** Pre-ingevulde huurder — als aanwezig worden huurder-velden overgeslagen */
-  tenant: { id: string; name: string }
+  tenant: { id: string; name: string; email?: string; phone?: string }
 }
+
+type SigningStatus = 'idle' | 'sending' | 'sent' | 'error'
 
 type UnitOption = {
   unitId: string
@@ -68,9 +70,19 @@ export function HuurovereenkomstDialog({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Na aanmaken: signing step
+  const [createdLease, setCreatedLease] = useState<CreatedLeasePayload | null>(null)
+  const [signingStatus, setSigningStatus] = useState<SigningStatus>('idle')
+  const [signingError, setSigningError] = useState<string | null>(null)
+  const [envelopeId, setEnvelopeId] = useState<string | null>(null)
+
   // Reset bij openen
   useEffect(() => {
     if (!open) return
+    setCreatedLease(null)
+    setSigningStatus('idle')
+    setSigningError(null)
+    setEnvelopeId(null)
     setUnitId('')
     setMonthlyRent('')
     setDeposit('')
@@ -141,56 +153,95 @@ export function HuurovereenkomstDialog({
       const rent = Number(monthlyRent)
       const dep = deposit ? Number(deposit) : null
 
-      if (isDemo) {
-        onCreated({
-          id: `demo-lease-${Date.now()}`,
-          tenantId: tenant.id,
-          unitId,
-          startDate,
-          endDate: endDate || null,
-          monthlyRent: rent,
-          deposit: dep,
-          propertyName: selectedUnit?.propertyName ?? '',
-        })
-        onClose()
-        return
-      }
+      const payload: CreatedLeasePayload = isDemo
+        ? {
+            id: `demo-lease-${Date.now()}`,
+            tenantId: tenant.id,
+            unitId,
+            startDate,
+            endDate: endDate || null,
+            monthlyRent: rent,
+            deposit: dep,
+            propertyName: selectedUnit?.propertyName ?? '',
+          }
+        : await (async () => {
+            const { user } = await getUser()
+            if (!user) throw new Error('Niet ingelogd')
+            const periodNotes = `Factuurperiode: ${factuurPeriode}${notes ? `\n${notes}` : ''}`
+            const created = await leaseQueries.create({
+              owner_id: user.id,
+              unit_id: unitId,
+              tenant_id: tenant.id,
+              start_date: startDate,
+              end_date: endDate || null,
+              monthly_rent: rent,
+              deposit: dep,
+              status: 'actief',
+              notes: periodNotes || null,
+            })
+            await unitQueries.update(unitId, { status: 'verhuurd' } as never)
+            return {
+              id: created.id,
+              tenantId: tenant.id,
+              unitId,
+              startDate,
+              endDate: endDate || null,
+              monthlyRent: rent,
+              deposit: dep,
+              propertyName: selectedUnit?.propertyName ?? '',
+            }
+          })()
 
-      const { user } = await getUser()
-      if (!user) throw new Error('Niet ingelogd')
-
-      const periodNotes = `Factuurperiode: ${factuurPeriode}${notes ? `\n${notes}` : ''}`
-
-      const created = await leaseQueries.create({
-        owner_id: user.id,
-        unit_id: unitId,
-        tenant_id: tenant.id,
-        start_date: startDate,
-        end_date: endDate || null,
-        monthly_rent: rent,
-        deposit: dep,
-        status: 'actief',
-        notes: periodNotes || null,
-      })
-
-      // Markeer eenheid als verhuurd
-      await unitQueries.update(unitId, { status: 'verhuurd' } as never)
-
-      onCreated({
-        id: created.id,
-        tenantId: tenant.id,
-        unitId,
-        startDate,
-        endDate: endDate || null,
-        monthlyRent: rent,
-        deposit: dep,
-        propertyName: selectedUnit?.propertyName ?? '',
-      })
-      onClose()
+      onCreated(payload)
+      setCreatedLease(payload)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Aanmaken mislukt')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSendDocuSign = async () => {
+    if (!createdLease) return
+    setSigningStatus('sending')
+    setSigningError(null)
+
+    try {
+      const landlord = isDemo ? mockLegalEntities[0] : null
+      const contractData = {
+        propertyAddress: selectedUnit?.label?.split(' — ')[1] ?? createdLease.propertyName,
+        monthlyRent: createdLease.monthlyRent,
+        deposit: createdLease.deposit ?? undefined,
+        startDate: createdLease.startDate,
+        endDate: createdLease.endDate ?? undefined,
+        landlordName: landlord?.name ?? 'Verhuurder',
+        landlordAddress: landlord?.address ?? undefined,
+        tenants: [{ name: tenant.name, email: tenant.email, phone: tenant.phone }],
+      }
+      const signers = tenant.email
+        ? [{ name: tenant.name, email: tenant.email }]
+        : []
+
+      if (!signers.length) {
+        setSigningError('Huurder heeft geen e-mailadres — voeg er eerst een toe.')
+        setSigningStatus('error')
+        return
+      }
+
+      const res = await fetch('/api/docusign/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractData, signers }),
+      })
+      const json = await res.json()
+
+      if (!res.ok) throw new Error(json.error ?? 'Versturen mislukt')
+
+      setEnvelopeId(json.envelopeId)
+      setSigningStatus('sent')
+    } catch (err) {
+      setSigningError(err instanceof Error ? err.message : 'Versturen mislukt')
+      setSigningStatus('error')
     }
   }
 
@@ -200,6 +251,81 @@ export function HuurovereenkomstDialog({
     'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
   const selectTrigger =
     'h-auto w-full p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
+
+  // ── Signing stap (na aanmaken) ─────────────────────────────────────────────
+  if (createdLease) {
+    return (
+      <CreateDialogShell
+        open={open}
+        onOpenChange={(v) => { if (!v) onClose() }}
+        title="Huurovereenkomst aangemaakt"
+        subtitle={`${createdLease.propertyName} · € ${createdLease.monthlyRent.toLocaleString('nl-NL')}/mnd`}
+        primaryLabel={signingStatus === 'sent' ? 'Sluiten' : signingStatus === 'sending' ? 'Versturen…' : 'Verstuur via DocuSign'}
+        onPrimary={signingStatus === 'sent' ? onClose : handleSendDocuSign}
+        primaryDisabled={signingStatus === 'sending'}
+        primaryLoading={signingStatus === 'sending'}
+        onBack={signingStatus === 'sent' ? undefined : onClose}
+      >
+        <div className="space-y-4">
+          {signingStatus === 'sent' ? (
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <div className="h-14 w-14 rounded-full bg-green-50 dark:bg-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="h-7 w-7 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Verstuurd!</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {tenant.name} ontvangt een e-mail van DocuSign om de huurovereenkomst te ondertekenen.
+                </p>
+                {envelopeId && (
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 font-mono">
+                    Envelope ID: {envelopeId}
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-2xl bg-gray-50 dark:bg-neutral-800/60 p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <PenLine className="h-4 w-4 text-gray-400 shrink-0" />
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Digitaal ondertekenen via DocuSign</p>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  De huurovereenkomst wordt als PDF gegenereerd en via DocuSign naar{' '}
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    {tenant.email ?? 'de huurder'}
+                  </span>{' '}
+                  verstuurd voor ondertekening.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-gray-100 dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-700">
+                {([
+                  ['Object', createdLease.propertyName],
+                  ['Huurprijs', `€ ${createdLease.monthlyRent.toLocaleString('nl-NL')} / mnd`],
+                  ['Startdatum', new Date(createdLease.startDate).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })],
+                  ['Huurder', tenant.name],
+                  ['E-mail', tenant.email ?? '—'],
+                ] as [string, string][]).map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between px-4 py-2.5">
+                    <span className="text-xs text-gray-400">{k}</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              {signingError && (
+                <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 px-3 py-2 rounded-xl">
+                  {signingError}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </CreateDialogShell>
+    )
+  }
 
   return (
     <CreateDialogShell

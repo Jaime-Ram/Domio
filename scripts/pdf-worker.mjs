@@ -189,10 +189,108 @@ function TestDocument() {
   ]})
 }
 
+// ─── Huurovereenkomst ─────────────────────────────────────────────────────────
+
+function Article({ nr, title, body }) {
+  return h(View, { style: [s.articleWrap, { marginBottom: 8 }] },
+    h(Text, { style: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: C.text, marginBottom: 2 } },
+      `Artikel ${nr} — ${title}`),
+    h(Text, { style: s.body }, body),
+  )
+}
+
+function HuurovereenkomstDocument({ data }) {
+  const ref = data.reference ?? `DOM-${Date.now().toString(36).toUpperCase()}`
+  const tenants = data.tenants ?? []
+  const tenantNames = tenants.map(t => t.name).join(' en ') || '_______________'
+  const rent = fmtCurrency(data.monthlyRent)
+  const deposit = data.deposit ? fmtCurrency(data.deposit) : null
+
+  return Shell({ docType: 'Huurovereenkomst', reference: ref, children: [
+    // Title block
+    h(View, { style: { marginBottom: 20 } },
+      h(Text, { style: s.h1 }, 'Huurovereenkomst'),
+      h(Text, { style: [s.muted, { marginTop: 3 }] }, data.propertyAddress || ''),
+    ),
+
+    // Partijen
+    Section({ title: 'Partijen', children: [
+      DataRow({ label: 'Verhuurder', value: data.landlordName || '_______________', alt: false }),
+      data.landlordAddress && DataRow({ label: 'Adres verhuurder', value: data.landlordAddress, alt: true }),
+      ...tenants.flatMap((t, i) => [
+        DataRow({ label: tenants.length > 1 ? `Huurder ${i + 1}` : 'Huurder', value: t.name, alt: i % 2 === 0 }),
+        t.email && DataRow({ label: 'E-mail huurder', value: t.email, alt: i % 2 !== 0 }),
+        t.phone && DataRow({ label: 'Telefoon huurder', value: t.phone, alt: i % 2 === 0 }),
+      ].filter(Boolean)),
+    ]}),
+
+    // Het gehuurde
+    Section({ title: 'Het gehuurde', children: [
+      DataRow({ label: 'Adres', value: data.propertyAddress, alt: false }),
+      data.propertyType && DataRow({ label: 'Type', value: data.propertyType, alt: true }),
+    ]}),
+
+    // Huurprijs en looptijd
+    Section({ title: 'Huurprijs en looptijd', children: [
+      DataRow({ label: 'Huurprijs per maand', value: rent, alt: false }),
+      deposit && DataRow({ label: 'Waarborgsom', value: deposit, alt: true }),
+      DataRow({ label: 'Ingangsdatum', value: fmtDate(data.startDate), alt: !!deposit }),
+      DataRow({ label: 'Einddatum', value: data.endDate ? fmtDate(data.endDate) : 'Onbepaalde tijd', alt: !deposit }),
+      DataRow({ label: 'Betalingstermijn', value: data.billingDay ? `Vóór de ${data.billingDay}e van elke maand` : 'Voor de 1e van elke maand', alt: true }),
+    ]}),
+
+    // Artikelen
+    Section({ title: 'Algemene voorwaarden', children: [
+      Article({ nr: 1, title: 'Bestemming',
+        body: `Het gehuurde is uitsluitend bestemd om te worden gebruikt als woonruimte door ${tenantNames}.` }),
+      Article({ nr: 2, title: 'Betaling',
+        body: `De huurprijs van ${rent} is bij vooruitbetaling verschuldigd, uiterlijk op de eerste dag van elke kalendermaand. Bij te late betaling is de huurder van rechtswege in verzuim.` }),
+      Article({ nr: 3, title: 'Waarborgsom',
+        body: deposit
+          ? `Bij aanvang van de huurovereenkomst betaalt de huurder een waarborgsom van ${deposit}. Deze wordt na correcte oplevering terugbetaald.`
+          : 'Er is geen waarborgsom overeengekomen.' }),
+      Article({ nr: 4, title: 'Onderhoud',
+        body: 'Klein onderhoud en kleine herstellingen (conform art. 7:240 BW) zijn voor rekening van de huurder. Groot onderhoud is voor rekening van de verhuurder.' }),
+      Article({ nr: 5, title: 'Opzegging',
+        body: 'Opzegging geschiedt schriftelijk met inachtneming van de wettelijke opzegtermijnen. Voor de huurder geldt een termijn van één maand, voor de verhuurder drie maanden, tenzij schriftelijk anders is overeengekomen.' }),
+      Article({ nr: 6, title: 'Toepasselijk recht',
+        body: 'Op deze overeenkomst is uitsluitend Nederlands recht van toepassing. Geschillen worden bij uitsluiting voorgelegd aan de bevoegde rechter in het arrondissement van het gehuurde.' }),
+    ]}),
+
+    // Handtekeningenblok
+    h(View, { style: { marginTop: 32 } },
+      h(Text, { style: [s.h2, { marginBottom: 16 }] }, 'Ondertekening'),
+      h(Text, { style: [s.body, { marginBottom: 20 }] },
+        `Aldus overeengekomen en in tweevoud ondertekend op ${fmtDate(new Date().toISOString())}.`),
+      h(View, { style: s.sigRow },
+        // Verhuurder
+        h(View, { style: s.sigBlock },
+          h(Text, { style: { fontSize: 8, color: C.gray, marginBottom: 4 } }, 'Verhuurder'),
+          h(Text, { style: [s.body, { marginBottom: 32 }] }, data.landlordName || '_______________'),
+          h(View, { style: s.sigLine },
+            h(Text, { style: { fontSize: 7, color: C.gray } }, 'Handtekening & datum'),
+          ),
+        ),
+        // Huurder(s)
+        ...tenants.map((t) =>
+          h(View, { style: s.sigBlock },
+            h(Text, { style: { fontSize: 8, color: C.gray, marginBottom: 4 } }, 'Huurder'),
+            h(Text, { style: [s.body, { marginBottom: 32 }] }, t.name),
+            h(View, { style: s.sigLine },
+              h(Text, { style: { fontSize: 7, color: C.gray } }, 'Handtekening & datum'),
+            ),
+          )
+        ),
+      ),
+    ),
+  ]})
+}
+
 // ─── Template registry ────────────────────────────────────────────────────────
 
 const templates = {
   test: (data) => TestDocument(data),
+  huurovereenkomst: (data) => HuurovereenkomstDocument({ data }),
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
