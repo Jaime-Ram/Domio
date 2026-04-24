@@ -41,6 +41,7 @@ import {
 import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { getUser } from '@/lib/supabase/auth'
+import { mockTenants, mockLeases, mockPayments } from '@/lib/mock-data/vastgoed'
 
 interface TenantDetailSheetProps {
   tenantId: string | null
@@ -187,6 +188,32 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     setActiveTab('tijdlijn')
     setEditError(null)
 
+    if (isDemo) {
+      const mockT = mockTenants.find(t => t.id === tenantId)
+      if (mockT) {
+        const mockL = mockLeases.find(l => l.tenant.id === tenantId)
+        const tenantData = {
+          full_name: mockT.name,
+          email: mockT.email,
+          phone: mockT.phone,
+          date_of_birth: null,
+        }
+        setTenant(tenantData)
+        initEditForm(tenantData)
+        if (mockL) {
+          setLeases([{
+            status: mockL.status,
+            monthly_rent: mockL.monthlyRent,
+            start_date: mockL.startDate,
+            deposit: mockL.deposit,
+            unit: { property: { name: mockL.property?.name ?? '—' } },
+          }])
+        }
+      }
+      setLoading(false)
+      return
+    }
+
     const load = async () => {
       try {
         const { user } = await getUser()
@@ -206,7 +233,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
       }
     }
     load()
-  }, [tenantId, open])
+  }, [tenantId, open, isDemo])
 
   const handleSave = async () => {
     setSaving(true); setEditError(null)
@@ -227,19 +254,27 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
   const activeLease = leases.find((l: any) => l.status === 'actief')
   const monthlyRent = activeLease?.monthly_rent ?? 1250
 
-  const paymentHistory = isDemo ? [
-    { id: '1', month: 'April 2026',    amount: monthlyRent, status: 'Betaald' },
-    { id: '2', month: 'Maart 2026',    amount: monthlyRent, status: 'Betaald' },
-    { id: '3', month: 'Februari 2026', amount: monthlyRent, status: 'Te laat' },
-    { id: '4', month: 'Januari 2026',  amount: monthlyRent, status: 'Betaald' },
-    { id: '5', month: 'December 2025', amount: monthlyRent, status: 'Openstaand' },
-  ] : []
+  const STATUS_MAP: Record<string, string> = { betaald: 'Betaald', openstaand: 'Openstaand', achterstallig: 'Te laat' }
+  const paymentHistory = isDemo && tenantId
+    ? mockPayments
+        .filter(p => p.tenantId === tenantId && p.type === 'huur')
+        .sort((a, b) => b.dueDate.localeCompare(a.dueDate))
+        .slice(0, 10)
+        .map(p => ({
+          id: p.id,
+          month: new Date(p.dueDate).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' }),
+          amount: p.amount,
+          status: STATUS_MAP[p.status] ?? p.status,
+        }))
+    : []
 
+  const activeLeaseMock = isDemo ? mockLeases.find(l => l.tenant.id === tenantId) : null
+  const leaseStart = activeLeaseMock?.startDate ?? '2025-01-01'
   const mockDocuments = isDemo ? [
-    { id: '1', name: 'Huurovereenkomst 2025',      category: 'Contract',   date: '2025-01-01' },
-    { id: '2', name: 'Borgovereenkomst',            category: 'Borg',       date: '2025-01-01' },
-    { id: '3', name: 'Kopie ID-bewijs',             category: 'Identificatie', date: '2025-01-03' },
-    { id: '4', name: 'Plaatsbeschrijving intrede',  category: 'Inspectie',  date: '2025-01-05' },
+    { id: '1', name: 'Huurovereenkomst', category: 'Contract', date: leaseStart },
+    { id: '2', name: 'Borgovereenkomst', category: 'Borg', date: leaseStart },
+    { id: '3', name: 'Kopie ID-bewijs', category: 'Identificatie', date: new Date(new Date(leaseStart).getTime() + 2 * 86400_000).toISOString().slice(0, 10) },
+    { id: '4', name: 'Plaatsbeschrijving intrede', category: 'Inspectie', date: new Date(new Date(leaseStart).getTime() + 4 * 86400_000).toISOString().slice(0, 10) },
   ] : []
 
   const timelineEvents = isDemo
