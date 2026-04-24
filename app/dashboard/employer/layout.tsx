@@ -175,11 +175,11 @@ function EmployerLayoutInner({
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
-                'mx-auto max-w-7xl px-8 sm:px-12 lg:pl-12 lg:pr-16 pb-10 flex flex-col gap-content-blocks h-full min-h-0',
+                'mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 pb-10 flex flex-col gap-content-blocks h-full min-h-0',
                 isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
               )}
             >
-              <div className={cn('flex min-h-0 flex-1 flex-col gap-content-blocks', DASHBOARD_PAGE_GUTTER_CLASS)}>
+              <div className="flex min-h-0 flex-1 flex-col gap-content-blocks">
                 {children}
               </div>
               {!isChatShell && (

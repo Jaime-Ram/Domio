@@ -1,28 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  dashboardCardClass,
-  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
-  DASHBOARD_TABLE_ICON_WRAP_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
-  DASHBOARD_FILTER_MENU_CONTENT_CLASS,
-  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/employer/dashboard-ui'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
 import { DocumentTypeGlyph } from '@/components/documents/document-type-icon'
 import { LocalPdfThumbnail } from '@/components/documents/local-pdf-thumbnail'
@@ -31,7 +11,7 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
-import { Search, Filter, Grid3x3, Table2, Plus, Eye, Download, Trash2, Upload, X } from 'lucide-react'
+import { Eye, Download, Trash2, Upload, X, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -41,18 +21,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 
 const DOC_TYPES = ['Contract', 'Keuring', 'Factuur', 'Verzekering', 'Overig'] as const
-type SortKey = 'name' | 'type' | 'date'
+type SortKey = 'name' | 'type' | 'date' | 'property'
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -77,6 +55,7 @@ export default function DocumentsPage() {
   const [uploadError, setUploadError] = useState<string | null>(null)
   /** Bestanden gekozen in de popup; pas na bevestiging uploaden. */
   const [stagedUploadFiles, setStagedUploadFiles] = useState<File[]>([])
+  const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortAsc, setSortAsc] = useState(false)
@@ -87,6 +66,7 @@ export default function DocumentsPage() {
     Verzekering: true,
     Overig: true,
   })
+  const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [selectionMode, setSelectionMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   /** Documenten waar nu een bulk-download of -verwijdering op bezig is (per id spinner op de kaart). */
@@ -150,9 +130,30 @@ export default function DocumentsPage() {
     return () => cancelAnimationFrame(id)
   }, [selectionMode, selectedIds.length])
 
+  const uniqueProperties = useMemo(() => {
+    const names = documents.map((doc: any) => {
+      const prop = doc.property ?? doc.properties
+      return prop?.address ?? prop?.name ?? null
+    }).filter(Boolean) as string[]
+    return [...new Set(names)].sort()
+  }, [documents])
+
   const filteredDocuments = useMemo(() => {
-    return documents.filter((doc: any) => typeFilter[doc.type] !== false)
-  }, [documents, typeFilter])
+    return documents.filter((doc: any) => {
+      if (typeFilter[doc.type] === false) return false
+      const prop = doc.property ?? doc.properties
+      const address = prop?.address ?? prop?.name ?? null
+      if (address && propertyFilter[address] === false) return false
+      if (search) {
+        const q = search.toLowerCase()
+        const name = (doc.name ?? doc.file_name ?? '').toLowerCase()
+        const type = (doc.type ?? '').toLowerCase()
+        const addr = (address ?? '').toLowerCase()
+        if (!name.includes(q) && !type.includes(q) && !addr.includes(q)) return false
+      }
+      return true
+    })
+  }, [documents, typeFilter, propertyFilter, search])
 
   const sortedDocuments = useMemo(() => {
     const list = [...filteredDocuments]
@@ -162,6 +163,10 @@ export default function DocumentsPage() {
         cmp = (a.name || '').localeCompare(b.name || '')
       } else if (sortKey === 'type') {
         cmp = (a.type || '').localeCompare(b.type || '')
+      } else if (sortKey === 'property') {
+        const pa = (a.property ?? a.properties)?.address ?? ''
+        const pb = (b.property ?? b.properties)?.address ?? ''
+        cmp = pa.localeCompare(pb)
       } else {
         const da = new Date(a.created_at || 0).getTime()
         const db = new Date(b.created_at || 0).getTime()
@@ -421,111 +426,88 @@ export default function DocumentsPage() {
     return sortAsc ? ' ↑' : ' ↓'
   }
 
-  const tableBleedDocuments = viewMode === 'table'
-
   return (
     <>
-      <Card ref={contentRef} className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
-        <CardHeader
-          className={cn(
-            'space-y-3',
-            tableBleedDocuments && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS
-          )}
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3 w-full min-w-0">
-              {mounted ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      id="documents-filter-trigger"
-                      type="button"
-                      variant="outline"
-                      className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
-                    >
-                      <Filter className="h-4 w-4 md:mr-1.5" />
-                      <span className="hidden md:inline">Filter</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    sideOffset={8}
-                    className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}
+      <div ref={contentRef}>
+        {/* Hidden file input */}
+        {!isDemo && (
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            accept=".pdf,.doc,.docx,.txt,.csv,image/jpeg,image/png,image/webp"
+            onChange={handleFileChange}
+          />
+        )}
+        <TableToolbar
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Zoek document, type, adres…"
+          filterContent={mounted ? (
+            <>
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                Type
+              </DropdownMenuLabel>
+              <div className="space-y-1">
+                {DOC_TYPES.map((t) => (
+                  <DropdownMenuCheckboxItem
+                    key={t}
+                    checked={typeFilter[t] !== false}
+                    onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
+                    onSelect={(e) => e.preventDefault()}
+                    className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                   >
-                    <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                      Type
-                    </DropdownMenuLabel>
-                    <div className="space-y-1">
-                      {DOC_TYPES.map((t) => (
-                        <DropdownMenuCheckboxItem
-                          key={t}
-                          checked={typeFilter[t] !== false}
-                          onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
-                          onSelect={(e) => e.preventDefault()}
-                          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
-                        >
-                          {t}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="inline-flex h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 md:px-4 items-center gap-1.5 min-w-[4.5rem]" aria-hidden />
-              )}
-              {/* Selecteer voor bulkacties */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={toggleSelectionMode}
-                disabled={bulkBusy}
-                className={cn(
-                  'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
-                  selectionMode
-                    ? 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/60 hover:bg-red-50 dark:hover:bg-red-950/40'
-                    : 'text-gray-700 dark:text-gray-200'
-                )}
-              >
-                {selectionMode ? 'Annuleer' : 'Selecteer'}
-              </Button>
-              <div className={cn('flex flex-wrap items-center gap-3', !previewDocId && 'lg:ml-auto')}>
-              <Button
-                id="documents-view-mode-trigger"
-                type="button"
-                variant="outline"
-                size="icon"
-                className={cn(
-                  'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
-                  'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
-                )}
-                onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-                aria-label={viewMode === 'grid' ? 'Toon als tabel' : 'Toon als raster'}
-              >
-                {viewMode === 'grid' ? (
-                  <Table2 className="h-4 w-4" />
-                ) : (
-                  <Grid3x3 className="h-4 w-4" />
-                )}
-              </Button>
-              {!isDemo && (
+                    {t}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+              {uniqueProperties.length > 0 && (
                 <>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.txt,.csv,image/jpeg,image/png,image/webp"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleUploadClick}
-                    disabled={uploading}
-                    className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    {uploading ? 'Bezig…' : 'Document uploaden'}
-                  </Button>
+                  <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Object
+                  </DropdownMenuLabel>
+                  <div className="space-y-1">
+                    {uniqueProperties.map((prop) => (
+                      <DropdownMenuCheckboxItem
+                        key={prop}
+                        checked={propertyFilter[prop] !== false}
+                        onCheckedChange={(v) => setPropertyFilter((f) => ({ ...f, [prop]: Boolean(v) }))}
+                        onSelect={(e) => e.preventDefault()}
+                        className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+                      >
+                        <span className="truncate max-w-[160px]">{prop}</span>
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          ) : undefined}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onAdd={!isDemo ? handleUploadClick : undefined}
+          addLabel={uploading ? 'Bezig…' : 'Document uploaden'}
+          addDisabled={uploading}
+          extra={
+            <Button
+              type="button"
+              variant="outline"
+              onClick={toggleSelectionMode}
+              disabled={bulkBusy}
+              className={cn(
+                'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
+                selectionMode
+                  ? 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/60 hover:bg-red-50 dark:hover:bg-red-950/40'
+                  : 'text-gray-700 dark:text-gray-200'
+              )}
+            >
+              {selectionMode ? 'Annuleer' : 'Selecteer'}
+            </Button>
+          }
+        />
+        {!isDemo && (
+          <>
                   <Dialog
                     open={uploadDialogOpen}
                     onOpenChange={(open) => {
@@ -685,118 +667,79 @@ export default function DocumentsPage() {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                </>
-              )}
+          </>
+        )}
+        {viewMode === 'table' ? (
+            <div className="rounded-2xl overflow-hidden mt-8">
+              {/* Column headers */}
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-left" onClick={() => toggleSort('name')}>
+                  Naam {getSortIcon('name')}
+                </button>
+                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('type')}>
+                  Type {getSortIcon('type')}
+                </button>
+                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('date')}>
+                  Datum {getSortIcon('date')}
+                </button>
+                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('property')}>
+                  Pand {getSortIcon('property')}
+                </button>
+                <span />
+              </div>
+              {/* Rows */}
+              <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+                {sortedDocuments.map((doc) => {
+                  const cardDoc = toCardDoc(doc)
+                  const prop = doc.property ?? doc.properties
+                  const address = prop?.address ?? null
+                  const created = doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'
+                  return (
+                    <div
+                      key={doc.id}
+                      className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                          <DocumentTypeGlyph
+                            name={cardDoc.name}
+                            file_name={cardDoc.file_name}
+                            mime_type={cardDoc.mime_type}
+                            className="h-4 w-4 text-gray-600 dark:text-gray-300"
+                          />
+                        </div>
+                        <span className="font-medium text-gray-900 dark:text-white truncate">{cardDoc.name}</span>
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 truncate">{cardDoc.type}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{created}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 truncate">{address || '—'}</span>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870]"
+                          onClick={() => handleView(doc)}
+                          aria-label="Bekijken"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => handleDownload(doc)}
+                          aria-label="Download"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent
-          className={cn(
-            tableBleedDocuments && 'p-0 px-0 pb-0',
-            tableBleedDocuments && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
-          )}
-        >
-          {viewMode === 'table' ? (
-            <DashboardTableBlock empty={sortedDocuments.length === 0}>
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('name')}>
-                        Naam {getSortIcon('name')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('type')}>
-                        Type {getSortIcon('type')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('date')}>
-                        Datum {getSortIcon('date')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      Pand
-                    </TableHead>
-                    <TableHead
-                      className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-px pr-4 text-right')}
-                    >
-                      Acties
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedDocuments.map((doc) => {
-                    const cardDoc = toCardDoc(doc)
-                    const prop = doc.property ?? doc.properties
-                    const address = prop?.address ?? null
-                    const created = doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'
-                    return (
-                      <TableRow
-                        key={doc.id}
-                        className="hover:bg-gray-50 dark:hover:bg-neutral-800"
-                      >
-                        <TableCell className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={cn(
-                                'h-10 w-10 rounded-lg',
-                                DASHBOARD_TABLE_ICON_WRAP_CLASS
-                              )}
-                            >
-                              <DocumentTypeGlyph
-                                name={cardDoc.name}
-                                file_name={cardDoc.file_name}
-                                mime_type={cardDoc.mime_type}
-                                className="h-5 w-5 text-[#163300] dark:text-[#9FE870]"
-                              />
-                            </div>
-                            <span className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
-                              {cardDoc.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                          {cardDoc.type}
-                        </TableCell>
-                        <TableCell className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                          {created}
-                        </TableCell>
-                        <TableCell className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400 truncate max-w-[140px]">
-                          {address || '—'}
-                        </TableCell>
-                        <TableCell className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870]"
-                              onClick={() => handleView(doc)}
-                              aria-label="Bekijken"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 rounded-full"
-                              onClick={() => handleDownload(doc)}
-                              aria-label="Download"
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </DashboardTableBlock>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -861,8 +804,7 @@ export default function DocumentsPage() {
               )}
             </>
           )}
-        </CardContent>
-      </Card>
+      </div>
     </>
   )
 }

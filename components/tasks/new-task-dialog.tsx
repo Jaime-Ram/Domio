@@ -2,15 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import {
   ADD_DIALOG_BODY_CLASS,
-  ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
-  ADD_DIALOG_HEADER_CLASS,
-  ADD_DIALOG_TITLE_CLASS,
-  addDialogContentClassName,
+  CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -127,113 +120,96 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
   const selectTrigger = 'h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
 
   return (
-    <Dialog open={open} onOpenChange={v => { if (!v) onClose() }}>
-      <DialogContent
-        className={addDialogContentClassName('max-w-md')}
-        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
-      >
+    <CreateDialogShell
+      open={open}
+      onOpenChange={v => { if (!v) onClose() }}
+      title="Nieuwe taak"
+      subtitle="Vul de basisgegevens in. Details stel je na aanmaken in."
+      primaryLabel="Aanmaken"
+      onPrimary={handleCreate}
+      primaryDisabled={saving || !form.title.trim()}
+      primaryLoading={saving}
+    >
+      <div className={ADD_DIALOG_BODY_CLASS}>
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">{error}</p>
+        )}
 
-        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
-          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe taak</DialogTitle>
-        </DialogHeader>
+        {/* Title */}
+        <div className={tile}>
+          <p className={label}>Titel *</p>
+          <input
+            autoFocus
+            value={form.title}
+            onChange={e => set('title', e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleCreate()}
+            placeholder="Bijv. CV-ketel inspecteren"
+            className={inputCls}
+          />
+        </div>
 
-        <div className={ADD_DIALOG_BODY_CLASS}>
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">{error}</p>
-          )}
-
-          {/* Title */}
+        {/* Categorie + Herinnering */}
+        <div className="grid grid-cols-2 gap-3">
           <div className={tile}>
-            <p className={label}>Titel *</p>
-            <input
-              autoFocus
-              value={form.title}
-              onChange={e => set('title', e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleCreate()}
-              placeholder="Bijv. CV-ketel inspecteren"
-              className={inputCls}
-            />
-          </div>
-
-          {/* Categorie + Herinnering */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className={tile}>
-              <p className={label}><Tag className="inline h-3 w-3 mr-1" />Categorie</p>
-              <Select value={form.category} onValueChange={v => set('category', v)}>
-                <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className={tile}>
-              <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
-              <WiseDatePicker
-                value={form.notification_date}
-                onChange={v => set('notification_date', v)}
-                placeholder="Optioneel"
-                className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Einddatum + Prioriteit */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className={tile}>
-              <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
-              <WiseDatePicker
-                value={form.due_date}
-                onChange={v => set('due_date', v)}
-                placeholder="Kies datum"
-                className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
-              />
-            </div>
-            <div className={tile}>
-              <p className={label}><Zap className="inline h-3 w-3 mr-1" />Prioriteit</p>
-              <Select value={form.priority} onValueChange={v => set('priority', v)}>
-                <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {PRIORITIES.map(p => (
-                    <SelectItem key={p.value} value={p.value}>
-                      <span className="flex items-center gap-2">
-                        <span className={cn('h-2 w-2 rounded-full shrink-0', p.dot)} />{p.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Gekoppeld pand */}
-          <div className={tile}>
-            <p className={label}><Link2 className="inline h-3 w-3 mr-1" />Gekoppeld pand</p>
-            <Select value={form.property_id || 'geen'} onValueChange={v => set('property_id', v === 'geen' ? '' : v)}>
-              <SelectTrigger className={selectTrigger}><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
+            <p className={label}><Tag className="inline h-3 w-3 mr-1" />Categorie</p>
+            <Select value={form.category} onValueChange={v => set('category', v)}>
+              <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="geen">Geen koppeling</SelectItem>
-                {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
-          <p className="text-[11px] text-gray-400 dark:text-gray-500 pb-1">
-            Details zoals beschrijving en herhaling kun je na aanmaken instellen.
-          </p>
+          <div className={tile}>
+            <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
+            <WiseDatePicker
+              value={form.notification_date}
+              onChange={v => set('notification_date', v)}
+              placeholder="Optioneel"
+              className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+            />
+          </div>
         </div>
 
-        <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-          <button
-            type="button"
-            onClick={handleCreate}
-            disabled={saving || !form.title.trim()}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 transition-colors"
-          >
-            <Check className="h-4 w-4 shrink-0" />
-            {saving ? 'Aanmaken…' : 'Aanmaken'}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        {/* Einddatum + Prioriteit */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className={tile}>
+            <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
+            <WiseDatePicker
+              value={form.due_date}
+              onChange={v => set('due_date', v)}
+              placeholder="Kies datum"
+              className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
+            />
+          </div>
+          <div className={tile}>
+            <p className={label}><Zap className="inline h-3 w-3 mr-1" />Prioriteit</p>
+            <Select value={form.priority} onValueChange={v => set('priority', v)}>
+              <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {PRIORITIES.map(p => (
+                  <SelectItem key={p.value} value={p.value}>
+                    <span className="flex items-center gap-2">
+                      <span className={cn('h-2 w-2 rounded-full shrink-0', p.dot)} />{p.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Gekoppeld pand */}
+        <div className={tile}>
+          <p className={label}><Link2 className="inline h-3 w-3 mr-1" />Gekoppeld pand</p>
+          <Select value={form.property_id || 'geen'} onValueChange={v => set('property_id', v === 'geen' ? '' : v)}>
+            <SelectTrigger className={selectTrigger}><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="geen">Geen koppeling</SelectItem>
+              {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </CreateDialogShell>
   )
 }

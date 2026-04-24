@@ -1,21 +1,10 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
-  ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
-  ADD_DIALOG_HEADER_CLASS,
-  ADD_DIALOG_TITLE_CLASS,
-  addDialogContentClassName,
+  CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
 import { Building2, Check, MapPin, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -96,17 +85,17 @@ export function AssignPropertiesDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={addDialogContentClassName('max-w-md')}
-        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
-      >
-        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
-          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
-            Indelen in {portfolioName}
-          </DialogTitle>
-        </DialogHeader>
-
+    <CreateDialogShell
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`Indelen in ${portfolioName}`}
+      subtitle="Selecteer de objecten die je wilt toevoegen aan deze portefeuille."
+      primaryLabel={selected.size > 0 ? `${selected.size} object${selected.size !== 1 ? 'en' : ''} indelen` : 'Indelen'}
+      onPrimary={handleConfirm}
+      primaryDisabled={saving || selected.size === 0}
+      primaryLoading={saving}
+      scrollBody
+    >
         <div className={cn(ADD_DIALOG_BODY_SCROLL_CLASS, 'space-y-3')}>
           {properties.length === 0 ? (
             <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center">
@@ -183,23 +172,6 @@ export function AssignPropertiesDialog({
             </>
           )}
         </div>
-
-        <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={saving || selected.size === 0}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 transition-colors"
-          >
-            <Check className="h-4 w-4 shrink-0" />
-            {saving
-              ? 'Bezig…'
-              : selected.size > 0
-              ? `${selected.size} object${selected.size !== 1 ? 'en' : ''} indelen`
-              : 'Indelen'}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </CreateDialogShell>
   )
 }

@@ -14,8 +14,8 @@ export function AddTaskTile({ onClick, className }: { onClick: () => void; class
       onClick={onClick}
       className={cn(
         'group w-full text-left',
-        'rounded-3xl border-0 shadow-none',
-        'min-h-[160px] h-full',
+        'rounded-2xl',
+        'min-h-[110px] h-full',
         DASHBOARD_SURFACE_PADDING,
         'flex flex-col justify-between',
         'bg-[#9FE870] dark:bg-[#9FE870]',

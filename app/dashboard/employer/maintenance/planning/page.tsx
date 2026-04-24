@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   ADD_DIALOG_BODY_CLASS,
   ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_FOOTER_SPLIT_CLASS,
   ADD_DIALOG_HEADER_CLASS,
   ADD_DIALOG_TITLE_CLASS,
   addDialogContentClassName,
@@ -199,7 +199,7 @@ export default function PlanningPage() {
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent
-          className={addDialogContentClassName('sm:max-w-md')}
+          className={addDialogContentClassName()}
           closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
         >
           <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
@@ -257,15 +257,19 @@ export default function PlanningPage() {
               <Textarea rows={2} placeholder="Extra context..." value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="rounded-xl resize-none" />
             </div>
           </div>
-          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-            <Button
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
-              disabled={!newTitle.trim() || !newPropertyId}
-              onClick={handleCreate}
-            >
-              <Calendar className="h-4 w-4 shrink-0" />
-              Inplannen
-            </Button>
+          <DialogFooter className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+            <span />
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
+              <Button
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+                disabled={!newTitle.trim() || !newPropertyId}
+                onClick={handleCreate}
+              >
+                <Calendar className="h-4 w-4 shrink-0" />
+                Inplannen
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

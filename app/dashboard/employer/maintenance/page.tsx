@@ -19,19 +19,11 @@ import {
 import {
   ADD_DIALOG_BODY_CLASS,
   ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_FOOTER_SPLIT_CLASS,
   ADD_DIALOG_HEADER_CLASS,
   ADD_DIALOG_TITLE_CLASS,
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -67,28 +59,18 @@ import {
   Ban,
   ChevronRight,
 } from 'lucide-react'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet'
+import { DetailShell } from '@/components/ui/detail-shell'
 import { mockMaintenanceRequests } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import {
   dashboardCardClass,
-  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_TABLE_ICON_WRAP_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
   DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { ticketQueries } from '@/lib/supabase/queries'
 import { cn } from '@/lib/utils'
@@ -408,121 +390,109 @@ export default function MaintenancePage() {
     </div>
   )
 
-  const tableBleedTickets = !loading && viewMode === 'table'
-
   return (
     <>
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
-      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
-        <CardHeader
-          className={cn(
-            'space-y-3',
-            tableBleedTickets && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS
-          )}
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <CardTitle className="text-lg text-[#163300] dark:text-[#9FE870]">Tickets</CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {filteredTickets.length} van {tickets.length} ticket{tickets.length === 1 ? '' : 's'}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto min-w-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
-                  >
-                    <Filter className="h-4 w-4 md:mr-1.5" />
-                    <span className="hidden md:inline">Filter</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  sideOffset={8}
-                  className={cn(
-                    DASHBOARD_FILTER_MENU_CONTENT_CLASS,
-                    'max-h-[min(70vh,420px)] overflow-y-auto'
-                  )}
-                >
-                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Status
-                  </DropdownMenuLabel>
-                  <div className="space-y-1 pb-2">
-                    {STATUS_KEYS.map((key) => (
-                      <DropdownMenuCheckboxItem
-                        key={key}
-                        checked={statusFilter[key] !== false}
-                        onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [key]: Boolean(v) }))}
-                        onSelect={(e) => e.preventDefault()}
-                        className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
-                      >
-                        {key.replace(/_/g, ' ')}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </div>
-                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Prioriteit
-                  </DropdownMenuLabel>
-                  <div className="space-y-1">
-                    {PRIORITY_KEYS.map((key) => (
-                      <DropdownMenuCheckboxItem
-                        key={key}
-                        checked={priorityFilter[key] !== false}
-                        onCheckedChange={(v) => setPriorityFilter((f) => ({ ...f, [key]: Boolean(v) }))}
-                        onSelect={(e) => e.preventDefault()}
-                        className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
-                      >
-                        {key === 'urgent' ? 'Spoed' : key}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+      {/* Toolbar — no Card wrapper */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">Tickets</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {filteredTickets.length} van {tickets.length} ticket{tickets.length === 1 ? '' : 's'}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto min-w-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 type="button"
                 variant="outline"
-                size="icon"
-                className={cn(
-                  'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
-                  'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
-                )}
-                onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
-                aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
+                className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
               >
-                {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
+                <Filter className="h-4 w-4 md:mr-1.5" />
+                <span className="hidden md:inline">Filter</span>
               </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  resetCreateForm()
-                  setCreateOpen(true)
-                }}
-                className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nieuw ticket
-              </Button>
-            </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={8}
+              className={cn(
+                DASHBOARD_FILTER_MENU_CONTENT_CLASS,
+                'max-h-[min(70vh,420px)] overflow-y-auto'
+              )}
+            >
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                Status
+              </DropdownMenuLabel>
+              <div className="space-y-1 pb-2">
+                {STATUS_KEYS.map((key) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={statusFilter[key] !== false}
+                    onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                    onSelect={(e) => e.preventDefault()}
+                    className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
+                  >
+                    {key.replace(/_/g, ' ')}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                Prioriteit
+              </DropdownMenuLabel>
+              <div className="space-y-1">
+                {PRIORITY_KEYS.map((key) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={priorityFilter[key] !== false}
+                    onCheckedChange={(v) => setPriorityFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                    onSelect={(e) => e.preventDefault()}
+                    className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
+                  >
+                    {key === 'urgent' ? 'Spoed' : key}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className={cn(
+              'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
+              'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
+            )}
+            onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
+            aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
+          >
+            {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              resetCreateForm()
+              setCreateOpen(true)
+            }}
+            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nieuw ticket
+          </Button>
+        </div>
+      </div>
+
+      {/* List — ActionList style */}
+      <div className="rounded-2xl overflow-hidden">
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-36 bg-gray-200 dark:bg-neutral-700 rounded-block animate-pulse" />
+            ))}
           </div>
-        </CardHeader>
-        <CardContent
-          className={cn(
-            tableBleedTickets && 'p-0 px-0 pb-0',
-            tableBleedTickets && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
-          )}
-        >
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-36 bg-gray-200 dark:bg-neutral-700 rounded-block animate-pulse" />
-              ))}
-            </div>
-          ) : viewMode === 'grid' ? (
-            sortedTickets.length === 0 ? null : (
+        ) : viewMode === 'grid' ? (
+          sortedTickets.length === 0 ? null : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {sortedTickets.map((t) => (
                 <Card
@@ -562,89 +532,64 @@ export default function MaintenancePage() {
                 </Card>
               ))}
             </div>
-            )
-          ) : (
-            <DashboardTableBlock empty={sortedTickets.length === 0}>
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('title')}>
-                        <span>Titel</span>
-                        {getSortIcon('title')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
-                        <span>Status</span>
-                        {getSortIcon('status')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('priority')}>
-                        <span>Prioriteit</span>
-                        {getSortIcon('priority')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1"
-                        onClick={() => toggleSort('created_at')}
-                      >
-                        <span>Aangemaakt</span>
-                        {getSortIcon('created_at')}
-                      </button>
-                    </TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>
-                      Acties
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedTickets.map((t) => (
-                      <TableRow
-                        key={t.id}
-                        className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer"
-                        onClick={() => openDetail(t.id)}
-                      >
-                        <TableCell className="py-4 px-4">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div
-                              className={cn(
-                                'relative h-10 w-10 rounded-lg overflow-hidden',
-                                DASHBOARD_TABLE_ICON_WRAP_CLASS
-                              )}
-                            >
-                              <Ticket className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-medium text-gray-900 dark:text-white line-clamp-2">{t.title}</div>
-                              {t.unitLabel ? (
-                                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5 truncate">
-                                  <MapPin className="h-3 w-3 shrink-0" />
-                                  <span className="truncate">{t.unitLabel}</span>
-                                </div>
-                              ) : null}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-4 align-middle">{getStatusBadge(t.status)}</TableCell>
-                        <TableCell className="py-4 px-4 align-middle">{getPriorityBadge(t.priority)}</TableCell>
-                        <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white whitespace-nowrap">
-                          {format(new Date(t.created_at), 'd MMM yyyy', { locale: nl })}
-                        </TableCell>
-                        <TableCell className="py-4 px-4 text-right align-middle" onClick={(e) => e.stopPropagation()}>
-                          {renderActions(t, 'inline')}
-                        </TableCell>
-                      </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DashboardTableBlock>
-          )}
-        </CardContent>
-      </Card>
+          )
+        ) : sortedTickets.length === 0 ? (
+          <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen tickets gevonden.</div>
+        ) : (
+          <>
+            {/* Column headers */}
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+              <button type="button" onClick={() => toggleSort('title')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-left">
+                Titel {getSortIcon('title')}
+              </button>
+              <button type="button" onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                Status {getSortIcon('status')}
+              </button>
+              <button type="button" onClick={() => toggleSort('priority')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                Prioriteit {getSortIcon('priority')}
+              </button>
+              <button type="button" onClick={() => toggleSort('created_at')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                Aangemaakt {getSortIcon('created_at')}
+              </button>
+              <span className="text-sm font-medium text-gray-400 dark:text-gray-500 text-right">Acties</span>
+            </div>
+
+            <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+              {sortedTickets.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => openDetail(t.id)}
+                  className="w-full grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left rounded-xl"
+                >
+                  {/* Title + location */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                      <Ticket className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{t.title}</p>
+                      {t.unitLabel ? (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1">
+                          <MapPin className="h-3 w-3 shrink-0" />{t.unitLabel}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div>{getStatusBadge(t.status)}</div>
+                  <div>{getPriorityBadge(t.priority)}</div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    {format(new Date(t.created_at), 'd MMM yyyy', { locale: nl })}
+                  </p>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    {renderActions(t, 'inline')}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
       <Dialog
         open={createOpen}
@@ -654,7 +599,7 @@ export default function MaintenancePage() {
         }}
       >
         <DialogContent
-          className={addDialogContentClassName('sm:max-w-md')}
+          className={addDialogContentClassName()}
           closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
         >
           <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
@@ -700,115 +645,30 @@ export default function MaintenancePage() {
               </Select>
             </div>
           </div>
-          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-            <Button
-              type="button"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
-              disabled={!newTitle.trim() || creating || (!isDemo && !user?.id)}
-              onClick={handleCreateTicket}
-            >
-              {creating ? 'Aanmaken…' : 'Ticket aanmaken'}
-            </Button>
+          <DialogFooter className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+            <span />
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
+              <Button
+                type="button"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+                disabled={!newTitle.trim() || creating || (!isDemo && !user?.id)}
+                onClick={handleCreateTicket}
+              >
+                {creating ? 'Aanmaken…' : 'Ticket aanmaken'}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Ticket detail panel */}
-      <Sheet open={!!detailTicket} onOpenChange={(open) => { if (!open) closeDetail() }}>
-        <SheetContent side="right" className="flex flex-col w-full max-w-lg overflow-y-auto">
-          {detailTicket && (
-            <>
-              <SheetHeader className="border-b border-gray-100 dark:border-neutral-800 pb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="h-9 w-9 rounded-lg bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-                    <Ticket className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                  </div>
-                  <SheetTitle className="text-base">{detailTicket.title}</SheetTitle>
-                </div>
-                {detailTicket.unitLabel && (
-                  <SheetDescription className="flex items-center gap-1 text-xs mt-1">
-                    <MapPin className="h-3 w-3" />{detailTicket.unitLabel}
-                  </SheetDescription>
-                )}
-              </SheetHeader>
-
-              <div className="flex-1 px-6 py-5 space-y-6">
-                {/* Status & prioriteit */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</p>
-                    <Select
-                      value={detailTicket.status}
-                      onValueChange={(v) => handleStatusChange(detailTicket.id, v)}
-                      disabled={updatingStatus}
-                    >
-                      <SelectTrigger className="rounded-xl h-9 text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="in_behandeling">In behandeling</SelectItem>
-                        <SelectItem value="gepland">Gepland</SelectItem>
-                        <SelectItem value="afgerond">Afgerond</SelectItem>
-                        <SelectItem value="geannuleerd">Geannuleerd</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Prioriteit</p>
-                    <div className="mt-1">{getPriorityBadge(detailTicket.priority)}</div>
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="space-y-3">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Details</p>
-                  <div className="rounded-xl border border-gray-100 dark:border-neutral-800 divide-y divide-gray-50 dark:divide-neutral-800">
-                    {[
-                      { label: 'Aangemaakt', value: format(new Date(detailTicket.created_at), 'd MMMM yyyy', { locale: nl }) },
-                      { label: 'Ticket ID', value: `#${detailTicket.id.slice(0, 8)}` },
-                      ...(detailTicket.unitLabel ? [{ label: 'Eenheid', value: detailTicket.unitLabel }] : []),
-                    ].map((row) => (
-                      <div key={row.label} className="flex items-center justify-between px-4 py-2.5">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{row.label}</span>
-                        <span className="text-xs font-medium text-gray-900 dark:text-white">{row.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Acties */}
-                <div className="space-y-2 pt-2">
-                  <Button
-                    type="button"
-                    className="w-full rounded-xl bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] gap-2"
-                    onClick={() => {
-                      closeDetail()
-                      router.push(`${basePath}/messages?ticket=${detailTicket.id}`)
-                    }}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    Open chat over dit ticket
-                    <ChevronRight className="h-4 w-4 ml-auto" />
-                  </Button>
-                  {detailTicket.status !== 'afgerond' && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full rounded-xl gap-2"
-                      disabled={updatingStatus}
-                      onClick={() => handleStatusChange(detailTicket.id, 'afgerond')}
-                    >
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      Markeer als afgerond
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
+      <DetailShell
+        open={!!detailTicket}
+        onClose={closeDetail}
+        title={detailTicket?.title ?? 'Ticket'}
+        subtitle={detailTicket?.unitLabel ?? undefined}
+      />
     </>
   )
 }

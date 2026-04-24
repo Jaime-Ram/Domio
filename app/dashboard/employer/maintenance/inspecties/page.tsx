@@ -1,9 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { dashboardCardClass, DASHBOARD_TABLE_HEAD_SHADCN_CLASS, DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS, DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS } from '@/app/dashboard/employer/dashboard-ui'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -11,21 +8,18 @@ import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import {
   ADD_DIALOG_BODY_CLASS,
   ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
+  ADD_DIALOG_FOOTER_SPLIT_CLASS,
   ADD_DIALOG_HEADER_CLASS,
   ADD_DIALOG_TITLE_CLASS,
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
 import {
   ClipboardCheck, Calendar, Ticket, Plus, Search,
-  CheckCircle2, Clock, AlertTriangle, MapPin, Camera,
+  CheckCircle2, Clock, AlertTriangle, MapPin, Camera, ChevronRight,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
@@ -118,8 +112,6 @@ export default function InspectiesPage() {
     setNewPropertyId(''); setNewType('tussentijds'); setNewDate(''); setNewInspector(''); setNewNotes('')
   }
 
-  const tableBleed = filtered.length > 0
-
   return (
     <>
       <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
@@ -131,72 +123,70 @@ export default function InspectiesPage() {
         <MetricCard label="Uitgesteld" value={String(uitgesteldCount)} icon={<AlertTriangle />} />
       </div>
 
-      {/* Table */}
-      <Card className={cn(dashboardCardClass(), 'overflow-hidden')}>
-        <CardHeader className={cn('space-y-3', tableBleed && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <CardTitle className="text-lg text-[#163300] dark:text-[#9FE870]">Inspecties</CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{filtered.length} inspecties</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:w-[200px]">
-                <Search className="h-4 w-4 text-gray-400 shrink-0" />
-                <Input placeholder="Zoek adres..." value={search} onChange={(e) => setSearch(e.target.value)}
-                  className="border-0 focus-visible:ring-0 h-8 px-2 text-sm bg-transparent" />
-              </div>
-              <Button onClick={() => setCreateOpen(true)}
-                className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0">
-                <Plus className="h-4 w-4 mr-2" />
-                Nieuwe inspectie
-              </Button>
-            </div>
+      {/* Toolbar — no Card wrapper */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">Inspecties</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{filtered.length} inspecties</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:w-[200px]">
+            <Search className="h-4 w-4 text-gray-400 shrink-0" />
+            <Input placeholder="Zoek adres..." value={search} onChange={(e) => setSearch(e.target.value)}
+              className="border-0 focus-visible:ring-0 h-8 px-2 text-sm bg-transparent" />
           </div>
-        </CardHeader>
-        <CardContent className={cn('p-0', tableBleed && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
-          <DashboardTableBlock empty={filtered.length === 0}>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Adres</TableHead>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Type</TableHead>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Status</TableHead>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Datum</TableHead>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Inspecteur</TableHead>
-                  <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Notities</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((insp) => (
-                  <TableRow key={insp.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer">
-                    <TableCell className="py-3.5 px-3.5 font-medium text-gray-900 dark:text-white">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
-                        {insp.address}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200">
-                      {TYPE_LABELS[insp.type]}
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5">{getStatusBadge(insp.status)}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200 whitespace-nowrap">
-                      {format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200">{insp.inspector}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-400 dark:text-gray-500 max-w-[200px] truncate">
-                      {insp.notes ?? '—'}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </DashboardTableBlock>
-        </CardContent>
-      </Card>
+          <Button onClick={() => setCreateOpen(true)}
+            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0">
+            <Plus className="h-4 w-4 mr-2" />
+            Nieuwe inspectie
+          </Button>
+        </div>
+      </div>
+
+      {/* List — ActionList style */}
+      <div className="rounded-2xl overflow-hidden">
+        {/* Column headers */}
+        <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Adres</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Type</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Status</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Datum</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Inspecteur</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Notities</span>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen inspecties gevonden.</div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+            {filtered.map((insp) => (
+              <div
+                key={insp.id}
+                className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
+              >
+                {/* Adres with icon */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{insp.address}</p>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{TYPE_LABELS[insp.type]}</p>
+                <div>{getStatusBadge(insp.status)}</div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  {format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}
+                </p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{insp.inspector}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 max-w-[200px] truncate">{insp.notes ?? '—'}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent
-          className={addDialogContentClassName('sm:max-w-md')}
+          className={addDialogContentClassName()}
           closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
         >
           <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
@@ -253,15 +243,19 @@ export default function InspectiesPage() {
               <Textarea placeholder="Extra informatie..." value={newNotes} onChange={(e) => setNewNotes(e.target.value)} rows={2} className="rounded-xl resize-none" />
             </div>
           </div>
-          <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-            <Button
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
-              disabled={!newPropertyId || !newDate}
-              onClick={handleCreate}
-            >
-              <ClipboardCheck className="h-4 w-4 shrink-0" />
-              Inspectie aanmaken
-            </Button>
+          <DialogFooter className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+            <span />
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
+              <Button
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+                disabled={!newPropertyId || !newDate}
+                onClick={handleCreate}
+              >
+                <ClipboardCheck className="h-4 w-4 shrink-0" />
+                Inspectie aanmaken
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

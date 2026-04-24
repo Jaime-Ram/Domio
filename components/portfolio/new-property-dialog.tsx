@@ -34,7 +34,6 @@ import { cn } from '@/lib/utils'
 import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
   ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
   ADD_DIALOG_FOOTER_SPLIT_CLASS,
   ADD_DIALOG_HEADER_CLASS,
   ADD_DIALOG_TITLE_CLASS,
@@ -332,7 +331,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className={addDialogContentClassName('max-w-md')}
+        className={addDialogContentClassName()}
         closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
       >
 
@@ -699,45 +698,49 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
           )}
         </div>
 
-        {/* Geen DialogFooter: die heeft sm:justify-end en zet “Terug” + CTA allebei rechts. */}
-        <footer
-          className={
-            step === 'confirm'
-              ? ADD_DIALOG_FOOTER_SPLIT_CLASS
-              : ADD_DIALOG_FOOTER_CLASS
-          }
-        >
-          {step === 'confirm' && (
+        <footer className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+          {step === 'confirm' ? (
             <button
               type="button"
               onClick={() => setStep('search')}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors shrink-0"
+              className={ADD_DIALOG_CLOSE_BUTTON_CLASS}
+              aria-label="Vorige stap"
             >
-              <ArrowLeft className="h-4 w-4 shrink-0" />
-              Terug
+              <ArrowLeft className="h-4 w-4" />
             </button>
-          )}
-          {step === 'search' ? (
-            <Button
-              type="button"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
-              onClick={handleSearch}
-              disabled={searching || !postcode.trim()}
-            >
-              {searching ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Search className="h-4 w-4 shrink-0" />}
-              Zoeken
-            </Button>
           ) : (
-            <Button
-              type="button"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
-              onClick={handleSave}
-              disabled={saving || (!form.address && !selectedAdres)}
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Building2 className="h-4 w-4 shrink-0" />}
-              {saving ? 'Aanmaken…' : 'Pand aanmaken'}
-            </Button>
+            <span />
           )}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1"
+            >
+              Annuleren
+            </button>
+            {step === 'search' ? (
+              <Button
+                type="button"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                onClick={handleSearch}
+                disabled={searching || !postcode.trim()}
+              >
+                {searching ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Search className="h-4 w-4 shrink-0" />}
+                Zoeken
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                onClick={handleSave}
+                disabled={saving || (!form.address && !selectedAdres)}
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Building2 className="h-4 w-4 shrink-0" />}
+                {saving ? 'Aanmaken…' : 'Pand aanmaken'}
+              </Button>
+            )}
+          </div>
         </footer>
       </DialogContent>
     </Dialog>

@@ -3,19 +3,9 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { dashboardCardClass, DASHBOARD_TABLE_HEAD_SHADCN_CLASS, DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS, DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS } from '@/app/dashboard/employer/dashboard-ui'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { dashboardCardClass } from '@/app/dashboard/employer/dashboard-ui'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   ShieldCheck,
   AlertTriangle,
@@ -203,8 +193,6 @@ export default function CompliancePage() {
         : <ChevronDown className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
       : <ChevronDown className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
 
-  const tableBleed = filteredAndSorted.length > 0
-
   return (
     <>
       <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
@@ -292,111 +280,108 @@ export default function CompliancePage() {
         </Card>
       </div>
 
-      {/* WWS Object table */}
-      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
-        <CardHeader className={cn('space-y-3', tableBleed && DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <CardTitle className="text-lg text-[#163300] dark:text-[#9FE870]">WWS Objecten</CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {filteredAndSorted.length} van {wwsObjects.length} objecten
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}>
-                    <span>Filter</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" sideOffset={8} className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}>
-                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Sector</DropdownMenuLabel>
-                  {(['sociaal', 'midden', 'vrij'] as WWSSector[]).map((s) => (
-                    <DropdownMenuCheckboxItem key={s} checked={sectorFilter[s]}
-                      onCheckedChange={(v) => setSectorFilter((f) => ({ ...f, [s]: Boolean(v) }))}
-                      onSelect={(e) => e.preventDefault()}
-                      className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}>
-                      {SECTOR_LABELS[s]}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                  <DropdownMenuLabel className="px-2 pb-1 pt-2 text-xs font-medium text-gray-500 dark:text-gray-400">Status</DropdownMenuLabel>
-                  {(['compliant', 'verlopen', 'te_hoog', 'pdf_mist'] as const).map((s) => (
-                    <DropdownMenuCheckboxItem key={s} checked={statusFilter[s]}
-                      onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [s]: Boolean(v) }))}
-                      onSelect={(e) => e.preventDefault()}
-                      className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}>
-                      {STATUS_LABELS[s]}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0">
-                <Download className="h-4 w-4 mr-2" />
-                Exporteer
+      {/* WWS Object table — ActionList style, no Card wrapper */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">WWS Objecten</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {filteredAndSorted.length} van {wwsObjects.length} objecten
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}>
+                <span>Filter</span>
               </Button>
-            </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}>
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Sector</DropdownMenuLabel>
+              {(['sociaal', 'midden', 'vrij'] as WWSSector[]).map((s) => (
+                <DropdownMenuCheckboxItem key={s} checked={sectorFilter[s]}
+                  onCheckedChange={(v) => setSectorFilter((f) => ({ ...f, [s]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}>
+                  {SECTOR_LABELS[s]}
+                </DropdownMenuCheckboxItem>
+              ))}
+              <DropdownMenuLabel className="px-2 pb-1 pt-2 text-xs font-medium text-gray-500 dark:text-gray-400">Status</DropdownMenuLabel>
+              {(['compliant', 'verlopen', 'te_hoog', 'pdf_mist'] as const).map((s) => (
+                <DropdownMenuCheckboxItem key={s} checked={statusFilter[s]}
+                  onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [s]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}>
+                  {STATUS_LABELS[s]}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0">
+            <Download className="h-4 w-4 mr-2" />
+            Exporteer
+          </Button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl overflow-hidden">
+        {/* Column headers */}
+        <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto_auto_auto] items-center gap-3 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+          {([
+            { key: 'address', label: 'Adres' },
+            { key: 'punten', label: 'Punten' },
+            { key: 'sector', label: 'Sector' },
+            { key: 'maxHuur', label: 'Max huur' },
+            { key: 'huidigeHuur', label: 'Huidig' },
+            { key: 'verschil', label: 'Marge' },
+            { key: 'status', label: 'Status' },
+            { key: 'laatsteCheck', label: 'Check' },
+          ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
+            <button key={key} type="button" onClick={() => toggleSort(key)} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+              {label} <SortIcon col={key} />
+            </button>
+          ))}
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500 text-right">Acties</span>
+        </div>
+
+        {filteredAndSorted.length === 0 ? (
+          <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen objecten gevonden.</div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+            {filteredAndSorted.map((obj) => (
+              <div
+                key={obj.id}
+                className="grid grid-cols-[1fr_auto_auto_auto_auto_auto_auto_auto_auto] items-center gap-3 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
+              >
+                {/* Adres with icon */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{obj.address}</p>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{obj.punten}</p>
+                <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: SECTOR_COLORS[obj.sector] }} />
+                  {SECTOR_LABELS[obj.sector]}
+                </span>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">€{obj.maxHuur.toLocaleString('nl-NL')}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">€{obj.huidigeHuur.toLocaleString('nl-NL')}</p>
+                <span className={cn('text-sm font-medium whitespace-nowrap', obj.verschil >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400')}>
+                  {obj.verschil >= 0 ? '+' : ''}€{obj.verschil}
+                </span>
+                <div>{getStatusBadge(obj.status)}</div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  {format(new Date(obj.laatsteCheck), 'd MMM yyyy', { locale: nl })}
+                </p>
+                <Button size="sm" variant="outline" className="rounded-full h-7 px-3 text-xs justify-self-end">
+                  <Eye className="h-3 w-3 mr-1" />
+                  Bekijk
+                </Button>
+              </div>
+            ))}
           </div>
-        </CardHeader>
-        <CardContent className={cn('p-0', tableBleed && DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
-          <DashboardTableBlock empty={filteredAndSorted.length === 0}>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {([
-                    { key: 'address', label: 'Adres' },
-                    { key: 'punten', label: 'Punten' },
-                    { key: 'sector', label: 'Sector' },
-                    { key: 'maxHuur', label: 'Max huur' },
-                    { key: 'huidigeHuur', label: 'Huidig' },
-                    { key: 'verschil', label: 'Marge' },
-                    { key: 'status', label: 'Status' },
-                    { key: 'laatsteCheck', label: 'Check' },
-                  ] as { key: SortKey; label: string }[]).map(({ key, label }) => (
-                    <TableHead key={key} className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                      <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort(key)}>
-                        {label}
-                        <SortIcon col={key} />
-                      </button>
-                    </TableHead>
-                  ))}
-                  <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'text-right')}>Acties</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAndSorted.map((obj) => (
-                  <TableRow key={obj.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer">
-                    <TableCell className="py-3.5 px-3.5 font-medium text-gray-900 dark:text-white">{obj.address}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200">{obj.punten}</TableCell>
-                    <TableCell className="py-3.5 px-3.5">
-                      <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-200">
-                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: SECTOR_COLORS[obj.sector] }} />
-                        {SECTOR_LABELS[obj.sector]}
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200">€{obj.maxHuur.toLocaleString('nl-NL')}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-700 dark:text-gray-200">€{obj.huidigeHuur.toLocaleString('nl-NL')}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm">
-                      <span className={cn('font-medium', obj.verschil >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400')}>
-                        {obj.verschil >= 0 ? '+' : ''}€{obj.verschil}
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5">{getStatusBadge(obj.status)}</TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                      {format(new Date(obj.laatsteCheck), 'd MMM yyyy', { locale: nl })}
-                    </TableCell>
-                    <TableCell className="py-3.5 px-3.5 text-right">
-                      <Button size="sm" variant="outline" className="rounded-full h-7 px-3 text-xs">
-                        <Eye className="h-3 w-3 mr-1" />
-                        Bekijk
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </DashboardTableBlock>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </>
   )
 }

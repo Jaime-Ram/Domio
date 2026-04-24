@@ -12,6 +12,15 @@
   }
 }
 
+/* Geen focus-ringen op interactieve elementen */
+@layer base {
+  *:focus,
+  *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Codec Pro Font Face */
 @font-face {
   font-family: 'Codec Pro';

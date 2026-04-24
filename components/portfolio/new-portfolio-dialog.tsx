@@ -2,13 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -17,14 +10,9 @@ import {
 } from '@/components/ui/select'
 import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
-  ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
-  ADD_DIALOG_HEADER_CLASS,
-  ADD_DIALOG_TITLE_CLASS,
-  addDialogContentClassName,
+  CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
-import { Briefcase, Building2, Check, Landmark } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Briefcase, Building2, Landmark } from 'lucide-react'
 import { portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -163,15 +151,17 @@ export function NewPortfolioDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
-      <DialogContent
-        className={addDialogContentClassName('max-w-md')}
-        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
-      >
-        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
-          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe portefeuille</DialogTitle>
-        </DialogHeader>
-
+    <CreateDialogShell
+      open={open}
+      onOpenChange={(v) => { if (!v) onClose() }}
+      title="Nieuwe portefeuille"
+      subtitle="Geef de portefeuille een naam en koppel optioneel een eigenaar."
+      primaryLabel="Portefeuille aanmaken"
+      onPrimary={handleSave}
+      primaryDisabled={saving || !canSave}
+      primaryLoading={saving}
+      scrollBody
+    >
         <div className={ADD_DIALOG_BODY_SCROLL_CLASS}>
           {error && (
             <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
@@ -285,22 +275,6 @@ export function NewPortfolioDialog({
             )}
           </div>
         </div>
-
-        <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || !canSave}
-            className={cn(
-              'inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F]',
-              'disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 transition-colors'
-            )}
-          >
-            <Check className="h-4 w-4 shrink-0" />
-            {saving ? 'Opslaan…' : 'Portefeuille aanmaken'}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </CreateDialogShell>
   )
 }

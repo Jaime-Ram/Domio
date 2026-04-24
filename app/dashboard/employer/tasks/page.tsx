@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   Clock, AlertCircle, Plus, Search,
   Calendar, Bell, RefreshCw, Building2, ListTodo,
-  Pencil, Check, Filter, Grid3x3, Table2,
+  Pencil, Check, Filter, Grid3x3, Table2, ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { taskQueries } from '@/lib/supabase/queries'
@@ -22,22 +22,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { MetricCard } from '@/components/finance/MetricCard'
 import { AddTaskTile } from '@/components/tasks/add-task-tile'
 import {
-  dashboardCardClass,
-  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
   DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
@@ -341,278 +328,253 @@ export default function TasksPage() {
         <AddTaskTile className="h-full min-h-[160px]" onClick={openNew} />
       </div>
 
-      {/* Toolbar + tabel (zelfde patroon als huurders / DashboardTableBlock) */}
-      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
-        <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-          {tasksToolbar}
-        </CardHeader>
-        <CardContent
-          className={cn(
-            !loading && viewMode === 'grid' && filtered.length > 0 ? 'px-5 pb-5 pt-2' : 'p-0 px-0 pb-0',
-            (loading || (!loading && viewMode === 'table' && filtered.length > 0)) &&
-              DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
-          )}
-        >
-          {loading ? (
-            <DashboardTableBlock empty={false}>
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-14')} />
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Taak</TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand</TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Einddatum</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Prioriteit</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Herinnering</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-12')} />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[0, 1, 2, 3].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell colSpan={7} className="py-3">
-                        <div className="h-4 w-full max-w-xl animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DashboardTableBlock>
-          ) : filtered.length === 0 ? (
-            <div className="py-20 text-center px-4">
-              <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                {search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}
-              </p>
-              {!search && filter === 'alle' && (
-                <button
-                  type="button"
-                  onClick={openNew}
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors"
+      {/* Toolbar + tabel — ActionList style (no Card wrapper) */}
+      {tasksToolbar}
+
+      <div className="rounded-2xl overflow-hidden">
+        {/* Column headers */}
+        <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_1fr_2.5rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+          <span />
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Taak</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Pand</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Einddatum</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500 hidden md:block">Prioriteit</span>
+          <span className="text-sm font-medium text-gray-400 dark:text-gray-500 hidden md:block">Herinnering</span>
+          <span />
+        </div>
+
+        {loading ? (
+          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="mx-1 px-3 py-3.5">
+                <div className="h-4 w-full max-w-xl animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="py-16 text-center px-4">
+            <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}
+            </p>
+            {!search && filter === 'alle' && (
+              <button
+                type="button"
+                onClick={openNew}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Eerste taak aanmaken
+              </button>
+            )}
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-3">
+            {filtered.map((task) => {
+              const done = task.status === 'afgerond'
+              const days = task.due_date ? daysUntil(task.due_date) : null
+              const isOverdue = days !== null && days < 0 && !done
+              const isUrgent = days !== null && days <= 7 && days >= 0 && !done
+              const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
+              return (
+                <Card
+                  key={task.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openEdit(task)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      openEdit(task)
+                    }
+                  }}
+                  className="rounded-2xl border border-gray-200 dark:border-neutral-700 shadow-none hover:border-[#163300] dark:hover:border-[#9FE870] cursor-pointer transition-colors"
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  Eerste taak aanmaken
-                </button>
-              )}
-            </div>
-          ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map((task) => {
-                const done = task.status === 'afgerond'
-                const days = task.due_date ? daysUntil(task.due_date) : null
-                const isOverdue = days !== null && days < 0 && !done
-                const isUrgent = days !== null && days <= 7 && days >= 0 && !done
-                const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
-                return (
-                  <Card
-                    key={task.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => openEdit(task)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        openEdit(task)
-                      }
-                    }}
-                    className={cn(
-                      dashboardCardClass('transition-colors cursor-pointer', isDemo),
-                      'rounded-block border-[0.5px] border-gray-200 dark:border-neutral-700 shadow-none hover:border-[#163300] dark:hover:border-[#9FE870]'
-                    )}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start gap-3">
-                        <ListTodo className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <CardTitle
-                            className={cn(
-                              'text-base font-semibold text-[#163300] dark:text-[#9FE870] mb-1 line-clamp-2',
-                              done && 'line-through text-gray-400 dark:text-gray-600'
-                            )}
-                          >
-                            {task.title}
-                          </CardTitle>
-                          <span className={cn('inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1', cat.color)}>
-                            {cat.label}
-                          </span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-2">
-                      {task.properties && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                          <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
-                          <span className="truncate">{task.properties.name}</span>
-                        </div>
-                      )}
-                      {task.due_date && (
-                        <div
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start gap-3">
+                      <ListTodo className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <CardTitle
                           className={cn(
-                            'flex items-center gap-1.5 text-sm font-medium',
-                            isOverdue
-                              ? 'text-red-600 dark:text-red-400'
-                              : isUrgent
-                                ? 'text-amber-600 dark:text-amber-400'
-                                : done
-                                  ? 'text-gray-400 dark:text-gray-600'
-                                  : 'text-gray-700 dark:text-gray-300'
+                            'text-base font-semibold text-[#163300] dark:text-[#9FE870] mb-1 line-clamp-2',
+                            done && 'line-through text-gray-400 dark:text-gray-600'
                           )}
                         >
-                          <Calendar className="h-4 w-4 shrink-0" />
-                          {fmtDate(task.due_date)}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          ) : (
-            <DashboardTableBlock empty={false}>
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-14 text-center')}>
-                      <span className="sr-only">Afgerond</span>
-                    </TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Taak</TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand</TableHead>
-                    <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Einddatum</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Prioriteit</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>Herinnering</TableHead>
-                    <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-12 text-right')}>
-                      <span className="sr-only">Acties</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((task) => {
-                    const done = task.status === 'afgerond'
-                    const days = task.due_date ? daysUntil(task.due_date) : null
-                    const isOverdue = days !== null && days < 0 && !done
-                    const isUrgent = days !== null && days <= 7 && days >= 0 && !done
-                    const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
-                    const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
-                    const rec = RECURRING_LABEL[task.recurring] ?? ''
+                          {task.title}
+                        </CardTitle>
+                        <span className={cn('inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1', cat.color)}>
+                          {cat.label}
+                        </span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-2">
+                    {task.properties && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
+                        <span className="truncate">{task.properties.name}</span>
+                      </div>
+                    )}
+                    {task.due_date && (
+                      <div
+                        className={cn(
+                          'flex items-center gap-1.5 text-sm font-medium',
+                          isOverdue
+                            ? 'text-red-600 dark:text-red-400'
+                            : isUrgent
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : done
+                                ? 'text-gray-400 dark:text-gray-600'
+                                : 'text-gray-700 dark:text-gray-300'
+                        )}
+                      >
+                        <Calendar className="h-4 w-4 shrink-0" />
+                        {fmtDate(task.due_date)}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+            {filtered.map((task) => {
+              const done = task.status === 'afgerond'
+              const days = task.due_date ? daysUntil(task.due_date) : null
+              const isOverdue = days !== null && days < 0 && !done
+              const isUrgent = days !== null && days <= 7 && days >= 0 && !done
+              const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
+              const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
+              const rec = RECURRING_LABEL[task.recurring] ?? ''
 
-                    return (
-                      <TableRow key={task.id} className="group">
-                        <TableCell className="align-middle w-14">
-                          <div className="flex justify-center">
-                            <button
-                              type="button"
-                              onClick={() => toggleDone(task)}
-                              aria-label={done ? 'Taak heropenen' : 'Taak afronden'}
-                              className={cn(
-                                'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
-                                done
-                                  ? 'border-[#163300] bg-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]'
-                                  : isOverdue
-                                    ? 'border-red-400 hover:border-red-500'
-                                    : 'border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870]'
-                              )}
-                            >
-                              {done && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" />}
-                            </button>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap items-center gap-2 min-w-0">
-                            <span
-                              className={cn(
-                                'text-sm font-medium',
-                                done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
-                              )}
-                            >
-                              {task.title}
-                            </span>
-                            <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0', cat.color)}>
-                              {cat.label}
-                            </span>
-                            {rec && (
-                              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
-                                <RefreshCw className="h-3 w-3 shrink-0" />
-                                {rec}
-                              </span>
-                            )}
-                          </div>
-                          {task.description && !task.properties && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-md">
-                              {task.description}
-                            </p>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {task.properties ? (
-                            <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 min-w-0">
-                              <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
-                              <span className="truncate">{task.properties.name}</span>
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {task.due_date ? (
-                            <span
-                              className={cn(
-                                'inline-flex items-center gap-1 text-sm font-medium',
-                                isOverdue
-                                  ? 'text-red-600 dark:text-red-400'
-                                  : isUrgent
-                                    ? 'text-amber-600 dark:text-amber-400'
-                                    : done
-                                      ? 'text-gray-400 dark:text-gray-600'
-                                      : 'text-gray-700 dark:text-gray-300'
-                              )}
-                            >
-                              {isOverdue && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
-                              <Calendar className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-                              {fmtDate(task.due_date)}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {task.priority && task.priority !== 'normaal' ? (
-                            <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
-                              <span className={cn('h-2 w-2 rounded-full shrink-0', prio.dot)} />
-                              {prio.label}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {task.notification_date ? (
-                            <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                              <Bell className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-                              {fmtDate(task.notification_date)}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-400">—</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right align-middle">
-                          <button
-                            type="button"
-                            onClick={() => openEdit(task)}
-                            className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
-                            aria-label="Bewerken"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </DashboardTableBlock>
-          )}
-        </CardContent>
-      </Card>
+              return (
+                <div
+                  key={task.id}
+                  className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_1fr_2.5rem] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
+                >
+                  {/* Done toggle */}
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => toggleDone(task)}
+                      aria-label={done ? 'Taak heropenen' : 'Taak afronden'}
+                      className={cn(
+                        'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
+                        done
+                          ? 'border-[#163300] bg-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]'
+                          : isOverdue
+                            ? 'border-red-400 hover:border-red-500'
+                            : 'border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870]'
+                      )}
+                    >
+                      {done && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" />}
+                    </button>
+                  </div>
+
+                  {/* Title + category */}
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 min-w-0">
+                      <span
+                        className={cn(
+                          'text-sm font-semibold truncate',
+                          done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
+                        )}
+                      >
+                        {task.title}
+                      </span>
+                      <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0', cat.color)}>
+                        {cat.label}
+                      </span>
+                      {rec && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
+                          <RefreshCw className="h-3 w-3 shrink-0" />
+                          {rec}
+                        </span>
+                      )}
+                    </div>
+                    {task.description && !task.properties && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                        {task.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Pand */}
+                  <div className="min-w-0">
+                    {task.properties ? (
+                      <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 min-w-0">
+                        <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
+                        <span className="truncate">{task.properties.name}</span>
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+
+                  {/* Einddatum */}
+                  <div className="min-w-0">
+                    {task.due_date ? (
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 text-sm font-medium',
+                          isOverdue
+                            ? 'text-red-600 dark:text-red-400'
+                            : isUrgent
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : done
+                                ? 'text-gray-400 dark:text-gray-600'
+                                : 'text-gray-700 dark:text-gray-300'
+                        )}
+                      >
+                        {isOverdue && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+                        <Calendar className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                        {fmtDate(task.due_date)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+
+                  {/* Prioriteit */}
+                  <div className="hidden md:block min-w-0">
+                    {task.priority && task.priority !== 'normaal' ? (
+                      <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                        <span className={cn('h-2 w-2 rounded-full shrink-0', prio.dot)} />
+                        {prio.label}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+
+                  {/* Herinnering */}
+                  <div className="hidden md:block min-w-0">
+                    {task.notification_date ? (
+                      <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                        <Bell className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                        {fmtDate(task.notification_date)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-gray-400">—</span>
+                    )}
+                  </div>
+
+                  {/* Edit action */}
+                  <button
+                    type="button"
+                    onClick={() => openEdit(task)}
+                    className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors justify-self-end"
+                    aria-label="Bewerken"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Create dialog */}
       <NewTaskDialog

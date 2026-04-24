@@ -244,7 +244,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
             <nav
               className={cn("w-full flex flex-col transition-[padding] duration-300 ease-in-out", collapsed ? "px-3 py-2" : "p-3")}
               onClick={(e) => {
@@ -300,11 +300,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                               )}
                             />
                           </button>
-                          {collapsed && (
-                            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                              {item.label}
-                            </div>
-                          )}
                           <div
                             className={cn(
                               "w-full overflow-hidden transition-all duration-300 ease-in-out",
@@ -323,7 +318,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                       className={cn(
                                         "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-600 transition-all duration-150 focus:outline-none",
                                         active
-                                          ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+                                          ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
                                           : "text-gray-800 dark:text-neutral-200"
                                       )}
                                     >
@@ -348,7 +343,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           className={cn(
                             "flex items-center w-full py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-600 transition-colors duration-150 focus:outline-none",
                             active
-                              ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+                              ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
                               : "text-gray-800 dark:text-neutral-200"
                           )}
                           title={collapsed ? item.label : undefined}
@@ -370,11 +365,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
                           )}
                         </Link>
-                        {collapsed && (
-                          <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
-                            {item.label}
-                          </div>
-                        )}
                       </li>
                     )
                   }
