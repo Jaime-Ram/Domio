@@ -830,7 +830,7 @@ export default function PortfolioPage() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden">
+              <div>
                 {/* Header */}
                 <div className="grid grid-cols-[1.5rem_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
                   <input
@@ -936,7 +936,7 @@ export default function PortfolioPage() {
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Rechtspersonen worden beheerd via Instellingen</p>
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden">
+              <div>
                 {/* Header */}
                 <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
                   <button type="button" onClick={() => toggleLegalSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
