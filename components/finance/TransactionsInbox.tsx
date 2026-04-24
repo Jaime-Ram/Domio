@@ -71,12 +71,10 @@ export interface TransactionRow {
     property_id: string | null
     category: string | null
     tenant_name: string | null
-    tenant_name: string | null
     property_name: string | null
     property_address: string | null
     // kept for backward-compat (always false / null with new schema)
     is_manual: boolean
-    category: string | null
   } | null
 }
 
