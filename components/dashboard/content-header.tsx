@@ -4,13 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Menu, Bell, User, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
+import { Menu, Bell, User, Mail, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AppDropdownContent, AppDropdownItem } from '@/components/ui/app-dropdown'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { notifications as mockNotifications } from '@/lib/mock-data/domio-dashboard'
@@ -90,14 +89,12 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
   const avatarInitials = getInitials(profile?.full_name ?? null, userEmail || '')
   const unreadCount = 0
 
-  const dropdownContentClass = 'rounded-2xl bg-white dark:bg-neutral-800 border-0 shadow-soft-lg p-0 overflow-hidden min-w-[260px] origin-top-right data-[state=open]:animate-widget-menu-in data-[state=closed]:animate-widget-menu-out'
-
   return (
     <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
-      <div className="relative mx-auto max-w-7xl px-8 sm:px-12 lg:pl-20 lg:pr-16 h-[5.25rem]">
+      <div className="relative mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 h-[5.25rem]">
 
         {/* Hamburger — verticaal gecentreerd (mobile) */}
-        <div className="absolute inset-y-0 left-8 sm:left-12 lg:hidden flex items-center">
+        <div className="absolute inset-y-0 left-10 sm:left-14 lg:hidden flex items-center">
           <Button
             variant="ghost"
             size="icon"
@@ -115,13 +112,13 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
 
         {/* Paginatitel — aan de onderkant van de balk */}
         {pageTitle && (
-          <h1 className="absolute bottom-4 left-8 sm:left-12 lg:left-20 right-48 text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870] truncate leading-none">
+          <h1 className="absolute bottom-4 left-10 sm:left-14 lg:left-16 right-48 text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870] truncate leading-none">
             {pageTitle}
           </h1>
         )}
 
         {/* Bell + Profiel — verticaal gecentreerd in de balk */}
-        <div className="absolute inset-y-0 right-8 sm:right-12 lg:right-16 flex items-center gap-3">
+        <div className="absolute inset-y-0 right-10 sm:right-14 lg:right-20 flex items-center gap-3">
           {!menusReady ? (
             <>
               <Button
@@ -173,7 +170,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className={dropdownContentClass}>
+              <AppDropdownContent align="end">
                 <div className="px-3 pt-3 pb-1.5">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">Notificaties</p>
@@ -212,7 +209,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                     Alle notificaties bekijken
                   </Button>
                 </div>
-              </DropdownMenuContent>
+              </AppDropdownContent>
             </DropdownMenu>
 
           <DropdownMenu>
@@ -232,7 +229,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" sideOffset={8} className={dropdownContentClass}>
+              <AppDropdownContent align="end" className="min-w-[260px]">
                 <div className="px-3 pt-3 pb-2">
                   <button
                     type="button"
@@ -243,13 +240,19 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       {avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">{userEmail}</p>
+                      <div className="flex items-center gap-1.5">
+                        <User className="h-3 w-3 text-gray-400 dark:text-gray-500 shrink-0" />
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <Mail className="h-3 w-3 text-gray-400 dark:text-gray-500 shrink-0" />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>
+                      </div>
                     </div>
                   </button>
                 </div>
                 <div className="px-1.5 py-1">
-                  <DropdownMenuItem
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
                   >
@@ -257,8 +260,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <User className="h-4 w-4 shrink-0" />
                       <span>Account</span>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
+                  </AppDropdownItem>
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
                   >
@@ -266,8 +269,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <Shield className="h-4 w-4 shrink-0" />
                       <span>Beveiliging</span>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
+                  </AppDropdownItem>
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
                   >
@@ -275,8 +278,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <CreditCard className="h-4 w-4 shrink-0" />
                       <span>Abonnement</span>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
+                  </AppDropdownItem>
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
                   >
@@ -284,11 +287,11 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <SettingsIcon className="h-4 w-4 shrink-0" />
                       <span>Koppelingen</span>
                     </Link>
-                  </DropdownMenuItem>
+                  </AppDropdownItem>
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 py-1">
-                  <DropdownMenuItem
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
                   >
@@ -296,8 +299,8 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <ExternalLink className="h-4 w-4 shrink-0" />
                       <span>Privacy</span>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
+                  </AppDropdownItem>
+                  <AppDropdownItem
                     asChild
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
                   >
@@ -305,11 +308,11 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                       <ExternalLink className="h-4 w-4 shrink-0" />
                       <span>Algemene voorwaarden</span>
                     </Link>
-                  </DropdownMenuItem>
+                  </AppDropdownItem>
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 pt-1 pb-1.5">
-                  <DropdownMenuItem
+                  <AppDropdownItem
                     className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-red-600 dark:hover:text-red-400 focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-red-600 dark:focus:text-red-400"
                     onSelect={async () => {
                       if (isDemo) {
@@ -323,9 +326,9 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                   >
                     <LogOut className="h-4 w-4 shrink-0" />
                     {isDemo ? 'Demo verlaten' : 'Uitloggen'}
-                  </DropdownMenuItem>
+                  </AppDropdownItem>
                 </div>
-              </DropdownMenuContent>
+              </AppDropdownContent>
             </DropdownMenu>
             </>
           )}

@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
   Building2,
   Plus,
   MapPin,
@@ -22,7 +14,6 @@ import {
   ChevronDown,
   ChevronsUpDown,
   ChevronRight,
-  Info,
   Filter,
   Landmark,
   Euro,
@@ -35,7 +26,6 @@ import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries, portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
 import {
   dashboardCardClass,
-  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_TABLE_ICON_WRAP_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
@@ -43,7 +33,6 @@ import {
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
@@ -65,7 +54,8 @@ import { NewPropertyDialog } from '@/components/portfolio/new-property-dialog'
 import { PropertyDetailSheet } from '@/components/portfolio/property-detail-sheet'
 import { NewPortfolioDialog } from '@/components/portfolio/new-portfolio-dialog'
 import { AssignPropertiesDialog } from '@/components/portfolio/assign-properties-dialog'
-import { mockProperties, mockPortfolios } from '@/lib/mock-data/vastgoed'
+import { mockProperties, mockPortfolios, mockLegalEntities } from '@/lib/mock-data/vastgoed'
+import { TabNav } from '@/components/ui/tab-nav'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +113,15 @@ function portfolioIncome(portfolio: PortfolioRow): number {
   return portfolio.properties.reduce((s, p) => s + getMonthlyIncome(p), 0)
 }
 
+function getPropertyStatus(prop: PropertyRow): string {
+  if (prop.units.length === 0) return 'leegstand'
+  const statuses = prop.units.map((u) => u.status ?? 'leegstand')
+  if (statuses.some((s) => s === 'achterstand')) return 'achterstand'
+  if (statuses.every((s) => s === 'verhuurd')) return 'verhuurd'
+  if (statuses.every((s) => s === 'leegstand' || s === 'beëindigd')) return 'leegstand'
+  return 'gemengd'
+}
+
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -131,11 +130,6 @@ export default function PortfolioPage() {
   const { basePath, isDemo } = useDashboardUser()
 
   const [activeSegment, setActiveSegment] = useState<PortfolioSegment>('portefeuilles')
-  const tabsContainerRef = useRef<HTMLDivElement | null>(null)
-  const pfRef = useRef<HTMLButtonElement | null>(null)
-  const objRef = useRef<HTMLButtonElement | null>(null)
-  const rpRef = useRef<HTMLButtonElement | null>(null)
-  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 })
 
   const [portfolios, setPortfolios] = useState<PortfolioRow[]>([])
   const [unassigned, setUnassigned] = useState<PropertyRow[]>([])
@@ -174,19 +168,6 @@ export default function PortfolioPage() {
   // ── Pre-selected portfolio for new property dialog ─────────────────────────
   const [newPropertyPortfolioId, setNewPropertyPortfolioId] = useState<string | undefined>()
 
-  // ── Tab indicator ──────────────────────────────────────────────────────────
-  useEffect(() => {
-    const container = tabsContainerRef.current
-    if (!container) return
-    const btn =
-      activeSegment === 'portefeuilles' ? pfRef.current
-      : activeSegment === 'objecten' ? objRef.current
-      : rpRef.current
-    if (!btn) return
-    const cr = container.getBoundingClientRect()
-    const br = btn.getBoundingClientRect()
-    setTabIndicator({ left: br.left - cr.left, width: br.width })
-  }, [activeSegment, portfolios.length])
 
   // ── Load data ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -232,9 +213,19 @@ export default function PortfolioPage() {
             portfolio_id: (p as any).portfolioId ?? null,
             portfolioName: mockPortfolios.find((pf) => pf.id === (p as any).portfolioId)?.name,
           }))
+          const demoEntities: LegalEntityRow[] = mockLegalEntities.map((le) => ({
+            id: le.id,
+            name: le.name,
+            entityType: le.type,
+            kvk: le.kvk,
+            propertyCount: mockPortfolios
+              .filter((pf) => pf.legalEntityId === le.id)
+              .reduce((sum, pf) => sum + pf.propertyIds.length, 0),
+          }))
           setPortfolios(pfs)
           setUnassigned(unassignedProps)
           setAllProperties(all)
+          setLegalEntities(demoEntities)
           setLoading(false)
           return
         }
@@ -433,19 +424,6 @@ export default function PortfolioPage() {
     )
   }
 
-  const tabClass = (seg: PortfolioSegment) =>
-    cn(
-      'pb-2 mr-6 last:mr-0 text-left sm:text-center font-semibold transition-colors duration-200 whitespace-nowrap',
-      activeSegment === seg
-        ? 'text-[#163300] dark:text-[#9FE870]'
-        : 'text-gray-500 dark:text-gray-400'
-    )
-
-  const countBadge = (n: number) => (
-    <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]">
-      {n}
-    </span>
-  )
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
@@ -456,41 +434,22 @@ export default function PortfolioPage() {
       {!loading && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           {[
-            {
-              icon: Briefcase,
-              label: 'Portefeuilles',
-              value: portfolios.length,
-              sub: null,
-            },
-            {
-              icon: Building2,
-              label: 'Objecten',
-              value: totalObjects,
-              sub: unassigned.length > 0 ? `${unassigned.length} niet ingedeeld` : null,
-            },
-            {
-              icon: Euro,
-              label: 'Maandhuur',
-              value: `€${totalMonthlyRent.toLocaleString('nl-NL')}`,
-              sub: null,
-            },
-            {
-              icon: Home,
-              label: 'Bezetting',
-              value: `${occupancyRate}%`,
-              sub: `${totalOccupied}/${totalUnits} eenheden`,
-            },
-          ].map(({ icon: Icon, label, value, sub }) => (
+            { Icon: Briefcase, label: 'Portefeuilles', value: portfolios.length },
+            { Icon: Building2, label: 'Objecten', value: totalObjects },
+            { Icon: Euro, label: 'Maandhuur', value: `€${totalMonthlyRent.toLocaleString('nl-NL')}` },
+            { Icon: Home, label: 'Bezetting', value: `${occupancyRate}%` },
+          ].map(({ Icon, label, value }) => (
             <div
               key={label}
-              className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl px-4 py-3"
+              className="bg-[#f4f4f4] dark:bg-neutral-800 rounded-2xl px-4 pt-3 pb-4 flex flex-col justify-between min-h-[110px]"
             >
-              <div className="flex items-center gap-1.5 mb-1">
-                <Icon className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">{label}</span>
+              <div className="flex justify-end">
+                <Icon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white leading-tight">{value}</p>
-              {sub && <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
+              <div>
+                <p className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight">{value}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-0.5">{label}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -500,24 +459,16 @@ export default function PortfolioPage() {
         <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             {/* Tabs */}
-            <div
-              ref={tabsContainerRef}
-              className="relative flex w-full sm:w-auto text-sm border-b border-gray-200 dark:border-neutral-700"
-            >
-              <button type="button" ref={pfRef} onClick={() => { setActiveSegment('portefeuilles'); setSelectedIds(new Set()) }} className={tabClass('portefeuilles')}>
-                <span>Portefeuilles</span>{countBadge(portfolios.length)}
-              </button>
-              <button type="button" ref={objRef} onClick={() => { setActiveSegment('objecten'); setSelectedIds(new Set()) }} className={tabClass('objecten')}>
-                <span>Alle objecten</span>{countBadge(allProperties.length)}
-              </button>
-              <button type="button" ref={rpRef} onClick={() => { setActiveSegment('rechtspersonen'); setSelectedIds(new Set()) }} className={tabClass('rechtspersonen')}>
-                <span>Rechtspersonen</span>{countBadge(legalEntities.length)}
-              </button>
-              <div
-                className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
-                style={{ left: tabIndicator.left, width: tabIndicator.width }}
-              />
-            </div>
+            <TabNav
+              tabs={[
+                { id: 'portefeuilles',  label: 'Portefeuilles',  count: portfolios.length },
+                { id: 'objecten',       label: 'Alle objecten',  count: allProperties.length },
+                { id: 'rechtspersonen', label: 'Rechtspersonen', count: legalEntities.length },
+              ]}
+              activeTab={activeSegment}
+              onChange={(id) => { setActiveSegment(id as PortfolioSegment); setSelectedIds(new Set()) }}
+              className="w-full sm:w-auto"
+            />
 
             {/* Controls per tab */}
             <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0">
@@ -879,126 +830,98 @@ export default function PortfolioPage() {
                 ))}
               </div>
             ) : (
-              <DashboardTableBlock empty={sortedProperties.length === 0}>
-                <Table className="w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-px px-4')}>
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
-                          checked={sortedProperties.length > 0 && sortedProperties.every((p) => selectedIds.has(p.id))}
-                          onChange={(e) => setSelectedIds(e.target.checked ? new Set(sortedProperties.map((p) => p.id)) : new Set())}
-                        />
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('name')}>
-                          <span>Object</span>{getSortIcon('name')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('type')}>
-                          <span>Type</span>{getSortIcon('type')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Portefeuille</TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('units')}>
-                          <span>Eenheden</span>{getSortIcon('units')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('income')}>
-                          <span>Maandhuur</span>{getSortIcon('income')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-px text-center')}>
-                        <span className="inline-flex items-center justify-center text-[#163300]/70 dark:text-[#9FE870]/70" title="Details">
-                          <Info className="h-4 w-4" />
-                        </span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedProperties.map((prop) => (
-                      <Fragment key={prop.id}>
-                        <TableRow
-                          className="hover:bg-gray-50 dark:hover:bg-neutral-800 cursor-pointer"
+              <div className="rounded-2xl overflow-hidden">
+                {/* Header */}
+                <div className="grid grid-cols-[1.5rem_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
+                    checked={sortedProperties.length > 0 && sortedProperties.every((p) => selectedIds.has(p.id))}
+                    onChange={(e) => setSelectedIds(e.target.checked ? new Set(sortedProperties.map((p) => p.id)) : new Set())}
+                  />
+                  <button type="button" onClick={() => toggleSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Object {getSortIcon('name')}
+                  </button>
+                  <button type="button" onClick={() => toggleSort('type')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Type {getSortIcon('type')}
+                  </button>
+                  <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Portefeuille</span>
+                  <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Status</span>
+                  <button type="button" onClick={() => toggleSort('income')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Maandhuur {getSortIcon('income')}
+                  </button>
+                  <span />
+                </div>
+
+                {sortedProperties.length === 0 ? (
+                  <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen objecten gevonden.</div>
+                ) : (
+                  <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+                    {sortedProperties.map((prop) => {
+                      const status = getPropertyStatus(prop)
+                      const income = getMonthlyIncome(prop)
+                      return (
+                        <div
+                          key={prop.id}
+                          className="grid grid-cols-[1.5rem_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer rounded-xl"
                           onClick={() => setSelectedPropertyId(prop.id)}
                         >
-                          <TableCell className="w-px px-4" onClick={(e) => e.stopPropagation()}>
-                            <input
-                              type="checkbox"
-                              className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
-                              checked={selectedIds.has(prop.id)}
-                              onChange={(e) =>
-                                setSelectedIds((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(prop.id)
-                                  else next.delete(prop.id)
-                                  return next
-                                })
-                              }
-                            />
-                          </TableCell>
-                          <TableCell className="py-4 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className={cn('h-10 w-10 rounded-lg', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                <Building2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                              </div>
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white">{prop.name}</div>
-                                <div className="text-sm text-gray-500 flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />{prop.address}
-                                </div>
-                              </div>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
+                            checked={selectedIds.has(prop.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) =>
+                              setSelectedIds((prev) => {
+                                const next = new Set(prev)
+                                if (e.target.checked) next.add(prop.id)
+                                else next.delete(prop.id)
+                                return next
+                              })
+                            }
+                          />
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="h-9 w-9 rounded-xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                              <Building2 className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                             </div>
-                          </TableCell>
-                          <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white capitalize">{prop.type}</TableCell>
-                          <TableCell className="py-4 px-4">
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{prop.name}</p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 truncate">
+                                <MapPin className="h-3 w-3 shrink-0" />{prop.address}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 capitalize truncate">{prop.type}</p>
+                          <div>
                             {prop.portfolioName ? (
-                              <span className="text-xs font-medium px-2 py-1 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">
                                 {prop.portfolioName}
                               </span>
                             ) : (
                               <span className="text-xs text-gray-400">—</span>
                             )}
-                          </TableCell>
-                          <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white">{prop.units.length}</TableCell>
-                          <TableCell className="py-4 px-4 text-sm font-medium text-[#163300] dark:text-[#9FE870]">
-                            €{getMonthlyIncome(prop).toLocaleString('nl-NL')}
-                          </TableCell>
-                          <TableCell className="w-px text-right pr-3">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setExpandedPropertyId(expandedPropertyId === prop.id ? null : prop.id)
-                              }}
-                              className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors"
-                            >
-                              <ChevronRight
-                                className={cn('h-4 w-4 transition-transform duration-200', expandedPropertyId === prop.id && 'rotate-90')}
-                              />
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                        {expandedPropertyId === prop.id && (
-                          <TableRow className="bg-gray-50/60 dark:bg-neutral-900/60">
-                            <TableCell colSpan={7} className="py-3 px-6 text-sm text-gray-600 dark:text-gray-300">
-                              <div className="flex flex-wrap gap-4 justify-between">
-                                {prop.city && <div><p className="text-xs uppercase tracking-wide text-gray-400">Plaats</p><p>{prop.city}</p></div>}
-                                {prop.portfolioName && <div><p className="text-xs uppercase tracking-wide text-gray-400">Portefeuille</p><p>{prop.portfolioName}</p></div>}
-                                <div><p className="text-xs uppercase tracking-wide text-gray-400">Eenheden</p><p>{prop.units.length}</p></div>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </Fragment>
-                    ))}
-                  </TableBody>
-                </Table>
-              </DashboardTableBlock>
+                          </div>
+                          <div>
+                            <span className={cn(
+                              'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                              status === 'verhuurd' && 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]',
+                              status === 'leegstand' && 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
+                              status === 'achterstand' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                              status === 'gemengd' && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                            )}>
+                              {status}
+                            </span>
+                          </div>
+                          <p className="text-sm font-medium text-[#163300] dark:text-[#9FE870]">
+                            {income > 0 ? `€${income.toLocaleString('nl-NL')}` : <span className="text-gray-400">—</span>}
+                          </p>
+                          <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             )
           )}
 
@@ -1006,59 +929,55 @@ export default function PortfolioPage() {
               TAB: RECHTSPERSONEN
               ════════════════════════════════════════ */}
           {activeSegment === 'rechtspersonen' && (
-            <DashboardTableBlock empty={sortedLegalEntities.length === 0}>
-              {sortedLegalEntities.length === 0 ? (
-                <div className="py-20 text-center">
-                  <Landmark className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nog geen rechtspersonen</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Rechtspersonen worden beheerd via Instellingen</p>
+            sortedLegalEntities.length === 0 ? (
+              <div className="py-20 text-center">
+                <Landmark className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nog geen rechtspersonen</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Rechtspersonen worden beheerd via Instellingen</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl overflow-hidden">
+                {/* Header */}
+                <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+                  <button type="button" onClick={() => toggleLegalSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Rechtspersoon {getLegalSortIcon('name')}
+                  </button>
+                  <button type="button" onClick={() => toggleLegalSort('entityType')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Type {getLegalSortIcon('entityType')}
+                  </button>
+                  <button type="button" onClick={() => toggleLegalSort('kvk')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    KvK {getLegalSortIcon('kvk')}
+                  </button>
+                  <button type="button" onClick={() => toggleLegalSort('propertyCount')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    Objecten {getLegalSortIcon('propertyCount')}
+                  </button>
+                  <span />
                 </div>
-              ) : (
-                <Table className="w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleLegalSort('name')}>
-                          <span>Rechtspersoon</span>{getLegalSortIcon('name')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleLegalSort('entityType')}>
-                          <span>Type</span>{getLegalSortIcon('entityType')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleLegalSort('kvk')}>
-                          <span>KVK</span>{getLegalSortIcon('kvk')}
-                        </button>
-                      </TableHead>
-                      <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleLegalSort('propertyCount')}>
-                          <span>Objecten</span>{getLegalSortIcon('propertyCount')}
-                        </button>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedLegalEntities.map((entity) => (
-                      <TableRow key={entity.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                        <TableCell className="py-4 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className={cn('h-10 w-10 rounded-lg', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                              <Landmark className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                            </div>
-                            <span className="font-medium text-gray-900 dark:text-white">{entity.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white">{entity.entityType}</TableCell>
-                        <TableCell className="py-4 px-4 text-sm text-gray-600 dark:text-gray-400 font-mono tabular-nums">{entity.kvk ?? '—'}</TableCell>
-                        <TableCell className="py-4 px-4 text-sm text-gray-900 dark:text-white tabular-nums">{entity.propertyCount}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </DashboardTableBlock>
+
+                {/* Rows */}
+                <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+                  {sortedLegalEntities.map((entity) => (
+                    <div
+                      key={entity.id}
+                      className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                          <Landmark className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{entity.name}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{entity.entityType}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-mono tabular-nums">{entity.kvk ?? '—'}</p>
+                      <p className="text-sm text-gray-900 dark:text-white tabular-nums">{entity.propertyCount}</p>
+                      <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
           )}
 
         </CardContent>

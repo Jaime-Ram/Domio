@@ -2,13 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -17,13 +10,9 @@ import {
 } from '@/components/ui/select'
 import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
-  ADD_DIALOG_CLOSE_BUTTON_CLASS,
-  ADD_DIALOG_FOOTER_CLASS,
-  ADD_DIALOG_HEADER_CLASS,
-  ADD_DIALOG_TITLE_CLASS,
-  addDialogContentClassName,
+  CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
-import { Building2, Calendar, Euro, FileText, Check, User, StickyNote } from 'lucide-react'
+import { Building2, Calendar, Euro, FileText, User, StickyNote } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { leaseQueries, propertyQueries, unitQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -213,22 +202,17 @@ export function HuurovereenkomstDialog({
     'h-auto w-full p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
-      <DialogContent
-        className={addDialogContentClassName('max-w-md')}
-        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
-      >
-        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
-          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuwe huurovereenkomst</DialogTitle>
-          {/* Huurder badge */}
-          <div className="flex items-center gap-2 mt-2">
-            <div className="h-6 w-6 rounded-full bg-[#163300]/10 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-              <User className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-            </div>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{tenant.name}</span>
-          </div>
-        </DialogHeader>
-
+    <CreateDialogShell
+      open={open}
+      onOpenChange={(v) => { if (!v) onClose() }}
+      title="Nieuwe huurovereenkomst"
+      subtitle={`Koppel een eenheid en stel de huurvoorwaarden in voor ${tenant.name}.`}
+      primaryLabel="Huurovereenkomst aanmaken"
+      onPrimary={handleSave}
+      primaryDisabled={saving || !canSave}
+      primaryLoading={saving}
+      scrollBody
+    >
         <div className={ADD_DIALOG_BODY_SCROLL_CLASS}>
           {error && (
             <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
@@ -368,22 +352,6 @@ export function HuurovereenkomstDialog({
             />
           </div>
         </div>
-
-        <DialogFooter className={ADD_DIALOG_FOOTER_CLASS}>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving || !canSave}
-            className={cn(
-              'inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F]',
-              'disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 transition-colors'
-            )}
-          >
-            <Check className="h-4 w-4 shrink-0" />
-            {saving ? 'Opslaan…' : 'Huurovereenkomst aanmaken'}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </CreateDialogShell>
   )
 }
