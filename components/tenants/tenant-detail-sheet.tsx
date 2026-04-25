@@ -308,7 +308,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
         {/* ── Tijdlijn ───────────────────────────────────────────────────── */}
         {activeTab === 'tijdlijn' && (
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-5">
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">
               Recente activiteit
             </p>
             {loading ? (
@@ -345,7 +345,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
                 {activeLease && (
                   <>
                     <div className="border-t border-gray-100 dark:border-neutral-800 pt-4 mt-4">
-                      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Huurcontract</p>
+                      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-3">Huurcontract</p>
                     </div>
                     <InfoRow icon={Home}       label="Object"       value={activeLease.unit?.property?.name ?? '—'} />
                     <InfoRow icon={Euro}       label="Huurprijs"    value={activeLease.monthly_rent ? `€ ${Number(activeLease.monthly_rent).toLocaleString('nl-NL')} / mnd` : '—'} />

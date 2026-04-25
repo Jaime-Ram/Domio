@@ -364,7 +364,7 @@ export function HuurovereenkomstDialog({
         {/* Contract preview */}
         {previewHtml && (
           <div className="mt-2">
-            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2 flex items-center gap-1.5">
               <FileText className="h-3 w-3" />
               Contractpreview
             </p>

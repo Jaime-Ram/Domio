@@ -187,7 +187,7 @@ export function NewPortfolioDialog({
 
           {/* Rechtspersoon */}
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-1">
+            <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 px-1">
               Eigenaar / rechtspersoon (optioneel)
             </p>
 
