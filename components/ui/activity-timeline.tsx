@@ -14,10 +14,10 @@ export type TimelineEvent = {
 }
 
 const variantCls: Record<NonNullable<TimelineEvent['variant']>, { circle: string; icon: string }> = {
-  default: { circle: 'bg-[#9FE870]/15 dark:bg-[#9FE870]/10', icon: 'text-[#163300] dark:text-[#9FE870]' },
-  warning: { circle: 'bg-amber-50 dark:bg-amber-500/10',     icon: 'text-amber-600 dark:text-amber-400' },
-  danger:  { circle: 'bg-red-50 dark:bg-red-500/10',         icon: 'text-red-600 dark:text-red-400' },
-  neutral: { circle: 'bg-gray-100 dark:bg-neutral-800',      icon: 'text-gray-500 dark:text-gray-400' },
+  default: { circle: 'bg-gray-100 dark:bg-neutral-800', icon: 'text-gray-500 dark:text-gray-400' },
+  warning: { circle: 'bg-gray-100 dark:bg-neutral-800', icon: 'text-gray-500 dark:text-gray-400' },
+  danger:  { circle: 'bg-gray-100 dark:bg-neutral-800', icon: 'text-gray-500 dark:text-gray-400' },
+  neutral: { circle: 'bg-gray-100 dark:bg-neutral-800', icon: 'text-gray-500 dark:text-gray-400' },
 }
 
 function formatRelative(ts: Date | string): string {
@@ -62,15 +62,15 @@ export function ActivityTimeline({ events, className }: ActivityTimelineProps) {
           const isLast = i === events.length - 1
 
           return (
-            <li key={event.id} className={cn('flex gap-4 relative', !isLast && 'pb-6')}>
+            <li key={event.id} className={cn('flex gap-4 relative group cursor-default', !isLast && 'pb-6')}>
               {/* Icon circle */}
               <div
                 className={cn(
-                  'h-10 w-10 shrink-0 rounded-full flex items-center justify-center z-10',
-                  v.circle,
+                  'h-10 w-10 shrink-0 rounded-full flex items-center justify-center z-10 transition-colors',
+                  'bg-gray-100 dark:bg-neutral-800 group-hover:bg-[#163300] dark:group-hover:bg-[#163300]',
                 )}
               >
-                <Icon className={cn('h-4 w-4', v.icon)} />
+                <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400 group-hover:text-white transition-colors" />
               </div>
 
               {/* Content */}

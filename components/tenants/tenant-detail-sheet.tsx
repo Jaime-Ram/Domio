@@ -64,7 +64,7 @@ const TICKET_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
 // ─── Tab nav ──────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'tijdlijn', label: 'Tijdlijn' },
+  { id: 'tijdlijn', label: 'Activiteit' },
   { id: 'info',     label: 'Info' },
   { id: 'betalingen', label: 'Betalingen' },
   { id: 'documenten', label: 'Documenten' },
