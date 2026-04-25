@@ -63,7 +63,7 @@ function TenantsPageContent() {
   const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [newTenantOpen, setNewTenantOpen] = useState(false)
   const [leaseDialogOpen, setLeaseDialogOpen] = useState(false)
-  const [leaseDialogTenant, setLeaseDialogTenant] = useState<{ id: string; name: string } | null>(null)
+  const [leaseDialogTenant, setLeaseDialogTenant] = useState<{ id: string; name: string; email?: string; phone?: string } | null>(null)
   const [pendingTenantNav, setPendingTenantNav] = useState<string | null>(null)
 
   useEffect(() => {
@@ -135,7 +135,7 @@ function TenantsPageContent() {
         `${basePath}/tenants/${t.id}${t.leaseLinkFailed ? '?koppeling=mislukt' : ''}`
       )
     }
-    setLeaseDialogTenant({ id: t.id, name: t.full_name })
+    setLeaseDialogTenant({ id: t.id, name: t.full_name, email: t.email ?? undefined, phone: t.phone ?? undefined })
     setLeaseDialogOpen(true)
   }
 
@@ -417,6 +417,15 @@ function TenantsPageContent() {
         onClose={() => setNewTenantOpen(false)}
         onCreated={onTenantCreated}
       />
+
+      {leaseDialogTenant && (
+        <HuurovereenkomstDialog
+          open={leaseDialogOpen}
+          onClose={() => { setLeaseDialogOpen(false); setLeaseDialogTenant(null) }}
+          onCreated={() => { setLeaseDialogOpen(false); setLeaseDialogTenant(null) }}
+          tenant={leaseDialogTenant}
+        />
+      )}
 
       <TenantDetailSheet
         tenantId={selectedTenantId}
