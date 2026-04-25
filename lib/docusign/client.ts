@@ -10,7 +10,8 @@
  *   DOCUSIGN_BASE_URL          — https://demo.docusign.net (sandbox) of https://na4.docusign.net
  */
 
-import { SignJWT, importPKCS8 } from 'jose'
+import { SignJWT } from 'jose'
+import { createPrivateKey } from 'crypto'
 
 const SCOPES = 'signature impersonation'
 const TOKEN_TTL = 3600 // seconden
@@ -25,24 +26,30 @@ export async function getAccessToken(): Promise<string> {
 
   const integrationKey = process.env.DOCUSIGN_INTEGRATION_KEY!
   const userId = process.env.DOCUSIGN_USER_ID!
-  const baseUrl = process.env.DOCUSIGN_BASE_URL ?? 'https://account-d.docusign.com'
   const rawKey = process.env.DOCUSIGN_PRIVATE_KEY!
 
+  // Auth altijd via account-d (sandbox) of account (productie) — nooit via demo.docusign.net
+  const apiBase = process.env.DOCUSIGN_BASE_URL ?? 'https://demo.docusign.net'
+  const authBase = apiBase.includes('demo.docusign.net')
+    ? 'https://account-d.docusign.com'
+    : 'https://account.docusign.com'
+
   const pemKey = rawKey.replace(/\\n/g, '\n')
-  const privateKey = await importPKCS8(pemKey, 'RS256')
+  // Werkt met zowel PKCS#1 (BEGIN RSA PRIVATE KEY) als PKCS#8 (BEGIN PRIVATE KEY)
+  const privateKey = createPrivateKey(pemKey)
 
   const jwt = await new SignJWT({
     scope: SCOPES,
     iss: integrationKey,
     sub: userId,
-    aud: new URL(baseUrl).hostname,
+    aud: new URL(authBase).hostname,
   })
     .setProtectedHeader({ alg: 'RS256' })
     .setIssuedAt()
     .setExpirationTime(`${TOKEN_TTL}s`)
     .sign(privateKey)
 
-  const res = await fetch(`${baseUrl}/oauth/token`, {
+  const res = await fetch(`${authBase}/oauth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -91,8 +98,7 @@ export interface EnvelopeResult {
 
 export async function createEnvelope(opts: CreateEnvelopeOptions): Promise<EnvelopeResult> {
   const accountId = process.env.DOCUSIGN_ACCOUNT_ID!
-  const baseUrl = process.env.DOCUSIGN_BASE_URL ?? 'https://demo.docusign.net'
-  const apiBase = `${baseUrl}/restapi/v2.1/accounts/${accountId}`
+  const apiBase = `${process.env.DOCUSIGN_BASE_URL ?? 'https://demo.docusign.net'}/restapi/v2.1/accounts/${accountId}`
 
   const token = await getAccessToken()
 
@@ -158,11 +164,10 @@ export async function createEnvelope(opts: CreateEnvelopeOptions): Promise<Envel
 
 export async function getEnvelopeStatus(envelopeId: string) {
   const accountId = process.env.DOCUSIGN_ACCOUNT_ID!
-  const baseUrl = process.env.DOCUSIGN_BASE_URL ?? 'https://demo.docusign.net'
   const token = await getAccessToken()
 
   const res = await fetch(
-    `${baseUrl}/restapi/v2.1/accounts/${accountId}/envelopes/${envelopeId}`,
+    `${process.env.DOCUSIGN_BASE_URL ?? 'https://demo.docusign.net'}/restapi/v2.1/accounts/${accountId}/envelopes/${envelopeId}`,
     { headers: { Authorization: `Bearer ${token}` } },
   )
 
