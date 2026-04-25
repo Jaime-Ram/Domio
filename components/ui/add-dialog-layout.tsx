@@ -52,6 +52,11 @@ interface CreateDialogShellProps {
   onBack?: () => void
   /** Gebruik scrollbare body (bij lange formulieren). Default: false. */
   scrollBody?: boolean
+  /** Optionele tweede actieknop links van de primaire knop */
+  secondaryLabel?: string
+  onSecondary?: () => void
+  secondaryDisabled?: boolean
+  secondaryLoading?: boolean
   children: React.ReactNode
 }
 
@@ -64,6 +69,10 @@ export function CreateDialogShell({
   onPrimary,
   primaryDisabled,
   primaryLoading,
+  secondaryLabel,
+  onSecondary,
+  secondaryDisabled,
+  secondaryLoading,
   step,
   totalSteps,
   onBack,
@@ -114,7 +123,7 @@ export function CreateDialogShell({
             <span />
           )}
 
-          {/* Rechts: Annuleren + primaire actie */}
+          {/* Rechts: Annuleren + optionele secondary + primaire actie */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -123,6 +132,16 @@ export function CreateDialogShell({
             >
               Annuleren
             </button>
+            {secondaryLabel && onSecondary && (
+              <button
+                type="button"
+                onClick={onSecondary}
+                disabled={secondaryDisabled || secondaryLoading}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-800 disabled:opacity-50 text-gray-700 dark:text-gray-300 text-sm font-semibold px-4 py-2 transition-colors"
+              >
+                {secondaryLoading ? `${secondaryLabel}…` : secondaryLabel}
+              </button>
+            )}
             <button
               type="button"
               onClick={onPrimary}
