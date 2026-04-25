@@ -79,14 +79,27 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
   const days = (n: number) => new Date(now - n * 86400_000)
   const hours = (n: number) => new Date(now - n * 3_600_000)
 
+  const fmt = (d: Date) => d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+
   return [
     {
       id: '1',
       icon: Send,
-      title: 'Huurovereenkomst verstuurd',
+      title: 'Huurovereenkomst verstuurd via DocuSign',
       actor: 'Domio',
       timestamp: hours(1),
       variant: 'default',
+      meta: [
+        { label: 'Ontvanger', value: tenantName },
+        { label: 'Status ondertekening', value: 'In afwachting', highlight: true },
+        { label: 'Verstuurd op', value: fmt(hours(1)) },
+        { label: 'Verloopdatum link', value: fmt(days(-6)) },
+      ],
+      attachments: [
+        { label: 'Huurovereenkomst.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/tenants',
+      hrefLabel: 'Bekijk huurder',
     },
     {
       id: '2',
@@ -95,6 +108,14 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: 'Domio',
       timestamp: hours(2),
       variant: 'default',
+      meta: [
+        { label: 'Naam', value: tenantName },
+        { label: 'Aangemaakt op', value: fmt(hours(2)) },
+        { label: 'Identiteitsverificatie', value: 'Goedgekeurd' },
+        { label: 'Gekoppeld object', value: 'Keizersgracht 142, Amsterdam' },
+      ],
+      href: '/dashboard/employer/tenants',
+      hrefLabel: 'Bekijk huurdersdossier',
     },
     {
       id: '3',
@@ -103,14 +124,40 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: tenantName,
       timestamp: days(5),
       variant: 'default',
+      meta: [
+        { label: 'Bedrag', value: `€ ${monthlyRent.toLocaleString('nl-NL')}`, highlight: true },
+        { label: 'Ontvangen op', value: fmt(days(5)) },
+        { label: 'Van rekening', value: 'NL91 ABNA 0417 1643 00' },
+        { label: 'Omschrijving', value: `Huur april 2026 — ${tenantName}` },
+        { label: 'Matched factuur', value: 'FAC-2026-004' },
+        { label: 'Status', value: 'Verwerkt', highlight: true },
+      ],
+      attachments: [
+        { label: 'Betaalbewijs april 2026.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/financial',
+      hrefLabel: 'Bekijk in financieel overzicht',
     },
     {
       id: '4',
       icon: Euro,
-      title: `Factuur verstuurd — april 2026`,
+      title: 'Factuur verstuurd — april 2026',
       actor: 'Domio',
       timestamp: days(6),
       variant: 'default',
+      meta: [
+        { label: 'Factuurnummer', value: 'FAC-2026-004' },
+        { label: 'Bedrag', value: `€ ${monthlyRent.toLocaleString('nl-NL')}`, highlight: true },
+        { label: 'Verstuurd op', value: fmt(days(6)) },
+        { label: 'Vervaldatum', value: fmt(days(-9)) },
+        { label: 'Periode', value: 'April 2026' },
+        { label: 'Status', value: 'Betaald', highlight: true },
+      ],
+      attachments: [
+        { label: 'Factuur FAC-2026-004.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/financial',
+      hrefLabel: 'Bekijk factuur',
     },
     {
       id: '5',
@@ -119,6 +166,15 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: 'Domio',
       timestamp: days(8),
       variant: 'warning',
+      meta: [
+        { label: 'Openstaand bedrag', value: `€ ${monthlyRent.toLocaleString('nl-NL')}`, highlight: true },
+        { label: 'Dagen te laat', value: '3 dagen' },
+        { label: 'Herinneringsnummer', value: '1e herinnering' },
+        { label: 'Verstuurd op', value: fmt(days(8)) },
+        { label: 'Betaald op', value: fmt(days(5)) },
+      ],
+      href: '/dashboard/employer/financial',
+      hrefLabel: 'Bekijk betalingshistorie',
     },
     {
       id: '6',
@@ -127,6 +183,16 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: tenantName,
       timestamp: days(22),
       variant: 'neutral',
+      meta: [
+        { label: 'Categorie', value: 'Loodgieterij' },
+        { label: 'Prioriteit', value: 'Normaal' },
+        { label: 'Status', value: 'In behandeling', highlight: true },
+        { label: 'Ingediend op', value: fmt(days(22)) },
+        { label: 'Monteur gepland', value: fmt(days(-7)) },
+        { label: 'Referentie', value: 'OND-2026-018' },
+      ],
+      href: '/dashboard/employer/maintenance',
+      hrefLabel: 'Bekijk onderhoudsticket',
     },
     {
       id: '7',
@@ -135,6 +201,19 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: 'Domio',
       timestamp: days(45),
       variant: 'default',
+      meta: [
+        { label: 'Index', value: 'CPI — CBS 2026' },
+        { label: 'Percentage', value: '+3,1%', highlight: true },
+        { label: 'Oude huurprijs', value: `€ ${monthlyRent.toLocaleString('nl-NL')}` },
+        { label: 'Nieuwe huurprijs', value: `€ ${Math.round(monthlyRent * 1.031).toLocaleString('nl-NL')}`, highlight: true },
+        { label: 'Ingangsdatum', value: '1 januari 2026' },
+        { label: 'Huurder geïnformeerd', value: 'Ja — per brief' },
+      ],
+      attachments: [
+        { label: 'Indexatiebrief 2026.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/tenants',
+      hrefLabel: 'Bekijk contractdetails',
     },
     {
       id: '8',
@@ -143,6 +222,17 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: tenantName,
       timestamp: days(90),
       variant: 'neutral',
+      meta: [
+        { label: 'Documenttype', value: 'Salarisstrook' },
+        { label: 'Geüpload op', value: fmt(days(90)) },
+        { label: 'Periode', value: 'Oktober 2025' },
+        { label: 'Status verificatie', value: 'Goedgekeurd', highlight: true },
+      ],
+      attachments: [
+        { label: 'Salarisstrook_okt2025.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/tenants',
+      hrefLabel: 'Bekijk documenten',
     },
     {
       id: '9',
@@ -151,6 +241,19 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       actor: 'Domio',
       timestamp: days(120),
       variant: 'default',
+      meta: [
+        { label: 'Contractnummer', value: 'HK-2025-0042' },
+        { label: 'Startdatum', value: fmt(days(120)) },
+        { label: 'Einddatum', value: 'Onbepaalde tijd' },
+        { label: 'Huurprijs', value: `€ ${monthlyRent.toLocaleString('nl-NL')} / mnd`, highlight: true },
+        { label: 'Borg', value: `€ ${(monthlyRent * 2).toLocaleString('nl-NL')}` },
+        { label: 'Ondertekend door', value: `${tenantName} + verhuurder` },
+      ],
+      attachments: [
+        { label: 'Getekend huurcontract.pdf', href: '#' },
+      ],
+      href: '/dashboard/employer/tenants',
+      hrefLabel: 'Bekijk contract',
     },
   ]
 }
@@ -369,7 +472,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
               return (
                 <div key={p.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-neutral-800 last:border-0">
                   <div className="flex items-center gap-3">
-                    <div className={cn('h-2 w-2 rounded-full', cfg?.dot ?? 'bg-gray-300')} />
+                    <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{p.month}</p>
                   </div>
                   <div className="flex items-center gap-3">
