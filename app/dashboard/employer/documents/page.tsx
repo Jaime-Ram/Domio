@@ -11,6 +11,7 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { Eye, Download, Trash2, Upload, X, Plus } from 'lucide-react'
 import {
   Dialog,
@@ -57,8 +58,7 @@ export default function DocumentsPage() {
   const [stagedUploadFiles, setStagedUploadFiles] = useState<File[]>([])
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-  const [sortKey, setSortKey] = useState<SortKey>('date')
-  const [sortAsc, setSortAsc] = useState(false)
+  const { sort: docSort, toggleSort } = useSortable<string>('date', 'desc')
   const [typeFilter, setTypeFilter] = useState<Record<string, boolean>>({
     Contract: true,
     Keuring: true,
@@ -155,27 +155,15 @@ export default function DocumentsPage() {
     })
   }, [documents, typeFilter, propertyFilter, search])
 
-  const sortedDocuments = useMemo(() => {
-    const list = [...filteredDocuments]
-    list.sort((a, b) => {
-      let cmp = 0
-      if (sortKey === 'name') {
-        cmp = (a.name || '').localeCompare(b.name || '')
-      } else if (sortKey === 'type') {
-        cmp = (a.type || '').localeCompare(b.type || '')
-      } else if (sortKey === 'property') {
-        const pa = (a.property ?? a.properties)?.address ?? ''
-        const pb = (b.property ?? b.properties)?.address ?? ''
-        cmp = pa.localeCompare(pb)
-      } else {
-        const da = new Date(a.created_at || 0).getTime()
-        const db = new Date(b.created_at || 0).getTime()
-        cmp = da - db
-      }
-      return sortAsc ? cmp : -cmp
+  const sortedDocuments = useMemo(() =>
+    applySortedRows(filteredDocuments, docSort, (d, k) => {
+      if (k === 'name') return d.name ?? ''
+      if (k === 'type') return d.type ?? ''
+      if (k === 'property') return (d.property ?? d.properties)?.address ?? ''
+      if (k === 'date') return new Date(d.created_at || 0).getTime()
+      return null
     })
-    return list
-  }, [filteredDocuments, sortKey, sortAsc])
+  , [filteredDocuments, docSort])
 
   const toCardDoc = (doc: any): DocumentCardDoc => {
     const extracted = doc.extracted_data as Record<string, unknown> | null | undefined
@@ -413,18 +401,6 @@ export default function DocumentsPage() {
 
   const bulkBusy = bulkProcessingIds.length > 0
 
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) setSortAsc((a) => !a)
-    else {
-      setSortKey(key)
-      setSortAsc(key === 'date')
-    }
-  }
-
-  const getSortIcon = (key: SortKey) => {
-    if (sortKey !== key) return null
-    return sortAsc ? ' ↑' : ' ↓'
-  }
 
   return (
     <>
@@ -673,18 +649,10 @@ export default function DocumentsPage() {
             <div className="rounded-2xl overflow-hidden mt-8">
               {/* Column headers */}
               <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-left" onClick={() => toggleSort('name')}>
-                  Naam {getSortIcon('name')}
-                </button>
-                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('type')}>
-                  Type {getSortIcon('type')}
-                </button>
-                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('date')}>
-                  Datum {getSortIcon('date')}
-                </button>
-                <button type="button" className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" onClick={() => toggleSort('property')}>
-                  Pand {getSortIcon('property')}
-                </button>
+                <SortableHeader label="Naam" sortKey="name" sort={docSort} onSort={toggleSort} />
+                <SortableHeader label="Type" sortKey="type" sort={docSort} onSort={toggleSort} />
+                <SortableHeader label="Datum" sortKey="date" sort={docSort} onSort={toggleSort} />
+                <SortableHeader label="Pand" sortKey="property" sort={docSort} onSort={toggleSort} />
                 <span />
               </div>
               {/* Rows */}

@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import {
-  Clock, AlertCircle, Plus, Search,
+  Clock, Plus, Search,
   Calendar, Bell, RefreshCw, Building2, ListTodo,
   Pencil, Check, Filter, Grid3x3, Table2, ChevronRight,
 } from 'lucide-react'
+import { AlertCircle, ClockCheck, CheckDone01 } from '@untitledui/icons'
 import { cn } from '@/lib/utils'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { taskQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -132,6 +134,7 @@ export default function TasksPage() {
   const [categoryFilter, setCategoryFilter] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(Object.keys(CATEGORY_CONFIG).map((k) => [k, true]))
   )
+  const { sort: taskSort, toggleSort } = useSortable<string>()
 
   // Load
   useEffect(() => {
@@ -161,8 +164,15 @@ export default function TasksPage() {
       return categoryFilter[cat] !== false
     })
     if (search) list = list.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
-    return list
-  }, [tasks, filter, search, openTasks, categoryFilter])
+    return applySortedRows(list, taskSort, (t, k) => {
+      if (k === 'title') return t.title ?? ''
+      if (k === 'property') return t.properties?.name ?? ''
+      if (k === 'due_date') return t.due_date ?? ''
+      if (k === 'priority') return ['laag','normaal','hoog','urgent'].indexOf(t.priority ?? 'normaal')
+      if (k === 'notification_date') return t.notification_date ?? ''
+      return null
+    })
+  }, [tasks, filter, search, openTasks, categoryFilter, taskSort])
 
   const toggleDone = async (task: any) => {
     const newStatus = task.status === 'afgerond' ? 'open' : 'afgerond'
@@ -318,12 +328,12 @@ export default function TasksPage() {
         <MetricCard
           label="Actie binnen 7 dagen"
           value={String(actionNeeded.length)}
-          icon={<Clock />}
+          icon={<ClockCheck />}
         />
         <MetricCard
           label="Open taken"
           value={String(openTasks.length)}
-          icon={<ListTodo />}
+          icon={<CheckDone01 />}
         />
         <AddTaskTile className="h-full min-h-[160px]" onClick={openNew} />
       </div>
@@ -335,11 +345,11 @@ export default function TasksPage() {
         {/* Column headers */}
         <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_1fr_2.5rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
           <span />
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Taak</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Pand</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Einddatum</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500 hidden md:block">Prioriteit</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500 hidden md:block">Herinnering</span>
+          <SortableHeader label="Taak" sortKey="title" sort={taskSort} onSort={toggleSort} />
+          <SortableHeader label="Pand" sortKey="property" sort={taskSort} onSort={toggleSort} />
+          <SortableHeader label="Einddatum" sortKey="due_date" sort={taskSort} onSort={toggleSort} />
+          <SortableHeader label="Prioriteit" sortKey="priority" sort={taskSort} onSort={toggleSort} className="hidden md:inline-flex" />
+          <SortableHeader label="Herinnering" sortKey="notification_date" sort={taskSort} onSort={toggleSort} className="hidden md:inline-flex" />
           <span />
         </div>
 
@@ -443,7 +453,6 @@ export default function TasksPage() {
               const done = task.status === 'afgerond'
               const days = task.due_date ? daysUntil(task.due_date) : null
               const isOverdue = days !== null && days < 0 && !done
-              const isUrgent = days !== null && days <= 7 && days >= 0 && !done
               const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
               const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
               const rec = RECURRING_LABEL[task.recurring] ?? ''
@@ -462,101 +471,84 @@ export default function TasksPage() {
                       className={cn(
                         'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
                         done
-                          ? 'border-[#163300] bg-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]'
-                          : isOverdue
-                            ? 'border-red-400 hover:border-red-500'
-                            : 'border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870]'
+                          ? 'border-gray-400 bg-gray-400 dark:border-neutral-500 dark:bg-neutral-500'
+                          : 'border-gray-300 dark:border-neutral-600 hover:border-gray-500 dark:hover:border-neutral-400'
                       )}
                     >
-                      {done && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" />}
+                      {done && <Check className="h-2.5 w-2.5 text-white" />}
                     </button>
                   </div>
 
                   {/* Title + category */}
                   <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 min-w-0">
-                      <span
-                        className={cn(
-                          'text-sm font-semibold truncate',
-                          done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
-                        )}
-                      >
-                        {task.title}
-                      </span>
-                      <span className={cn('text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0', cat.color)}>
-                        {cat.label}
-                      </span>
+                    <span className={cn(
+                      'text-sm font-semibold truncate block',
+                      done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
+                    )}>
+                      {task.title}
+                    </span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
+                      {cat.label}
                       {rec && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
-                          <RefreshCw className="h-3 w-3 shrink-0" />
-                          {rec}
-                        </span>
+                        <>
+                          <span>·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <RefreshCw className="h-3 w-3 shrink-0" />
+                            {rec}
+                          </span>
+                        </>
                       )}
-                    </div>
-                    {task.description && !task.properties && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                        {task.description}
-                      </p>
-                    )}
+                    </span>
                   </div>
 
                   {/* Pand */}
                   <div className="min-w-0">
                     {task.properties ? (
-                      <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 min-w-0">
-                        <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
-                        <span className="truncate">{task.properties.name}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">
+                        {task.properties.name}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">—</span>
+                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
                     )}
                   </div>
 
                   {/* Einddatum */}
                   <div className="min-w-0">
                     {task.due_date ? (
-                      <span
-                        className={cn(
-                          'inline-flex items-center gap-1 text-sm font-medium',
-                          isOverdue
-                            ? 'text-red-600 dark:text-red-400'
-                            : isUrgent
-                              ? 'text-amber-600 dark:text-amber-400'
-                              : done
-                                ? 'text-gray-400 dark:text-gray-600'
-                                : 'text-gray-700 dark:text-gray-300'
-                        )}
-                      >
-                        {isOverdue && <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
-                        <Calendar className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                      <span className={cn(
+                        'text-sm',
+                        isOverdue
+                          ? 'text-red-500 dark:text-red-400 font-medium'
+                          : done
+                            ? 'text-gray-400 dark:text-gray-600'
+                            : 'text-gray-500 dark:text-gray-400'
+                      )}>
                         {fmtDate(task.due_date)}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">—</span>
+                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
                     )}
                   </div>
 
                   {/* Prioriteit */}
                   <div className="hidden md:block min-w-0">
                     {task.priority && task.priority !== 'normaal' ? (
-                      <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
-                        <span className={cn('h-2 w-2 rounded-full shrink-0', prio.dot)} />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {prio.label}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">—</span>
+                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
                     )}
                   </div>
 
                   {/* Herinnering */}
                   <div className="hidden md:block min-w-0">
                     {task.notification_date ? (
-                      <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                        <Bell className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {fmtDate(task.notification_date)}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">—</span>
+                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
                     )}
                   </div>
 
@@ -564,7 +556,7 @@ export default function TasksPage() {
                   <button
                     type="button"
                     onClick={() => openEdit(task)}
-                    className="inline-flex items-center justify-center h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors justify-self-end"
+                    className="inline-flex items-center justify-center h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-300 transition-colors justify-self-end"
                     aria-label="Bewerken"
                   >
                     <Pencil className="h-4 w-4" />

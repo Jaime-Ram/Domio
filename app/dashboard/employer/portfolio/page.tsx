@@ -10,10 +10,8 @@ import {
   MapPin,
   Grid3x3,
   Table2,
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
   ChevronRight,
+  ChevronDown,
   Filter,
   Landmark,
   Euro,
@@ -22,6 +20,7 @@ import {
   Layers,
   X,
 } from 'lucide-react'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries, portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
 import {
@@ -145,12 +144,8 @@ export default function PortfolioPage() {
     appartement: true, huis: true, overig: true,
   })
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
-  const [sort, setSort] = useState<{ column: SortColumn | null; direction: 'asc' | 'desc' | null }>({
-    column: null, direction: null,
-  })
-  const [legalSort, setLegalSort] = useState<{ column: LegalSortColumn | null; direction: 'asc' | 'desc' | null }>({
-    column: null, direction: null,
-  })
+  const { sort: propSort, toggleSort } = useSortable<string>()
+  const { sort: legalSortState, toggleSort: toggleLegalSort } = useSortable<string>()
 
   const [newPropertyOpen, setNewPropertyOpen] = useState(false)
   const [newPortfolioOpen, setNewPortfolioOpen] = useState(false)
@@ -308,70 +303,29 @@ export default function PortfolioPage() {
   )
   const occupancyRate = totalUnits > 0 ? Math.round((totalOccupied / totalUnits) * 100) : 0
 
-  // ── Sorting helpers ───────────────────────────────────────────────────────
-  const toggleSort = (column: SortColumn) => {
-    setSort((prev) => {
-      if (prev.column !== column || prev.direction === null) return { column, direction: 'asc' }
-      if (prev.direction === 'asc') return { column, direction: 'desc' }
-      return { column: null, direction: null }
-    })
-  }
-  const getSortIcon = (column: SortColumn) => {
-    if (sort.column !== column || !sort.direction) return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
-    return sort.direction === 'asc'
-      ? <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-      : <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-  }
-
-  const toggleLegalSort = (column: LegalSortColumn) => {
-    setLegalSort((prev) => {
-      if (prev.column !== column || prev.direction === null) return { column, direction: 'asc' }
-      if (prev.direction === 'asc') return { column, direction: 'desc' }
-      return { column: null, direction: null }
-    })
-  }
-  const getLegalSortIcon = (column: LegalSortColumn) => {
-    if (legalSort.column !== column || !legalSort.direction) return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
-    return legalSort.direction === 'asc'
-      ? <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-      : <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-  }
-
   // ── Filtered + sorted properties (Alle objecten tab) ──────────────────────
   const filteredProperties = allProperties.filter((p) => {
     const key = (p.type === 'appartement' || p.type === 'huis' ? p.type : 'overig') as string
     return typeFilter[key] !== false
   })
 
-  const sortedProperties = [...filteredProperties]
-  if (sort.column && sort.direction) {
-    const dir = sort.direction === 'asc' ? 1 : -1
-    sortedProperties.sort((a, b) => {
-      switch (sort.column) {
-        case 'name': return dir * a.name.localeCompare(b.name, 'nl')
-        case 'type': return dir * a.type.localeCompare(b.type, 'nl')
-        case 'units': return dir * (a.units.length - b.units.length)
-        case 'income': return dir * (getMonthlyIncome(a) - getMonthlyIncome(b))
-        default: return 0
-      }
-    })
-  }
+  const sortedProperties = applySortedRows(filteredProperties, propSort, (p, k) => {
+    if (k === 'name') return p.name
+    if (k === 'type') return p.type
+    if (k === 'units') return p.units.length
+    if (k === 'income') return getMonthlyIncome(p)
+    return null
+  })
 
-  const sortedLegalEntities = useMemo(() => {
-    const list = [...legalEntities]
-    if (!legalSort.column || !legalSort.direction) return list
-    const dir = legalSort.direction === 'asc' ? 1 : -1
-    list.sort((a, b) => {
-      switch (legalSort.column) {
-        case 'name': return dir * a.name.localeCompare(b.name, 'nl')
-        case 'entityType': return dir * a.entityType.localeCompare(b.entityType, 'nl')
-        case 'kvk': return dir * (a.kvk ?? '').localeCompare(b.kvk ?? '', 'nl')
-        case 'propertyCount': return dir * (a.propertyCount - b.propertyCount)
-        default: return 0
-      }
+  const sortedLegalEntities = useMemo(() =>
+    applySortedRows(legalEntities, legalSortState, (e, k) => {
+      if (k === 'name') return e.name
+      if (k === 'entityType') return e.entityType
+      if (k === 'kvk') return e.kvk ?? ''
+      if (k === 'propertyCount') return e.propertyCount
+      return null
     })
-    return list
-  }, [legalEntities, legalSort])
+  , [legalEntities, legalSortState])
 
   // ── Bulk assign handler (Invoerpunt 2) ───────────────────────────────────
   const handleBulkAssign = async () => {
@@ -839,17 +793,11 @@ export default function PortfolioPage() {
                     checked={sortedProperties.length > 0 && sortedProperties.every((p) => selectedIds.has(p.id))}
                     onChange={(e) => setSelectedIds(e.target.checked ? new Set(sortedProperties.map((p) => p.id)) : new Set())}
                   />
-                  <button type="button" onClick={() => toggleSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Object {getSortIcon('name')}
-                  </button>
-                  <button type="button" onClick={() => toggleSort('type')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Type {getSortIcon('type')}
-                  </button>
+                  <SortableHeader label="Object" sortKey="name" sort={propSort} onSort={toggleSort} />
+                  <SortableHeader label="Type" sortKey="type" sort={propSort} onSort={toggleSort} />
                   <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Portefeuille</span>
                   <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Status</span>
-                  <button type="button" onClick={() => toggleSort('income')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Maandhuur {getSortIcon('income')}
-                  </button>
+                  <SortableHeader label="Maandhuur" sortKey="income" sort={propSort} onSort={toggleSort} />
                   <span />
                 </div>
 
@@ -939,18 +887,10 @@ export default function PortfolioPage() {
               <div>
                 {/* Header */}
                 <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-                  <button type="button" onClick={() => toggleLegalSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Rechtspersoon {getLegalSortIcon('name')}
-                  </button>
-                  <button type="button" onClick={() => toggleLegalSort('entityType')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Type {getLegalSortIcon('entityType')}
-                  </button>
-                  <button type="button" onClick={() => toggleLegalSort('kvk')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    KvK {getLegalSortIcon('kvk')}
-                  </button>
-                  <button type="button" onClick={() => toggleLegalSort('propertyCount')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Objecten {getLegalSortIcon('propertyCount')}
-                  </button>
+                  <SortableHeader label="Rechtspersoon" sortKey="name" sort={legalSortState} onSort={toggleLegalSort} />
+                  <SortableHeader label="Type" sortKey="entityType" sort={legalSortState} onSort={toggleLegalSort} />
+                  <SortableHeader label="KvK" sortKey="kvk" sort={legalSortState} onSort={toggleLegalSort} />
+                  <SortableHeader label="Objecten" sortKey="propertyCount" sort={legalSortState} onSort={toggleLegalSort} />
                   <span />
                 </div>
 

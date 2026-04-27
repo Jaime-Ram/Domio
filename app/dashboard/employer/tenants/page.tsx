@@ -24,6 +24,7 @@ import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
 import { HuurovereenkomstDialog } from '@/components/tenants/huurovereenkomst-dialog'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 
 type TenantRow = {
   id: string
@@ -46,11 +47,7 @@ function TenantsPageContent() {
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
 
-  type SortColumn = 'name' | 'property' | 'rent' | 'status' | 'object'
-  const [sort, setSort] = useState<{ column: SortColumn | null; direction: 'asc' | 'desc' | null }>({
-    column: null,
-    direction: null,
-  })
+  const { sort: tenantSort, toggleSort } = useSortable<string>()
 
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null)
@@ -165,54 +162,13 @@ function TenantsPageContent() {
     return true
   })
 
-  const toggleSort = (column: SortColumn) => {
-    setSort((prev) => {
-      if (prev.column !== column || prev.direction === null) {
-        return { column, direction: 'asc' }
-      }
-      if (prev.direction === 'asc') {
-        return { column, direction: 'desc' }
-      }
-      return { column: null, direction: null }
-    })
-  }
-
-  const getSortIcon = (column: SortColumn) => {
-    if (sort.column !== column || !sort.direction) {
-      return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
-    }
-    if (sort.direction === 'asc') {
-      return <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-    }
-    return <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-  }
-
-  const sortedTenants = [...filteredTenants]
-  if (sort.column && sort.direction) {
-    sortedTenants.sort((a, b) => {
-      const dir = sort.direction === 'asc' ? 1 : -1
-      const val = (field: keyof TenantRow) => a[field]
-      const valB = (field: keyof TenantRow) => b[field]
-
-      switch (sort.column) {
-        case 'name': {
-          return dir * String(val('name') ?? '').localeCompare(String(valB('name') ?? ''), 'nl')
-        }
-        case 'property':
-        case 'object': {
-          return dir * String(val('propertyName') ?? '').localeCompare(String(valB('propertyName') ?? ''), 'nl')
-        }
-        case 'rent': {
-          return dir * (((val('monthlyRent') as number) ?? 0) - ((valB('monthlyRent') as number) ?? 0))
-        }
-        case 'status': {
-          return dir * String(val('status') ?? '').localeCompare(String(valB('status') ?? ''), 'nl')
-        }
-        default:
-          return 0
-      }
-    })
-  }
+  const sortedTenants = applySortedRows(filteredTenants, tenantSort, (t, k) => {
+    if (k === 'name') return t.name ?? ''
+    if (k === 'object') return t.propertyName ?? ''
+    if (k === 'rent') return t.monthlyRent ?? 0
+    if (k === 'status') return t.status ?? ''
+    return null
+  })
 
   const getBalanceBadge = (balance: number) => {
     if (balance === 0) {
@@ -344,18 +300,10 @@ function TenantsPageContent() {
             <div className="rounded-2xl overflow-hidden">
               {/* Grijs header */}
               <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-                <button type="button" onClick={() => toggleSort('name')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                  Huurder {getSortIcon('name')}
-                </button>
-                <button type="button" onClick={() => toggleSort('object')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                  Object {getSortIcon('object')}
-                </button>
-                <button type="button" onClick={() => toggleSort('rent')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                  Huurprijs {getSortIcon('rent')}
-                </button>
-                <button type="button" onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                  Status {getSortIcon('status')}
-                </button>
+                <SortableHeader label="Huurder" sortKey="name" sort={tenantSort} onSort={toggleSort} />
+                <SortableHeader label="Object" sortKey="object" sort={tenantSort} onSort={toggleSort} />
+                <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
+                <SortableHeader label="Status" sortKey="status" sort={tenantSort} onSort={toggleSort} />
                 <span />
               </div>
 

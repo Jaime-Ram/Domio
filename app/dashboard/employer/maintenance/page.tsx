@@ -73,6 +73,7 @@ import {
 } from '@/app/dashboard/employer/dashboard-ui'
 import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { ticketQueries } from '@/lib/supabase/queries'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { cn } from '@/lib/utils'
 
 const getMaintenanceNav = (basePath: string) => [
@@ -109,10 +110,7 @@ export default function MaintenancePage() {
   const [priorityFilter, setPriorityFilter] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(PRIORITY_KEYS.map((k) => [k, true]))
   )
-  const [sort, setSort] = useState<{ column: SortColumn | null; direction: 'asc' | 'desc' | null }>({
-    column: null,
-    direction: null,
-  })
+  const { sort: ticketSort, toggleSort } = useSortable<string>()
 
   const [createOpen, setCreateOpen] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -258,48 +256,15 @@ export default function MaintenancePage() {
     })
   }, [tickets, statusFilter, priorityFilter])
 
-  const toggleSort = (column: SortColumn) => {
-    setSort((prev) => {
-      if (prev.column !== column || prev.direction === null) {
-        return { column, direction: 'asc' }
-      }
-      if (prev.direction === 'asc') {
-        return { column, direction: 'desc' }
-      }
-      return { column: null, direction: null }
+  const sortedTickets = useMemo(() =>
+    applySortedRows(filteredTickets, ticketSort, (t, k) => {
+      if (k === 'title') return t.title
+      if (k === 'status') return t.status
+      if (k === 'priority') return normalizePriority(t.priority)
+      if (k === 'created_at') return new Date(t.created_at).getTime()
+      return null
     })
-  }
-
-  const getSortIcon = (column: SortColumn) => {
-    if (sort.column !== column || !sort.direction) {
-      return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
-    }
-    if (sort.direction === 'asc') {
-      return <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-    }
-    return <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
-  }
-
-  const sortedTickets = useMemo(() => {
-    const list = [...filteredTickets]
-    if (!sort.column || !sort.direction) return list
-    const dir = sort.direction === 'asc' ? 1 : -1
-    list.sort((a, b) => {
-      switch (sort.column) {
-        case 'title':
-          return dir * a.title.localeCompare(b.title, 'nl')
-        case 'status':
-          return dir * a.status.localeCompare(b.status, 'nl')
-        case 'priority':
-          return dir * normalizePriority(a.priority).localeCompare(normalizePriority(b.priority), 'nl')
-        case 'created_at':
-          return dir * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-        default:
-          return 0
-      }
-    })
-    return list
-  }, [filteredTickets, sort])
+  , [filteredTickets, ticketSort])
 
   const resetCreateForm = () => {
     setNewTitle('')
@@ -539,18 +504,10 @@ export default function MaintenancePage() {
           <>
             {/* Column headers */}
             <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-              <button type="button" onClick={() => toggleSort('title')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-left">
-                Titel {getSortIcon('title')}
-              </button>
-              <button type="button" onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                Status {getSortIcon('status')}
-              </button>
-              <button type="button" onClick={() => toggleSort('priority')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                Prioriteit {getSortIcon('priority')}
-              </button>
-              <button type="button" onClick={() => toggleSort('created_at')} className="inline-flex items-center gap-1 text-sm font-medium text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                Aangemaakt {getSortIcon('created_at')}
-              </button>
+              <SortableHeader label="Titel" sortKey="title" sort={ticketSort} onSort={toggleSort} />
+              <SortableHeader label="Status" sortKey="status" sort={ticketSort} onSort={toggleSort} />
+              <SortableHeader label="Prioriteit" sortKey="priority" sort={ticketSort} onSort={toggleSort} />
+              <SortableHeader label="Aangemaakt" sortKey="created_at" sort={ticketSort} onSort={toggleSort} />
               <span className="text-sm font-medium text-gray-400 dark:text-gray-500 text-right">Acties</span>
             </div>
 
