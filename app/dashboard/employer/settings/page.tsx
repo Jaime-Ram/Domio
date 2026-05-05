@@ -170,6 +170,12 @@ export default function SettingsPage() {
   const [bankLoading, setBankLoading] = useState(true)
   const [bankSyncing, setBankSyncing] = useState(false)
 
+  // Bank picker
+  interface YapilyInstitution { id: string; name: string; logo: string | null }
+  const [showBankPicker, setShowBankPicker] = useState(false)
+  const [institutions, setInstitutions] = useState<YapilyInstitution[]>([])
+  const [institutionsLoading, setInstitutionsLoading] = useState(false)
+
 
   const loadTotpFactors = useCallback(async () => {
     if (isDemo) return
@@ -250,22 +256,35 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (isDemo) { setBankLoading(false); return }
-    supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'tink').maybeSingle()
+    supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'yapily').maybeSingle()
       .then(({ data }) => { setBankConnection(data ?? null); setBankLoading(false) })
   }, [isDemo])
 
   async function handleBankSync() {
     setBankSyncing(true)
     try {
-      await fetch('/api/tink/sync', { method: 'POST' })
-      const { data } = await supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'tink').maybeSingle()
+      await fetch('/api/yapily/sync')
+      const { data } = await supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'yapily').maybeSingle()
       setBankConnection(data ?? null)
     } finally {
       setBankSyncing(false)
     }
   }
 
-  function handleBankConnect() { window.location.href = '/api/tink/link' }
+  async function handleBankConnect() {
+    setShowBankPicker(true)
+    if (institutions.length > 0) return
+    setInstitutionsLoading(true)
+    try {
+      const res = await fetch('/api/yapily/institutions')
+      if (res.ok) {
+        const data = await res.json()
+        setInstitutions(data.institutions ?? [])
+      }
+    } finally {
+      setInstitutionsLoading(false)
+    }
+  }
 
   const formatBankDate = (iso: string) =>
     new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -1022,7 +1041,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">Bankkoppeling</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Koppel je bankrekening via Tink Open Banking</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Koppel je bankrekening via Yapily Open Banking</p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
                 </button>
@@ -1057,6 +1076,47 @@ export default function SettingsPage() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ── Bank picker modal ── */}
+      {showBankPicker && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setShowBankPicker(false)}>
+          <div className="w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100 dark:border-neutral-800">
+              <p className="text-base font-semibold text-gray-900 dark:text-white">Kies je bank</p>
+              <button onClick={() => setShowBankPicker(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto py-2">
+              {institutionsLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                </div>
+              ) : institutions.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-8">Geen banken beschikbaar</p>
+              ) : (
+                institutions.map(inst => (
+                  <a
+                    key={inst.id}
+                    href={`/api/yapily/link?institutionId=${inst.id}`}
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
+                  >
+                    {inst.logo ? (
+                      <img src={inst.logo} alt={inst.name} className="h-8 w-8 rounded-lg object-contain shrink-0" />
+                    ) : (
+                      <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                        <Landmark className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{inst.name}</span>
+                    <ChevronRight className="h-4 w-4 text-gray-400 ml-auto shrink-0" />
+                  </a>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -391,35 +391,39 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
         side="right"
         className="sm:max-w-[520px] p-0 flex flex-col overflow-hidden"
       >
-        {/* Header */}
+        {/* Header — SheetTitle/SheetDescription must always be in the DOM (Radix a11y) */}
         <SheetHeader className="border-b border-gray-100 dark:border-neutral-800 px-6 py-5 shrink-0">
-          {loadingHeader ? (
-            <div className="flex items-center gap-2 text-gray-400">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Laden…</span>
-            </div>
-          ) : (
-            <>
-              <SheetTitle className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+          <SheetTitle className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+            {loadingHeader ? (
+              <span className="text-gray-400 font-normal text-sm flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Laden…
+              </span>
+            ) : (
+              <>
                 {header?.propertyName ?? '—'}
                 {header?.unitNumber && (
                   <span className="font-normal text-gray-500 dark:text-gray-400">
                     {' · '}{header.unitNumber}
                   </span>
                 )}
-              </SheetTitle>
-              <SheetDescription asChild>
-                <div className="space-y-0.5 mt-1">
+              </>
+            )}
+          </SheetTitle>
+          <SheetDescription asChild>
+            <div className="space-y-0.5 mt-1">
+              {!loadingHeader && (
+                <>
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {header?.tenantName ?? '—'}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {header ? `€${fmtAmt(header.monthlyRent)}/maand · sinds ${fmtShortDate(header.startDate)}` : '—'}
                   </p>
-                </div>
-              </SheetDescription>
-            </>
-          )}
+                </>
+              )}
+            </div>
+          </SheetDescription>
         </SheetHeader>
 
         {/* Scrollable body */}
