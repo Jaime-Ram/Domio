@@ -18,19 +18,6 @@ interface KpiData {
 const formatEur = (amount: number) =>
   new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount)
 
-function leaseOverlapsCalendarMonth(
-  status: string,
-  startDate: string | null | undefined,
-  endDate: string | null | undefined,
-  monthStart: string,
-  monthEndExclusive: string
-): boolean {
-  if (status !== 'actief') return false
-  if (!startDate) return false
-  if (startDate >= monthEndExclusive) return false
-  if (endDate != null && endDate !== '' && endDate < monthStart) return false
-  return true
-}
 
 export default function GeldstromenPage() {
   const panelRef = useRef<GeldstromenPanelRef>(null)
@@ -41,6 +28,7 @@ export default function GeldstromenPage() {
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ imported: number; skipped: number } | null>(null)
   const [reauthRequired, setReauthRequired] = useState(false)
+  const [noConnection, setNoConnection] = useState(false)
 
   const fetchData = async () => {
     const now = new Date()
@@ -48,7 +36,7 @@ export default function GeldstromenPage() {
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
     const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`
 
-    const [txRes, propRes, leasesRes] = await Promise.all([
+    const [txRes, propRes, expRes] = await Promise.all([
       supabase
         .from('raw_transactions')
         .select(`
@@ -97,13 +85,14 @@ export default function GeldstromenPage() {
         `)
         .order('name'),
       supabase
-        .from('leases')
-        .select('monthly_rent, status, start_date, end_date'),
+        .from('rent_expectations')
+        .select('amount_expected')
+        .eq('due_period', monthStart),
     ])
 
     if (txRes.error) console.error('[betalingen] raw_transactions query error:', txRes.error)
     if (propRes.error) console.error('[betalingen] properties query error:', propRes.error)
-    if (leasesRes.error) console.error('[betalingen] leases query error:', leasesRes.error)
+    if (expRes.error) console.error('[betalingen] rent_expectations query error:', expRes.error)
 
     // Build lookup maps from properties data for resolving names
     const propById = new Map<string, { name: string; address: string }>()
@@ -189,12 +178,9 @@ export default function GeldstromenPage() {
     const receivedThisMonth = txRows
       .filter(tx => tx.value_date && tx.value_date >= monthStart && tx.value_date < monthEnd)
       .reduce((s, tx) => s + Number(tx.amount), 0)
-    let expectedThisMonth = 0
-    for (const lease of (leasesRes.data ?? []) as any[]) {
-      if (leaseOverlapsCalendarMonth(lease.status, lease.start_date, lease.end_date, monthStart, monthEnd)) {
-        expectedThisMonth += Number(lease.monthly_rent) || 0
-      }
-    }
+    const expectedThisMonth = (expRes.data ?? []).reduce(
+      (s, e: any) => s + Number(e.amount_expected), 0
+    )
 
     setKpis({ totalReceived, receivedThisMonth, expectedThisMonth })
     setTransactions(txRows)
@@ -207,10 +193,13 @@ export default function GeldstromenPage() {
     setSyncResult(null)
     setReauthRequired(false)
     try {
-      const res = await fetch('/api/tink/sync')
+      const res = await fetch('/api/yapily/sync')
       if (res.status === 401) {
         setReauthRequired(true)
+      } else if (res.status === 404) {
+        setNoConnection(true)
       } else if (res.ok) {
+        setNoConnection(false)
         const data = await res.json()
         setSyncResult({ imported: data.imported ?? 0, skipped: data.skipped ?? 0 })
         if ((data.imported ?? 0) > 0) await fetchData()
@@ -223,11 +212,24 @@ export default function GeldstromenPage() {
 
   useEffect(() => {
     fetchData()
+    supabase
+      .from('bank_connections')
+      .select('id')
+      .eq('provider', 'yapily')
+      .maybeSingle()
+      .then(({ data }) => setNoConnection(!data))
   }, [])
 
-  const syncButton = reauthRequired ? (
+  const syncButton = noConnection ? (
     <a
-      href="/api/tink/link"
+      href="/dashboard/employer/settings?tab=koppelingen"
+      className="inline-flex items-center gap-1.5 h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors shrink-0"
+    >
+      <span className="hidden sm:inline">Bankrekening koppelen</span>
+    </a>
+  ) : reauthRequired ? (
+    <a
+      href="/dashboard/employer/settings?tab=koppelingen"
       className="inline-flex items-center gap-1.5 h-9 rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-3 text-sm font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors shrink-0"
     >
       <RefreshCw className="h-4 w-4" />
@@ -241,7 +243,7 @@ export default function GeldstromenPage() {
       title={
         syncResult
           ? `${syncResult.imported} nieuw, ${syncResult.skipped} overgeslagen`
-          : 'Synchroniseer met Tink'
+          : 'Synchroniseer transacties'
       }
       className="inline-flex items-center gap-1.5 h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors shrink-0"
     >
