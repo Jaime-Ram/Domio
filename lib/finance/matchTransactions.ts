@@ -5,9 +5,11 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+type MatchMethod = "iban" | "description_full" | "description_huur" | "description_address" | "manual";
+
 interface MatchDetail {
   transaction_id: string;
-  method: string;
+  method: MatchMethod;
   confidence: number;
 }
 
@@ -30,12 +32,19 @@ interface RawTransaction {
 interface RentExpectation {
   id: string;
   lease_id: string;
-  tenant_id: string;
+  due_period: string; // YYYY-MM-01
+  amount_expected: number;
+}
+
+interface Lease {
+  id: string;
   unit_id: string;
+  tenant_id: string | null;
+}
+
+interface Unit {
+  id: string;
   property_id: string;
-  expected_amount: number;
-  due_date: string;
-  period_label: string;
 }
 
 interface Tenant {
@@ -55,19 +64,11 @@ function getPeriodLabel(dateStr: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function daysApart(a: string, b: string): number {
-  const msPerDay = 86400000;
-  return Math.abs(new Date(a).getTime() - new Date(b).getTime()) / msPerDay;
-}
-
 function containsIgnoreCase(haystack: string, needle: string): boolean {
   return haystack.toLowerCase().includes(needle.toLowerCase());
 }
 
-export async function matchTransactions(
-  ownerId: string
-): Promise<MatchResult> {
-  // 1. Fetch unmatched transactions (left join via NOT IN)
+export async function matchTransactions(ownerId: string): Promise<MatchResult> {
   const { data: allTx, error: txErr } = await supabaseAdmin
     .from("raw_transactions")
     .select("id, amount, value_date, counterparty_iban, counterparty_name, description")
@@ -75,30 +76,54 @@ export async function matchTransactions(
 
   if (txErr) throw txErr;
 
+  // Fetch existing assignments to exclude already-matched transactions and expectations
   const { data: assigned, error: assignErr } = await supabaseAdmin
     .from("payment_assignments")
-    .select("transaction_id")
+    .select("raw_transaction_id, rent_expectation_id")
     .eq("owner_id", ownerId);
 
   if (assignErr) throw assignErr;
 
-  const assignedIds = new Set((assigned ?? []).map((a) => a.transaction_id));
+  const assignedTxIds = new Set((assigned ?? []).map((a) => a.raw_transaction_id));
+  const assignedExpIds = new Set((assigned ?? []).map((a) => a.rent_expectation_id));
+
   const unmatched: RawTransaction[] = (allTx ?? []).filter(
-    (tx) => !assignedIds.has(tx.id)
+    (tx) => !assignedTxIds.has(tx.id)
   );
 
-  // 2. Fetch pending expectations
   const { data: expectations, error: expErr } = await supabaseAdmin
     .from("rent_expectations")
-    .select(
-      "id, lease_id, tenant_id, unit_id, property_id, expected_amount, due_date, period_label"
-    )
-    .eq("owner_id", ownerId)
-    .eq("status", "pending");
+    .select("id, lease_id, due_period, amount_expected")
+    .eq("owner_id", ownerId);
 
   if (expErr) throw expErr;
 
-  // 3. Fetch tenants and properties
+  const pendingExpectations = ((expectations ?? []) as RentExpectation[]).filter(
+    (e) => !assignedExpIds.has(e.id)
+  );
+
+  // Fetch only the leases we actually need
+  const leaseIds = [...new Set(pendingExpectations.map((e) => e.lease_id))];
+  const { data: leases, error: leaseErr } = leaseIds.length
+    ? await supabaseAdmin
+        .from("leases")
+        .select("id, unit_id, tenant_id")
+        .in("id", leaseIds)
+    : { data: [], error: null };
+
+  if (leaseErr) throw leaseErr;
+
+  // Fetch units to resolve unit_id → property_id
+  const unitIds = [...new Set((leases ?? []).map((l: Lease) => l.unit_id))];
+  const { data: units, error: unitErr } = unitIds.length
+    ? await supabaseAdmin
+        .from("units")
+        .select("id, property_id")
+        .in("id", unitIds)
+    : { data: [], error: null };
+
+  if (unitErr) throw unitErr;
+
   const { data: tenants, error: tenErr } = await supabaseAdmin
     .from("tenants")
     .select("id, full_name, iban")
@@ -113,35 +138,8 @@ export async function matchTransactions(
 
   if (propErr) throw propErr;
 
-  // 4. Fetch historical assignments for pattern matching
-  const { data: historicalAssignments, error: histErr } = await supabaseAdmin
-    .from("payment_assignments")
-    .select("transaction_id, tenant_id, property_id, unit_id, lease_id")
-    .eq("owner_id", ownerId)
-    .eq("is_manual", false);
-
-  if (histErr) throw histErr;
-
-  // Build historical counterparty_iban → assignment lookup
-  const historicalByIban = new Map<
-    string,
-    { tenant_id: string; property_id: string; unit_id: string; lease_id: string }
-  >();
-  if (historicalAssignments) {
-    for (const ha of historicalAssignments) {
-      const matchedTx = (allTx ?? []).find((t) => t.id === ha.transaction_id);
-      if (matchedTx?.counterparty_iban && ha.tenant_id) {
-        historicalByIban.set(matchedTx.counterparty_iban, {
-          tenant_id: ha.tenant_id,
-          property_id: ha.property_id,
-          unit_id: ha.unit_id,
-          lease_id: ha.lease_id,
-        });
-      }
-    }
-  }
-
-  // Index helpers
+  const leaseById = new Map((leases ?? []).map((l: Lease) => [l.id, l]));
+  const unitById = new Map((units ?? []).map((u: Unit) => [u.id, u]));
   const tenantById = new Map((tenants ?? []).map((t: Tenant) => [t.id, t]));
   const tenantByIban = new Map(
     (tenants ?? [])
@@ -149,7 +147,6 @@ export async function matchTransactions(
       .map((t: Tenant) => [t.iban!.toUpperCase(), t])
   );
 
-  const pendingExpectations = [...(expectations ?? [])] as RentExpectation[];
   const matchedExpIds = new Set<string>();
   const details: MatchDetail[] = [];
 
@@ -159,19 +156,19 @@ export async function matchTransactions(
 
   for (const tx of unmatched) {
     const txPeriod = tx.value_date ? getPeriodLabel(tx.value_date) : null;
+    const searchText = [tx.description, tx.counterparty_name].filter(Boolean).join(" ");
     let matched = false;
 
-    // --- Match 1: IBAN match (confidence 95) ---
+    // --- Match 1: IBAN (confidence 95) ---
     if (tx.counterparty_iban) {
       const tenant = tenantByIban.get(tx.counterparty_iban.toUpperCase());
       if (tenant) {
-        const exp = pendingExpectations.find(
-          (e) =>
-            e.tenant_id === tenant.id &&
-            e.period_label === txPeriod &&
-            Number(e.expected_amount) === Number(tx.amount) &&
-            !matchedExpIds.has(e.id)
-        );
+        const exp = pendingExpectations.find((e) => {
+          if (matchedExpIds.has(e.id)) return false;
+          if (e.due_period.substring(0, 7) !== txPeriod) return false;
+          if (Number(e.amount_expected) !== Number(tx.amount)) return false;
+          return leaseById.get(e.lease_id)?.tenant_id === tenant.id;
+        });
         if (exp) {
           await assign(tx, exp, 95, "iban", ownerId);
           matchedExpIds.add(exp.id);
@@ -182,76 +179,71 @@ export async function matchTransactions(
       }
     }
 
-    // --- Match 2: Reference match (confidence 80) ---
-    if (!matched && (tx.description || tx.counterparty_name)) {
-      const searchText = [tx.description, tx.counterparty_name]
-        .filter(Boolean)
-        .join(" ");
-
+    // --- Match 2: Description full name (confidence 80) ---
+    if (!matched && searchText) {
       for (const exp of pendingExpectations) {
         if (matchedExpIds.has(exp.id)) continue;
-        if (exp.period_label !== txPeriod) continue;
-        if (Number(exp.expected_amount) !== Number(tx.amount)) continue;
+        if (exp.due_period.substring(0, 7) !== txPeriod) continue;
+        if (Number(exp.amount_expected) !== Number(tx.amount)) continue;
 
-        const tenant = tenantById.get(exp.tenant_id);
-        const prop = (properties ?? []).find(
-          (p: Property) => p.id === exp.property_id
-        );
-
-        const nameMatch = tenant && containsIgnoreCase(searchText, tenant.full_name);
-        const addrMatch = prop && containsIgnoreCase(searchText, prop.address);
-        const propNameMatch = prop && containsIgnoreCase(searchText, prop.name);
-
-        if (nameMatch || addrMatch || propNameMatch) {
-          await assign(tx, exp, 80, "reference", ownerId);
+        const lease = leaseById.get(exp.lease_id);
+        const tenant = lease?.tenant_id ? tenantById.get(lease.tenant_id) : undefined;
+        if (tenant && containsIgnoreCase(searchText, tenant.full_name)) {
+          await assign(tx, exp, 80, "description_full", ownerId);
           matchedExpIds.add(exp.id);
-          details.push({ transaction_id: tx.id, method: "reference", confidence: 80 });
-          console.log(`  ~ Reference match (suggestion): tx ${tx.id} → exp ${exp.id}`);
+          details.push({ transaction_id: tx.id, method: "description_full", confidence: 80 });
+          console.log(`  ~ Description full match: tx ${tx.id} → exp ${exp.id}`);
           matched = true;
           break;
         }
       }
     }
 
-    // --- Match 3: Amount + date match (confidence 70) ---
-    if (!matched && tx.value_date) {
+    // --- Match 3: Description address (confidence 75) ---
+    if (!matched && searchText) {
+      for (const exp of pendingExpectations) {
+        if (matchedExpIds.has(exp.id)) continue;
+        if (exp.due_period.substring(0, 7) !== txPeriod) continue;
+        if (Number(exp.amount_expected) !== Number(tx.amount)) continue;
+
+        const lease = leaseById.get(exp.lease_id);
+        const unit = lease ? unitById.get(lease.unit_id) : undefined;
+        const prop = unit
+          ? (properties ?? []).find((p: Property) => p.id === unit.property_id)
+          : undefined;
+        if (
+          prop &&
+          (containsIgnoreCase(searchText, prop.address) ||
+            containsIgnoreCase(searchText, prop.name))
+        ) {
+          await assign(tx, exp, 75, "description_address", ownerId);
+          matchedExpIds.add(exp.id);
+          details.push({ transaction_id: tx.id, method: "description_address", confidence: 75 });
+          console.log(`  ~ Description address match: tx ${tx.id} → exp ${exp.id}`);
+          matched = true;
+          break;
+        }
+      }
+    }
+
+    // --- Match 4: Description huur (confidence 65) — only when unambiguous ---
+    if (!matched && tx.description && containsIgnoreCase(tx.description, "huur") && txPeriod) {
       const candidates = pendingExpectations.filter(
         (e) =>
           !matchedExpIds.has(e.id) &&
-          Number(e.expected_amount) === Number(tx.amount) &&
-          daysApart(tx.value_date!, e.due_date) <= 5
+          e.due_period.substring(0, 7) === txPeriod &&
+          Number(e.amount_expected) === Number(tx.amount)
       );
 
       if (candidates.length === 1) {
         const exp = candidates[0];
-        await assign(tx, exp, 70, "amount_date", ownerId);
+        await assign(tx, exp, 65, "description_huur", ownerId);
         matchedExpIds.add(exp.id);
-        details.push({ transaction_id: tx.id, method: "amount_date", confidence: 70 });
-        console.log(`  ~ Amount+date match (suggestion): tx ${tx.id} → exp ${exp.id}`);
+        details.push({ transaction_id: tx.id, method: "description_huur", confidence: 65 });
+        console.log(`  ~ Description huur match: tx ${tx.id} → exp ${exp.id}`);
         matched = true;
       } else if (candidates.length > 1) {
-        console.log(`  ✗ Amount+date ambiguous (${candidates.length} candidates): tx ${tx.id}`);
-      }
-    }
-
-    // --- Match 4: Historical pattern (confidence 85) ---
-    if (!matched && tx.counterparty_iban) {
-      const hist = historicalByIban.get(tx.counterparty_iban);
-      if (hist) {
-        const exp = pendingExpectations.find(
-          (e) =>
-            !matchedExpIds.has(e.id) &&
-            e.tenant_id === hist.tenant_id &&
-            e.property_id === hist.property_id &&
-            e.period_label === txPeriod
-        );
-        if (exp) {
-          await assign(tx, exp, 85, "historical", ownerId);
-          matchedExpIds.add(exp.id);
-          details.push({ transaction_id: tx.id, method: "historical", confidence: 85 });
-          console.log(`  ✓ Historical match: tx ${tx.id} → exp ${exp.id}`);
-          matched = true;
-        }
+        console.log(`  ✗ Huur match ambiguous (${candidates.length} candidates): tx ${tx.id}`);
       }
     }
 
@@ -280,41 +272,22 @@ async function assign(
   tx: RawTransaction,
   exp: RentExpectation,
   confidence: number,
-  method: string,
+  method: MatchMethod,
   ownerId: string
 ) {
-  // Insert payment assignment
   const { error: insertErr } = await supabaseAdmin
     .from("payment_assignments")
     .insert({
       owner_id: ownerId,
-      transaction_id: tx.id,
-      property_id: exp.property_id,
-      unit_id: exp.unit_id,
-      tenant_id: exp.tenant_id,
-      lease_id: exp.lease_id,
-      confidence_score: confidence,
+      raw_transaction_id: tx.id,
+      rent_expectation_id: exp.id,
+      amount_assigned: tx.amount,
       match_method: method,
-      is_manual: false,
+      confidence_score: method === "manual" ? null : confidence,
+      assigned_by: null,
     });
 
   if (insertErr) {
     console.error(`Failed to insert assignment for tx ${tx.id}:`, insertErr);
-    return;
-  }
-
-  // Only update expectation status if confidence >= 85
-  if (confidence >= 85) {
-    const status =
-      Number(tx.amount) >= Number(exp.expected_amount) ? "paid" : "partial";
-
-    const { error: updateErr } = await supabaseAdmin
-      .from("rent_expectations")
-      .update({ status })
-      .eq("id", exp.id);
-
-    if (updateErr) {
-      console.error(`Failed to update expectation ${exp.id}:`, updateErr);
-    }
   }
 }

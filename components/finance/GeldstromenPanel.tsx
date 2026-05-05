@@ -94,26 +94,6 @@ function todayISODate() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-async function ensureManualBankConnection(ownerId: string): Promise<string> {
-  const { data: existingRaw } = await supabase
-    .from('bank_connections')
-    .select('id')
-    .eq('owner_id', ownerId)
-    .eq('provider', 'manual')
-    .maybeSingle()
-  const existing = existingRaw as { id: string } | null
-  if (existing?.id) return existing.id
-
-  const { data: inserted, error } = await supabase
-    .from('bank_connections')
-    .insert({ owner_id: ownerId, provider: 'manual', access_token: '', refresh_token: null } as never)
-    .select('id')
-    .single()
-  if (error) throw error
-  const insertedRow = inserted as { id: string } | null
-  if (!insertedRow?.id) throw new Error('Kon handmatige bankkoppeling niet aanmaken')
-  return insertedRow.id
-}
 
 // ─── Component ────────────────────────────────────────────────────────
 
@@ -283,40 +263,27 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
       setPaymentError('Vul een geldig bedrag in (niet nul).')
       return
     }
+    if (!payDate) {
+      setPaymentError('Vul een datum in.')
+      return
+    }
     const amountNum = payDirection === 'uitgaven' ? -Math.abs(absAmount) : Math.abs(absAmount)
     setSavingPayment(true)
     try {
-      const connId = await ensureManualBankConnection(user.id)
-      const { data: inserted, error } = await supabase.from('raw_transactions').insert({
+      const { error } = await supabase.from('raw_transactions').insert({
         owner_id: user.id,
-        bank_connection_id: connId,
-        external_id: `manual-${crypto.randomUUID()}`,
-        value_date: payDate || null,
+        source: 'manual',
+        bank_connection_id: null,
+        external_id: null,
+        booking_date: payDate,
+        value_date: payDate,
         amount: amountNum,
         currency: 'EUR',
         counterparty_name: null,
         counterparty_iban: null,
         description: payDescription.trim() || null,
-      } as never).select('id').single()
+      } as never)
       if (error) throw error
-
-      // If category or property was selected in step 2, assign immediately
-      const txId = (inserted as { id: string } | null)?.id
-      if (txId && (payCategory || payPropertyId)) {
-        const res = await fetch(`/api/finance/transactions/${txId}/assign`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            property_id: payPropertyId ?? null,
-            unit_id: payUnitId ?? null,
-            tenant_id: null,
-            lease_id: null,
-            category: payCategory ?? null,
-            cost_allocation_key_id: payAllocationKeyId ?? null,
-          }),
-        })
-        if (!res.ok) throw new Error('Toewijzing mislukt.')
-      }
 
       setShowManualPayForm(false)
       onRefresh()

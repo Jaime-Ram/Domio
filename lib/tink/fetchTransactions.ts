@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { matchTransaction } from "@/lib/matching";
 
 const TINK_TRANSACTIONS_URL = "https://api.tink.com/data/v2/transactions";
 const TINK_TOKEN_URL = "https://api.tink.com/api/v1/oauth/token";
@@ -66,6 +67,7 @@ interface TinkTransactionsResponse {
 export interface SyncResult {
   imported: number;
   skipped: number;
+  pending: number;
   total: number;
 }
 
@@ -112,11 +114,20 @@ export async function fetchTransactions(
   } while (pageToken);
 
   if (allTransactions.length === 0) {
-    return { imported: 0, skipped: 0, total: 0 };
+    return { imported: 0, skipped: 0, pending: 0, total: 0 };
+  }
+
+  // Filter out pending transactions (no booked date) — they're not useful for matching
+  // and would force us to fabricate a booking_date
+  const bookedTransactions = allTransactions.filter((txn) => txn.dates.booked);
+  const pendingCount = allTransactions.length - bookedTransactions.length;
+
+  if (pendingCount > 0) {
+    console.log(`Tink: skipping ${pendingCount} pending transactions without booked date`);
   }
 
   // Map to raw_transactions schema
-  const rows = allTransactions.map((txn) => {
+  const rows = bookedTransactions.map((txn) => {
     const scale = parseInt(txn.amount.value.scale, 10) || 0;
     const unscaled = parseInt(txn.amount.value.unscaledValue, 10) || 0;
     const amount = unscaled / Math.pow(10, scale);
@@ -125,10 +136,11 @@ export async function fetchTransactions(
     return {
       owner_id: ownerId,
       bank_connection_id: bankConnectionId,
+      source: "tink",
       external_id: txn.id,
       amount,
       currency: txn.amount.currencyCode,
-      booking_date: txn.dates.booked ?? new Date().toISOString().slice(0, 10),
+      booking_date: txn.dates.booked!,
       value_date: txn.dates.booked ?? null,
       counterparty_iban: counterparty?.identifiers?.iban?.iban ?? null,
       counterparty_name: counterparty?.name ?? null,
@@ -140,6 +152,7 @@ export async function fetchTransactions(
   // Upsert in batches (Supabase has a payload size limit)
   const BATCH_SIZE = 500;
   let imported = 0;
+  const newIds: string[] = [];
 
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
@@ -152,7 +165,9 @@ export async function fetchTransactions(
       .select("id");
 
     if (error) throw error;
-    imported += data?.length ?? 0;
+    const batchIds = (data ?? []).map((r) => r.id as string);
+    imported += batchIds.length;
+    newIds.push(...batchIds);
   }
 
   // Update last_synced_at on the bank connection
@@ -167,10 +182,36 @@ export async function fetchTransactions(
 
   const result: SyncResult = {
     imported,
-    skipped: allTransactions.length - imported,
+    skipped: bookedTransactions.length - imported,
+    pending: pendingCount,
     total: allTransactions.length,
   };
 
   console.log("Tink sync complete:", result);
+
+  // Run matching on all newly inserted transactions after the sync is fully done.
+  // Promise.allSettled so a scoring error on one transaction never aborts the others.
+  if (newIds.length > 0) {
+    const settled = await Promise.allSettled(newIds.map((id) => matchTransaction(id)));
+    const errors = settled.filter((r) => r.status === "rejected").length;
+    const statuses = settled
+      .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof matchTransaction>>> =>
+        r.status === "fulfilled"
+      )
+      .map((r) => r.value.status);
+    const committed = statuses.filter((s) => s === "auto_committed").length;
+    const review   = statuses.filter((s) => s === "review_queue").length;
+    const noMatch  = statuses.filter((s) => s === "no_match").length;
+    console.log(
+      `Matching: ${committed} auto-committed, ${review} review queue, ${noMatch} no match, ${errors} errors`
+    );
+    if (errors > 0) {
+      const reasons = settled
+        .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+        .map((r) => (r.reason instanceof Error ? r.reason.message : String(r.reason)));
+      console.error("Matching errors:", reasons);
+    }
+  }
+
   return result;
 }

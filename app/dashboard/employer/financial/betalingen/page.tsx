@@ -59,7 +59,7 @@ export default function GeldstromenPage() {
           counterparty_name,
           counterparty_iban,
           description,
-          bank_connections ( provider ),
+          source,
           payment_assignments (
             id,
             amount_assigned,
@@ -162,7 +162,7 @@ export default function GeldstromenPage() {
         counterparty_name: tx.counterparty_name,
         counterparty_iban: tx.counterparty_iban,
         description: tx.description,
-        is_manual_transaction: tx.bank_connections?.provider === 'manual',
+        is_manual_transaction: tx.source === 'manual',
         assignment,
       }
     })

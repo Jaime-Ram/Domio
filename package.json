@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
     "mobile": "cd mobile && npx expo start",
     "mobile:tunnel": "cd mobile && npx expo start --tunnel",
     "mobile:ios": "cd mobile && npx expo start --ios",
@@ -59,9 +60,11 @@
     "@types/node": "^20.10.6",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
+    "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.1.5"
   }
 }
