@@ -11,6 +11,7 @@ CREATE TABLE public.bank_connections (
   last_synced_at timestamp with time zone,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  account_id text,
   CONSTRAINT bank_connections_pkey PRIMARY KEY (id),
   CONSTRAINT bank_connections_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
 );
@@ -20,12 +21,12 @@ CREATE TABLE public.cost_allocation_keys (
   property_id uuid,
   name text NOT NULL,
   method text NOT NULL CHECK (method = ANY (ARRAY['equal'::text, 'surface_area'::text, 'custom'::text])),
-  units jsonb NOT NULL DEFAULT '[]'::jsonb,
+  units jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(units) = 'array'),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT cost_allocation_keys_pkey PRIMARY KEY (id),
-  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
-  CONSTRAINT cost_allocation_keys_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
+  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT cost_allocation_keys_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id) ON DELETE CASCADE
 );
 CREATE TABLE public.documents (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -98,18 +99,40 @@ CREATE TABLE public.payment_assignments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
   raw_transaction_id uuid NOT NULL,
-  rent_expectation_id uuid NOT NULL,
+  rent_expectation_id uuid,
   amount_assigned numeric NOT NULL CHECK (amount_assigned > 0::numeric),
   match_method text NOT NULL CHECK (match_method = ANY (ARRAY['iban'::text, 'description_full'::text, 'description_huur'::text, 'description_address'::text, 'manual'::text])),
   confidence_score integer CHECK (confidence_score IS NULL OR confidence_score >= 0 AND confidence_score <= 100),
   assigned_by uuid,
   assigned_at timestamp with time zone NOT NULL DEFAULT now(),
+  category text,
+  property_id uuid,
+  unit_id uuid,
+  cost_allocation_key_id uuid,
   CONSTRAINT payment_assignments_pkey PRIMARY KEY (id),
   CONSTRAINT payment_assignments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
   CONSTRAINT payment_assignments_raw_transaction_id_fkey FOREIGN KEY (raw_transaction_id) REFERENCES public.raw_transactions(id),
   CONSTRAINT payment_assignments_rent_expectation_id_fkey FOREIGN KEY (rent_expectation_id) REFERENCES public.rent_expectations(id),
-  CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id)
+  CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id),
+  CONSTRAINT payment_assignments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id) ON DELETE CASCADE,
+  CONSTRAINT payment_assignments_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id) ON DELETE CASCADE,
+  CONSTRAINT payment_assignments_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id) ON DELETE SET NULL,
+  CONSTRAINT payment_assignments_level_check CHECK (
+    category = 'huur'
+    OR (unit_id IS NULL AND cost_allocation_key_id IS NOT NULL)
+    OR (unit_id IS NOT NULL AND cost_allocation_key_id IS NULL)
+    OR category IS NULL
+    OR property_id IS NULL
+  )
 );
+CREATE INDEX IF NOT EXISTS idx_payment_assignments_property_category
+  ON public.payment_assignments (property_id, category)
+  WHERE category IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_payment_assignments_unit
+  ON public.payment_assignments (unit_id)
+  WHERE unit_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_raw_transactions_owner_date
+  ON public.raw_transactions (owner_id, value_date);
 CREATE TABLE public.payment_profile_events (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
@@ -213,14 +236,14 @@ CREATE TABLE public.properties (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   ean_electricity text,
   ean_gas text,
-  cost_allocation_key_id uuid,
+  cost_allocation_key_id uuid NOT NULL,
   legal_entity_id uuid,
   portfolio_id uuid,
   CONSTRAINT properties_pkey PRIMARY KEY (id),
   CONSTRAINT properties_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id),
   CONSTRAINT properties_portfolio_id_fkey FOREIGN KEY (portfolio_id) REFERENCES public.portfolios(id),
   CONSTRAINT properties_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT properties_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id)
+  CONSTRAINT properties_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id) ON DELETE RESTRICT
 );
 CREATE TABLE public.raw_transactions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -236,7 +259,7 @@ CREATE TABLE public.raw_transactions (
   description text,
   raw_data jsonb,
   imported_at timestamp with time zone NOT NULL DEFAULT now(),
-  source text NOT NULL DEFAULT 'tink'::text CHECK (source = ANY (ARRAY['tink'::text, 'manual'::text, 'camt053'::text])),
+  source text NOT NULL DEFAULT '''yapily''::text'::text CHECK (source = ANY (ARRAY['yapily'::text, 'manual'::text, 'camt053'::text])),
   CONSTRAINT raw_transactions_pkey PRIMARY KEY (id),
   CONSTRAINT raw_transactions_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
   CONSTRAINT raw_transactions_bank_connection_id_fkey FOREIGN KEY (bank_connection_id) REFERENCES public.bank_connections(id)
@@ -266,6 +289,7 @@ CREATE TABLE public.settlements (
   total_actual_costs numeric NOT NULL DEFAULT 0,
   balance numeric NOT NULL DEFAULT 0,
   cost_breakdown jsonb,
+  allocation_keys_snapshot jsonb,
   status text NOT NULL DEFAULT 'concept'::text CHECK (status = ANY (ARRAY['concept'::text, 'definitief'::text, 'verzonden'::text, 'verrekend'::text, 'nietig'::text])),
   notes text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),

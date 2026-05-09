@@ -42,7 +42,7 @@ export async function PUT(
   // Verify ownership and get current status
   const { data: existing } = await (supabase as any)
     .from("settlements")
-    .select("owner_id, status")
+    .select("owner_id, status, cost_breakdown")
     .eq("id", id)
     .single();
 
@@ -93,6 +93,31 @@ export async function PUT(
     updates.status = status;
     if (status === "definitief" && currentStatus === "concept") {
       updates.published_at = new Date().toISOString();
+
+      // Snapshot every allocation key referenced in the breakdown so future
+      // edits to those keys do not retroactively change a published settlement.
+      const breakdown =
+        (cost_breakdown ?? existing.cost_breakdown ?? []) as Array<{
+          cost_allocation_key_id?: string | null;
+        }>;
+      const keyIds = [
+        ...new Set(
+          breakdown
+            .map((r) => r.cost_allocation_key_id)
+            .filter((v): v is string => Boolean(v))
+        ),
+      ];
+      if (keyIds.length > 0) {
+        const { data: keys } = await (supabase as any)
+          .from("cost_allocation_keys")
+          .select("id, name, method, units")
+          .in("id", keyIds);
+        const snapshot: Record<string, unknown> = {};
+        for (const k of keys ?? []) snapshot[k.id] = k;
+        updates.allocation_keys_snapshot = snapshot;
+      } else {
+        updates.allocation_keys_snapshot = {};
+      }
     }
     if (status === "verzonden") {
       updates.sent_at = new Date().toISOString();

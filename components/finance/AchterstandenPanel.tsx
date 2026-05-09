@@ -22,7 +22,7 @@ import {
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
 import { supabase } from '@/lib/supabase/client'
-import { classifyUnit, type UnitStatus, type PaymentProfile } from '@/lib/finance/classification'
+import { classifyUnit, computePaymentWindow, type UnitStatus, type PaymentProfile } from '@/lib/finance/classification'
 import { STATUS_CONFIG } from '@/components/finance/statusConfig'
 import { LeaseDrawer } from '@/components/finance/LeaseDrawer'
 
@@ -35,6 +35,7 @@ interface UnitRow {
   property_name: string | null
   tenant_name: string | null
   status: UnitStatus
+  subtext: string | null
 }
 
 interface LeaseRow {
@@ -64,6 +65,85 @@ const STATUS_PRIORITY: Record<UnitStatus, number> = {
   achterstand: 3,
 }
 
+// ── Sub-text helpers ─────────────────────────────────────────────────────────
+
+const NL_MONTHS = [
+  'januari', 'februari', 'maart', 'april', 'mei', 'juni',
+  'juli', 'augustus', 'september', 'oktober', 'november', 'december',
+]
+
+function formatNlDate(iso: string): string {
+  const d = new Date(iso)
+  return `${d.getDate()} ${NL_MONTHS[d.getMonth()]} ${d.getFullYear()}`
+}
+
+function duePeriodToMonth(duePeriod: string): string {
+  return NL_MONTHS[new Date(duePeriod).getUTCMonth()]
+}
+
+function formatEurShort(amount: number): string {
+  const r = Math.round(amount * 100) / 100
+  return r % 1 === 0 ? String(Math.round(r)) : r.toFixed(2).replace('.', ',')
+}
+
+function getStatusSubtext(
+  status: UnitStatus,
+  leaseExps: ExpectationRow[],
+  paidByExp: Map<string, number>,
+  profile: PaymentProfile | null,
+  today: Date,
+  latestBookingDate: string | null,
+): string | null {
+  if (!profile) return null
+
+  switch (status) {
+    case 'betaald': {
+      if (!latestBookingDate) return null
+      return `Betaald op ${formatNlDate(latestBookingDate)}`
+    }
+
+    case 'verwacht': {
+      const exp = leaseExps.find(e => {
+        if ((paidByExp.get(e.id) ?? 0) !== 0) return false
+        const { first, last } = computePaymentWindow(e.due_period, profile)
+        return today >= first && today <= last
+      })
+      if (!exp) return null
+      const { last } = computePaymentWindow(exp.due_period, profile)
+      const N = Math.round((last.getTime() - today.getTime()) / 86_400_000)
+      if (N === 0) return 'Betaling verwacht vandaag'
+      if (N === 1) return 'Betaling verwacht binnen 1 dag'
+      return `Betaling verwacht binnen ${N} dagen`
+    }
+
+    case 'aandacht': {
+      const partial = leaseExps
+        .filter(e => {
+          const paid = paidByExp.get(e.id) ?? 0
+          return paid > 0 && Math.abs(paid - Number(e.amount_expected)) >= 0.005
+        })
+        .sort((a, b) => b.due_period.localeCompare(a.due_period))[0]
+      if (!partial) return null
+      const outstanding = Number(partial.amount_expected) - (paidByExp.get(partial.id) ?? 0)
+      return `€${formatEurShort(outstanding)} openstaand (${duePeriodToMonth(partial.due_period)})`
+    }
+
+    case 'achterstand': {
+      const overdue = leaseExps
+        .filter(e => {
+          if ((paidByExp.get(e.id) ?? 0) !== 0) return false
+          const { last } = computePaymentWindow(e.due_period, profile)
+          return today > last
+        })
+        .sort((a, b) => a.due_period.localeCompare(b.due_period))
+      if (overdue.length === 0) return null
+      if (overdue.length === 1) return `${duePeriodToMonth(overdue[0].due_period)} niet betaald`
+      if (overdue.length === 2) return `${duePeriodToMonth(overdue[0].due_period)} en ${duePeriodToMonth(overdue[1].due_period)} niet betaald`
+      return `${overdue.length} maanden niet betaald (sinds ${duePeriodToMonth(overdue[0].due_period)})`
+    }
+  }
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 
 interface AchterstandenPanelProps {
@@ -84,7 +164,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
     const load = async () => {
       setLoading(true)
       try {
-        // 1. Fetch active leases — payment profile is on the lease, not the tenant
+        // 1. Fetch active leases
         const { data: leasesData, error: leaseErr } = await supabase
           .from('leases')
           .select(`
@@ -108,7 +188,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
         const leaseIds = leases.map(l => l.id)
 
-        // 2. Fetch rent_expectations for these leases
+        // 2. Fetch rent_expectations
         const { data: expectationsData, error: expErr } = await supabase
           .from('rent_expectations')
           .select('id, lease_id, due_period, amount_expected')
@@ -118,19 +198,41 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
         const expectations = (expectationsData ?? []) as ExpectationRow[]
 
-        // 3. Sum payment_assignments per expectation
+        // 3. Sum payment_assignments per expectation; also track latest booking_date per lease
         const paidByExp = new Map<string, number>()
+        const latestBookingByLease = new Map<string, string>()
+
         if (expectations.length > 0) {
           const expectationIds = expectations.map(e => e.id)
+
+          // Build expectation → lease lookup
+          const expToLease = new Map<string, string>()
+          for (const e of expectations) expToLease.set(e.id, e.lease_id)
+
           const { data: assignmentsData, error: assignErr } = await supabase
             .from('payment_assignments')
-            .select('rent_expectation_id, amount_assigned')
+            .select('rent_expectation_id, amount_assigned, raw_transactions(booking_date)')
             .in('rent_expectation_id', expectationIds)
 
           if (assignErr) throw assignErr
 
-          for (const a of (assignmentsData ?? []) as { rent_expectation_id: string; amount_assigned: number }[]) {
-            paidByExp.set(a.rent_expectation_id, (paidByExp.get(a.rent_expectation_id) ?? 0) + Number(a.amount_assigned))
+          for (const a of (assignmentsData ?? []) as {
+            rent_expectation_id: string
+            amount_assigned: number
+            raw_transactions: { booking_date: string | null } | null
+          }[]) {
+            paidByExp.set(
+              a.rent_expectation_id,
+              (paidByExp.get(a.rent_expectation_id) ?? 0) + Number(a.amount_assigned)
+            )
+            const bookingDate = a.raw_transactions?.booking_date
+            if (bookingDate) {
+              const leaseId = expToLease.get(a.rent_expectation_id)
+              if (leaseId) {
+                const existing = latestBookingByLease.get(leaseId)
+                if (!existing || bookingDate > existing) latestBookingByLease.set(leaseId, bookingDate)
+              }
+            }
           }
         }
 
@@ -142,13 +244,17 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
           expsByLease.set(exp.lease_id, list)
         }
 
-        // 4. Classify each lease
+        // 4. Classify each lease and compute sub-text
         const result: UnitRow[] = []
         for (const lease of leases) {
           const unit = lease.units ?? null
           const property = unit?.properties ?? null
           const leaseExps = expsByLease.get(lease.id) ?? []
           const status = classifyUnit(leaseExps, paidByExp, lease.payment_profiles, today, lease.id)
+          const subtext = getStatusSubtext(
+            status, leaseExps, paidByExp, lease.payment_profiles, today,
+            latestBookingByLease.get(lease.id) ?? null,
+          )
 
           result.push({
             lease_id: lease.id,
@@ -157,10 +263,10 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
             property_name: property?.name ?? null,
             tenant_name: lease.tenants?.full_name ?? null,
             status,
+            subtext,
           })
         }
 
-        // Sort: worst status first, then alphabetically by property name
         result.sort((a, b) => {
           const diff = STATUS_PRIORITY[b.status] - STATUS_PRIORITY[a.status]
           if (diff !== 0) return diff
@@ -325,6 +431,9 @@ function BoardCard({
       {row.tenant_name && (
         <p className="text-xs text-gray-500 dark:text-gray-400">{row.tenant_name}</p>
       )}
+      {row.subtext && (
+        <p className="text-xs text-gray-400 dark:text-gray-500">{row.subtext}</p>
+      )}
       <span className={cn(
         'mt-1 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium',
         cfg.classes
@@ -346,13 +455,14 @@ function TableView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
           <TableRow>
             <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Pand · Eenheid</TableHead>
             <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Huurder</TableHead>
+            <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Detail</TableHead>
             <TableHead className={DASHBOARD_TABLE_HEAD_SHADCN_CLASS}>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={3} className="py-12 text-center">
+              <TableCell colSpan={4} className="py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
                   <Building2 className="h-8 w-8 text-gray-300 dark:text-neutral-600" />
                   <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -378,6 +488,9 @@ function TableView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
                 </TableCell>
                 <TableCell className="px-3.5 py-3 text-gray-600 dark:text-gray-300">
                   {r.tenant_name ?? '—'}
+                </TableCell>
+                <TableCell className="px-3.5 py-3 text-gray-400 dark:text-gray-500 text-xs">
+                  {r.subtext ?? '—'}
                 </TableCell>
                 <TableCell className="px-3.5 py-3">
                   <span className={cn(

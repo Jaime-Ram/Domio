@@ -88,11 +88,9 @@ type SortCol = 'name' | 'method'
 type UnitRow = { unit_id: string; value: string }
 
 function UnitRowsBuilder({
-  method,
   rows,
   onChange,
 }: {
-  method: 'surface_area' | 'custom'
   rows: UnitRow[]
   onChange: (r: UnitRow[]) => void
 }) {
@@ -108,9 +106,7 @@ function UnitRowsBuilder({
     onChange(rows.filter((_, i) => i !== idx))
   }
 
-  const totalPct = method === 'custom'
-    ? rows.reduce((s, r) => s + (parseFloat(r.value) || 0), 0)
-    : null
+  const totalPct = rows.reduce((s, r) => s + (parseFloat(r.value) || 0), 0)
 
   return (
     <div className="space-y-2">
@@ -124,7 +120,7 @@ function UnitRowsBuilder({
           />
           <Input
             type="number"
-            placeholder={method === 'surface_area' ? 'm²' : '%'}
+            placeholder="%"
             value={r.value}
             onChange={(e) => update(i, 'value', e.target.value)}
             className="w-24 h-8 rounded-lg text-sm"
@@ -143,17 +139,13 @@ function UnitRowsBuilder({
       <Button type="button" variant="outline" size="sm" onClick={addRow} className="h-8 rounded-lg text-xs px-3">
         <Plus className="h-3.5 w-3.5 mr-1" />Rij toevoegen
       </Button>
-      {method === 'custom' && totalPct !== null && (
-        <div className={cn('flex items-center gap-1.5 text-xs', Math.abs(totalPct - 100) < 0.01 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400')}>
-          {Math.abs(totalPct - 100) < 0.01
-            ? '✓ Percentages tellen op tot 100%'
-            : `Som = ${totalPct.toFixed(1)}% — moet 100% zijn`}
-        </div>
-      )}
+      <div className={cn('flex items-center gap-1.5 text-xs', Math.abs(totalPct - 100) < 0.01 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400')}>
+        {Math.abs(totalPct - 100) < 0.01
+          ? '✓ Percentages tellen op tot 100%'
+          : `Som = ${totalPct.toFixed(1)}% — moet 100% zijn`}
+      </div>
       <p className="text-xs text-gray-400 dark:text-gray-500">
-        {method === 'surface_area'
-          ? 'Vul het m²-oppervlak per eenheid in.'
-          : 'Percentages moeten optellen tot 100%.'}
+        Percentages moeten optellen tot 100%.
       </p>
     </div>
   )
@@ -173,7 +165,9 @@ function AllocationPreview({ keyObj, amount }: { keyObj: CostAllocationKey; amou
   if (rows.length === 0) {
     return (
       <p className="text-xs text-gray-400 dark:text-gray-500 italic">
-        {keyObj.method === 'equal' ? 'Voeg eenheden toe om de verdeling te berekenen.' : 'Onvoldoende data voor preview.'}
+        {keyObj.method === 'custom'
+          ? 'Onvoldoende data voor preview.'
+          : 'Verdeling wordt automatisch berekend per pand op basis van de eenheden.'}
       </p>
     )
   }
@@ -276,10 +270,8 @@ export default function VerdeelsleutelPage() {
     setEditingKey(k)
     setFormName(k.name)
     setFormMethod(k.method)
-    if (k.method === 'surface_area') {
-      setFormUnitRows((k.units as { unit_id: string; m2: number }[]).map((u) => ({ unit_id: u.unit_id, value: String(u.m2) })))
-    } else if (k.method === 'custom') {
-      setFormUnitRows((k.units as { unit_id: string; percentage: number }[]).map((u) => ({ unit_id: u.unit_id, value: String(u.percentage) })))
+    if (k.method === 'custom') {
+      setFormUnitRows(k.units.map((u) => ({ unit_id: u.unit_id, value: String(u.percentage) })))
     } else {
       setFormUnitRows([])
     }
@@ -288,13 +280,10 @@ export default function VerdeelsleutelPage() {
   }
 
   // ── Parse units ───────────────────────────────────────────────────────────
+  // Only `custom` keys store per-unit data; equal/surface_area derive everything
+  // from the property's units at compute time.
   function parseUnits(): AllocationUnit[] {
-    if (formMethod === 'equal') return []
-    if (formMethod === 'surface_area') {
-      return formUnitRows
-        .filter((r) => r.unit_id.trim() && r.value)
-        .map((r) => ({ unit_id: r.unit_id.trim(), m2: parseFloat(r.value) || 0 }))
-    }
+    if (formMethod !== 'custom') return []
     return formUnitRows
       .filter((r) => r.unit_id.trim() && r.value)
       .map((r) => ({ unit_id: r.unit_id.trim(), percentage: parseFloat(r.value) || 0 }))
@@ -545,12 +534,19 @@ export default function VerdeelsleutelPage() {
               </div>
             </div>
 
-            {/* Unit rows (not shown for 'equal') */}
-            {(formMethod === 'surface_area' || formMethod === 'custom') && (
+            {/* Unit rows — only for 'custom' (equal/surface_area derive from property) */}
+            {formMethod === 'custom' && (
               <div className="space-y-1.5">
                 <Label>Eenheden</Label>
-                <UnitRowsBuilder method={formMethod} rows={formUnitRows} onChange={setFormUnitRows} />
+                <UnitRowsBuilder rows={formUnitRows} onChange={setFormUnitRows} />
               </div>
+            )}
+            {formMethod !== 'custom' && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {formMethod === 'equal'
+                  ? 'Kosten worden gelijk verdeeld over alle eenheden van het pand.'
+                  : 'Kosten worden verdeeld op basis van het opgegeven m²-oppervlak per eenheid.'}
+              </p>
             )}
 
             {saveError && <p className="text-xs text-red-500">{saveError}</p>}

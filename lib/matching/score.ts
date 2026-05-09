@@ -61,13 +61,13 @@ export function scoreCandidate(
   const windowStr = `[${first.toISOString().slice(0, 10)}, ${last.toISOString().slice(0, 10)}]`;
 
   // Tier 90 — IBAN
-  if (
-    tx.counterparty_iban &&
-    candidate.tenantIban &&
-    tx.counterparty_iban.replace(/\s/g, "").toUpperCase() ===
-      candidate.tenantIban.replace(/\s/g, "").toUpperCase() &&
-    inWindow
-  ) {
+  const normalizedTxIban = tx.counterparty_iban?.replace(/\s/g, "").toUpperCase();
+  const ibanMatch =
+    normalizedTxIban &&
+    candidate.tenantIbans.some(
+      (iban) => iban.replace(/\s/g, "").toUpperCase() === normalizedTxIban
+    );
+  if (ibanMatch && inWindow) {
     return {
       score: 90,
       method: "iban",

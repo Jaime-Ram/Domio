@@ -54,6 +54,10 @@ export default function GeldstromenPage() {
             match_method,
             confidence_score,
             rent_expectation_id,
+            category,
+            property_id,
+            unit_id,
+            cost_allocation_key_id,
             rent_expectations (
               lease_id,
               due_period,
@@ -97,11 +101,13 @@ export default function GeldstromenPage() {
     // Build lookup maps from properties data for resolving names
     const propById = new Map<string, { name: string; address: string }>()
     const unitToPropertyId = new Map<string, string>()
+    const unitById = new Map<string, string>()
     const tenantById = new Map<string, string>()
     for (const p of (propRes.data ?? []) as any[]) {
       propById.set(p.id, { name: p.name, address: p.address })
       for (const u of p.units ?? []) {
         unitToPropertyId.set(u.id, p.id)
+        unitById.set(u.id, u.unit_number)
         for (const l of u.leases ?? []) {
           if (l.tenant_id && l.tenants?.full_name) {
             tenantById.set(l.tenant_id, l.tenants.full_name)
@@ -122,8 +128,10 @@ export default function GeldstromenPage() {
         const lease = raw.rent_expectations?.leases ?? null
         const lease_id = raw.rent_expectations?.lease_id ?? null
         const tenant_id = lease?.tenant_id ?? null
-        const unit_id = lease?.unit_id ?? null
-        const property_id = unit_id ? (unitToPropertyId.get(unit_id) ?? null) : null
+        // unit_id: directly on assignment (non-huur eenheid) or from lease (huur)
+        const unit_id = raw.unit_id ?? (lease?.unit_id ?? null)
+        // property_id: from the assignment directly or derived from unit
+        const property_id = raw.property_id ?? (unit_id ? (unitToPropertyId.get(unit_id) ?? null) : null)
         const propInfo = property_id ? propById.get(property_id) : null
         assignment = {
           id: raw.id,
@@ -134,12 +142,14 @@ export default function GeldstromenPage() {
           lease_id,
           tenant_id,
           unit_id,
+          unit_name: unit_id ? (unitById.get(unit_id) ?? null) : null,
           property_id,
           tenant_name: tenant_id ? (tenantById.get(tenant_id) ?? null) : null,
           property_name: propInfo?.name ?? null,
           property_address: propInfo?.address ?? null,
           is_manual: raw.match_method === 'manual',
-          category: null,
+          category: raw.category ?? null,
+          cost_allocation_key_id: raw.cost_allocation_key_id ?? null,
         }
       }
 

@@ -113,6 +113,14 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
 
   if (leaseErr) throw leaseErr;
 
+  // Build lease → tenant ID set from leases.tenant_id
+  const tenantIdsByLease = new Map<string, Set<string>>();
+  for (const l of (leases ?? []) as Lease[]) {
+    if (l.tenant_id) {
+      tenantIdsByLease.set(l.id, new Set([l.tenant_id]));
+    }
+  }
+
   // Fetch units to resolve unit_id → property_id
   const unitIds = [...new Set((leases ?? []).map((l: Lease) => l.unit_id))];
   const { data: units, error: unitErr } = unitIds.length
@@ -167,7 +175,7 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
           if (matchedExpIds.has(e.id)) return false;
           if (e.due_period.substring(0, 7) !== txPeriod) return false;
           if (Number(e.amount_expected) !== Number(tx.amount)) return false;
-          return leaseById.get(e.lease_id)?.tenant_id === tenant.id;
+          return tenantIdsByLease.get(e.lease_id)?.has(tenant.id) ?? false;
         });
         if (exp) {
           await assign(tx, exp, 95, "iban", ownerId);

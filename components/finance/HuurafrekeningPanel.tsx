@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Plus,
   Loader2,
@@ -11,7 +12,15 @@ import {
   Search,
   Table2,
   Columns3,
+  Building2,
+  Home,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isBefore, isAfter, parseISO } from 'date-fns'
+import { nl } from 'date-fns/locale'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,13 +37,6 @@ import {
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,7 +67,6 @@ import {
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/employer/dashboard-ui'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { supabase } from '@/lib/supabase/client'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -108,6 +109,11 @@ interface BreakdownRow {
   category?: string
   date?: string
   selected: boolean
+  cost_allocation_key_id?: string | null
+  cost_allocation_key_name?: string | null
+  allocation_pct?: number | null
+  full_amount?: number | null
+  is_property_level?: boolean
 }
 
 interface PropertyOption {
@@ -143,6 +149,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 
+
+const MONTH_ABBRS = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+const WEEKDAYS_NL = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n)
@@ -190,6 +199,111 @@ function OverzichtTable({
   const totalExpense = expenseRows.filter((r) => r.selected).reduce((s, r) => s + r.expense, 0)
   const netTotal = totalIncome - totalExpense
 
+  // Split expenses by level so we can render them as separate sections.
+  const propertyExpenseRows = expenseRows.filter((r) => r.is_property_level)
+  const unitExpenseRows = expenseRows.filter((r) => !r.is_property_level)
+
+  const colSpan = editable ? 9 : 8
+
+  const SectionLabel = ({ label }: { label: string }) => (
+    <tr className="bg-gray-50/60 dark:bg-neutral-800/40">
+      <td
+        colSpan={colSpan}
+        className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+      >
+        {label}
+      </td>
+    </tr>
+  )
+
+  const renderExpenseRow = (r: BreakdownRow) => (
+    <tr
+      key={r.id}
+      className={`border-b border-gray-50 dark:border-neutral-800/50 ${
+        editable && !r.selected ? 'opacity-40' : ''
+      }`}
+    >
+      {editable && (
+        <td className="px-3 py-2">
+          <Checkbox
+            checked={r.selected}
+            onCheckedChange={(v) => onToggle?.(r.id, !!v)}
+          />
+        </td>
+      )}
+      <td className="px-3 py-2">
+        {editable && r.source === 'inline' ? (
+          <Input
+            value={r.description}
+            onChange={(e) => onUpdateExpense?.(r.id, 'description', e.target.value)}
+            placeholder="Omschrijving"
+            className="h-8 text-sm"
+          />
+        ) : (
+          <span className="text-gray-900 dark:text-white">
+            {r.description || '—'}
+            {r.category && (
+              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+                {CATEGORY_LABELS[r.category] ?? r.category}
+              </span>
+            )}
+          </span>
+        )}
+      </td>
+      <td className="px-3 py-2 text-sm">
+        {r.is_property_level && r.cost_allocation_key_name && r.allocation_pct != null ? (
+          <div className="flex flex-col leading-tight">
+            <span className="text-gray-700 dark:text-gray-300">{r.cost_allocation_key_name}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{r.allocation_pct.toFixed(1)}%</span>
+          </div>
+        ) : (
+          <span className="text-gray-400">—</span>
+        )}
+      </td>
+      <td className="px-3 py-2 text-right text-gray-500 dark:text-gray-400">
+        {r.is_property_level && r.full_amount != null ? fmt(-r.full_amount) : '—'}
+      </td>
+      <td className="px-3 py-2 text-right text-gray-400">—</td>
+      <td className="px-3 py-2 text-right">
+        {editable && r.source === 'inline' ? (
+          <Input
+            type="number"
+            value={r.expense || ''}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value) || 0
+              onUpdateExpense?.(r.id, 'expense', val)
+              onUpdateExpense?.(r.id, 'total', -val)
+            }}
+            placeholder="0,00"
+            className="h-8 text-sm w-28 text-right"
+            min="0"
+            step="0.01"
+          />
+        ) : (
+          <span className="text-red-600 dark:text-red-400 font-medium">
+            {fmt(-r.expense)}
+          </span>
+        )}
+      </td>
+      <td className="px-3 py-2 text-right text-gray-400">—</td>
+      <td className="px-3 py-2 text-right font-medium text-red-600 dark:text-red-400">
+        {editable && r.source === 'inline' ? fmt(-r.expense) : fmt(r.total)}
+      </td>
+      {editable && (
+        <td className="px-3 py-2">
+          {r.source === 'inline' && (
+            <button
+              onClick={() => onRemoveExpense?.(r.id)}
+              className="text-gray-400 hover:text-red-500 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </td>
+      )}
+    </tr>
+  )
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -197,6 +311,8 @@ function OverzichtTable({
           <tr className="border-b border-gray-200 dark:border-neutral-700 text-left">
             {editable && <th className="px-3 py-2.5 w-8"></th>}
             <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400">Omschrijving</th>
+            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400">Verdeelsleutel</th>
+            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Origineel</th>
             <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Inkomen</th>
             <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Uitgaven</th>
             <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">BTW</th>
@@ -206,10 +322,13 @@ function OverzichtTable({
         </thead>
         <tbody>
           {/* ── Income section ── */}
+          {incomeRows.length > 0 && <SectionLabel label="Inkomsten" />}
           {incomeRows.map((r) => (
             <tr key={r.id} className="border-b border-gray-50 dark:border-neutral-800/50">
               {editable && <td className="px-3 py-2"></td>}
               <td className="px-3 py-2 text-gray-900 dark:text-white">{r.description}</td>
+              <td className="px-3 py-2 text-gray-400">—</td>
+              <td className="px-3 py-2 text-right text-gray-400">—</td>
               <td className="px-3 py-2 text-right text-green-600 dark:text-green-400 font-medium">
                 {r.income > 0 ? fmt(r.income) : '—'}
               </td>
@@ -220,95 +339,18 @@ function OverzichtTable({
             </tr>
           ))}
 
-          {/* ── Divider ── */}
-          {incomeRows.length > 0 && expenseRows.length > 0 && (
-            <tr>
-              <td colSpan={editable ? 7 : 6} className="py-1">
-                <div className="border-t border-gray-200 dark:border-neutral-700" />
-              </td>
-            </tr>
-          )}
+          {/* ── Unit-level expenses ── */}
+          {unitExpenseRows.length > 0 && <SectionLabel label="Kosten — eenheid" />}
+          {unitExpenseRows.map(renderExpenseRow)}
 
-          {/* ── Expense section ── */}
-          {expenseRows.map((r) => (
-            <tr
-              key={r.id}
-              className={`border-b border-gray-50 dark:border-neutral-800/50 ${
-                editable && !r.selected ? 'opacity-40' : ''
-              }`}
-            >
-              {editable && (
-                <td className="px-3 py-2">
-                  <Checkbox
-                    checked={r.selected}
-                    onCheckedChange={(v) => onToggle?.(r.id, !!v)}
-                  />
-                </td>
-              )}
-              <td className="px-3 py-2">
-                {editable && r.source === 'inline' ? (
-                  <Input
-                    value={r.description}
-                    onChange={(e) => onUpdateExpense?.(r.id, 'description', e.target.value)}
-                    placeholder="Omschrijving"
-                    className="h-8 text-sm"
-                  />
-                ) : (
-                  <span className="text-gray-900 dark:text-white">
-                    {r.description || '—'}
-                    {r.category && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">
-                        {CATEGORY_LABELS[r.category] ?? r.category}
-                      </span>
-                    )}
-                  </span>
-                )}
-              </td>
-              <td className="px-3 py-2 text-right text-gray-400">—</td>
-              <td className="px-3 py-2 text-right">
-                {editable && r.source === 'inline' ? (
-                  <Input
-                    type="number"
-                    value={r.expense || ''}
-                    onChange={(e) => {
-                      const val = parseFloat(e.target.value) || 0
-                      onUpdateExpense?.(r.id, 'expense', val)
-                      onUpdateExpense?.(r.id, 'total', -val)
-                    }}
-                    placeholder="0,00"
-                    className="h-8 text-sm w-28 text-right"
-                    min="0"
-                    step="0.01"
-                  />
-                ) : (
-                  <span className="text-red-600 dark:text-red-400 font-medium">
-                    {fmt(-r.expense)}
-                  </span>
-                )}
-              </td>
-              <td className="px-3 py-2 text-right text-gray-400">—</td>
-              <td className="px-3 py-2 text-right font-medium text-red-600 dark:text-red-400">
-                {editable && r.source === 'inline' ? fmt(-r.expense) : fmt(r.total)}
-              </td>
-              {editable && (
-                <td className="px-3 py-2">
-                  {r.source === 'inline' && (
-                    <button
-                      onClick={() => onRemoveExpense?.(r.id)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </td>
-              )}
-            </tr>
-          ))}
+          {/* ── Property-level expenses ── */}
+          {propertyExpenseRows.length > 0 && <SectionLabel label="Kosten — pand (verdeeld)" />}
+          {propertyExpenseRows.map(renderExpenseRow)}
 
           {/* ── Add cost (editable only) ── */}
           {editable && onAddExpense && (
             <tr>
-              <td colSpan={7} className="px-3 py-2">
+              <td colSpan={9} className="px-3 py-2">
                 <button
                   onClick={onAddExpense}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
@@ -324,6 +366,8 @@ function OverzichtTable({
           <tr className="border-t-2 border-gray-200 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30">
             {editable && <td className="px-3 py-3"></td>}
             <td className="px-3 py-3 font-semibold text-gray-900 dark:text-white">Totaal</td>
+            <td className="px-3 py-3"></td>
+            <td className="px-3 py-3"></td>
             <td className="px-3 py-3 text-right font-semibold text-green-600 dark:text-green-400">{fmt(totalIncome)}</td>
             <td className="px-3 py-3 text-right font-semibold text-red-600 dark:text-red-400">{fmt(-totalExpense)}</td>
             <td className="px-3 py-3 text-right font-semibold text-gray-400">—</td>
@@ -862,6 +906,20 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
   const [saving, setSaving] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
+  // Picker state
+  const [propPickerOpen, setPropPickerOpen] = useState(false)
+  const [unitPickerOpen, setUnitPickerOpen] = useState(false)
+  const [pickerPos, setPickerPos] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  // Period state
+  const [periodMode, setPeriodMode] = useState<'months' | 'custom'>('months')
+  const [yearView, setYearView] = useState(new Date().getFullYear())
+  const [monthRangeStart, setMonthRangeStart] = useState('')   // "yyyy-MM"
+  const [monthRangeEnd, setMonthRangeEnd] = useState('')       // "yyyy-MM"
+  const [monthHover, setMonthHover] = useState<string | null>(null)
+  const [calView, setCalView] = useState<Date>(startOfMonth(new Date()))
+  const [dayHover, setDayHover] = useState<Date | null>(null)
+
   // Step 1 state
   const [properties, setProperties] = useState<PropertyOption[]>([])
   const [propertyId, setPropertyId] = useState('')
@@ -960,6 +1018,21 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
       setPeriodStart(s.period_start)
       setPeriodEnd(s.period_end)
       setNotes(s.notes ?? '')
+      // Restore period mode
+      const sd = parseISO(s.period_start)
+      const ed = parseISO(s.period_end)
+      const isFullMonths =
+        s.period_start === format(startOfMonth(sd), 'yyyy-MM-dd') &&
+        s.period_end === format(endOfMonth(ed), 'yyyy-MM-dd')
+      if (isFullMonths) {
+        setPeriodMode('months')
+        setMonthRangeStart(s.period_start.slice(0, 7))
+        setMonthRangeEnd(s.period_end.slice(0, 7))
+        setYearView(sd.getFullYear())
+      } else {
+        setPeriodMode('custom')
+        setCalView(startOfMonth(sd))
+      }
       if (s.cost_breakdown) {
         const income = s.cost_breakdown
           .filter((r) => r.type === 'income')
@@ -990,13 +1063,24 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
         period_start: periodStart,
         period_end: periodEnd,
       })
-      if (tenantId) qs.set('tenant_id', tenantId)
       if (unitId) qs.set('unit_id', unitId)
       const res = await fetch(`/api/finance/settlements/_/costs?${qs}`)
       if (res.ok) {
         const data: {
           income: { id: string; source: string; date: string; description: string; counterparty_name: string; amount: number }[]
-          expenses: { id: string; source: string; date: string; description: string; category: string; amount: number }[]
+          expenses: {
+            id: string
+            source: string
+            date: string
+            description: string
+            category: string
+            amount: number
+            full_amount: number
+            is_property_level: boolean
+            cost_allocation_key_id: string | null
+            cost_allocation_key_name: string | null
+            allocation_pct: number | null
+          }[]
         } = await res.json()
 
         setIncomeRows(
@@ -1034,6 +1118,11 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             category: c.category,
             date: c.date,
             selected: true,
+            cost_allocation_key_id: c.cost_allocation_key_id,
+            cost_allocation_key_name: c.cost_allocation_key_name,
+            allocation_pct: c.allocation_pct,
+            full_amount: c.full_amount,
+            is_property_level: c.is_property_level,
           }))
         )
       }
@@ -1082,6 +1171,44 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
 
   const removeExpense = (id: string) => {
     setExpenseRows((prev) => prev.filter((r) => r.id !== id))
+  }
+
+  // ── Period helpers ────────────────────────────────────────────────────────
+
+  function handleMonthClick(ym: string) {
+    if (!monthRangeStart || monthRangeEnd) {
+      setMonthRangeStart(ym)
+      setMonthRangeEnd('')
+      const [y, m] = ym.split('-').map(Number)
+      setPeriodStart(format(new Date(y, m - 1, 1), 'yyyy-MM-dd'))
+      setPeriodEnd(format(new Date(y, m, 0), 'yyyy-MM-dd'))
+    } else {
+      const [start, end] = ym >= monthRangeStart ? [monthRangeStart, ym] : [ym, monthRangeStart]
+      setMonthRangeStart(start)
+      setMonthRangeEnd(end)
+      const [sy, sm] = start.split('-').map(Number)
+      const [ey, em] = end.split('-').map(Number)
+      setPeriodStart(format(new Date(sy, sm - 1, 1), 'yyyy-MM-dd'))
+      setPeriodEnd(format(new Date(ey, em, 0), 'yyyy-MM-dd'))
+    }
+  }
+
+  function handleRangeDayClick(day: Date) {
+    const dayStr = format(day, 'yyyy-MM-dd')
+    if (!periodStart || periodEnd) {
+      setPeriodStart(dayStr)
+      setPeriodEnd('')
+      setDayHover(null)
+    } else {
+      const start = parseISO(periodStart)
+      if (isBefore(day, start)) {
+        setPeriodEnd(periodStart)
+        setPeriodStart(dayStr)
+      } else {
+        setPeriodEnd(dayStr)
+      }
+      setDayHover(null)
+    }
   }
 
   // Computed totals
@@ -1138,7 +1265,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className={addDialogContentClassName('sm:max-w-2xl')}
+          className={addDialogContentClassName('sm:max-w-5xl')}
           closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
         >
           <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
@@ -1166,43 +1293,252 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               ) : (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Pand picker */}
                     <div className="space-y-2">
                       <Label>Pand *</Label>
-                      <Select value={propertyId} onValueChange={setPropertyId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer pand" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {properties.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <button type="button"
+                        onClick={e => {
+                          const r = e.currentTarget.getBoundingClientRect()
+                          setPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                          setPropPickerOpen(v => !v); setUnitPickerOpen(false)
+                        }}
+                        className={cn(
+                          'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                          propertyId
+                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                        )}
+                      >
+                        <Building2 className="h-4 w-4 shrink-0" />
+                        <span className="flex-1 text-left">{properties.find(p => p.id === propertyId)?.name ?? 'Pand kiezen'}</span>
+                        {propertyId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                      </button>
+                      {propPickerOpen && pickerPos && createPortal(
+                        <>
+                          <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPropPickerOpen(false)} />
+                          <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                          >
+                            {properties.map(p => {
+                              const isSel = propertyId === p.id
+                              return (
+                                <button key={p.id} type="button"
+                                  onClick={() => { setPropertyId(p.id); setUnitId(''); setPropPickerOpen(false) }}
+                                  className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                  )}
+                                >
+                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <span className="flex-1">{p.name}</span>
+                                  {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </>,
+                        document.body
+                      )}
                     </div>
+
+                    {/* Eenheid picker */}
                     <div className="space-y-2">
                       <Label>Eenheid *</Label>
-                      <Select value={unitId} onValueChange={setUnitId} disabled={!propertyId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer eenheid" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(selectedProperty?.units ?? []).map((u) => (
-                            <SelectItem key={u.id} value={u.id}>{u.unit_number}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <button type="button"
+                        disabled={!propertyId}
+                        onClick={e => {
+                          const r = e.currentTarget.getBoundingClientRect()
+                          setPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                          setUnitPickerOpen(v => !v); setPropPickerOpen(false)
+                        }}
+                        className={cn(
+                          'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                          unitId
+                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
+                        )}
+                      >
+                        <Home className="h-4 w-4 shrink-0" />
+                        <span className="flex-1 text-left">{selectedProperty?.units.find(u => u.id === unitId)?.unit_number ?? 'Eenheid kiezen'}</span>
+                        {unitId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                      </button>
+                      {unitPickerOpen && pickerPos && createPortal(
+                        <>
+                          <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setUnitPickerOpen(false)} />
+                          <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                          >
+                            {(selectedProperty?.units ?? []).map(u => {
+                              const isSel = unitId === u.id
+                              return (
+                                <button key={u.id} type="button"
+                                  onClick={() => { setUnitId(u.id); setUnitPickerOpen(false) }}
+                                  className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                  )}
+                                >
+                                  <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <span className="flex-1">{u.unit_number}</span>
+                                  {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </>,
+                        document.body
+                      )}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Startdatum periode *</Label>
-                      <WiseDatePicker value={periodStart} onChange={setPeriodStart} placeholder="Kies startdatum" />
+                  {/* ── Period selector ── */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Periode *</Label>
+                      <div className="inline-flex rounded-full border border-gray-200 dark:border-neutral-700 p-0.5">
+                        {(['months', 'custom'] as const).map((mode) => (
+                          <button key={mode} type="button"
+                            onClick={() => { setPeriodMode(mode); setPeriodStart(''); setPeriodEnd(''); setMonthRangeStart(''); setMonthRangeEnd('') }}
+                            className={cn(
+                              'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                              periodMode === mode
+                                ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                            )}
+                          >
+                            {mode === 'months' ? 'Maanden' : 'Aangepast'}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Einddatum periode *</Label>
-                      <WiseDatePicker value={periodEnd} onChange={setPeriodEnd} placeholder="Kies einddatum" />
-                    </div>
+
+                    {/* Month grid */}
+                    {periodMode === 'months' && (
+                      <div className="rounded-xl border border-gray-200 dark:border-neutral-700 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <button type="button" onClick={() => setYearView(y => y - 1)}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{yearView}</span>
+                          <button type="button" onClick={() => setYearView(y => y + 1)}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {MONTH_ABBRS.map((label, i) => {
+                            const ym = `${yearView}-${String(i + 1).padStart(2, '0')}`
+                            const effectiveEnd = !monthRangeEnd && monthHover && monthRangeStart
+                              ? (monthHover >= monthRangeStart ? monthHover : monthRangeStart)
+                              : (monthRangeEnd || monthRangeStart)
+                            const effectiveStart = !monthRangeEnd && monthHover && monthHover < monthRangeStart
+                              ? monthHover : monthRangeStart
+                            const inRange = !!monthRangeStart && ym >= effectiveStart && ym <= effectiveEnd
+                            const isEdge = ym === effectiveStart || ym === effectiveEnd
+                            return (
+                              <button key={ym} type="button"
+                                onClick={() => handleMonthClick(ym)}
+                                onMouseEnter={() => { if (monthRangeStart && !monthRangeEnd) setMonthHover(ym) }}
+                                onMouseLeave={() => setMonthHover(null)}
+                                className={cn(
+                                  'rounded-lg py-2.5 text-sm font-medium transition-colors',
+                                  inRange && isEdge
+                                    ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                                    : inRange
+                                      ? 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]'
+                                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                                )}
+                              >
+                                {label}
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        {monthRangeStart && (
+                          <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                            {monthRangeEnd && monthRangeEnd !== monthRangeStart
+                              ? `${format(parseISO(`${monthRangeStart}-01`), 'MMM yyyy', { locale: nl })} — ${format(parseISO(`${monthRangeEnd}-01`), 'MMM yyyy', { locale: nl })}`
+                              : format(parseISO(`${monthRangeStart}-01`), 'MMMM yyyy', { locale: nl })
+                            }
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Custom date range calendar */}
+                    {periodMode === 'custom' && (
+                      <div className="rounded-xl border border-gray-200 dark:border-neutral-700 p-4 space-y-3">
+                        <p className="text-xs text-gray-400">
+                          {!periodStart ? 'Klik op een startdatum' : !periodEnd ? 'Klik op een einddatum' : 'Bereik geselecteerd — klik om opnieuw te beginnen'}
+                        </p>
+
+                        <div className="flex items-center justify-between">
+                          <button type="button" onClick={() => setCalView(d => subMonths(d, 1))}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                            {format(calView, 'MMMM yyyy', { locale: nl })}
+                          </span>
+                          <button type="button" onClick={() => setCalView(d => addMonths(d, 1))}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-7">
+                          {WEEKDAYS_NL.map((wd, i) => (
+                            <div key={wd} className={cn('text-center text-xs font-semibold py-1', i >= 5 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300')}>
+                              {wd}
+                            </div>
+                          ))}
+                          {Array.from({ length: (getDay(startOfMonth(calView)) + 6) % 7 }).map((_, i) => <div key={i} />)}
+                          {eachDayOfInterval({ start: startOfMonth(calView), end: endOfMonth(calView) }).map(day => {
+                            const startDate = periodStart ? parseISO(periodStart) : null
+                            const endDate = periodEnd ? parseISO(periodEnd) : null
+                            const isStart = startDate ? isSameDay(day, startDate) : false
+                            const isEnd = endDate ? isSameDay(day, endDate) : false
+                            const isHoverEnd = !endDate && dayHover && startDate ? isSameDay(day, dayHover) : false
+                            let inRange = false
+                            if (startDate && endDate) {
+                              inRange = !isBefore(day, startDate) && !isAfter(day, endDate)
+                            } else if (startDate && dayHover) {
+                              const [s, e] = isBefore(dayHover, startDate) ? [dayHover, startDate] : [startDate, dayHover]
+                              inRange = !isBefore(day, s) && !isAfter(day, e)
+                            }
+                            const isSelected = isStart || isEnd || isHoverEnd
+                            return (
+                              <button key={day.toISOString()} type="button"
+                                onClick={() => handleRangeDayClick(day)}
+                                onMouseEnter={() => { if (periodStart && !periodEnd) setDayHover(day) }}
+                                onMouseLeave={() => setDayHover(null)}
+                                className={cn(
+                                  'flex items-center justify-center h-8 w-8 mx-auto text-sm transition-colors',
+                                  isSelected
+                                    ? 'rounded-full bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300] font-semibold'
+                                    : inRange
+                                      ? 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
+                                      : 'rounded-full text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                                )}
+                              >
+                                {format(day, 'd')}
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        {(periodStart || periodEnd) && (
+                          <div className="flex items-center gap-2 text-xs pt-2 border-t border-gray-100 dark:border-neutral-800">
+                            <span className="text-gray-400">Van:</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">{periodStart ? format(parseISO(periodStart), 'd MMM yyyy', { locale: nl }) : '—'}</span>
+                            <span className="text-gray-300 dark:text-neutral-600 mx-0.5">→</span>
+                            <span className="text-gray-400">Tot:</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">{periodEnd ? format(parseISO(periodEnd), 'd MMM yyyy', { locale: nl }) : '—'}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )

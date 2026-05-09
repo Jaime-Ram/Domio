@@ -18,7 +18,8 @@ type EnrichedExp = {
   lease_id: string;
   due_period: string;
   amountRemaining: number;
-  tenant: DbTenant | null;
+  primaryTenant: DbTenant | null;
+  tenantIbans: string[];
   paymentProfile: Pick<DbPaymentProfile, "pay_date" | "reminders"> | null;
   propertyAddress: string | null;
 };
@@ -68,13 +69,30 @@ export async function findCandidates(
     (leases as DbLease[]).map((l) => [l.id, l])
   );
 
-  // Batch-fetch tenants
+  // Fetch all tenant IDs per lease via lease_tenants (supports multi-tenant)
+  const { data: leaseTenantsRows, error: ltErr } = await client
+    .from("lease_tenants")
+    .select("lease_id, tenant_id")
+    .in("lease_id", leaseIds);
+  if (ltErr) throw ltErr;
+
+  const tenantIdsByLease = new Map<string, string[]>();
+  for (const row of leaseTenantsRows ?? []) {
+    const existing = tenantIdsByLease.get(row.lease_id) ?? [];
+    existing.push(row.tenant_id);
+    tenantIdsByLease.set(row.lease_id, existing);
+  }
+
+  // Fall back to leases.tenant_id for leases not yet in lease_tenants
+  for (const lease of leases as DbLease[]) {
+    if (!tenantIdsByLease.has(lease.id) && lease.tenant_id) {
+      tenantIdsByLease.set(lease.id, [lease.tenant_id]);
+    }
+  }
+
+  // Batch-fetch tenants (union of all tenant IDs across all leases)
   const tenantIds = [
-    ...new Set(
-      (leases as DbLease[])
-        .map((l) => l.tenant_id)
-        .filter((id): id is string => id !== null)
-    ),
+    ...new Set([...tenantIdsByLease.values()].flat()),
   ];
 
   let tenantById = new Map<string, DbTenant>();
@@ -134,9 +152,14 @@ export async function findCandidates(
   // Build enriched expectations
   const enriched: EnrichedExp[] = openExps.map((e) => {
     const lease = leaseById.get(e.lease_id) ?? null;
-    const tenant = lease?.tenant_id ? (tenantById.get(lease.tenant_id) ?? null) : null;
-    const paymentProfile = tenant?.payment_profile_id
-      ? (profileById.get(tenant.payment_profile_id) ?? null)
+    // Primary tenant drives payment profile; all tenants contribute IBANs
+    const primaryTenant = lease?.tenant_id ? (tenantById.get(lease.tenant_id) ?? null) : null;
+    const allTenantIds = tenantIdsByLease.get(e.lease_id) ?? [];
+    const tenantIbans = allTenantIds
+      .map((tid) => tenantById.get(tid)?.iban)
+      .filter((iban): iban is string => iban != null && iban.trim() !== "");
+    const paymentProfile = primaryTenant?.payment_profile_id
+      ? (profileById.get(primaryTenant.payment_profile_id) ?? null)
       : null;
     const unit = lease?.unit_id ? (unitById.get(lease.unit_id) ?? null) : null;
     const property = unit?.property_id ? (propertyById.get(unit.property_id) ?? null) : null;
@@ -146,7 +169,8 @@ export async function findCandidates(
       lease_id: e.lease_id,
       due_period: e.due_period,
       amountRemaining: Number(e.amount_expected) - (paidByExp.get(e.id) ?? 0),
-      tenant,
+      primaryTenant,
+      tenantIbans,
       paymentProfile,
       propertyAddress: property?.address ?? null,
     };
@@ -166,7 +190,7 @@ export async function findCandidates(
 
   for (const group of groups.values()) {
     const [first] = group;
-    const tenantIban = first.tenant?.iban ?? null;
+    const tenantIbans = first.tenantIbans;
     const paymentProfile = first.paymentProfile;
     const propertyAddress = first.propertyAddress;
 
@@ -178,7 +202,7 @@ export async function findCandidates(
           amountAssigned: txAmount,
           assignments: [{ expectationId: exp.id, amount: txAmount }],
           duePeriod: exp.due_period,
-          tenantIban,
+          tenantIbans,
           paymentProfile,
           propertyAddress,
         });
@@ -198,7 +222,7 @@ export async function findCandidates(
             { expectationId: b.id, amount: b.amountRemaining },
           ],
           duePeriod: a.due_period,
-          tenantIban,
+          tenantIbans,
           paymentProfile,
           propertyAddress,
         });
