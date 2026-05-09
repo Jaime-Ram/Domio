@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Search,
   Building2,
@@ -16,9 +17,18 @@ import {
   Briefcase,
   UserX,
   MoreHorizontal,
+  Key,
   Pencil,
+  ChevronDown,
+  ChevronLeft,
   ChevronsUpDown,
+  AlertTriangle,
+  Tag,
+  Trash2,
+  Plus,
+  X as XIcon,
 } from 'lucide-react'
+import { useTransactionCategories } from '@/lib/finance/useTransactionCategories'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase/client'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -37,6 +47,8 @@ import {
   ADD_DIALOG_TITLE_CLASS,
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
+import { DetailShell } from '@/components/ui/detail-shell'
+import { WiseDatePicker } from '@/components/ui/wise-date-picker'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
@@ -65,17 +77,31 @@ const inputCls =
 type Filter = 'all' | 'inkomsten' | 'kosten' | 'unmatched'
 type RightPanelMode = 'empty' | 'detail'
 
-const CATEGORIES = [
-  { key: 'onderhoud', label: 'Onderhoud', icon: Wrench },
-  { key: 'verzekering', label: 'Verzekering', icon: Shield },
-  { key: 'belasting', label: 'Belasting', icon: Landmark },
-  { key: 'energie', label: 'Energie', icon: Zap },
-  { key: 'vve', label: 'VvE', icon: Building },
-  { key: 'hypotheek', label: 'Hypotheek', icon: Home },
-  { key: 'beheer', label: 'Beheer', icon: Briefcase },
-  { key: 'prive', label: 'Privé', icon: UserX },
-  { key: 'overig', label: 'Overig', icon: MoreHorizontal },
-] as const
+// Fixed icons for the built-in category ids; custom categories fall back to Tag
+const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  huur: Key,
+  onderhoud: Wrench,
+  verzekering: Shield,
+  belasting: Landmark,
+  energie: Zap,
+  vve: Building,
+  hypotheek: Home,
+  beheer: Briefcase,
+  prive: UserX,
+  overig: MoreHorizontal,
+}
+
+function getCategoryIcon(id: string): React.ComponentType<{ className?: string }> {
+  return CATEGORY_ICONS[id] ?? Tag
+}
+
+const METHOD_LABELS: Record<string, string> = {
+  iban: 'IBAN',
+  reference: 'Referentie',
+  amount_date: 'Bedrag+datum',
+  historical: 'Historisch',
+  manual: 'Handmatig',
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
@@ -110,23 +136,50 @@ export interface GeldstromenPanelRef {
 
 export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanelProps>(function GeldstromenPanel({ transactions, properties, onRefresh, headerActions }, ref) {
   const { user, isDemo } = useDashboardUser()
+  const { categories: txCategories, addCategory, deleteCategory, renameCategory } = useTransactionCategories()
   const [filter, setFilter] = useState<Filter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null)
   const [rightMode, setRightMode] = useState<RightPanelMode>('empty')
 
   // Assignment state
-  const [assignTab, setAssignTab] = useState<'rent' | 'category'>('rent')
-  const [assignSearch, setAssignSearch] = useState('')
-  const [selectedRent, setSelectedRent] = useState<{ property_id: string; unit_id: string; tenant_id: string | null; lease_id: string } | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [assignStep, setAssignStep] = useState<1 | 2 | 3>(1)
+  const [assignLevel, setAssignLevel] = useState<'geen' | 'pand' | 'eenheid' | null>(null)
+  const [propPickerOpen, setPropPickerOpen] = useState(false)
+  const [unitPickerOpen, setUnitPickerOpen] = useState(false)
+  const [allocKeyPickerOpen, setAllocKeyPickerOpen] = useState(false)
+const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedCategoryProperty, setSelectedCategoryProperty] = useState<string | null>(null)
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(null)
+  const [selectedAllocationKey, setSelectedAllocationKey] = useState<string | null>(null)
+  const [assignAllocKeys, setAssignAllocKeys] = useState<{ id: string; name: string; method: string }[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
+
+  // Category management state (shared between dropdown and tile grid)
+  const [catEditId, setCatEditId] = useState<string | null>(null)
+  const [catEditLabel, setCatEditLabel] = useState('')
+  const [catAddLabel, setCatAddLabel] = useState('')
+  const [catAddOpen, setCatAddOpen] = useState(false)
+
+  const getCategoryLabel = (id: string) => txCategories.find(c => c.id === id)?.label ?? id
+
+  // IBAN check state
+  const [ibanStatus, setIbanStatus] = useState<'loading' | 'matched' | 'unmatched' | null>(null)
+  const [ibanMatchedTenant, setIbanMatchedTenant] = useState<{ id: string; name: string } | null>(null)
+  const [showIbanAssignForm, setShowIbanAssignForm] = useState(false)
+  const [selectedIbanTenantId, setSelectedIbanTenantId] = useState<string | null>(null)
+  const [savingIban, setSavingIban] = useState(false)
 
   // Manual payment state
   const [showManualPayForm, setShowManualPayForm] = useState(false)
-  const [payStep, setPayStep] = useState<1 | 2>(1)
+  const [payStep, setPayStep] = useState<1 | 2 | 3 | 4>(1)
+  const [payLevel, setPayLevel] = useState<'pand' | 'eenheid' | 'geen' | null>(null)
+  const [payPropOpen, setPayPropOpen] = useState(false)
+  const [payUnitOpen, setPayUnitOpen] = useState(false)
+  const [payAllocOpen, setPayAllocOpen] = useState(false)
+  const [payPickerPos, setPayPickerPos] = useState<{ top: number; left: number; width: number } | null>(null)
   const [payDirection, setPayDirection] = useState<'inkomsten' | 'uitgaven'>('inkomsten')
   const [payDate, setPayDate] = useState(todayISODate())
   const [payAmount, setPayAmount] = useState('')
@@ -223,20 +276,38 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
     setSelectedTxId(tx.id)
     setRightMode('detail')
     setIsEditing(false)
+    setShowCategoryDropdown(false)
     resetAssignState(tx)
+    setShowIbanAssignForm(false)
+    setSelectedIbanTenantId(null)
   }
 
   function resetAssignState(tx: TransactionRow | null) {
-    setAssignSearch('')
     setSubmitting(false)
-    setAssignTab('rent')
-    if (tx?.assignment?.lease_id && tx.assignment.unit_id && tx.assignment.property_id) {
-      setSelectedRent({ property_id: tx.assignment.property_id, unit_id: tx.assignment.unit_id, tenant_id: tx.assignment.tenant_id, lease_id: tx.assignment.lease_id })
+    setPropPickerOpen(false)
+    setUnitPickerOpen(false)
+    setAllocKeyPickerOpen(false)
+    setSelectedAllocationKey(null)
+    if (tx?.assignment?.category && tx.assignment.category !== 'huur') {
+      const level = tx.assignment.unit_id ? 'eenheid' : tx.assignment.property_id ? 'pand' : null
+      setSelectedCategory(tx.assignment.category)
+      setSelectedCategoryProperty(tx.assignment.property_id ?? null)
+      setSelectedUnit(tx.assignment.unit_id ?? null)
+      setAssignLevel(level)
+      setAssignStep(level ? 3 : 2)
+    } else if (tx?.assignment?.lease_id && tx.assignment.unit_id && tx.assignment.property_id) {
+      setSelectedCategory('huur')
+      setSelectedCategoryProperty(tx.assignment.property_id)
+      setSelectedUnit(tx.assignment.unit_id)
+      setAssignLevel('eenheid')
+      setAssignStep(3)
     } else {
-      setSelectedRent(null)
+      setSelectedCategory(null)
+      setSelectedCategoryProperty(null)
+      setSelectedUnit(null)
+      setAssignLevel(null)
+      setAssignStep(1)
     }
-    setSelectedCategory(null)
-    setSelectedCategoryProperty(null)
   }
 
   function handleShowManualPaymentForm() {
@@ -247,10 +318,14 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
     setPayAmount('')
     setPayDescription('')
     setPayCategory(null)
+    setPayLevel(null)
     setPayPropertyId(null)
     setPayUnitId(null)
     setPayAllocationKeyId(null)
     setAllocationKeys([])
+    setPayPropOpen(false)
+    setPayUnitOpen(false)
+    setPayAllocOpen(false)
     setShowManualPayForm(true)
   }
 
@@ -270,7 +345,7 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
     const amountNum = payDirection === 'uitgaven' ? -Math.abs(absAmount) : Math.abs(absAmount)
     setSavingPayment(true)
     try {
-      const { error } = await supabase.from('raw_transactions').insert({
+      const { data: newTx, error } = await (supabase as any).from('raw_transactions').insert({
         owner_id: user.id,
         source: 'manual',
         bank_connection_id: null,
@@ -282,8 +357,30 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
         counterparty_name: null,
         counterparty_iban: null,
         description: payDescription.trim() || null,
-      } as never)
+      }).select('id').single()
       if (error) throw error
+
+      // Assign category + level if set
+      if (payCategory && payLevel) {
+        let body: Record<string, unknown>
+        if (payLevel === 'geen') {
+          body = { category: payCategory, property_id: null, unit_id: null, cost_allocation_key_id: null }
+        } else if (payCategory === 'huur' && payUnitId) {
+          const prop = properties.find(p => p.id === payPropertyId)
+          const unit = prop?.units.find(u => u.id === payUnitId)
+          const lease = unit?.leases.find(l => l.status === 'actief')
+          body = { category: 'huur', lease_id: lease?.id ?? null, property_id: payPropertyId, unit_id: payUnitId }
+        } else if (payLevel === 'pand') {
+          body = { category: payCategory, property_id: payPropertyId, unit_id: null, cost_allocation_key_id: payAllocationKeyId }
+        } else {
+          body = { category: payCategory, property_id: payPropertyId, unit_id: payUnitId, cost_allocation_key_id: null }
+        }
+        await fetch(`/api/finance/transactions/${newTx.id}/assign`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).catch(() => null)
+      }
 
       setShowManualPayForm(false)
       onRefresh()
@@ -294,33 +391,141 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
     }
   }
 
-  // Filtered properties for rent assignment
-  const filteredProperties = useMemo(() => {
-    const q = assignSearch.toLowerCase()
-    return properties
-      .map(p => ({
-        ...p,
-        units: p.units
-          .map(u => ({ ...u, leases: u.leases.filter(l => l.status === 'actief') }))
-          .filter(u => u.leases.length > 0),
-      }))
-      .filter(p => {
-        if (!q) return p.units.length > 0
-        const propMatch = p.name.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.city.toLowerCase().includes(q)
-        const unitMatch = p.units.some(u => u.unit_number.toLowerCase().includes(q) || u.leases.some(l => l.tenant_name?.toLowerCase().includes(q)))
-        return (propMatch || unitMatch) && p.units.length > 0
+  // All active tenants across the property hierarchy (for IBAN assignment)
+  const allActiveTenants = useMemo(() => {
+    const seen = new Set<string>()
+    const result: { id: string; name: string; propertyName: string }[] = []
+    for (const prop of properties) {
+      for (const unit of prop.units) {
+        for (const lease of unit.leases) {
+          if (lease.status === 'actief' && lease.tenant_id && lease.tenant_name && !seen.has(lease.tenant_id)) {
+            seen.add(lease.tenant_id)
+            result.push({ id: lease.tenant_id, name: lease.tenant_name, propertyName: prop.name })
+          }
+        }
+      }
+    }
+    return result
+  }, [properties])
+
+  // Check if counterparty IBAN is stored on any tenant when a transaction is selected
+  useEffect(() => {
+    if (!selectedTx?.counterparty_iban) {
+      setIbanStatus(null)
+      setIbanMatchedTenant(null)
+      setShowIbanAssignForm(false)
+      return
+    }
+    if (isDemo) {
+      setIbanStatus('unmatched')
+      setIbanMatchedTenant(null)
+      return
+    }
+    if (!user?.id || allActiveTenants.length === 0) {
+      setIbanStatus('unmatched')
+      return
+    }
+    setIbanStatus('loading')
+    const tenantIds = allActiveTenants.map(t => t.id)
+    const normalizedTxIban = selectedTx.counterparty_iban.replace(/\s/g, '').toUpperCase()
+    supabase
+      .from('tenants')
+      .select('id, full_name, iban')
+      .eq('owner_id', user.id)
+      .in('id', tenantIds)
+      .then(({ data }) => {
+        if (!data) { setIbanStatus('unmatched'); return }
+        const rows = data as { id: string; full_name: string; iban: string | null }[]
+        const match = rows.find(t => t.iban && t.iban.replace(/\s/g, '').toUpperCase() === normalizedTxIban)
+        if (match) {
+          setIbanStatus('matched')
+          setIbanMatchedTenant({ id: match.id, name: match.full_name })
+        } else {
+          setIbanStatus('unmatched')
+          setIbanMatchedTenant(null)
+        }
       })
-  }, [properties, assignSearch])
+  }, [selectedTx?.counterparty_iban, allActiveTenants, isDemo, user?.id])
+
+  async function handleSaveIban() {
+    if (!selectedIbanTenantId || !selectedTx?.counterparty_iban || !user?.id) return
+    setSavingIban(true)
+    try {
+      const { error } = await (supabase as any)
+        .from('tenants')
+        .update({ iban: selectedTx.counterparty_iban })
+        .eq('id', selectedIbanTenantId)
+        .eq('owner_id', user.id)
+      if (error) throw error
+
+      const tenant = allActiveTenants.find(t => t.id === selectedIbanTenantId)
+      setIbanStatus('matched')
+      setIbanMatchedTenant(tenant ? { id: tenant.id, name: tenant.name } : null)
+      setShowIbanAssignForm(false)
+      setSelectedIbanTenantId(null)
+
+      // Run the match engine so existing unassigned transactions from this IBAN get linked
+      if (!isDemo) {
+        await fetch('/api/finance/match').catch(() => null)
+        onRefresh()
+      }
+    } finally {
+      setSavingIban(false)
+    }
+  }
+
+  // Units for property selected in manual payment form (step 4)
+  const unitsForPayProperty = useMemo(() => {
+    if (!payPropertyId) return []
+    return properties.find(p => p.id === payPropertyId)?.units ?? []
+  }, [properties, payPropertyId])
+
+  // Units for the currently selected property (for unit picker in step 1)
+  const unitsForSelectedProperty = useMemo(() => {
+    if (!selectedCategoryProperty) return []
+    const prop = properties.find(p => p.id === selectedCategoryProperty)
+    return prop?.units ?? []
+  }, [properties, selectedCategoryProperty])
+
+  // Active leases for the currently selected unit (for huur tenant picker in step 2)
+  const leasesForSelectedUnit = useMemo(() => {
+    if (!selectedCategoryProperty || !selectedUnit) return []
+    const prop = properties.find(p => p.id === selectedCategoryProperty)
+    if (!prop) return []
+    const unit = prop.units.find(u => u.id === selectedUnit)
+    return (unit?.leases ?? []).filter(l => l.status === 'actief')
+  }, [properties, selectedCategoryProperty, selectedUnit])
+
+  // Load allocation keys when pand level + property selected in assign form
+  useEffect(() => {
+    if (!selectedCategoryProperty || assignLevel !== 'pand') {
+      setAssignAllocKeys([])
+      setSelectedAllocationKey(null)
+      return
+    }
+    supabase
+      .from('cost_allocation_keys')
+      .select('id, name, method')
+      .or(`property_id.eq.${selectedCategoryProperty},property_id.is.null`)
+      .then(({ data }) => setAssignAllocKeys(data ?? []))
+  }, [selectedCategoryProperty, assignLevel])
 
   // Assignment submit
   async function handleAssign() {
-    if (!selectedTx || !selectedRent) return
+    if (!selectedTx || !selectedCategory) return
     setSubmitting(true)
     try {
+      let body: Record<string, unknown>
+      if (selectedCategory === 'huur') {
+        const lease = leasesForSelectedUnit[0] ?? null
+        body = { category: 'huur', lease_id: lease?.id ?? null, property_id: selectedCategoryProperty, unit_id: selectedUnit }
+      } else {
+        body = { category: selectedCategory, property_id: selectedCategoryProperty, unit_id: selectedUnit, cost_allocation_key_id: selectedAllocationKey }
+      }
       const res = await fetch(`/api/finance/transactions/${selectedTx.id}/assign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(selectedRent),
+        body: JSON.stringify(body),
       })
       if (res.ok) {
         setIsEditing(false)
@@ -460,28 +665,37 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
                           </TableCell>
 
                           <TableCell>
-                            <span className={cn(
-                              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap',
-                              !isMatched
-                                ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-                                : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                            )}>
-                              <span className={cn(
-                                'h-1.5 w-1.5 rounded-full shrink-0',
-                                !isMatched ? 'bg-amber-400' : 'bg-green-500'
-                              )} />
-                              {!isMatched ? 'Niet gekoppeld' : 'Huur'}
-                            </span>
+                            {!isMatched ? (
+                              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
+                                <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-amber-400" />
+                                Niet gekoppeld
+                              </span>
+                            ) : (() => {
+                              const cat = tx.assignment!.category
+                              const Icon = cat ? getCategoryIcon(cat) : null
+                              return (
+                                <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
+                                  {Icon && <Icon className="h-3 w-3 shrink-0" />}
+                                  {cat ? getCategoryLabel(cat) : '—'}
+                                </span>
+                              )
+                            })()}
                           </TableCell>
 
                           <TableCell className="hidden md:table-cell">
                             {tx.assignment?.property_name ? (
-                              <>
-                                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{tx.assignment.property_name}</p>
-                                {tx.assignment.tenant_name && (
-                                  <p className="text-xs text-gray-400 truncate">{tx.assignment.tenant_name}</p>
-                                )}
-                              </>
+                              <div className="flex items-center gap-1.5">
+                                {tx.assignment.unit_id
+                                  ? <Home className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                  : <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                                }
+                                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                                  {tx.assignment.unit_id
+                                    ? (tx.assignment.unit_name ?? tx.assignment.property_name)
+                                    : tx.assignment.property_name
+                                  }
+                                </p>
+                              </div>
                             ) : (
                               <span className="text-gray-300 dark:text-neutral-600">—</span>
                             )}
@@ -512,228 +726,645 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
       </CardContent>
     </Card>
 
-    {/* ─── Payment detail dialog ─── */}
-    <Dialog open={rightMode === 'detail' && !!selectedTx} onOpenChange={(v) => { if (!v) { setRightMode('empty'); setSelectedTxId(null) } }}>
-      <DialogContent
-        className={addDialogContentClassName('max-w-md')}
-        closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}
-      >
-        {selectedTx && (
-          <>
-            <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
-              <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
-                {selectedTx.description || selectedTx.counterparty_name || 'Betaling'}
-              </DialogTitle>
-              <p className={cn(
-                'text-2xl font-bold mt-1',
-                selectedTx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-              )}>
-                {formatEur(selectedTx.amount)}
-              </p>
-            </DialogHeader>
+    {/* ─── Payment detail sheet ─── */}
+    <DetailShell
+      open={rightMode === 'detail' && !!selectedTx}
+      onClose={() => { setRightMode('empty'); setSelectedTxId(null) }}
+      title={selectedTx?.description || selectedTx?.counterparty_name || 'Betaling'}
+      footer={
+        <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+          <button
+            type="button"
+            onClick={() => { setRightMode('empty'); setSelectedTxId(null) }}
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            Sluiten
+          </button>
 
-            <div className={ADD_DIALOG_BODY_SCROLL_CLASS}>
-              <div className="space-y-3">
-
-                {/* Date + Status */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className={tile}>
-                    <p className={fieldLabel}>Datum</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{formatDate(selectedTx.value_date)}</p>
-                  </div>
-                  <div className={tile}>
-                    <p className={fieldLabel}>Status</p>
-                    <p className={cn('text-sm font-medium', selectedTx.assignment ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-400')}>
-                      {selectedTx.assignment ? 'Gekoppeld' : 'Niet gekoppeld'}
-                    </p>
+          {selectedTx?.assignment && !showAssignForm ? (
+            <button
+              type="button"
+              onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:opacity-80 transition-opacity"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Toewijzing wijzigen
+            </button>
+          ) : showAssignForm ? (() => {
+            const canSave = !!selectedCategory && assignLevel !== null && (
+              assignLevel === 'geen' ||
+              (!!selectedCategoryProperty && (
+                assignLevel === 'pand' ? !!selectedAllocationKey : !!selectedUnit
+              ))
+            )
+            return (
+              <button
+                type="button"
+                onClick={handleAssign}
+                disabled={submitting || !canSave}
+                className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+              >
+                {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Opslaan
+              </button>
+            )
+          })() : null}
+        </div>
+      }
+    >
+      {selectedTx && (
+        <>
+          {/* ── Amount — centered hero ── */}
+          <div className="px-6 pt-8 pb-6 text-center">
+            {selectedCategory && (() => {
+              const Icon = getCategoryIcon(selectedCategory)
+              return (
+                <div className="flex justify-center mb-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-neutral-800">
+                    <Icon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   </div>
                 </div>
+              )
+            })()}
+            <p className={cn('text-3xl font-bold tracking-tight',
+              selectedTx.amount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+            )}>
+              {formatEur(selectedTx.amount)}
+            </p>
+            <p className="text-sm text-gray-400 mt-1.5">{formatDate(selectedTx.value_date)}</p>
 
-                {/* Source */}
-                {selectedTx.is_manual_transaction && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Bron</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Handmatig</p>
-                  </div>
-                )}
+            {/* Category pill — shown in read mode only */}
+            {!showAssignForm && <div className="relative inline-flex justify-center mt-3">
+              {showCategoryDropdown && (
+                <div className="fixed inset-0 z-10" onClick={() => {
+                  setShowCategoryDropdown(false)
+                  setCatEditId(null)
+                  setCatAddOpen(false)
+                  setCatAddLabel('')
+                }} />
+              )}
+              <button
+                type="button"
+                onClick={() => setShowCategoryDropdown(v => !v)}
+                className="relative z-20 inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 px-3.5 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors"
+              >
+                {selectedCategory && (() => { const Icon = getCategoryIcon(selectedCategory); return <Icon className="h-3.5 w-3.5 shrink-0" /> })()}
+                <span>{selectedCategory ? getCategoryLabel(selectedCategory) : 'Categorie kiezen'}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+              </button>
 
-                {/* Sender */}
-                {selectedTx.counterparty_name && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Afzender</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedTx.counterparty_name}</p>
-                  </div>
-                )}
-
-                {selectedTx.counterparty_iban && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>IBAN</p>
-                    <p className="text-sm font-mono text-gray-600 dark:text-gray-400">{selectedTx.counterparty_iban}</p>
-                  </div>
-                )}
-
-                {selectedTx.description && selectedTx.counterparty_name && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Omschrijving</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{selectedTx.description}</p>
-                  </div>
-                )}
-
-                {/* Assignment info */}
-                {selectedTx.assignment?.property_name && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Pand</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedTx.assignment.property_name}</p>
-                  </div>
-                )}
-
-                {selectedTx.assignment?.tenant_name && (
-                  <div className={tile}>
-                    <p className={fieldLabel}>Huurder</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedTx.assignment.tenant_name}</p>
-                  </div>
-                )}
-
-                {/* Assignment form — shown when not yet assigned or editing */}
-                {showAssignForm && (
-                  <div className="space-y-3">
-                    {/* Tabs */}
-                    <div className="flex text-sm border-b border-gray-200 dark:border-neutral-700">
-                      <button
-                        onClick={() => setAssignTab('rent')}
-                        className={cn('pb-2.5 pt-1 mr-6 whitespace-nowrap font-semibold transition-colors border-b-2', assignTab === 'rent' ? 'text-[#163300] dark:text-[#9FE870] border-[#163300] dark:border-[#9FE870]' : 'text-gray-500 dark:text-gray-400 border-transparent')}
-                      >
-                        Huurkoppeling
-                      </button>
-                      <button
-                        onClick={() => setAssignTab('category')}
-                        className={cn('pb-2.5 pt-1 whitespace-nowrap font-semibold transition-colors border-b-2', assignTab === 'category' ? 'text-[#163300] dark:text-[#9FE870] border-[#163300] dark:border-[#9FE870]' : 'text-gray-500 dark:text-gray-400 border-transparent')}
-                      >
-                        Categoriseren
-                      </button>
-                    </div>
-
-                    {assignTab === 'rent' ? (
-                      <div className="space-y-2">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                          <input
-                            type="text"
-                            placeholder="Zoek op pand, eenheid of huurder..."
-                            value={assignSearch}
-                            onChange={e => setAssignSearch(e.target.value)}
-                            className="w-full h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 pl-9 pr-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
-                          />
-                        </div>
-                        {filteredProperties.length === 0 && (
-                          <p className="text-sm text-gray-400 text-center py-4">Geen resultaten gevonden</p>
-                        )}
-                        {filteredProperties.map(property => (
-                          <div key={property.id} className="rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
-                            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-neutral-800/50">
-                              <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                              <span className="font-medium text-sm text-gray-900 dark:text-white">{property.name}</span>
-                              <span className="text-xs text-gray-400 ml-auto">{property.address}, {property.city}</span>
-                            </div>
-                            {property.units.map(unit =>
-                              unit.leases.map(lease => {
-                                const isSelected = selectedRent?.lease_id === lease.id && selectedRent?.unit_id === unit.id
-                                return (
-                                  <button
-                                    key={`${unit.id}-${lease.id}`}
-                                    onClick={() => setSelectedRent(isSelected ? null : { property_id: property.id, unit_id: unit.id, tenant_id: lease.tenant_id, lease_id: lease.id })}
-                                    className={cn('w-full flex items-center gap-2.5 px-3 py-2.5 text-left border-t border-gray-100 dark:border-neutral-700/50 transition-colors', isSelected ? 'bg-green-50 dark:bg-green-900/20' : 'hover:bg-gray-50 dark:hover:bg-neutral-800/50')}
-                                  >
-                                    <Home className="h-3 w-3 text-gray-400 shrink-0" />
-                                    <span className="text-sm font-medium w-12 shrink-0">{unit.unit_number}</span>
-                                    <User className="h-3 w-3 text-gray-400 shrink-0" />
-                                    <span className="text-sm flex-1 truncate">{lease.tenant_name || 'Onbekend'}</span>
-                                    <span className="text-xs text-gray-400">{formatEur(lease.monthly_rent)}/mnd</span>
-                                    {isSelected && <Check className="h-4 w-4 text-green-600 shrink-0" />}
-                                  </button>
-                                )
-                              })
-                            )}
+              {showCategoryDropdown && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-20 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 min-w-[220px]">
+                  {txCategories.map(cat => {
+                    const Icon = getCategoryIcon(cat.id)
+                    const isSelected = selectedCategory === cat.id
+                    const isEditingThis = catEditId === cat.id
+                    return (
+                      <div key={cat.id} className="group flex items-center">
+                        {isEditingThis ? (
+                          <div className="flex items-center gap-1.5 w-full px-2 py-1">
+                            <input
+                              autoFocus
+                              value={catEditLabel}
+                              onChange={e => setCatEditLabel(e.target.value)}
+                              onKeyDown={async e => {
+                                if (e.key === 'Enter') { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }
+                                if (e.key === 'Escape') setCatEditId(null)
+                              }}
+                              className="flex-1 min-w-0 h-7 rounded-md border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                            />
+                            <button type="button" onClick={async () => { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }}
+                              className="h-7 px-2 rounded-md bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0">
+                              Ok
+                            </button>
+                            <button type="button" onClick={() => setCatEditId(null)}
+                              className="h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                              <XIcon className="h-3.5 w-3.5" />
+                            </button>
                           </div>
-                        ))}
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCategory(cat.id)
+                                if (cat.id === 'huur') setSelectedCategoryProperty(null)
+                                setIsEditing(true)
+                                setShowCategoryDropdown(false)
+                                setCatEditId(null)
+                              }}
+                              className={cn(
+                                'flex-1 flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                isSelected
+                                  ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold'
+                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                              )}
+                            >
+                              <Icon className="h-4 w-4 shrink-0 text-gray-400" />
+                              <span className="flex-1">{cat.label}</span>
+                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#163300] dark:text-[#9FE870]" />}
+                            </button>
+                            <button type="button"
+                              onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
+                              className="opacity-0 group-hover:opacity-100 mr-1 h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-opacity">
+                              <Pencil className="h-3 w-3" />
+                            </button>
+                            <button type="button"
+                              onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (selectedCategory === cat.id) setSelectedCategory(null) }}
+                              className="opacity-0 group-hover:opacity-100 mr-2 h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-red-500 transition-opacity">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )
+                  })}
+
+                  {/* Add new category */}
+                  <div className="border-t border-gray-100 dark:border-neutral-800 mt-1 pt-1">
+                    {catAddOpen ? (
+                      <div className="flex items-center gap-1.5 px-2 py-1">
+                        <input
+                          autoFocus
+                          value={catAddLabel}
+                          onChange={e => setCatAddLabel(e.target.value)}
+                          placeholder="Naam categorie"
+                          onKeyDown={async e => {
+                            if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
+                            if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
+                          }}
+                          className="flex-1 min-w-0 h-7 rounded-md border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                        />
+                        <button type="button"
+                          disabled={!catAddLabel.trim()}
+                          onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
+                          className="h-7 px-2 rounded-md bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                          Ok
+                        </button>
+                        <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
+                          className="h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                          <XIcon className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Categorie</p>
-                          <div className="grid grid-cols-3 gap-2">
-                            {CATEGORIES.map(cat => {
-                              const Icon = cat.icon
-                              const isSelected = selectedCategory === cat.key
-                              return (
-                                <button key={cat.key} onClick={() => setSelectedCategory(isSelected ? null : cat.key)}
-                                  className={cn('flex flex-col items-center gap-1 rounded-lg border px-2 py-2.5 text-xs transition-colors', isSelected ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]' : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300')}
-                                >
-                                  <Icon className="h-4 w-4" />
-                                  <span className="font-medium">{cat.label}</span>
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Pand (optioneel)</p>
-                          <div className="space-y-1">
-                            {properties.map(p => {
-                              const isSelected = selectedCategoryProperty === p.id
-                              return (
-                                <button key={p.id} onClick={() => setSelectedCategoryProperty(isSelected ? null : p.id)}
-                                  className={cn('w-full flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors', isSelected ? 'border-[#163300] bg-[#163300]/5 dark:border-[#9FE870] dark:bg-[#9FE870]/10' : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300')}
-                                >
-                                  <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                                  <span className="font-medium flex-1">{p.name}</span>
-                                  {isSelected && <Check className="h-4 w-4 text-green-600 shrink-0" />}
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
+                      <button type="button" onClick={() => setCatAddOpen(true)}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                        <Plus className="h-3.5 w-3.5" />
+                        Nieuwe categorie
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>}
+          </div>
+
+          {/* ── Transaction detail rows ── */}
+          <div className="border-t border-gray-100 dark:border-neutral-800">
+
+            {selectedTx.counterparty_name && (
+              <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
+                <span className="text-sm text-gray-400 shrink-0">Afzender</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6 truncate">{selectedTx.counterparty_name}</span>
+              </div>
+            )}
+
+            {selectedTx.counterparty_iban && (
+              <div className="border-b border-gray-100 dark:border-neutral-800">
+                <div className="flex items-start justify-between px-6 py-3.5">
+                  <span className="text-sm text-gray-400 shrink-0">IBAN</span>
+                  <div className="text-right ml-6 min-w-0">
+                    <p className="text-sm font-mono text-gray-900 dark:text-white">{selectedTx.counterparty_iban}</p>
+                    {ibanStatus === 'loading' && (
+                      <div className="flex items-center justify-end gap-1 mt-1">
+                        <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
+                        <span className="text-xs text-gray-400">Controleren…</span>
+                      </div>
+                    )}
+                    {ibanStatus === 'matched' && ibanMatchedTenant && (
+                      <div className="flex items-center justify-end gap-1 mt-1 text-xs font-medium text-green-600 dark:text-green-400">
+                        <Check className="h-3 w-3 shrink-0" />
+                        {ibanMatchedTenant.name}
+                      </div>
+                    )}
+                    {ibanStatus === 'unmatched' && (
+                      <div className="flex items-center justify-end gap-2 mt-1">
+                        <span className="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                          <AlertTriangle className="h-3 w-3 shrink-0" />
+                          Onbekend
+                        </span>
+                        {!showIbanAssignForm && (
+                          <button type="button" onClick={() => setShowIbanAssignForm(true)}
+                            className="text-xs font-medium text-[#163300] dark:text-[#9FE870] underline underline-offset-2"
+                          >
+                            Koppelen
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
+                </div>
+                {showIbanAssignForm && ibanStatus === 'unmatched' && (
+                  <div className="px-6 pb-4 space-y-2">
+                    {allActiveTenants.length === 0 ? (
+                      <p className="text-xs text-gray-400 py-2 text-center">Geen actieve huurders gevonden</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {allActiveTenants.map(tenant => (
+                          <button key={tenant.id} type="button"
+                            onClick={() => setSelectedIbanTenantId(tenant.id === selectedIbanTenantId ? null : tenant.id)}
+                            className={cn('w-full flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors',
+                              selectedIbanTenantId === tenant.id
+                                ? 'border-[#163300] bg-[#163300]/5 dark:border-[#9FE870] dark:bg-[#9FE870]/10'
+                                : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                            )}
+                          >
+                            <User className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                            <span className="font-medium flex-1 truncate">{tenant.name}</span>
+                            <span className="text-xs text-gray-400 shrink-0">{tenant.propertyName}</span>
+                            {selectedIbanTenantId === tenant.id && <Check className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870] shrink-0" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex justify-end gap-2 pt-1">
+                      <button type="button"
+                        onClick={() => { setShowIbanAssignForm(false); setSelectedIbanTenantId(null) }}
+                        className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                      >
+                        Annuleren
+                      </button>
+                      <button type="button" onClick={handleSaveIban}
+                        disabled={!selectedIbanTenantId || savingIban}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-40"
+                      >
+                        {savingIban && <Loader2 className="h-3 w-3 animate-spin" />}
+                        Opslaan
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
 
-            <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
-              <button
-                type="button"
-                onClick={() => { setRightMode('empty'); setSelectedTxId(null) }}
-                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-              >
-                Sluiten
-              </button>
+            {selectedTx.description && (
+              <div className="flex items-start justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
+                <span className="text-sm text-gray-400 shrink-0">Omschrijving</span>
+                <span className="text-sm text-gray-900 dark:text-white text-right ml-6">{selectedTx.description}</span>
+              </div>
+            )}
+          </div>
 
-              {selectedTx.assignment && !showAssignForm ? (
-                <button
-                  type="button"
-                  onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:opacity-80 transition-opacity"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Toewijzing wijzigen
-                </button>
-              ) : showAssignForm ? (
-                <button
-                  type="button"
-                  onClick={handleAssign}
-                  disabled={submitting || (assignTab === 'rent' ? !selectedRent : !selectedCategory)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
-                >
-                  {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  {isEditing ? 'Opslaan' : 'Toewijzen'}
-                </button>
-              ) : null}
-            </div>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+          {/* ── Assignment section ── */}
+          <div>
+            <p className="px-6 pt-5 pb-2 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              Toewijzing
+            </p>
+
+            {!showAssignForm ? (
+              /* Assignment rows — read-only */
+              (() => {
+                const a = selectedTx.assignment!
+                const CatIcon = a.category ? getCategoryIcon(a.category) : null
+                return (
+                  <div className="border-t border-gray-100 dark:border-neutral-800">
+                    <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
+                      <span className="text-sm text-gray-400 shrink-0">Categorie</span>
+                      <div className="flex items-center gap-2 ml-6">
+                        {CatIcon && <CatIcon className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />}
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {a.category ? getCategoryLabel(a.category) : '—'}
+                        </span>
+                      </div>
+                    </div>
+                    {a.property_name && (
+                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
+                        <span className="text-sm text-gray-400 shrink-0">Pand</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6">{a.property_name}</span>
+                      </div>
+                    )}
+                    {a.tenant_name && (
+                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
+                        <span className="text-sm text-gray-400 shrink-0">Huurder</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6">{a.tenant_name}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between px-6 py-3.5">
+                      <span className="text-sm text-gray-400 shrink-0">Gekoppeld via</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 text-right ml-6">
+                        {a.is_manual ? 'Handmatig' : `${a.confidence_score ?? 0}% — ${METHOD_LABELS[a.match_method] ?? a.match_method}`}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })()
+            ) : (
+              /* Assignment wizard */
+              <div className="px-6 space-y-4 pb-4">
+                {/* Step indicator with back button */}
+                <div className="flex items-center gap-2">
+                  {assignStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setAssignStep(s => (s - 1) as 1 | 2 | 3)}
+                      className="h-6 w-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                  )}
+                  <div className="flex items-center gap-1">
+                    {([1, 2, 3] as const).map(s => (
+                      <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', assignStep === s ? 'w-6' : 'w-2 opacity-30')} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-400">Stap {assignStep} van 3</span>
+                </div>
+
+                {/* ── Step 1: Category ── */}
+                {assignStep === 1 && (
+                  <>
+                    <p className="text-xs text-gray-400">Wat voor betaling is dit?</p>
+                    <div className="grid grid-cols-5 gap-2">
+                      {txCategories.map(cat => {
+                        const Icon = getCategoryIcon(cat.id)
+                        const isSel = selectedCategory === cat.id
+                        return (
+                          <div key={cat.id} className="relative group">
+                            <button type="button"
+                              onClick={() => {
+                                if (isSel) return
+                                setSelectedCategory(cat.id)
+                                setAssignStep(2)
+                              }}
+                              className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
+                                isSel
+                                  ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                                  : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                              )}
+                            >
+                              <Icon className="h-4 w-4" />
+                              <span className="font-medium text-[11px] leading-tight text-center">{cat.label}</span>
+                            </button>
+                            <div className="absolute -top-2 -right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                              <button type="button"
+                                onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
+                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                              <button type="button"
+                                onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (selectedCategory === cat.id) setSelectedCategory(null) }}
+                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                              >
+                                <XIcon className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {catEditId && (
+                        <div className="col-span-5 flex items-center gap-1.5">
+                          <input autoFocus value={catEditLabel} onChange={e => setCatEditLabel(e.target.value)} placeholder="Nieuwe naam"
+                            onKeyDown={async e => {
+                              if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
+                              if (e.key === 'Escape') setCatEditId(null)
+                            }}
+                            className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                          />
+                          <button type="button" disabled={!catEditLabel.trim()}
+                            onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
+                            className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                          <button type="button" onClick={() => setCatEditId(null)}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                            <XIcon className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      {catAddOpen ? (
+                        <div className="col-span-5 flex items-center gap-1.5">
+                          <input
+                            autoFocus
+                            value={catAddLabel}
+                            onChange={e => setCatAddLabel(e.target.value)}
+                            placeholder="Naam categorie"
+                            onKeyDown={async e => {
+                              if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
+                              if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
+                            }}
+                            className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                          />
+                          <button type="button"
+                            disabled={!catAddLabel.trim()}
+                            onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
+                            className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                            Ok
+                          </button>
+                          <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
+                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                            <XIcon className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => setCatAddOpen(true)}
+                          className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-gray-200 dark:border-neutral-700 px-1 py-3 text-gray-400 dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                          <Plus className="h-4 w-4" />
+                          <span className="font-medium text-[11px] leading-tight text-center">Toevoegen</span>
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* ── Step 2: Pand or Eenheid ── */}
+                {assignStep === 2 && (
+                  <>
+                    <p className="text-xs text-gray-400">Koppelen aan een pand of eenheid?</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {([
+                        { key: 'pand', label: 'Pand', Icon: Building2, sub: 'Met verdeelsleutel' },
+                        { key: 'eenheid', label: 'Eenheid', Icon: Home, sub: 'Specifieke huurder' },
+                      ] as const).map(({ key, label, Icon, sub }) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => {
+                            setAssignLevel(key)
+                            setSelectedUnit(null)
+                            setSelectedAllocationKey(null)
+                            setAssignStep(3)
+                          }}
+                          className={cn(
+                            'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
+                            assignLevel === key
+                              ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                              : 'border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
+                          )}
+                        >
+                          <Icon className="h-4 w-4 mb-0.5" />
+                          <span className="text-sm font-medium">{label}</span>
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500">{sub}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssignLevel('geen')
+                        setSelectedCategoryProperty(null)
+                        setSelectedUnit(null)
+                        setSelectedAllocationKey(null)
+                        setAssignStep(3)
+                      }}
+                      className={cn(
+                        'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
+                        assignLevel === 'geen'
+                          ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                          : 'border-gray-200 dark:border-neutral-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-neutral-600 hover:text-gray-600 dark:hover:text-gray-300'
+                      )}
+                    >
+                      Niet koppelen
+                    </button>
+                  </>
+                )}
+
+                {/* ── Step 3: Property + unit/verdeelsleutel ── */}
+                {assignStep === 3 && (
+                  <>
+                    <p className="text-xs text-gray-400">
+                      {assignLevel === 'pand' ? 'Kies een pand en verdeelsleutel' : assignLevel === 'eenheid' ? 'Kies een pand en eenheid' : 'Alleen categorie wordt opgeslagen'}
+                    </p>
+
+                    <div className="flex flex-col gap-2">
+                      {/* Property picker */}
+                      <div className="relative">
+                        {propPickerOpen && <div className="fixed inset-0 z-10" onClick={() => setPropPickerOpen(false)} />}
+                        <button type="button"
+                          onClick={() => { setPropPickerOpen(v => !v); setUnitPickerOpen(false); setAllocKeyPickerOpen(false) }}
+                          className={cn(
+                            'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                            selectedCategoryProperty
+                              ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                              : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                          )}
+                        >
+                          <Building2 className="h-4 w-4 shrink-0" />
+                          <span className="flex-1 text-left">{properties.find(p => p.id === selectedCategoryProperty)?.name ?? 'Pand kiezen'}</span>
+                          {selectedCategoryProperty && <Check className="h-4 w-4 shrink-0" />}
+                          {!selectedCategoryProperty && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                        </button>
+                        {propPickerOpen && (
+                          <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                            {properties.map(p => {
+                              const isSel = selectedCategoryProperty === p.id
+                              return (
+                                <button key={p.id} type="button"
+                                  onClick={() => { setSelectedCategoryProperty(p.id); setSelectedUnit(null); setPropPickerOpen(false) }}
+                                  className={cn(
+                                    'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                  )}
+                                >
+                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <span className="flex-1">{p.name}</span>
+                                  {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Unit picker — eenheid level */}
+                      {assignLevel === 'eenheid' && selectedCategoryProperty && (
+                        <div className="relative">
+                          {unitPickerOpen && <div className="fixed inset-0 z-10" onClick={() => setUnitPickerOpen(false)} />}
+                          <button type="button"
+                            onClick={() => { setUnitPickerOpen(v => !v); setPropPickerOpen(false); setAllocKeyPickerOpen(false) }}
+                            className={cn(
+                              'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                              selectedUnit
+                                ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                            )}
+                          >
+                            <Home className="h-4 w-4 shrink-0" />
+                            <span className="flex-1 text-left">{unitsForSelectedProperty.find(u => u.id === selectedUnit)?.unit_number ?? 'Eenheid kiezen'}</span>
+                            {selectedUnit && <Check className="h-4 w-4 shrink-0" />}
+                            {!selectedUnit && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                          </button>
+                          {unitPickerOpen && (
+                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                              {unitsForSelectedProperty.length === 0 ? (
+                                <p className="px-4 py-3 text-sm text-gray-400">Geen eenheden gevonden</p>
+                              ) : unitsForSelectedProperty.map(u => {
+                                const isSel = selectedUnit === u.id
+                                return (
+                                  <button key={u.id} type="button"
+                                    onClick={() => { setSelectedUnit(isSel ? null : u.id); setUnitPickerOpen(false) }}
+                                    className={cn(
+                                      'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                      isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                    )}
+                                  >
+                                    <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                    <span className="flex-1">{u.unit_number}</span>
+                                    {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Allocation key picker — pand level (mandatory) */}
+                      {assignLevel === 'pand' && selectedCategoryProperty && (
+                        <div className="relative">
+                          {allocKeyPickerOpen && <div className="fixed inset-0 z-10" onClick={() => setAllocKeyPickerOpen(false)} />}
+                          <button type="button"
+                            onClick={() => { setAllocKeyPickerOpen(v => !v); setPropPickerOpen(false) }}
+                            className={cn(
+                              'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                              selectedAllocationKey
+                                ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                            )}
+                          >
+                            <span className="flex-1 text-left">{assignAllocKeys.find(k => k.id === selectedAllocationKey)?.name ?? (assignAllocKeys.length === 0 ? 'Geen verdeelsleutels beschikbaar' : 'Verdeelsleutel kiezen')}</span>
+                            {selectedAllocationKey && <Check className="h-4 w-4 shrink-0" />}
+                            {!selectedAllocationKey && assignAllocKeys.length > 0 && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                          </button>
+                          {allocKeyPickerOpen && assignAllocKeys.length > 0 && (
+                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                              {assignAllocKeys.map(k => {
+                                const isSel = selectedAllocationKey === k.id
+                                return (
+                                  <button key={k.id} type="button"
+                                    onClick={() => { setSelectedAllocationKey(isSel ? null : k.id); setAllocKeyPickerOpen(false) }}
+                                    className={cn(
+                                      'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                      isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                    )}
+                                  >
+                                    <span className="flex-1">{k.name}</span>
+                                    {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </DetailShell>
 
     {/* ─── Manual payment dialog ─── */}
     <Dialog open={showManualPayForm} onOpenChange={(v) => { if (!v) setShowManualPayForm(false) }}>
@@ -743,162 +1374,343 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
       >
         <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
           <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
-            {payStep === 1 ? 'Betalingsdetails' : 'Categorisatie'}
+            {payStep === 1 ? 'Nieuwe betaling' : payStep === 2 ? 'Categorie' : payStep === 3 ? 'Koppeling' : 'Details'}
           </DialogTitle>
-          <div className="flex items-center gap-1.5 mt-2">
-            <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', payStep === 1 ? 'w-6' : 'w-3 opacity-30')} />
-            <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', payStep === 2 ? 'w-6' : 'w-3 opacity-30')} />
-            <span className="ml-1 text-xs text-gray-400">Stap {payStep} van 2</span>
+          <div className="flex items-center gap-2 mt-2">
+            {payStep > 1 && (
+              <button
+                type="button"
+                onClick={() => setPayStep(s => (s - 1) as 1 | 2 | 3 | 4)}
+                className="h-6 w-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            )}
+            <div className="flex items-center gap-1">
+              {([1, 2, 3, 4] as const).map(s => (
+                <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', payStep === s ? 'w-6' : 'w-2 opacity-30')} />
+              ))}
+            </div>
+            <span className="text-xs text-gray-400">Stap {payStep} van 4</span>
           </div>
         </DialogHeader>
 
         <div className={ADD_DIALOG_BODY_SCROLL_CLASS}>
 
-          {/* ── Step 1 ── */}
+          {/* ── Step 1: Payment details ── */}
           {payStep === 1 && (
             <div className="space-y-3">
-              {/* Direction toggle */}
               <div className="flex rounded-2xl overflow-hidden border border-gray-200 dark:border-neutral-700 p-0.5 gap-0.5 bg-gray-50 dark:bg-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => setPayDirection('inkomsten')}
-                  className={cn(
-                    'flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
-                    payDirection === 'inkomsten'
-                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                      : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                  )}
-                >
+                <button type="button" onClick={() => setPayDirection('inkomsten')}
+                  className={cn('flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
+                    payDirection === 'inkomsten' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  )}>
                   Inkomsten
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPayDirection('uitgaven')}
-                  className={cn(
-                    'flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
-                    payDirection === 'uitgaven'
-                      ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
-                      : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                  )}
-                >
+                <button type="button" onClick={() => setPayDirection('uitgaven')}
+                  className={cn('flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
+                    payDirection === 'uitgaven' ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  )}>
                   Uitgaven
                 </button>
               </div>
 
-              {/* Datum + Bedrag */}
               <div className="grid grid-cols-2 gap-3">
                 <div className={tile}>
                   <p className={fieldLabel}>Datum *</p>
-                  <input
-                    type="date"
-                    value={payDate}
-                    onChange={e => setPayDate(e.target.value)}
-                    className={inputCls}
-                  />
+                  <WiseDatePicker value={payDate} onChange={setPayDate} />
                 </div>
                 <div className={tile}>
                   <p className={fieldLabel}>Bedrag (€) *</p>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="0,00"
-                    value={payAmount}
-                    onChange={e => setPayAmount(e.target.value)}
-                    className={inputCls}
-                  />
+                  <input type="text" inputMode="decimal" placeholder="0,00" value={payAmount} onChange={e => setPayAmount(e.target.value)} className={inputCls} />
                 </div>
               </div>
 
-              {/* Omschrijving */}
               <div className={tile}>
-                <p className={fieldLabel}>Omschrijving *</p>
-                <textarea
-                  rows={2}
-                  placeholder="Bijv. huurinkomsten januari"
-                  value={payDescription}
-                  onChange={e => setPayDescription(e.target.value)}
-                  className={cn(inputCls, 'resize-none')}
-                />
+                <p className={fieldLabel}>Omschrijving</p>
+                <textarea rows={2} placeholder="Bijv. huurinkomsten januari" value={payDescription} onChange={e => setPayDescription(e.target.value)} className={cn(inputCls, 'resize-none')} />
               </div>
             </div>
           )}
 
-          {/* ── Step 2 ── */}
+          {/* ── Step 2: Category tiles ── */}
           {payStep === 2 && (
             <div className="space-y-3">
-              <div className={tile}>
-                <p className={fieldLabel}>Categorie</p>
-                <select
-                  value={payCategory ?? ''}
-                  onChange={e => setPayCategory(e.target.value || null)}
-                  className={inputCls}
-                >
-                  <option value="">— Geen categorie —</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat.key} value={cat.key}>{cat.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={tile}>
-                <p className={fieldLabel}>
-                  Koppel aan pand{' '}
-                  <span className="text-gray-300 dark:text-neutral-600">(optioneel)</span>
-                </p>
-                <select
-                  value={payPropertyId ?? ''}
-                  onChange={e => { setPayPropertyId(e.target.value || null); setPayUnitId(null) }}
-                  className={inputCls}
-                >
-                  <option value="">— Geen pand —</option>
-                  {properties.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {payPropertyId && (() => {
-                const prop = properties.find(p => p.id === payPropertyId)
-                const units = prop?.units ?? []
-                if (units.length === 0) return null
-                return (
-                  <div className={tile}>
-                    <p className={fieldLabel}>
-                      Eenheid{' '}
-                      <span className="text-gray-300 dark:text-neutral-600">(optioneel)</span>
-                    </p>
-                    <select
-                      value={payUnitId ?? ''}
-                      onChange={e => setPayUnitId(e.target.value || null)}
-                      className={inputCls}
-                    >
-                      <option value="">— Geen eenheid —</option>
-                      {units.map(u => (
-                        <option key={u.id} value={u.id}>{u.unit_number}</option>
-                      ))}
-                    </select>
+              <p className="text-xs text-gray-400">Wat voor betaling is dit?</p>
+              <div className="grid grid-cols-5 gap-2">
+                {txCategories.map(cat => {
+                  const Icon = getCategoryIcon(cat.id)
+                  const isSel = payCategory === cat.id
+                  return (
+                    <div key={cat.id} className="relative group">
+                      <button type="button"
+                        onClick={() => { setPayCategory(cat.id); setPayStep(3) }}
+                        className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
+                          isSel
+                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="font-medium text-[11px] leading-tight text-center">{cat.label}</span>
+                      </button>
+                      <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <button type="button"
+                          onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
+                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                        >
+                          <Pencil className="h-2.5 w-2.5" />
+                        </button>
+                        <button type="button"
+                          onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (payCategory === cat.id) setPayCategory(null) }}
+                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        >
+                          <XIcon className="h-2.5 w-2.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+                {catEditId && (
+                  <div className="col-span-5 flex items-center gap-1.5">
+                    <input autoFocus value={catEditLabel} onChange={e => setCatEditLabel(e.target.value)} placeholder="Nieuwe naam"
+                      onKeyDown={async e => {
+                        if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
+                        if (e.key === 'Escape') setCatEditId(null)
+                      }}
+                      className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                    />
+                    <button type="button" disabled={!catEditLabel.trim()}
+                      onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
+                      className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                    <button type="button" onClick={() => setCatEditId(null)}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                      <XIcon className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                )
-              })()}
+                )}
 
-              {payPropertyId && allocationKeys.length > 0 && (
-                <div className={tile}>
-                  <p className={fieldLabel}>
-                    Verdeelsleutel{' '}
-                    <span className="text-gray-300 dark:text-neutral-600">(optioneel)</span>
-                  </p>
-                  <select
-                    value={payAllocationKeyId ?? ''}
-                    onChange={e => setPayAllocationKeyId(e.target.value || null)}
-                    className={inputCls}
+                {catAddOpen ? (
+                  <div className="col-span-5 flex items-center gap-1.5">
+                    <input
+                      autoFocus
+                      value={catAddLabel}
+                      onChange={e => setCatAddLabel(e.target.value)}
+                      placeholder="Naam categorie"
+                      onKeyDown={async e => {
+                        if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
+                        if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
+                      }}
+                      className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                    />
+                    <button type="button"
+                      disabled={!catAddLabel.trim()}
+                      onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
+                      className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                      Ok
+                    </button>
+                    <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                      <XIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => setCatAddOpen(true)}
+                    className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-gray-200 dark:border-neutral-700 px-1 py-3 text-gray-400 dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                    <Plus className="h-4 w-4" />
+                    <span className="font-medium text-[11px] leading-tight text-center">Toevoegen</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 3: Pand or Eenheid ── */}
+          {payStep === 3 && (
+            <div className="space-y-3">
+              <p className="text-xs text-gray-400">Koppelen aan een pand of eenheid?</p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { key: 'pand', label: 'Pand', Icon: Building2, sub: 'Met verdeelsleutel' },
+                  { key: 'eenheid', label: 'Eenheid', Icon: Home, sub: 'Specifieke huurder' },
+                ] as const).map(({ key, label, Icon, sub }) => (
+                  <button key={key} type="button"
+                    onClick={() => { setPayLevel(key); setPayPropertyId(null); setPayUnitId(null); setPayAllocationKeyId(null); setPayStep(4) }}
+                    className={cn(
+                      'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
+                      payLevel === key
+                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                        : 'border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
+                    )}
                   >
-                    <option value="">— Standaard —</option>
-                    {allocationKeys.map(k => (
-                      <option key={k.id} value={k.id}>{k.name}</option>
-                    ))}
-                  </select>
-                </div>
+                    <Icon className="h-4 w-4 mb-0.5" />
+                    <span className="text-sm font-medium">{label}</span>
+                    <span className="text-[11px] text-gray-400 dark:text-gray-500">{sub}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => { setPayLevel('geen'); setPayPropertyId(null); setPayUnitId(null); setPayAllocationKeyId(null); setPayStep(4) }}
+                className={cn(
+                  'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
+                  payLevel === 'geen'
+                    ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                    : 'border-gray-200 dark:border-neutral-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-neutral-600 hover:text-gray-600 dark:hover:text-gray-300'
+                )}
+              >
+                Niet koppelen
+              </button>
+            </div>
+          )}
+
+          {/* ── Step 4: Property + unit/verdeelsleutel ── */}
+          {payStep === 4 && (
+            <div className="space-y-3">
+              <p className="text-xs text-gray-400">
+                {payLevel === 'pand' ? 'Kies een pand en verdeelsleutel' : payLevel === 'eenheid' ? 'Kies een pand en eenheid' : 'Alleen categorie wordt opgeslagen'}
+              </p>
+              {payLevel !== 'geen' && <>
+              {/* Property picker */}
+              <button type="button"
+                onClick={e => {
+                  const r = e.currentTarget.getBoundingClientRect()
+                  setPayPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                  setPayPropOpen(v => !v); setPayUnitOpen(false); setPayAllocOpen(false)
+                }}
+                className={cn(
+                  'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                  payPropertyId
+                    ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                    : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                )}
+              >
+                <Building2 className="h-4 w-4 shrink-0" />
+                <span className="flex-1 text-left">{properties.find(p => p.id === payPropertyId)?.name ?? 'Pand kiezen'}</span>
+                {payPropertyId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+              </button>
+              {payPropOpen && payPickerPos && createPortal(
+                <>
+                  <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayPropOpen(false)} />
+                  <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                    className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                  >
+                    {properties.map(p => {
+                      const isSel = payPropertyId === p.id
+                      return (
+                        <button key={p.id} type="button"
+                          onClick={() => { setPayPropertyId(p.id); setPayUnitId(null); setPayAllocationKeyId(null); setPayPropOpen(false) }}
+                          className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                            isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                          )}
+                        >
+                          <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          <span className="flex-1">{p.name}</span>
+                          {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>,
+                document.body
               )}
+
+              {/* Unit picker — eenheid level */}
+              {payLevel === 'eenheid' && payPropertyId && (
+                <>
+                  <button type="button"
+                    onClick={e => {
+                      const r = e.currentTarget.getBoundingClientRect()
+                      setPayPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                      setPayUnitOpen(v => !v); setPayPropOpen(false); setPayAllocOpen(false)
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                      payUnitId
+                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                    )}
+                  >
+                    <Home className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-left">{unitsForPayProperty.find(u => u.id === payUnitId)?.unit_number ?? 'Eenheid kiezen'}</span>
+                    {payUnitId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                  </button>
+                  {payUnitOpen && payPickerPos && createPortal(
+                    <>
+                      <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayUnitOpen(false)} />
+                      <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                      >
+                        {unitsForPayProperty.length === 0 ? (
+                          <p className="px-4 py-3 text-sm text-gray-400">Geen eenheden gevonden</p>
+                        ) : unitsForPayProperty.map(u => {
+                          const isSel = payUnitId === u.id
+                          return (
+                            <button key={u.id} type="button"
+                              onClick={() => { setPayUnitId(isSel ? null : u.id); setPayUnitOpen(false) }}
+                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                              )}
+                            >
+                              <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              <span className="flex-1">{u.unit_number}</span>
+                              {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>,
+                    document.body
+                  )}
+                </>
+              )}
+
+              {/* Allocation key picker — pand level (mandatory) */}
+              {payLevel === 'pand' && payPropertyId && (
+                <>
+                  <button type="button"
+                    onClick={e => {
+                      const r = e.currentTarget.getBoundingClientRect()
+                      setPayPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                      setPayAllocOpen(v => !v); setPayPropOpen(false)
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                      payAllocationKeyId
+                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                    )}
+                  >
+                    <span className="flex-1 text-left">{allocationKeys.find(k => k.id === payAllocationKeyId)?.name ?? (allocationKeys.length === 0 ? 'Geen verdeelsleutels beschikbaar' : 'Verdeelsleutel kiezen')}</span>
+                    {payAllocationKeyId ? <Check className="h-4 w-4 shrink-0" /> : (allocationKeys.length > 0 && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />)}
+                  </button>
+                  {payAllocOpen && payPickerPos && allocationKeys.length > 0 && createPortal(
+                    <>
+                      <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayAllocOpen(false)} />
+                      <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                      >
+                        {allocationKeys.map(k => {
+                          const isSel = payAllocationKeyId === k.id
+                          return (
+                            <button key={k.id} type="button"
+                              onClick={() => { setPayAllocationKeyId(isSel ? null : k.id); setPayAllocOpen(false) }}
+                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                                isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                              )}
+                            >
+                              <span className="flex-1">{k.name}</span>
+                              {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>,
+                    document.body
+                  )}
+                </>
+              )}
+              </>}
             </div>
           )}
 
@@ -910,44 +1722,42 @@ export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanel
         </div>
 
         <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
-          {payStep === 1 ? (
-            <button
-              type="button"
-              onClick={() => setShowManualPayForm(false)}
-              className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-            >
-              Annuleren
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setPayStep(1)}
-              className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-            >
-              ← Terug
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setShowManualPayForm(false)}
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            Annuleren
+          </button>
 
           {payStep === 1 ? (
             <button
               type="button"
-              disabled={!payDate || !payAmount || !payDescription.trim()}
+              disabled={!payDate || !payAmount.trim()}
               onClick={() => setPayStep(2)}
               className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
             >
               Volgende →
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSaveManualPayment}
-              disabled={savingPayment}
-              className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
-            >
-              {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Opslaan
-            </button>
-          )}
+          ) : (() => {
+            const payCanSave = !!payCategory && payLevel !== null && (
+              payLevel === 'geen' ||
+              (!!payPropertyId && (
+                payLevel === 'pand' ? !!payAllocationKeyId : !!payUnitId
+              ))
+            )
+            return (
+              <button
+                type="button"
+                onClick={handleSaveManualPayment}
+                disabled={savingPayment || !payCanSave}
+                className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+              >
+                {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                Opslaan
+              </button>
+            )
+          })()}
         </div>
       </DialogContent>
     </Dialog>

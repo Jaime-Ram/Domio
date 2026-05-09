@@ -68,8 +68,10 @@ export interface TransactionRow {
     lease_id: string | null
     tenant_id: string | null
     unit_id: string | null
+    unit_name: string | null
     property_id: string | null
     category: string | null
+    cost_allocation_key_id: string | null
     tenant_name: string | null
     property_name: string | null
     property_address: string | null

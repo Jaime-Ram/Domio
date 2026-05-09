@@ -79,7 +79,7 @@ export type EnrichedCandidate = {
   // Per-expectation amounts needed for DB inserts (split candidates have 2 entries)
   assignments: Array<{ expectationId: string; amount: number }>;
   duePeriod: string;
-  tenantIban: string | null;
+  tenantIbans: string[];
   paymentProfile: Pick<DbPaymentProfile, "pay_date" | "reminders"> | null;
   propertyAddress: string | null;
 };

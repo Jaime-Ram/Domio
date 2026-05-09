@@ -2,9 +2,11 @@ import { supabase } from './client'
 
 export type AllocationMethod = 'equal' | 'surface_area' | 'custom'
 
-export type AllocationUnit =
-  | { unit_id: string; m2: number }          // surface_area
-  | { unit_id: string; percentage: number }   // custom
+// Only `custom` keys store per-unit data; equal/surface_area derive everything
+// from the property's units at compute time.
+export type AllocationUnit = { unit_id: string; percentage: number }
+
+export type PropertyUnitInput = { id: string; size_m2: number | null }
 
 export type CostAllocationKey = {
   id: string
@@ -76,33 +78,40 @@ export const costAllocationKeyQueries = {
   },
 }
 
-/** Preview how a given amount splits under a key. Returns array of {unit_id, amount, pct}. */
+/** Preview how a given amount splits under a key. Returns array of {unit_id, amount, pct}.
+ *
+ * `propertyUnits` is required for `equal` and `surface_area` (the unit list and
+ * m² values come from the property, not the key). For `custom`, the key's own
+ * units array is authoritative.
+ */
 export function previewAllocation(
   key: CostAllocationKey,
   totalAmount: number,
-  unitIds?: string[], // required for 'equal' when units array is empty
+  propertyUnits: PropertyUnitInput[] = [],
 ): Array<{ unit_id: string; pct: number; amount: number }> {
   if (key.method === 'equal') {
-    const ids = unitIds ?? key.units.map((u) => (u as { unit_id: string }).unit_id)
-    const n = ids.length
+    const n = propertyUnits.length
     if (n === 0) return []
     const pct = 100 / n
-    return ids.map((uid) => ({ unit_id: uid, pct, amount: (totalAmount * pct) / 100 }))
+    return propertyUnits.map((u) => ({
+      unit_id: u.id,
+      pct,
+      amount: (totalAmount * pct) / 100,
+    }))
   }
 
   if (key.method === 'surface_area') {
-    const typed = key.units as { unit_id: string; m2: number }[]
-    const totalM2 = typed.reduce((s, u) => s + u.m2, 0)
+    const totalM2 = propertyUnits.reduce((s, u) => s + (u.size_m2 ?? 0), 0)
     if (totalM2 === 0) return []
-    return typed.map((u) => {
-      const pct = (u.m2 / totalM2) * 100
-      return { unit_id: u.unit_id, pct, amount: (totalAmount * pct) / 100 }
+    return propertyUnits.map((u) => {
+      const m2 = u.size_m2 ?? 0
+      const pct = (m2 / totalM2) * 100
+      return { unit_id: u.id, pct, amount: (totalAmount * pct) / 100 }
     })
   }
 
-  // custom
-  const typed = key.units as { unit_id: string; percentage: number }[]
-  return typed.map((u) => ({
+  // custom — use the key's stored percentages
+  return key.units.map((u) => ({
     unit_id: u.unit_id,
     pct: u.percentage,
     amount: (totalAmount * u.percentage) / 100,

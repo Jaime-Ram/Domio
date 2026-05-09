@@ -30,7 +30,7 @@ function makeCandidate(overrides: Partial<EnrichedCandidate> = {}): EnrichedCand
     amountAssigned: 1000,
     assignments: [{ expectationId: "exp-1", amount: 1000 }],
     duePeriod: DUE_PERIOD,
-    tenantIban: null,
+    tenantIbans: [],
     paymentProfile: PROFILE,
     propertyAddress: PROPERTY,
     ...overrides,
@@ -50,28 +50,28 @@ const cases: Case[] = [
   {
     label: "90 IBAN — matching IBAN, amount, booking_date in window",
     tx: makeTx({ counterparty_iban: IBAN, booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: IBAN }),
+    candidate: makeCandidate({ tenantIbans: [IBAN] }),
     expectedScore: 90,
     expectedMethod: "iban",
   },
   {
     label: "90 IBAN — IBAN comparison is case-insensitive",
     tx: makeTx({ counterparty_iban: IBAN.toLowerCase(), booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: IBAN }),
+    candidate: makeCandidate({ tenantIbans: [IBAN] }),
     expectedScore: 90,
     expectedMethod: "iban",
   },
   {
     label: "not 90 IBAN — booking_date outside window → falls to description tiers",
     tx: makeTx({ counterparty_iban: IBAN, booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: IBAN }),
+    candidate: makeCandidate({ tenantIbans: [IBAN] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
   {
     label: "not 90 IBAN — IBAN mismatch → falls to description tiers",
     tx: makeTx({ counterparty_iban: "NL01OTHER0000000000", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: IBAN }),
+    candidate: makeCandidate({ tenantIbans: [IBAN] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
@@ -80,21 +80,21 @@ const cases: Case[] = [
   {
     label: "90 description_full — street + house + huur + month in description",
     tx: makeTx({ description: "Huur Prinsengracht 123 april 2026", booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 90,
     expectedMethod: "description_full",
   },
   {
     label: "90 description_full — numeric month format MM/YYYY",
     tx: makeTx({ description: "Huur Prinsengracht 123 04/2026", booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 90,
     expectedMethod: "description_full",
   },
   {
     label: "90 description_full — short month name 'apr'",
     tx: makeTx({ description: "huur prinsengracht 123 apr 2026", booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 90,
     expectedMethod: "description_full",
   },
@@ -103,14 +103,14 @@ const cases: Case[] = [
   {
     label: "85 description_huur — street + house + huur + in window (no month)",
     tx: makeTx({ description: "Huur Prinsengracht 123", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 85,
     expectedMethod: "description_huur",
   },
   {
     label: "not 85 — has huur + street + house but outside window and no month → score 0",
     tx: makeTx({ description: "Huur Prinsengracht 123", booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
@@ -119,14 +119,14 @@ const cases: Case[] = [
   {
     label: "80 description_address — street + house + in window (no huur, no month)",
     tx: makeTx({ description: "Prinsengracht 123 betaling", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 80,
     expectedMethod: "description_address",
   },
   {
     label: "not 80 — has street + house but outside window → score 0",
     tx: makeTx({ description: "Prinsengracht 123 betaling", booking_date: OUT_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
@@ -135,21 +135,21 @@ const cases: Case[] = [
   {
     label: "0 — unrelated description, no IBAN",
     tx: makeTx({ description: "Boodschappen supermarkt", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
   {
     label: "0 — null description, no IBAN",
     tx: makeTx({ description: null, booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ tenantIban: null }),
+    candidate: makeCandidate({ tenantIbans: [] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
   {
     label: "0 — no house number in property address → all description tiers fail",
     tx: makeTx({ description: "Huur Ergens huur april 2026", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ propertyAddress: "Ergens", tenantIban: null }),
+    candidate: makeCandidate({ propertyAddress: "Ergens", tenantIbans: [] }),
     expectedScore: 0,
     expectedMethod: "description_address",
   },
@@ -158,7 +158,7 @@ const cases: Case[] = [
   {
     label: "uses default window (pay_date=1, reminders=[-3,7,14]) when paymentProfile is null",
     tx: makeTx({ description: "Huur Prinsengracht 123", booking_date: IN_WINDOW_DATE }),
-    candidate: makeCandidate({ paymentProfile: null, tenantIban: null }),
+    candidate: makeCandidate({ paymentProfile: null, tenantIbans: [] }),
     expectedScore: 85,
     expectedMethod: "description_huur",
   },
@@ -170,7 +170,7 @@ const cases: Case[] = [
       description: "Huur Van der Helststraat 12 april 2026",
       booking_date: OUT_WINDOW_DATE,
     }),
-    candidate: makeCandidate({ propertyAddress: "Van der Helststraat 12", tenantIban: null }),
+    candidate: makeCandidate({ propertyAddress: "Van der Helststraat 12", tenantIbans: [] }),
     expectedScore: 90,
     expectedMethod: "description_full",
   },
@@ -191,7 +191,7 @@ describe("scoreCandidate — payment window boundary", () => {
   it("first day of window (2026-03-29) is in window", () => {
     const result = scoreCandidate(
       makeTx({ description: "Huur Prinsengracht 123", booking_date: "2026-03-29" }),
-      makeCandidate({ tenantIban: null })
+      makeCandidate({ tenantIbans: [] })
     );
     expect(result.score).toBe(85);
   });
@@ -199,7 +199,7 @@ describe("scoreCandidate — payment window boundary", () => {
   it("last day of window (2026-04-15) is in window", () => {
     const result = scoreCandidate(
       makeTx({ description: "Huur Prinsengracht 123", booking_date: "2026-04-15" }),
-      makeCandidate({ tenantIban: null })
+      makeCandidate({ tenantIbans: [] })
     );
     expect(result.score).toBe(85);
   });
@@ -207,7 +207,7 @@ describe("scoreCandidate — payment window boundary", () => {
   it("day before window (2026-03-28) is outside window", () => {
     const result = scoreCandidate(
       makeTx({ description: "Huur Prinsengracht 123", booking_date: "2026-03-28" }),
-      makeCandidate({ tenantIban: null })
+      makeCandidate({ tenantIbans: [] })
     );
     expect(result.score).toBe(0);
   });
@@ -215,7 +215,7 @@ describe("scoreCandidate — payment window boundary", () => {
   it("day after window (2026-04-16) is outside window", () => {
     const result = scoreCandidate(
       makeTx({ description: "Huur Prinsengracht 123", booking_date: "2026-04-16" }),
-      makeCandidate({ tenantIban: null })
+      makeCandidate({ tenantIbans: [] })
     );
     expect(result.score).toBe(0);
   });

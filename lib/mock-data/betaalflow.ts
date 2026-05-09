@@ -54,11 +54,7 @@ export const mockCostAllocationKeys: CostAllocationKey[] = [
     property_id: 'prop-1',
     name: 'Oppervlakte — Keizersgracht 12',
     method: 'surface_area',
-    units: [
-      { unit_id: 'unit-1', m2: 65 },
-      { unit_id: 'unit-2', m2: 80 },
-      { unit_id: 'unit-3', m2: 55 },
-    ],
+    units: [],
     created_at: new Date('2024-02-10').toISOString(),
     updated_at: new Date('2024-02-10').toISOString(),
   },
