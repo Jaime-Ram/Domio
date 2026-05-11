@@ -93,6 +93,7 @@ type AccountFormData = {
   kvk_number: string
   btw_number: string
   company_email: string
+  company_phone: string
   company_address: string
   company_postal_code: string
   company_city: string
@@ -111,6 +112,7 @@ export default function SettingsPage() {
     kvk_number: '',
     btw_number: '',
     company_email: '',
+    company_phone: '',
     company_address: '',
     company_postal_code: '',
     company_city: '',
@@ -161,6 +163,9 @@ export default function SettingsPage() {
   // Beveiliging expand
   const [bevSection, setBevSection] = useState<'wachtwoord' | '2fa' | null>(null)
 
+  // Account expand
+  const [accSection, setAccSection] = useState<'personal' | 'login' | 'company' | null>(null)
+
   // Voorkeuren expand
   const [prefSection, setPrefSection] = useState<'taal' | 'notif' | null>(null)
 
@@ -197,6 +202,7 @@ export default function SettingsPage() {
           kvk_number: p.kvk_number || '',
           btw_number: p.btw_number || '',
           company_email: p.company_email || '',
+          company_phone: p.company_phone || '',
           company_address: p.company_address || '',
           company_postal_code: p.company_postal_code || '',
           company_city: p.company_city || '',
@@ -226,6 +232,7 @@ export default function SettingsPage() {
         kvk_number: dashProfile.kvk_number || '12345678',
         btw_number: dashProfile.btw_number || 'NL123456789B01',
         company_email: dashProfile.company_email || 'info@demovastgoed.nl',
+        company_phone: dashProfile.company_phone || '+31 20 1234567',
         company_address: dashProfile.company_address || 'Voorbeeldstraat 1',
         company_postal_code: dashProfile.company_postal_code || '1234 AB',
         company_city: dashProfile.company_city || 'Amsterdam',
@@ -330,6 +337,7 @@ export default function SettingsPage() {
       kvk_number: accountForm.kvk_number.trim() || null,
       btw_number: accountForm.btw_number.trim() || null,
       company_email: companyEmail || null,
+      company_phone: accountForm.company_phone.trim() || null,
       company_address: accountForm.company_address.trim() || null,
       company_postal_code: accountForm.company_postal_code.trim() || null,
       company_city: accountForm.company_city.trim() || null,
@@ -342,6 +350,7 @@ export default function SettingsPage() {
       kvk_number: accountForm.kvk_number.trim(),
       btw_number: accountForm.btw_number.trim(),
       company_email: companyEmail,
+      company_phone: accountForm.company_phone.trim(),
       company_address: accountForm.company_address.trim(),
       company_postal_code: accountForm.company_postal_code.trim(),
       company_city: accountForm.company_city.trim(),
@@ -543,38 +552,161 @@ export default function SettingsPage() {
             <div className="border-b border-gray-100 dark:border-neutral-800" />
             <div className="">
 
-              <button className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
-                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                  <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Persoonlijke gegevens</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{accountForm.name ? `${accountForm.name}${accountForm.phone ? ` · ${accountForm.phone}` : ''}` : 'Naam en telefoonnummer instellen'}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-              </button>
+              {/* Persoonlijke gegevens */}
+              <div>
+                <button onClick={() => { setAccSection(accSection === 'personal' ? null : 'personal'); setFieldError('') }} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
+                  <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Persoonlijke gegevens</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{accountForm.name ? `${accountForm.name}${accountForm.phone ? ` · ${accountForm.phone}` : ''}` : 'Naam en telefoonnummer instellen'}</p>
+                  </div>
+                  <ChevronRight className={cn('h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0 transition-transform', accSection === 'personal' && 'rotate-90')} />
+                </button>
+                {accSection === 'personal' && (
+                  <div className="pb-4 space-y-3">
+                    {isDemo ? (
+                      <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Naam</label>
+                          <input type="text" value={accountForm.name} onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Telefoonnummer</label>
+                          <input type="tel" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        </div>
+                        {fieldError && editingField !== 'login' && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
+                        <div className="flex gap-2">
+                          <button onClick={handleSavePersonal} disabled={savingField === 'personal'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                            {savingField === 'personal' && <Loader2 className="h-4 w-4 animate-spin" />}
+                            <span>Opslaan</span>
+                          </button>
+                          <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
 
-              <button className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
-                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                  <Mail className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Inloggegevens</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.email || 'E-mailadres instellen'}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-              </button>
+              {/* Inloggegevens */}
+              <div>
+                <button onClick={() => { setAccSection(accSection === 'login' ? null : 'login'); setFieldError(''); setNewEmail(''); setEmailChangeStatus('idle') }} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
+                  <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <Mail className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Inloggegevens</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.email || 'E-mailadres instellen'}</p>
+                  </div>
+                  <ChevronRight className={cn('h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0 transition-transform', accSection === 'login' && 'rotate-90')} />
+                </button>
+                {accSection === 'login' && (
+                  <div className="pb-4 space-y-3">
+                    {isDemo ? (
+                      <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    ) : emailChangeStatus === 'sent' ? (
+                      <div className="rounded-xl border border-[#9FE870]/40 bg-[#9FE870]/10 px-4 py-3 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                          <p className="text-sm font-medium text-[#163300] dark:text-[#9FE870]">Bevestigingsmail verstuurd</p>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Klik op de link in de e-mail naar <span className="font-medium">{newEmail}</span> om de wijziging te bevestigen.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Huidig e-mailadres</label>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">{user?.email || '—'}</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Nieuw e-mailadres</label>
+                          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nieuw@voorbeeld.nl" className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        </div>
+                        {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
+                        <p className="text-xs text-gray-500 dark:text-gray-400">We sturen een bevestigingslink naar het nieuwe adres.</p>
+                        <button onClick={handleSendEmailVerification} disabled={savingField === 'login' || !newEmail.trim()} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                          {savingField === 'login' && <Loader2 className="h-4 w-4 animate-spin" />}
+                          <span>Bevestigingsmail versturen</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
 
-              <button className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
-                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                  <Building2 className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Bedrijfsgegevens</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{accountForm.company_name || 'Naam, KvK, BTW en adres instellen'}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-              </button>
+              {/* Bedrijfsgegevens */}
+              <div>
+                <button onClick={() => { setAccSection(accSection === 'company' ? null : 'company'); setFieldError('') }} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
+                  <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <Building2 className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Bedrijfsgegevens</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{accountForm.company_name || 'Naam, KvK, BTW en adres instellen'}</p>
+                  </div>
+                  <ChevronRight className={cn('h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0 transition-transform', accSection === 'company' && 'rotate-90')} />
+                </button>
+                {accSection === 'company' && (
+                  <div className="pb-4 space-y-3">
+                    {isDemo ? (
+                      <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Bedrijfsnaam</label>
+                          <input type="text" value={accountForm.company_name} onChange={(e) => setAccountForm({ ...accountForm, company_name: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">KvK-nummer</label>
+                            <input type="text" value={accountForm.kvk_number} onChange={(e) => setAccountForm({ ...accountForm, kvk_number: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">BTW-nummer</label>
+                            <input type="text" value={accountForm.btw_number} onChange={(e) => setAccountForm({ ...accountForm, btw_number: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Zakelijk e-mailadres</label>
+                            <input type="email" value={accountForm.company_email} onChange={(e) => setAccountForm({ ...accountForm, company_email: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Zakelijk telefoonnummer</label>
+                            <input type="tel" value={accountForm.company_phone} onChange={(e) => setAccountForm({ ...accountForm, company_phone: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Adres</label>
+                          <input type="text" value={accountForm.company_address} onChange={(e) => setAccountForm({ ...accountForm, company_address: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Postcode</label>
+                            <input type="text" value={accountForm.company_postal_code} onChange={(e) => setAccountForm({ ...accountForm, company_postal_code: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Plaats</label>
+                            <input type="text" value={accountForm.company_city} onChange={(e) => setAccountForm({ ...accountForm, company_city: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          </div>
+                        </div>
+                        {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
+                        <div className="flex gap-2">
+                          <button onClick={handleSaveCompany} disabled={savingField === 'company'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                            {savingField === 'company' && <Loader2 className="h-4 w-4 animate-spin" />}
+                            <span>Opslaan</span>
+                          </button>
+                          <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
 
             </div>
           </div>
