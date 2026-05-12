@@ -17,7 +17,7 @@ interface SearchAction {
   description?: string
 }
 
-const BP = '/dashboard/employer'
+const BP = '/dashboard/landlord'
 
 export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
   const router = useRouter()

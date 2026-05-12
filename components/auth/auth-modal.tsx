@@ -100,7 +100,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
         const { error: authError } = await signIn(email, password)
         if (authError) throw authError
         onOpenChange(false)
-        router.push('/dashboard/employer')
+        router.push('/dashboard/landlord')
       } else {
         if (password !== confirmPassword) {
           setError('Wachtwoorden komen niet overeen')
@@ -116,7 +116,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
         const { error: authError } = await signUp(email, password, name, supaRole as 'verhuurder' | 'huurder')
         if (authError) throw authError
         onOpenChange(false)
-        router.push('/dashboard/employer')
+        router.push('/dashboard/landlord')
       }
     } catch (err: any) {
       setError(translateAuthError(err.message || 'Er is een fout opgetreden'))

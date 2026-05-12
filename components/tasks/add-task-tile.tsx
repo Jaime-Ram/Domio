@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { DASHBOARD_SURFACE_PADDING } from '@/app/dashboard/employer/dashboard-ui'
+import { DASHBOARD_SURFACE_PADDING } from '@/app/dashboard/landlord/dashboard-ui'
 
 /**
  * Groene actie-tegel naast MetricCard (zelfde patroon als AddPaymentTile op financieel).

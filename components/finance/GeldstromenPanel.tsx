@@ -65,7 +65,7 @@ import {
   DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
+} from '@/app/dashboard/landlord/dashboard-ui'
 
 const tile = 'bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3'
 const fieldLabel = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'

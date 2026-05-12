@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import {
   DASHBOARD_TABLE_HEAD_CLASS,
   DASHBOARD_TABLE_CELL_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
+} from '@/app/dashboard/landlord/dashboard-ui'
 
 /**
  * TableHead / TableCell met vaste dashboard-marges (`px-5`), hergebruik op financiële tabellen e.d.

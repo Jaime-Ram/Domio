@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/employer/maintenance/page'
+export { default } from '@/app/dashboard/landlord/maintenance/page'

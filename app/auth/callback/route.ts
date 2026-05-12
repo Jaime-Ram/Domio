@@ -44,12 +44,12 @@ export async function GET(request: NextRequest) {
       }
 
       // Bestaand account logt normaal in
-      const destination = role === 'huurder' ? '/portal' : '/dashboard/employer'
+      const destination = role === 'huurder' ? '/dashboard/tenant' : '/dashboard/landlord'
       return clearCookies(NextResponse.redirect(new URL(destination, requestUrl.origin)))
     }
   }
 
-  const destination = next ?? '/dashboard/employer'
+  const destination = next ?? '/dashboard/landlord'
   const res = NextResponse.redirect(new URL(destination, request.url))
   res.cookies.set('domio_from', '', { path: '/', maxAge: 0 })
   res.cookies.set('domio_demo', '', { path: '/', maxAge: 0 })

@@ -1,16 +1,4 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-
 export default function DashboardPage() {
-  const router = useRouter()
-  
-  useEffect(() => {
-    // Redirect naar employer dashboard (demo)
-    router.push('/dashboard/employer')
-  }, [router])
-  
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
@@ -20,6 +8,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
-
-

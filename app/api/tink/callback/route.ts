@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const userId = searchParams.get("state");
   const error = searchParams.get("error");
 
-  const betalingenUrl = "/dashboard/employer/financial/betalingen"
+  const betalingenUrl = "/dashboard/landlord/financial/betalingen"
 
   if (error || !code || !userId) {
     return NextResponse.redirect(new URL(`${betalingenUrl}?tink_error=true`, request.url));

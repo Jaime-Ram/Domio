@@ -202,7 +202,7 @@ export default function Home() {
                       <div className="px-3 pt-3 pb-2">
                         <button
                           type="button"
-                          onClick={() => { setUserMenuOpen(false); router.push('/dashboard/employer/settings?tab=account') }}
+                          onClick={() => { setUserMenuOpen(false); router.push('/dashboard/landlord/settings?tab=account') }}
                           className="flex items-center gap-3 w-full rounded-lg px-2 py-1.5 transition-colors hover:bg-[#f4f4f4] text-left"
                         >
                           <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center">
@@ -217,7 +217,7 @@ export default function Home() {
                       {/* Menu items */}
                       <div className="px-1.5 py-1">
                         <Link
-                          href="/dashboard/employer"
+                          href="/dashboard/landlord"
                           onClick={() => setUserMenuOpen(false)}
                           className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
                         >
@@ -225,7 +225,7 @@ export default function Home() {
                           Dashboard
                         </Link>
                         <Link
-                          href="/dashboard/employer/settings"
+                          href="/dashboard/landlord/settings"
                           onClick={() => setUserMenuOpen(false)}
                           className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
                         >

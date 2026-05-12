@@ -66,7 +66,7 @@ import {
   DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
+} from '@/app/dashboard/landlord/dashboard-ui'
 import { supabase } from '@/lib/supabase/client'
 
 // ── Types ────────────────────────────────────────────────────────────────────

@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
   const errorParam = searchParams.get('error')
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin
-  const successUrl = `${baseUrl}/dashboard/employer/financial?tink=success`
-  const cancelUrl = `${baseUrl}/dashboard/employer/financial?tink=cancelled`
+  const successUrl = `${baseUrl}/dashboard/landlord/financial?tink=success`
+  const cancelUrl = `${baseUrl}/dashboard/landlord/financial?tink=cancelled`
 
   if (errorParam) {
     return NextResponse.redirect(cancelUrl)

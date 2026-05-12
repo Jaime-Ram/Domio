@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AppDropdownContent } from '@/components/ui/app-dropdown'
 import { cn } from '@/lib/utils'
-import { DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS } from '@/app/dashboard/employer/dashboard-ui'
+import { DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 
 interface TableToolbarProps {
   // Search

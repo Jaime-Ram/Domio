@@ -1,1 +1,1 @@
-export { default } from '@/app/dashboard/employer/compliance/puntentelling/page'
+export { default } from '@/app/dashboard/landlord/compliance/puntentelling/page'

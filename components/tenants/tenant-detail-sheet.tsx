@@ -98,7 +98,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Huurovereenkomst.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/tenants',
+      href: '/dashboard/landlord/tenants',
       hrefLabel: 'Bekijk huurder',
     },
     {
@@ -114,7 +114,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
         { label: 'Identiteitsverificatie', value: 'Goedgekeurd' },
         { label: 'Gekoppeld object', value: 'Keizersgracht 142, Amsterdam' },
       ],
-      href: '/dashboard/employer/tenants',
+      href: '/dashboard/landlord/tenants',
       hrefLabel: 'Bekijk huurdersdossier',
     },
     {
@@ -135,7 +135,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Betaalbewijs april 2026.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/financial',
+      href: '/dashboard/landlord/financial',
       hrefLabel: 'Bekijk in financieel overzicht',
     },
     {
@@ -156,7 +156,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Factuur FAC-2026-004.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/financial',
+      href: '/dashboard/landlord/financial',
       hrefLabel: 'Bekijk factuur',
     },
     {
@@ -173,7 +173,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
         { label: 'Verstuurd op', value: fmt(days(8)) },
         { label: 'Betaald op', value: fmt(days(5)) },
       ],
-      href: '/dashboard/employer/financial',
+      href: '/dashboard/landlord/financial',
       hrefLabel: 'Bekijk betalingshistorie',
     },
     {
@@ -191,7 +191,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
         { label: 'Monteur gepland', value: fmt(days(-7)) },
         { label: 'Referentie', value: 'OND-2026-018' },
       ],
-      href: '/dashboard/employer/maintenance',
+      href: '/dashboard/landlord/maintenance',
       hrefLabel: 'Bekijk onderhoudsticket',
     },
     {
@@ -212,7 +212,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Indexatiebrief 2026.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/tenants',
+      href: '/dashboard/landlord/tenants',
       hrefLabel: 'Bekijk contractdetails',
     },
     {
@@ -231,7 +231,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Salarisstrook_okt2025.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/tenants',
+      href: '/dashboard/landlord/tenants',
       hrefLabel: 'Bekijk documenten',
     },
     {
@@ -252,7 +252,7 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
       attachments: [
         { label: 'Getekend huurcontract.pdf', href: '#' },
       ],
-      href: '/dashboard/employer/tenants',
+      href: '/dashboard/landlord/tenants',
       hrefLabel: 'Bekijk contract',
     },
   ]

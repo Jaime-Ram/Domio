@@ -78,7 +78,7 @@ export async function updatePassword(newPassword: string) {
 
 export async function updateEmail(newEmail: string) {
   const origin = getAppOrigin()
-  const redirectTo = origin ? `${origin}/auth/callback?next=/dashboard/employer/settings` : undefined
+  const redirectTo = origin ? `${origin}/auth/callback?next=/dashboard/landlord/settings` : undefined
   
   // Debug log
   console.log('[updateEmail] origin:', origin)

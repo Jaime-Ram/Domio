@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const institutionId = new URL(request.url).searchParams.get('institutionId')
   if (!institutionId) {
     return NextResponse.redirect(
-      new URL('/dashboard/employer/settings?tab=koppelingen&yapily_error=true', request.url)
+      new URL('/dashboard/landlord/settings?tab=koppelingen&yapily_error=true', request.url)
     )
   }
 
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   if (!res.ok) {
     console.error('Yapily auth request failed:', await res.text())
     return NextResponse.redirect(
-      new URL('/dashboard/employer/settings?tab=koppelingen&yapily_error=true', request.url)
+      new URL('/dashboard/landlord/settings?tab=koppelingen&yapily_error=true', request.url)
     )
   }
 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
   if (!authorisationUrl) {
     return NextResponse.redirect(
-      new URL('/dashboard/employer/settings?tab=koppelingen&yapily_error=true', request.url)
+      new URL('/dashboard/landlord/settings?tab=koppelingen&yapily_error=true', request.url)
     )
   }
 

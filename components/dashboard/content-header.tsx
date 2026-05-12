@@ -20,7 +20,7 @@ interface ContentHeaderProps {
   onMenuClick?: () => void
   /** Sticky offset (e.g. md:top-12 when demo bar is above) */
   stickyOffsetClassName?: string
-  /** Base path voor links (default: /dashboard/employer). Voor demo: /demo/app */
+  /** Base path voor links (default: /dashboard/landlord). Voor demo: /demo/app */
   basePath?: string
 }
 
@@ -70,7 +70,7 @@ function getPageTitle(pathname: string, basePath: string, firstName: string): st
   return ''
 }
 
-export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/employer' }: ContentHeaderProps) {
+export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/landlord' }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const router = useRouter()
   const pathname = usePathname()

@@ -14,7 +14,7 @@ export default function MijnDomioPage() {
     if (typeof document !== 'undefined') {
       document.cookie = 'domio_demo=; path=/; max-age=0'
     }
-    router.prefetch('/dashboard/employer')
+    router.prefetch('/dashboard/landlord')
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
@@ -22,7 +22,7 @@ export default function MijnDomioPage() {
 
   const handleAnimationComplete = () => {
     timeoutRef.current = setTimeout(() => {
-      router.replace('/dashboard/employer')
+      router.replace('/dashboard/landlord')
     }, 80)
   }
 

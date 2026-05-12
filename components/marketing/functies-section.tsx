@@ -120,7 +120,7 @@ export function FunctiesSection() {
             <TransactionListWidget
               elevatedShadow
               title="Recente activiteit"
-              seeAllHref="/dashboard/employer"
+              seeAllHref="/dashboard/landlord"
               seeAllLabel="Alles"
               items={ACTIVITIES.map((item, i) => ({
                 icon: activityIcon(item.type),

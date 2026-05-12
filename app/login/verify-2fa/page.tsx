@@ -68,7 +68,7 @@ function Verify2FaContent() {
         const { error: verifyError } = await verifyMfa(totpFactorId, trimmed)
         if (verifyError) { setError(verifyError.message); return }
         set2FaVerifiedCookie()
-        router.push('/dashboard/employer')
+        router.push('/dashboard/landlord')
       } else {
         const res = await fetch('/api/auth/2fa/email/verify', {
           method: 'POST',
@@ -78,7 +78,7 @@ function Verify2FaContent() {
         const data = await res.json().catch(() => ({}))
         if (!res.ok) { setError(data.error || 'Code ongeldig of verlopen'); return }
         set2FaVerifiedCookie()
-        router.push('/dashboard/employer')
+        router.push('/dashboard/landlord')
       }
     } finally {
       setLoading(false)

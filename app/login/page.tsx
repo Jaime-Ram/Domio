@@ -75,7 +75,7 @@ function LoginContent() {
       }
 
       // Session is valid and no 2FA pending
-      router.replace('/dashboard/employer')
+      router.replace('/dashboard')
     }
     checkExistingSession()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -213,7 +213,7 @@ function LoginContent() {
       if (credential && credential.type === 'public-key') {
         await new Promise((r) => setTimeout(r, 500))
         clearDemoCookie()
-        router.push('/dashboard/employer')
+        router.push('/dashboard')
       } else {
         setError('Geen passkey geselecteerd. Probeer opnieuw of log in met e-mail.')
       }
@@ -233,7 +233,7 @@ function LoginContent() {
     return (
       <AuthLoadingScreen
         onAnimationComplete={() => {
-          router.push('/dashboard/employer')
+          router.push('/dashboard')
         }}
       />
     )

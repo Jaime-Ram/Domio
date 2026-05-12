@@ -16,7 +16,7 @@ export default function OnboardingPage() {
   const handleSelect = async (role: 'verhuurder' | 'huurder') => {
     setLoading(true)
     await supabase.auth.updateUser({ data: { role } })
-    router.replace(role === 'huurder' ? '/portal' : '/dashboard/employer')
+    router.replace(role === 'huurder' ? '/dashboard/tenant' : '/dashboard/landlord')
   }
 
   return (

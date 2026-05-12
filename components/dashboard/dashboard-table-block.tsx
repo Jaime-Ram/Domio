@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import {
   DASHBOARD_TABLE_BLOCK_CLASS,
   DASHBOARD_TABLE_BLOCK_EMPTY_MODIFIER_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
+} from '@/app/dashboard/landlord/dashboard-ui'
 
 /**
  * Eén lichtgrijs blok met afgeronde hoeken; met data een wit datagedeelte in `tbody`.

@@ -23,7 +23,7 @@ export default function SuccessPage() {
               </>
             }
             primaryButton={{ label: 'Naar home', href: '/' }}
-            secondaryButton={{ label: 'Naar dashboard', href: '/dashboard/employer' }}
+            secondaryButton={{ label: 'Naar dashboard', href: '/dashboard/landlord' }}
           />
         </div>
       </main>

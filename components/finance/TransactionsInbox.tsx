@@ -38,7 +38,7 @@ import {
   dashboardCardClass,
   DASHBOARD_TABLE_TOOLBAR_HEADER_DASHBOARD_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-} from '@/app/dashboard/employer/dashboard-ui'
+} from '@/app/dashboard/landlord/dashboard-ui'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/types'

@@ -60,7 +60,7 @@ interface VastgoedSidebarProps {
   onClose?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
-  /** Base path voor links (default: /dashboard/employer). Voor demo: /demo/app */
+  /** Base path voor links (default: /dashboard/landlord). Voor demo: /demo/app */
   basePath?: string
   /** Demo-modus: cleaner look, nav grijs zonder rand */
   demoMode?: boolean
@@ -70,7 +70,7 @@ interface VastgoedSidebarProps {
   showHulp?: boolean
 }
 
-export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/employer', demoMode = false, menuGroups: menuGroupsProp, showHulp = true }: VastgoedSidebarProps) {
+export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/landlord', demoMode = false, menuGroups: menuGroupsProp, showHulp = true }: VastgoedSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])

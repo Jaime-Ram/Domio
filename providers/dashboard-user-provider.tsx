@@ -52,7 +52,7 @@ interface DashboardUserContextValue {
   profile: Profile | null
   loading: boolean
   isDemo: boolean
-  /** Base path voor links: /demo/app in demo, /dashboard/employer anders */
+  /** Base path voor links: /demo/app in demo, /dashboard/landlord anders */
   basePath: string
   refetch: () => Promise<void>
 }
@@ -62,7 +62,7 @@ export const DashboardUserContext = createContext<DashboardUserContextValue>({
   profile: null,
   loading: true,
   isDemo: false,
-  basePath: '/dashboard/employer',
+  basePath: '/dashboard/landlord',
   refetch: async () => {},
 })
 
@@ -115,6 +115,12 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
     return () => subscription.unsubscribe()
   }, [])
 
+  const basePath = isDemo
+    ? '/demo/app'
+    : profile?.role === 'huurder'
+      ? '/dashboard/tenant'
+      : '/dashboard/landlord'
+
   return (
     <DashboardUserContext.Provider
       value={{
@@ -122,7 +128,7 @@ export function DashboardUserProvider({ children }: { children: React.ReactNode 
         profile,
         loading,
         isDemo,
-        basePath: isDemo ? '/demo/app' : '/dashboard/employer',
+        basePath,
         refetch: fetchUserAndProfile,
       }}
     >

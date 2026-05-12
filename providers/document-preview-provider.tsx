@@ -23,7 +23,7 @@ export function DocumentPreviewProvider({ children }: { children: ReactNode }) {
     if (window.innerWidth >= PREVIEW_BREAKPOINT_PX) {
       setPreviewDocId(docId)
     } else {
-      window.location.href = `/dashboard/employer/documents/preview/${docId}`
+      window.location.href = `/dashboard/landlord/documents/preview/${docId}`
     }
   }, [])
 

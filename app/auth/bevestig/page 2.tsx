@@ -25,7 +25,7 @@ export default function BevestigAccountPage() {
       // Als de gebruiker al een rol heeft, stuur door naar dashboard
       if (user.user_metadata?.role) {
         const role = user.user_metadata.role as string
-        router.replace(role === 'huurder' ? '/portal' : '/dashboard/employer')
+        router.replace(role === 'huurder' ? '/dashboard/tenant' : '/dashboard/landlord')
         return
       }
       setEmail(user.email ?? null)

@@ -7,7 +7,7 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const betalingenUrl = '/dashboard/employer/financial/betalingen'
+const betalingenUrl = '/dashboard/landlord/financial/betalingen'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
