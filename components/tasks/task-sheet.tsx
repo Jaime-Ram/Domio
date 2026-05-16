@@ -13,7 +13,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Check, X, Trash2, RefreshCw, Bell, Calendar, Tag, Zap, Link2 } from 'lucide-react'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
+import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
 import { taskQueries, propertyQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -142,11 +142,6 @@ export function TaskSheet({ open, onClose, task, onSaved, onDeleted }: TaskSheet
 
   const set = (key: keyof typeof EMPTY_FORM, val: string) =>
     setForm(f => ({ ...f, [key]: val }))
-
-  const tile = 'bg-gray-50 dark:bg-neutral-800/60 rounded-xl px-4 py-3'
-  const label = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'
-  const inputCls = 'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
-  const selectTrigger = 'h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
 
   return (
     <DetailShell

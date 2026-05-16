@@ -9,7 +9,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { Check, Tag, Zap, Calendar, Link2, Bell } from 'lucide-react'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Input } from '@/components/ui/input'
+import { DialogField } from '@/components/ui/dialog-field'
 import { cn } from '@/lib/utils'
 import { taskQueries, propertyQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -114,11 +116,6 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
     } finally { setSaving(false) }
   }
 
-  const tile  = 'bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3'
-  const label = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'
-  const inputCls = 'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
-  const selectTrigger = 'h-auto p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
-
   return (
     <CreateDialogShell
       open={open}
@@ -135,56 +132,38 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
           <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">{error}</p>
         )}
 
-        {/* Title */}
-        <div className={tile}>
-          <p className={label}>Titel *</p>
-          <input
+        <DialogField label="Titel" required>
+          <Input
             autoFocus
             value={form.title}
             onChange={e => set('title', e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleCreate()}
             placeholder="Bijv. CV-ketel inspecteren"
-            className={inputCls}
+            className="rounded-xl"
           />
-        </div>
+        </DialogField>
 
-        {/* Categorie + Herinnering */}
         <div className="grid grid-cols-2 gap-3">
-          <div className={tile}>
-            <p className={label}><Tag className="inline h-3 w-3 mr-1" />Categorie</p>
+          <DialogField label="Categorie">
             <Select value={form.category} onValueChange={v => set('category', v)}>
-              <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
               </SelectContent>
             </Select>
-          </div>
-          <div className={tile}>
-            <p className={label}><Bell className="inline h-3 w-3 mr-1" />Herinnering</p>
-            <WiseDatePicker
-              value={form.notification_date}
-              onChange={v => set('notification_date', v)}
-              placeholder="Optioneel"
-              className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
-            />
-          </div>
+          </DialogField>
+          <DialogField label="Herinnering" optional>
+            <DatePicker value={form.notification_date} onChange={v => set('notification_date', v)} placeholder="Optioneel" />
+          </DialogField>
         </div>
 
-        {/* Einddatum + Prioriteit */}
         <div className="grid grid-cols-2 gap-3">
-          <div className={tile}>
-            <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
-            <WiseDatePicker
-              value={form.due_date}
-              onChange={v => set('due_date', v)}
-              placeholder="Kies datum"
-              className="[&_button]:min-h-[2.25rem] [&_button]:text-sm"
-            />
-          </div>
-          <div className={tile}>
-            <p className={label}><Zap className="inline h-3 w-3 mr-1" />Prioriteit</p>
+          <DialogField label="Einddatum" optional>
+            <DatePicker value={form.due_date} onChange={v => set('due_date', v)} placeholder="Kies datum" />
+          </DialogField>
+          <DialogField label="Prioriteit">
             <Select value={form.priority} onValueChange={v => set('priority', v)}>
-              <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {PRIORITIES.map(p => (
                   <SelectItem key={p.value} value={p.value}>
@@ -195,20 +174,18 @@ export function NewTaskDialog({ open, onClose, onSaved }: NewTaskDialogProps) {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </DialogField>
         </div>
 
-        {/* Gekoppeld pand */}
-        <div className={tile}>
-          <p className={label}><Link2 className="inline h-3 w-3 mr-1" />Gekoppeld pand</p>
+        <DialogField label="Gekoppeld pand" optional>
           <Select value={form.property_id || 'geen'} onValueChange={v => set('property_id', v === 'geen' ? '' : v)}>
-            <SelectTrigger className={selectTrigger}><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
+            <SelectTrigger className="rounded-xl"><SelectValue placeholder="Geen koppeling" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="geen">Geen koppeling</SelectItem>
               {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
             </SelectContent>
           </Select>
-        </div>
+        </DialogField>
       </div>
     </CreateDialogShell>
   )

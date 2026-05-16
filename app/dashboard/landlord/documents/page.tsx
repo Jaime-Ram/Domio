@@ -710,7 +710,7 @@ export default function DocumentsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-8">
                 {sortedDocuments.map((doc) => (
                   <DocumentCard
                     key={doc.id}

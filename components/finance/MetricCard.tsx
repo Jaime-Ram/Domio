@@ -6,6 +6,7 @@ interface MetricCardProps {
   label: string
   value: string
   icon: React.ReactNode
+  delta?: string
   className?: string
   /** @deprecated */
   subtitle?: string
@@ -15,7 +16,7 @@ interface MetricCardProps {
   accent?: string
 }
 
-export function MetricCard({ label, value, icon, className }: MetricCardProps) {
+export function MetricCard({ label, value, icon, delta, className }: MetricCardProps) {
   return (
     <div
       className={cn(
@@ -28,7 +29,12 @@ export function MetricCard({ label, value, icon, className }: MetricCardProps) {
       </div>
       <div>
         <p className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight">{value}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-0.5">{label}</p>
+        <div className="flex items-baseline gap-2 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{label}</p>
+          {delta && (
+            <span className="text-xs font-semibold text-[#15803D] dark:text-[#4ADE80]">{delta}</span>
+          )}
+        </div>
       </div>
     </div>
   )

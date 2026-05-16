@@ -48,9 +48,10 @@ import {
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
 import { DetailShell } from '@/components/ui/detail-shell'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { DialogField } from '@/components/ui/dialog-field'
 import {
   Table,
   TableBody,
@@ -67,10 +68,6 @@ import {
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
 
-const tile = 'bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3'
-const fieldLabel = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'
-const inputCls =
-  'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
 
 // ─── Constants ────────────────────────────────────────────────────────
 
@@ -1416,20 +1413,18 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className={tile}>
-                  <p className={fieldLabel}>Datum *</p>
-                  <WiseDatePicker value={payDate} onChange={setPayDate} />
-                </div>
-                <div className={tile}>
-                  <p className={fieldLabel}>Bedrag (€) *</p>
-                  <input type="text" inputMode="decimal" placeholder="0,00" value={payAmount} onChange={e => setPayAmount(e.target.value)} className={inputCls} />
-                </div>
+                <DialogField label="Datum" required>
+                  <DatePicker value={payDate} onChange={setPayDate} />
+                </DialogField>
+                <DialogField label="Bedrag (€)" required>
+                  <Input type="text" inputMode="decimal" placeholder="0,00" value={payAmount} onChange={e => setPayAmount(e.target.value)} className="rounded-xl" />
+                </DialogField>
               </div>
 
-              <div className={tile}>
-                <p className={fieldLabel}>Omschrijving</p>
-                <textarea rows={2} placeholder="Bijv. huurinkomsten januari" value={payDescription} onChange={e => setPayDescription(e.target.value)} className={cn(inputCls, 'resize-none')} />
-              </div>
+              <DialogField label="Omschrijving" optional>
+                <textarea rows={2} placeholder="Bijv. huurinkomsten januari" value={payDescription} onChange={e => setPayDescription(e.target.value)}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-[var(--color-interactive-primary)] focus-visible:ring-2 focus-visible:ring-[var(--color-interactive-primary)] focus-visible:ring-offset-0 transition-colors resize-none" />
+              </DialogField>
             </div>
           )}
 

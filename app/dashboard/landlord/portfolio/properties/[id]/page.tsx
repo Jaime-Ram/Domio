@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { 
+import {
   ArrowLeft,
   MapPin,
   DoorOpen,
@@ -40,6 +40,9 @@ import {
   Upload,
   Edit,
   X,
+  Mail,
+  Loader2,
+  CheckCircle2,
 } from 'lucide-react'
 import { propertyQueries, unitQueries, leaseQueries, documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -104,6 +107,13 @@ export default function PropertyDetailPage() {
   const [newUnitDraft, setNewUnitDraft] = useState<{ unit_number: string; rooms: string; size_m2: string; monthly_rent: string; status: string } | null>(null)
   const [savingNewUnit, setSavingNewUnit] = useState(false)
   const [newUnitError, setNewUnitError] = useState<string | null>(null)
+
+  // Invite-to-unit state
+  const [inviteUnitId, setInviteUnitId] = useState<string | null>(null)
+  const [inviteForm, setInviteForm] = useState({ name: '', email: '' })
+  const [inviteSending, setInviteSending] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [invitedUnits, setInvitedUnits] = useState<Set<string>>(new Set())
 
   const initEditForm = (p: any) => {
     setEditForm({
@@ -333,6 +343,31 @@ export default function PropertyDetailPage() {
     }
   }
   
+  const handleInviteToUnit = async (unitId: string) => {
+    if (!inviteForm.name || !inviteForm.email) return
+    setInviteSending(true)
+    setInviteError(null)
+    try {
+      const res = await fetch('/api/invitations/invite-to-unit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unitId, tenantName: inviteForm.name, tenantEmail: inviteForm.email }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error || 'Onbekende fout')
+      setInvitedUnits((prev) => new Set(prev).add(unitId))
+      setInviteUnitId(null)
+      setInviteForm({ name: '', email: '' })
+      // Refresh property so new tenant appears in unit
+      const data = await propertyQueries.getWithUnits(propertyId)
+      setProperty(data)
+    } catch (err: any) {
+      setInviteError(err.message)
+    } finally {
+      setInviteSending(false)
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'verhuurd':
@@ -959,17 +994,66 @@ export default function PropertyDetailPage() {
                                           </Link>
                                         ))}
                                       </div>
-                                    ) : (
-                                      <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
+                                    ) : inviteUnitId === unit.id ? (
+                                      /* Inline invite form */
+                                      <div className="border border-[#163300]/20 dark:border-[#9FE870]/20 rounded-lg p-4 space-y-3">
+                                        <p className="text-xs font-semibold text-[#163300] dark:text-[#9FE870]">Huurder uitnodigen</p>
+                                        <Input
+                                          placeholder="Volledige naam"
+                                          value={inviteForm.name}
+                                          onChange={(e) => setInviteForm((f) => ({ ...f, name: e.target.value }))}
+                                          disabled={inviteSending}
+                                        />
+                                        <Input
+                                          type="email"
+                                          placeholder="E-mailadres"
+                                          value={inviteForm.email}
+                                          onChange={(e) => setInviteForm((f) => ({ ...f, email: e.target.value }))}
+                                          disabled={inviteSending}
+                                        />
+                                        {inviteError && (
+                                          <p className="text-xs text-red-600 dark:text-red-400">{inviteError}</p>
+                                        )}
+                                        <div className="flex items-center gap-2">
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => { setInviteUnitId(null); setInviteError(null) }}
+                                            disabled={inviteSending}
+                                          >
+                                            Annuleren
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            className="bg-[#163300] hover:bg-[#356258] text-white"
+                                            onClick={() => handleInviteToUnit(unit.id)}
+                                            disabled={inviteSending || !inviteForm.name || !inviteForm.email}
+                                          >
+                                            {inviteSending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                                            Uitnodiging versturen
+                                          </Button>
+                                        </div>
                                       </div>
+                                    ) : invitedUnits.has(unit.id) ? (
+                                      <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                                        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                                        <span className="text-sm text-green-700 dark:text-green-400">Uitnodiging verstuurd</span>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        onClick={() => { setInviteUnitId(unit.id); setInviteForm({ name: '', email: '' }); setInviteError(null) }}
+                                        className="w-full flex items-center justify-center gap-2 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-dashed border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-sm text-gray-500 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
+                                      >
+                                        <Mail className="h-4 w-4" />
+                                        Huurder uitnodigen
+                                      </button>
                                     )}
                                   </div>
 
                                   {/* Actions */}
                                   <div className="flex items-center gap-2 justify-end">
-                                    <Button 
-                                      size="sm" 
+                                    <Button
+                                      size="sm"
                                       variant="outline"
                                       onClick={() => handleStartEditUnit(unit)}
                                     >

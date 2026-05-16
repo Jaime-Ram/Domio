@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   Clock, Plus, Search,
   Calendar, Bell, RefreshCw, Building2, ListTodo,
-  Pencil, Check, Filter, Grid3x3, Table2, ChevronRight,
+  Pencil, Check, Filter, ChevronRight,
 } from 'lucide-react'
 import { AlertCircle, ClockCheck, CheckDone01 } from '@untitledui/icons'
 import { cn } from '@/lib/utils'
@@ -130,7 +130,6 @@ export default function TasksPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [sheetOpen, setSheetOpen]   = useState(false)
   const [editing, setEditing]       = useState<any | null>(null)
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const [categoryFilter, setCategoryFilter] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(Object.keys(CATEGORY_CONFIG).map((k) => [k, true]))
   )
@@ -236,20 +235,20 @@ export default function TasksPage() {
               'shrink-0 flex-1 sm:flex-initial pb-2 text-left sm:text-center whitespace-nowrap transition-colors duration-200 font-semibold',
               index < FILTERS.length - 1 ? 'mr-4 sm:mr-6' : '',
               filter === f.key
-                ? 'text-[#163300] dark:text-[#9FE870]'
+                ? 'text-[#15803D] dark:text-[#4ADE80]'
                 : 'text-gray-500 dark:text-gray-400'
             )}
           >
             <span>{f.label}</span>
             {f.count !== undefined && (
-              <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]">
+              <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#15803D]/15 text-[11px] font-medium text-[#15803D] dark:bg-[#4ADE80]/20 dark:text-[#4ADE80] px-1">
                 {f.count}
               </span>
             )}
           </button>
         ))}
         <div
-          className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
+          className="absolute bottom-0 h-[2px] rounded-full bg-[#15803D] dark:bg-[#4ADE80] transition-all duration-200"
           style={{ left: tabIndicator.left, width: tabIndicator.width }}
         />
       </div>
@@ -292,19 +291,6 @@ export default function TasksPage() {
         </DropdownMenu>
         <Button
           type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
-            'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
-          )}
-          onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
-          aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
-        >
-          {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
-        </Button>
-        <Button
-          type="button"
           onClick={openNew}
           className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
         >
@@ -318,7 +304,7 @@ export default function TasksPage() {
   return (
     <div className="space-y-6">
 
-      {/* KPI’s — zelfde patroon als financieel: icoon + bedrag + één onderzin (geen extra subtitle) */}
+      {/* KPI's — zelfde patroon als financieel: icoon + bedrag + één onderzin (geen extra subtitle) */}
       <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Verlopen"
@@ -377,75 +363,6 @@ export default function TasksPage() {
                 Eerste taak aanmaken
               </button>
             )}
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-3">
-            {filtered.map((task) => {
-              const done = task.status === 'afgerond'
-              const days = task.due_date ? daysUntil(task.due_date) : null
-              const isOverdue = days !== null && days < 0 && !done
-              const isUrgent = days !== null && days <= 7 && days >= 0 && !done
-              const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
-              return (
-                <Card
-                  key={task.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => openEdit(task)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      openEdit(task)
-                    }
-                  }}
-                  className="rounded-2xl border border-gray-200 dark:border-neutral-700 shadow-none hover:border-[#163300] dark:hover:border-[#9FE870] cursor-pointer transition-colors"
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start gap-3">
-                      <ListTodo className="h-5 w-5 text-[#163300] dark:text-[#9FE870] mt-0.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <CardTitle
-                          className={cn(
-                            'text-base font-semibold text-[#163300] dark:text-[#9FE870] mb-1 line-clamp-2',
-                            done && 'line-through text-gray-400 dark:text-gray-600'
-                          )}
-                        >
-                          {task.title}
-                        </CardTitle>
-                        <span className={cn('inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1', cat.color)}>
-                          {cat.label}
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0 space-y-2">
-                    {task.properties && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <Building2 className="h-4 w-4 shrink-0 text-gray-400" />
-                        <span className="truncate">{task.properties.name}</span>
-                      </div>
-                    )}
-                    {task.due_date && (
-                      <div
-                        className={cn(
-                          'flex items-center gap-1.5 text-sm font-medium',
-                          isOverdue
-                            ? 'text-red-600 dark:text-red-400'
-                            : isUrgent
-                              ? 'text-amber-600 dark:text-amber-400'
-                              : done
-                                ? 'text-gray-400 dark:text-gray-600'
-                                : 'text-gray-700 dark:text-gray-300'
-                        )}
-                      >
-                        <Calendar className="h-4 w-4 shrink-0" />
-                        {fmtDate(task.due_date)}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })}
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-neutral-800">

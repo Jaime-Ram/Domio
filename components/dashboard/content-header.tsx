@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Menu, Bell, User, Mail, FileText, Wrench, LogOut, Shield, ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon } from 'lucide-react'
+import {
+  Menu, Bell, User, Mail, FileText, Wrench, LogOut, Shield,
+  ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon,
+  HelpCircle, Search,
+} from 'lucide-react'
+import { getSubscriptionClient, trialDaysRemaining, type Subscription } from '@/lib/supabase/subscription'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -18,18 +23,17 @@ import { signOut } from '@/lib/supabase/auth'
 
 interface ContentHeaderProps {
   onMenuClick?: () => void
-  /** Sticky offset (e.g. md:top-12 when demo bar is above) */
   stickyOffsetClassName?: string
-  /** Base path voor links (default: /dashboard/landlord). Voor demo: /demo/app */
   basePath?: string
 }
+
+const iconBtnCls =
+  'h-[34px] w-[34px] flex items-center justify-center rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors focus-visible:ring-0 focus-visible:ring-offset-0'
 
 function getInitials(name: string | null, email: string): string {
   if (name?.trim()) {
     const parts = name.trim().split(/\s+/)
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-    }
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
     return name.slice(0, 2).toUpperCase()
   }
   return email.slice(0, 2).toUpperCase()
@@ -39,136 +43,98 @@ function clearDemoCookie() {
   document.cookie = 'domio_demo=; path=/; max-age=0'
 }
 
-function getGreeting(): string {
-  const h = new Date().getHours()
-  if (h < 12) return 'Goedemorgen'
-  if (h < 18) return 'Goedemiddag'
-  return 'Goedenavond'
-}
-
-function getPageTitle(pathname: string, basePath: string, firstName: string): string {
-  const rel = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname
-  if (rel === '' || rel === '/') return `${getGreeting()}, ${firstName}`
-  if (rel.startsWith('/financial')) return 'Financieel'
-  if (rel.startsWith('/tenants')) return 'Huurders'
-  if (rel.startsWith('/portfolio')) return 'Portefeuille'
-  if (rel.startsWith('/maintenance')) return 'Onderhoud'
-  if (rel.startsWith('/compliance')) return 'Compliance'
-  if (rel.startsWith('/documents')) return 'Documenten'
-  if (rel.startsWith('/messages')) return 'Communicatie'
-  if (rel.startsWith('/tasks')) return 'Taken'
-  if (rel.startsWith('/assist')) return 'Assist'
-  if (rel.startsWith('/settings')) return 'Instellingen'
-  if (rel.startsWith('/accounting')) return 'Boekhouding'
-  if (rel.startsWith('/hulp')) return 'Hulp'
-  // Portal routes
-  if (rel.startsWith('/betalingen')) return 'Betalingen'
-  if (rel.startsWith('/onderhoud')) return 'Onderhoud'
-  if (rel.startsWith('/documenten')) return 'Documenten'
-  if (rel.startsWith('/berichten')) return 'Berichten'
-  if (rel.startsWith('/instellingen')) return 'Instellingen'
-  return ''
-}
-
-export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '/dashboard/landlord' }: ContentHeaderProps) {
+export function ContentHeader({
+  onMenuClick,
+  stickyOffsetClassName,
+  basePath = '/dashboard/landlord',
+}: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const router = useRouter()
-  const pathname = usePathname()
-  const firstName = (profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '').trim()
-  const pageTitle = getPageTitle(pathname, basePath, firstName)
-  /** Radix DropdownMenu gebruikt useId(); pas na mount renderen voorkomt SSR/client id-mismatch. */
+
   const [menusReady, setMenusReady] = useState(false)
+  const [sub, setSub] = useState<Subscription | null>(null)
+
+  useEffect(() => { setMenusReady(true) }, [])
   useEffect(() => {
-    setMenusReady(true)
-  }, [])
+    if (!user || isDemo) return
+    getSubscriptionClient(user.id).then(setSub)
+  }, [user, isDemo])
+
+  const showTrialPill =
+    sub && sub.status === 'trialing' && new Date(sub.trial_ends_at) > new Date() && !isDemo
+  const trialDays = sub ? trialDaysRemaining(sub) : 0
+  const trialPct = Math.round((trialDays / 30) * 100)
+  const circumference = 2 * Math.PI * 7
 
   const notifications = isDemo ? mockNotifications : []
   const userName = profile?.full_name || user?.email?.split('@')[0] || (loading ? 'Laden...' : 'Gebruiker')
   const userEmail = user?.email || profile?.email || ''
-  const userRole = profile?.role === 'verhuurder' ? 'Beheerder' : profile?.role === 'huurder' ? 'Bewoner' : 'Admin'
   const avatarInitials = getInitials(profile?.full_name ?? null, userEmail || '')
   const unreadCount = 0
 
   return (
-    <header className={cn("sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur", stickyOffsetClassName)}>
-      <div className="relative mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 h-[5.25rem]">
+    <header className={cn('sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur', stickyOffsetClassName)}>
+      <div className="mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 h-14 flex items-center gap-2">
 
-        {/* Hamburger — verticaal gecentreerd (mobile) */}
-        <div className="absolute inset-y-0 left-10 sm:left-14 lg:hidden flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 min-h-[44px] min-w-[44px] rounded-2xl text-gray-600 dark:text-gray-400 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 touch-manipulation"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onMenuClick?.()
-            }}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Menu openen</span>
-          </Button>
+        {/* Hamburger (mobile only) */}
+        <button
+          type="button"
+          className={cn(iconBtnCls, 'md:hidden shrink-0')}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMenuClick?.() }}
+        >
+          <Menu className="h-[18px] w-[18px]" />
+        </button>
+
+        {/* Search bar */}
+        <div className="flex-1 max-w-[420px]">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-[16px] w-[16px] text-gray-400 dark:text-neutral-500" />
+            <input
+              type="text"
+              placeholder="Zoeken…"
+              className="h-[34px] w-full rounded-full bg-gray-100 dark:bg-neutral-800 pl-9 pr-4 text-[13px] text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#163300]/15 dark:focus:ring-[#9FE870]/15"
+            />
+          </div>
         </div>
 
-        {/* Paginatitel — aan de onderkant van de balk */}
-        {pageTitle && (
-          <h1 className="absolute bottom-4 left-10 sm:left-14 lg:left-16 right-48 text-2xl sm:text-3xl font-bold text-[#163300] dark:text-[#9FE870] truncate leading-none">
-            {pageTitle}
-          </h1>
-        )}
+        <div className="flex-1" />
 
-        {/* Bell + Profiel — verticaal gecentreerd in de balk */}
-        <div className="absolute inset-y-0 right-10 sm:right-14 lg:right-20 flex items-center gap-3">
-          {!menusReady ? (
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                disabled
-                aria-hidden
-                tabIndex={-1}
-                className="relative h-10 w-10 rounded-full text-[#163300] dark:text-[#9FE870] bg-transparent opacity-80 pointer-events-none"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled
-                aria-hidden
-                tabIndex={-1}
-                className="h-10 py-0 pl-2 pr-3 rounded-full gap-2 bg-transparent opacity-80 pointer-events-none"
-              >
-                <span
-                  className={cn(
-                    'h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0',
-                    loading ? 'bg-gray-300 dark:bg-neutral-600 animate-pulse' : 'bg-[#163300] dark:bg-[#9FE870] dark:text-[#163300]'
-                  )}
-                >
-                  {loading ? '' : avatarInitials}
-                </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
-                  {userName}
-                </span>
-              </Button>
-            </>
-          ) : (
-            <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative h-10 w-10 rounded-full text-[#163300] dark:text-[#9FE870] bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800/50 focus-visible:ring-0 focus-visible:ring-offset-0"
-                >
-                  <Bell className="h-5 w-5" />
+        {/* Help */}
+        <Link href={`${basePath}/hulp`} className={iconBtnCls} title="Hulp">
+          <HelpCircle className="h-[18px] w-[18px]" />
+        </Link>
+
+        {/* Notifications + profile */}
+        {!menusReady ? (
+          <>
+            <div className={cn(iconBtnCls, 'pointer-events-none opacity-60')}>
+              <Bell className="h-[18px] w-[18px]" />
+            </div>
+            <div className="h-[34px] py-0 pl-1.5 pr-2.5 rounded-full flex items-center gap-1.5 opacity-60 pointer-events-none">
+              <span className={cn(
+                'h-[26px] w-[26px] rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0',
+                loading ? 'bg-gray-300 dark:bg-neutral-600 animate-pulse' : 'bg-[#163300] dark:bg-[#9FE870] dark:text-[#163300]'
+              )}>
+                {loading ? '' : avatarInitials}
+              </span>
+              <span className="text-[13px] font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[100px] truncate">
+                {userName}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Bell */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className={cn(iconBtnCls, 'relative')}>
+                  <Bell className="h-[18px] w-[18px]" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-semibold bg-red-500 text-white rounded-full border-2 border-white dark:border-neutral-900">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-semibold bg-red-500 text-white rounded-full border-2 border-white dark:border-neutral-900">
                       {unreadCount}
                     </span>
                   )}
-                </Button>
+                </button>
               </DropdownMenuTrigger>
               <AppDropdownContent align="end">
                 <div className="px-3 pt-3 pb-1.5">
@@ -192,7 +158,7 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                             : 'hover:bg-[#f4f4f4] dark:hover:bg-neutral-700'
                         )}
                       >
-                        <div className="h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 bg-[#f4f4f4] dark:bg-neutral-900">
+                        <div className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 bg-[#f4f4f4] dark:bg-neutral-900">
                           <Icon className="h-4 w-4 text-brand-primary dark:text-brand-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -212,22 +178,23 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
               </AppDropdownContent>
             </DropdownMenu>
 
-          <DropdownMenu>
+            {/* Profile */}
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-10 py-0 pl-2 pr-3 rounded-full gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800/50 focus-visible:ring-0 focus-visible:ring-offset-0"
+                <button
+                  type="button"
+                  className="h-[34px] py-0 pl-1.5 pr-2.5 rounded-full flex items-center gap-1.5 bg-transparent hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors focus-visible:ring-0 focus-visible:ring-offset-0"
                 >
                   <span className={cn(
-                    "h-7 w-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center flex-shrink-0",
-                    loading ? "bg-gray-300 dark:bg-neutral-600 animate-pulse" : "bg-[#163300] dark:bg-[#9FE870] dark:text-[#163300]"
+                    'h-[26px] w-[26px] rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0',
+                    loading ? 'bg-gray-300 dark:bg-neutral-600 animate-pulse' : 'bg-[#163300] dark:bg-[#9FE870] dark:text-[#163300]'
                   )}>
                     {loading ? '' : avatarInitials}
                   </span>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[120px] truncate">
+                  <span className="text-[13px] font-medium text-gray-900 dark:text-white hidden sm:inline max-w-[100px] truncate">
                     {userName}
                   </span>
-                </Button>
+                </button>
               </DropdownMenuTrigger>
               <AppDropdownContent align="end" className="min-w-[260px]">
                 <div className="px-3 pt-3 pb-2">
@@ -252,76 +219,49 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                   </button>
                 </div>
                 <div className="px-1.5 py-1">
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
-                  >
-                    <Link href={`${basePath}/settings?tab=account`} className="flex items-center gap-3 w-full">
-                      <User className="h-4 w-4 shrink-0" />
-                      <span>Account</span>
-                    </Link>
-                  </AppDropdownItem>
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
-                  >
-                    <Link href={`${basePath}/settings?tab=beveiliging`} className="flex items-center gap-3 w-full">
-                      <Shield className="h-4 w-4 shrink-0" />
-                      <span>Beveiliging</span>
-                    </Link>
-                  </AppDropdownItem>
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
-                  >
-                    <Link href={`${basePath}/settings?tab=abonnement`} className="flex items-center gap-3 w-full">
-                      <CreditCard className="h-4 w-4 shrink-0" />
-                      <span>Abonnement</span>
-                    </Link>
-                  </AppDropdownItem>
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
-                  >
-                    <Link href={`${basePath}/settings?tab=koppelingen`} className="flex items-center gap-3 w-full">
-                      <SettingsIcon className="h-4 w-4 shrink-0" />
-                      <span>Koppelingen</span>
-                    </Link>
-                  </AppDropdownItem>
+                  {[
+                    { href: `${basePath}/settings?tab=account`, icon: User, label: 'Account' },
+                    { href: `${basePath}/settings?tab=beveiliging`, icon: Shield, label: 'Beveiliging' },
+                    { href: `${basePath}/settings?tab=abonnement`, icon: CreditCard, label: 'Abonnement' },
+                    { href: `${basePath}/settings?tab=koppelingen`, icon: SettingsIcon, label: 'Koppelingen' },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <AppDropdownItem
+                      key={label}
+                      asChild
+                      className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#9FE870] dark:hover:bg-[#9FE870]/70 hover:text-[#163300] dark:hover:text-[#163300] focus:bg-[#9FE870] dark:focus:bg-[#9FE870]/70 focus:text-[#163300] dark:focus:text-[#163300]"
+                    >
+                      <Link href={href} className="flex items-center gap-3 w-full">
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                      </Link>
+                    </AppDropdownItem>
+                  ))}
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 py-1">
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
-                  >
-                    <Link href="/privacy" className="flex items-center gap-3 w-full">
-                      <ExternalLink className="h-4 w-4 shrink-0" />
-                      <span>Privacy</span>
-                    </Link>
-                  </AppDropdownItem>
-                  <AppDropdownItem
-                    asChild
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white"
-                  >
-                    <Link href="/terms" className="flex items-center gap-3 w-full">
-                      <ExternalLink className="h-4 w-4 shrink-0" />
-                      <span>Algemene voorwaarden</span>
-                    </Link>
-                  </AppDropdownItem>
+                  {[
+                    { href: '/privacy', label: 'Privacy' },
+                    { href: '/terms', label: 'Algemene voorwaarden' },
+                  ].map(({ href, label }) => (
+                    <AppDropdownItem
+                      key={label}
+                      asChild
+                      className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-gray-900 dark:hover:text-white"
+                    >
+                      <Link href={href} className="flex items-center gap-3 w-full">
+                        <ExternalLink className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                      </Link>
+                    </AppDropdownItem>
+                  ))}
                 </div>
                 <div className="mx-3 my-0.5 h-px bg-[#e8e8e8] dark:bg-neutral-700" />
                 <div className="px-1.5 pt-1 pb-1.5">
                   <AppDropdownItem
-                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-red-600 dark:hover:text-red-400 focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-red-600 dark:focus:text-red-400"
+                    className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 hover:text-red-600 dark:hover:text-red-400"
                     onSelect={async () => {
-                      if (isDemo) {
-                        clearDemoCookie()
-                        window.location.href = '/'
-                      } else {
-                        await signOut()
-                        window.location.href = '/'
-                      }
+                      if (isDemo) { clearDemoCookie(); window.location.href = '/' }
+                      else { await signOut(); window.location.href = '/' }
                     }}
                   >
                     <LogOut className="h-4 w-4 shrink-0" />
@@ -330,12 +270,26 @@ export function ContentHeader({ onMenuClick, stickyOffsetClassName, basePath = '
                 </div>
               </AppDropdownContent>
             </DropdownMenu>
-            </>
-          )}
-        </div>
+          </>
+        )}
+
+        {/* Trial pill */}
+        {showTrialPill && (
+          <Link
+            href={`${basePath}/upgrade`}
+            className="hidden sm:flex items-center gap-1.5 h-[34px] rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 px-2.5 transition-colors"
+          >
+            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">Proefperiode</span>
+            <svg width="16" height="16" viewBox="0 0 18 18" className="shrink-0 -rotate-90">
+              <circle cx="9" cy="9" r="7" fill="none" strokeWidth="4" className="stroke-[#163300]/15 dark:stroke-[#9FE870]/20" />
+              <circle cx="9" cy="9" r="7" fill="none" strokeWidth="4" strokeLinecap="round"
+                className="stroke-[#163300] dark:stroke-[#9FE870]"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - trialPct / 100)} />
+            </svg>
+          </Link>
+        )}
       </div>
     </header>
   )
 }
-
-

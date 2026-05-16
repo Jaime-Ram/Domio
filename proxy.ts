@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+const LANDLORD_BASE = '/dashboard/landlord'
+const SUBSCRIPTION_EXEMPT = [
+  `${LANDLORD_BASE}/upgrade`,
+  `${LANDLORD_BASE}/settings`,
+]
+
+function isSubscriptionExempt(pathname: string): boolean {
+  return SUBSCRIPTION_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
@@ -80,6 +90,27 @@ export async function proxy(request: NextRequest) {
     }
     if (role && role !== 'huurder' && pathname.startsWith('/dashboard/tenant')) {
       return NextResponse.redirect(new URL(landlordHome, request.url))
+    }
+
+    // Subscription gate: only for landlord dashboard
+    if (pathname.startsWith(LANDLORD_BASE) && role !== 'huurder' && !isSubscriptionExempt(pathname)) {
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('status, trial_ends_at')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (!sub) {
+        return NextResponse.redirect(new URL(`${LANDLORD_BASE}/upgrade`, request.url))
+      }
+
+      const isActive =
+        sub.status === 'active' ||
+        (sub.status === 'trialing' && new Date(sub.trial_ends_at) > new Date())
+
+      if (!isActive) {
+        return NextResponse.redirect(new URL(`${LANDLORD_BASE}/upgrade`, request.url))
+      }
     }
   }
 

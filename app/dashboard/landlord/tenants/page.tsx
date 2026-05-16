@@ -19,11 +19,9 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
-import { HuurovereenkomstDialog } from '@/components/tenants/huurovereenkomst-dialog'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 
 type TenantRow = {
@@ -45,7 +43,6 @@ function TenantsPageContent() {
   const { user, isDemo, basePath } = useDashboardUser()
   const [tenants, setTenants] = useState<TenantRow[]>([])
   const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
 
   const { sort: tenantSort, toggleSort } = useSortable<string>()
 
@@ -59,9 +56,7 @@ function TenantsPageContent() {
   })
   const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [newTenantOpen, setNewTenantOpen] = useState(false)
-  const [leaseDialogOpen, setLeaseDialogOpen] = useState(false)
-  const [leaseDialogTenant, setLeaseDialogTenant] = useState<{ id: string; name: string; email?: string; phone?: string } | null>(null)
-  const [pendingTenantNav, setPendingTenantNav] = useState<string | null>(null)
+
 
   useEffect(() => {
     if (searchParams.get('nieuw') === '1') {
@@ -93,7 +88,7 @@ function TenantsPageContent() {
     }
     leaseQueries.getByOwner(user.id).then((leases) => {
       const rows: TenantRow[] = (leases || [])
-        .filter((l: any) => l.status === 'actief' && l.tenants)
+        .filter((l: any) => ['actief', 'concept'].includes(l.status) && l.tenants)
         .map((l: any) => ({
           id: l.tenants?.id ?? l.id,
           name: l.tenants?.full_name ?? '',
@@ -111,29 +106,24 @@ function TenantsPageContent() {
   }, [user?.id, isDemo])
 
   const onTenantCreated = (t: CreatedTenantPayload) => {
-    if (isDemo) {
-      setTenants((prev) => [
-        {
-          id: t.id,
-          name: t.full_name,
-          email: t.email ?? '',
-          phone: t.phone ?? '',
-          propertyName: t.propertyName ?? '',
-          monthlyRent: t.monthlyRent ?? 0,
-          startDate: t.startDate ?? null,
-          endDate: null,
-          status: 'actief',
-          balance: 0,
-        },
-        ...prev,
-      ])
-    } else {
-      setPendingTenantNav(
-        `${basePath}/tenants/${t.id}${t.leaseLinkFailed ? '?koppeling=mislukt' : ''}`
-      )
+    setTenants((prev) => [
+      {
+        id: t.id,
+        name: t.full_name,
+        email: t.email ?? '',
+        phone: t.phone ?? '',
+        propertyName: t.propertyName ?? '',
+        monthlyRent: t.monthlyRent ?? 0,
+        startDate: t.startDate ?? null,
+        endDate: null,
+        status: 'actief',
+        balance: 0,
+      },
+      ...prev,
+    ])
+    if (!isDemo && t.leaseLinkFailed) {
+      router.push(`${basePath}/tenants/${t.id}?koppeling=mislukt`)
     }
-    setLeaseDialogTenant({ id: t.id, name: t.full_name, email: t.email ?? undefined, phone: t.phone ?? undefined })
-    setLeaseDialogOpen(true)
   }
 
   const getBalanceCategory = (balance: number | undefined) => {
@@ -204,7 +194,6 @@ function TenantsPageContent() {
   if (loading) {
     return (
       <>
-        <SectionNavDashboard title="Huurders" items={[]} titleVariant="hero" />
         <div className="flex items-center justify-center min-h-[200px]">
           <p className="text-gray-500">Laden...</p>
         </div>
@@ -283,15 +272,13 @@ function TenantsPageContent() {
 
   return (
     <>
-            <SectionNavDashboard title="Huurders" items={[]} titleVariant="hero" />
             <div className="flex flex-col gap-8">
             <TableToolbar
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder="Zoek huurder, e-mail, object…"
               filterContent={filterContent}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
+
               onAdd={() => setNewTenantOpen(true)}
               addLabel="Nieuw contract"
             />
@@ -344,10 +331,14 @@ function TenantsPageContent() {
                         {/* Status */}
                         <div>
                           <span className={cn(
-                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium text-white',
-                            tenant.status === 'actief' ? 'bg-[#2F5711]' : 'bg-[#A8200D]'
+                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                            tenant.status === 'actief'
+                              ? 'bg-[#2F5711] text-white'
+                              : tenant.status === 'concept'
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                              : 'bg-[#A8200D] text-white'
                           )}>
-                            {tenant.status}
+                            {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status}
                           </span>
                         </div>
                         {/* Chevron */}
@@ -365,16 +356,6 @@ function TenantsPageContent() {
         onClose={() => setNewTenantOpen(false)}
         onCreated={onTenantCreated}
       />
-
-      {leaseDialogTenant && (
-        <HuurovereenkomstDialog
-          open={leaseDialogOpen}
-          onClose={() => { setLeaseDialogOpen(false); setLeaseDialogTenant(null) }}
-          onCreated={() => { setLeaseDialogOpen(false); setLeaseDialogTenant(null) }}
-          tenant={leaseDialogTenant}
-        />
-      )}
-
       <TenantDetailSheet
         tenantId={selectedTenantId}
         open={!!selectedTenantId}

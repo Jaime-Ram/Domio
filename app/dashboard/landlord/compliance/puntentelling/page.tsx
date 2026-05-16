@@ -12,16 +12,11 @@ import {
   Calculator, AlertTriangle, BarChart3, CheckCircle2,
   RotateCcw,
 } from 'lucide-react'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { mockWwsOptimalisatieAdviezen } from '@/lib/mock-data/wws-compliance'
 
-const getComplianceNav = (basePath: string) => [
-  { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-  { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-  { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-]
 
 type EnergyLabel = 'A+++' | 'A++' | 'A+' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G'
 
@@ -87,7 +82,6 @@ interface BreakdownItem { label: string; punten: number; toelichting: string }
 
 export default function PuntentellingPage() {
   const { basePath } = useDashboardUser()
-  const COMPLIANCE_NAV = getComplianceNav(basePath)
   const [form, setForm] = useState<FormState>(INITIAL_FORM)
   const [currentHuur, setCurrentHuur] = useState('')
 
@@ -139,7 +133,6 @@ export default function PuntentellingPage() {
 
   return (
     <>
-      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-content-blocks items-start">
         {/* Form */}

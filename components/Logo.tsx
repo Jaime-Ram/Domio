@@ -14,11 +14,9 @@ export interface LogoProps {
 }
 
 export function Logo({ width = 140, height = 40, className, imgClassName, variant = 'default', href = '/' }: LogoProps) {
-  // Gebruik altijd DomioLogo.png als primair logo
   const [imgSrc, setImgSrc] = useState('/images/DomioLogo.png')
   const [hasError, setHasError] = useState(false)
 
-  // Fallback chain: DomioLogo.png -> Logo.png -> text logo
   const handleError = () => {
     if (imgSrc === '/images/DomioLogo.png') {
       setImgSrc('/images/Logo.png')
@@ -30,7 +28,6 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
   }
 
   if (hasError) {
-    // Als logo niet bestaat, toon tekst logo met kleuren die matchen je brand
     return (
       <Link href={href} className={`flex items-center gap-2 ${className || ''}`}>
         <span className="text-2xl font-bold">
@@ -41,15 +38,6 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
     )
   }
 
-  const imageClass = [
-    'h-auto object-contain',
-    variant === 'white' ? 'brightness-0 invert' : '',
-    imgClassName || '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  // Donkergroen (#163300): alleen de logo-vorm, geen blok – via filter
   const darkGreenFilter =
     'brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(2000%) hue-rotate(128deg)'
 
@@ -58,15 +46,15 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
       <Image
         src={`${imgSrc}?v=2`}
         alt="Domio Logo"
-        width={width}
-        height={height}
+        width={341}
+        height={70}
         priority
-        className={imageClass}
+        className={imgClassName || ''}
         style={{
-          maxWidth: width,
-          maxHeight: height,
+          height: height,
           width: 'auto',
-          height: 'auto',
+          maxWidth: '100%',
+          ...(variant === 'white' ? { filter: 'brightness(0) invert(1)' } : {}),
           ...(variant === 'default' ? { filter: darkGreenFilter } : {}),
         }}
         onError={handleError}
@@ -76,5 +64,4 @@ export function Logo({ width = 140, height = 40, className, imgClassName, varian
   )
 }
 
-// Default export for compatibility
 export default Logo

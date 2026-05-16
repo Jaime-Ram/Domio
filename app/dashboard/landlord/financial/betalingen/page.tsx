@@ -61,7 +61,7 @@ export default function GeldstromenPage() {
             rent_expectations (
               lease_id,
               due_period,
-              leases ( id, tenant_id, unit_id )
+              leases ( id, unit_id )
             )
           )
         `)
@@ -94,15 +94,16 @@ export default function GeldstromenPage() {
         .eq('due_period', monthStart),
     ])
 
-    if (txRes.error) console.error('[betalingen] raw_transactions query error:', txRes.error)
-    if (propRes.error) console.error('[betalingen] properties query error:', propRes.error)
-    if (expRes.error) console.error('[betalingen] rent_expectations query error:', expRes.error)
+    if (txRes.error) console.error('[betalingen] raw_transactions:', txRes.error.message, txRes.error.code, txRes.error.details)
+    if (propRes.error) console.error('[betalingen] properties:', propRes.error.message, propRes.error.code)
+    if (expRes.error) console.error('[betalingen] rent_expectations:', expRes.error.message, expRes.error.code)
 
     // Build lookup maps from properties data for resolving names
     const propById = new Map<string, { name: string; address: string }>()
     const unitToPropertyId = new Map<string, string>()
     const unitById = new Map<string, string>()
     const tenantById = new Map<string, string>()
+    const unitToTenantId = new Map<string, string>()
     for (const p of (propRes.data ?? []) as any[]) {
       propById.set(p.id, { name: p.name, address: p.address })
       for (const u of p.units ?? []) {
@@ -111,6 +112,9 @@ export default function GeldstromenPage() {
         for (const l of u.leases ?? []) {
           if (l.tenant_id && l.tenants?.full_name) {
             tenantById.set(l.tenant_id, l.tenants.full_name)
+          }
+          if (l.tenant_id && l.status === 'active') {
+            unitToTenantId.set(u.id, l.tenant_id)
           }
         }
       }
@@ -127,9 +131,9 @@ export default function GeldstromenPage() {
       if (raw) {
         const lease = raw.rent_expectations?.leases ?? null
         const lease_id = raw.rent_expectations?.lease_id ?? null
-        const tenant_id = lease?.tenant_id ?? null
         // unit_id: directly on assignment (non-huur eenheid) or from lease (huur)
         const unit_id = raw.unit_id ?? (lease?.unit_id ?? null)
+        const tenant_id = unit_id ? (unitToTenantId.get(unit_id) ?? null) : null
         // property_id: from the assignment directly or derived from unit
         const property_id = raw.property_id ?? (unit_id ? (unitToPropertyId.get(unit_id) ?? null) : null)
         const propInfo = property_id ? propById.get(property_id) : null

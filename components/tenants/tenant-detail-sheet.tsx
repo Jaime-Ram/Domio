@@ -329,8 +329,8 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
         initEditForm(tenantData)
         setLeases((allLeases || []).filter((l: any) => l.tenant_id === tenantId))
       } catch (err) {
-        const e = err as { code?: string }
-        if (e?.code !== 'PGRST116') console.error(err)
+        const code = (err as { code?: string })?.code
+        if (code !== 'PGRST116' && err instanceof Error) console.error(err)
       } finally {
         setLoading(false)
       }

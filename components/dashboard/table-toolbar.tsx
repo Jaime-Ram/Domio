@@ -22,6 +22,7 @@ interface TableToolbarProps {
   onAdd?: () => void
   addLabel?: string
   addDisabled?: boolean
+  secondaryAction?: { label: string; onClick: () => void }
   // Slot for extra controls rendered before search (e.g. "Selecteer" for bulk)
   extra?: React.ReactNode
   className?: string
@@ -37,6 +38,7 @@ export function TableToolbar({
   onAdd,
   addLabel = 'Nieuw',
   addDisabled,
+  secondaryAction,
   extra,
   className,
 }: TableToolbarProps) {
@@ -96,6 +98,16 @@ export function TableToolbar({
         </Button>
       )}
 
+      {secondaryAction && (
+        <Button
+          type="button"
+          onClick={secondaryAction.onClick}
+          variant="outline"
+          className="rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0"
+        >
+          {secondaryAction.label}
+        </Button>
+      )}
       {onAdd && (
         <Button
           type="button"

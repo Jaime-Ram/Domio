@@ -32,7 +32,7 @@ import {
 } from 'lucide-react'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { AssignDrawer } from './AssignDrawer'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
+import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
 import {
   dashboardCardClass,
@@ -599,7 +599,7 @@ export function TransactionsInbox({
           <div className="grid gap-4 py-2">
             <div className="grid gap-2">
               <Label htmlFor="add-pay-date">Datum</Label>
-              <WiseDatePicker
+              <DatePicker
                 value={addForm.value_date}
                 onChange={(v) => setAddForm((f) => ({ ...f, value_date: v }))}
                 placeholder="Kies datum"

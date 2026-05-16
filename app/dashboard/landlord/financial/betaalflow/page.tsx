@@ -44,7 +44,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
 } from 'lucide-react'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
@@ -53,7 +53,7 @@ import {
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
-import { getFinancialNav } from '../nav'
+
 import {
   paymentProfileQueries,
   type PaymentProfile,
@@ -145,7 +145,6 @@ function ReminderBuilder({
 
 export default function BetaalflowPage() {
   const { user, isDemo, basePath } = useDashboardUser()
-  const FINANCIAL_NAV = getFinancialNav(basePath)
 
   const [profiles, setProfiles] = useState<PaymentProfile[]>([])
   const [loading, setLoading] = useState(true)

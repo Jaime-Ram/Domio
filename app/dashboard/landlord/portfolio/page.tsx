@@ -32,7 +32,7 @@ import {
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import {
@@ -143,7 +143,6 @@ export default function PortfolioPage() {
   const [typeFilter, setTypeFilter] = useState<Record<string, boolean>>({
     appartement: true, huis: true, overig: true,
   })
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const { sort: propSort, toggleSort } = useSortable<string>()
   const { sort: legalSortState, toggleSort: toggleLegalSort } = useSortable<string>()
 
@@ -382,7 +381,6 @@ export default function PortfolioPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <>
-      <SectionNavDashboard title="Portefeuille" items={[]} titleVariant="hero" />
 
       {/* ── KPI strip ─────────────────────────────────────────────────────── */}
       {!loading && (
@@ -461,16 +459,6 @@ export default function PortfolioPage() {
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800"
-                    onClick={() => { setViewMode(viewMode === 'table' ? 'grid' : 'table'); setSelectedIds(new Set()) }}
-                    aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
-                  >
-                    {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
-                  </Button>
                   <Button
                     onClick={() => setNewPropertyOpen(true)}
                     disabled={creating}
@@ -742,46 +730,6 @@ export default function PortfolioPage() {
             loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                 {[0, 1, 2].map((i) => <div key={i} className="h-40 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />)}
-              </div>
-            ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                {sortedProperties.map((prop) => (
-                  <div
-                    key={prop.id}
-                    className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 hover:border-[#163300] dark:hover:border-[#9FE870] transition-colors cursor-pointer"
-                    onClick={() => setSelectedPropertyId(prop.id)}
-                  >
-                    {prop.portfolioName && (
-                      <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1.5 flex items-center gap-1">
-                        <Briefcase className="h-3 w-3" />{prop.portfolioName}
-                      </p>
-                    )}
-                    <div className="flex items-start gap-3">
-                      <div className={cn('h-9 w-9 rounded-xl shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                        <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 dark:text-white truncate text-sm">{prop.name}</p>
-                        <p className="text-xs text-gray-500 capitalize">{prop.type}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-neutral-800">
-                      <div>
-                        <p className="text-[11px] text-gray-400">Eenheden</p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{prop.units.length}</p>
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-gray-400">Maandhuur</p>
-                        <p className="text-sm font-semibold text-[#163300] dark:text-[#9FE870]">
-                          €{getMonthlyIncome(prop).toLocaleString('nl-NL')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
-                      <MapPin className="h-3 w-3" />{prop.address}
-                    </div>
-                  </div>
-                ))}
               </div>
             ) : (
               <div>

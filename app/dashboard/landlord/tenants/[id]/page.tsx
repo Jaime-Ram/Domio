@@ -41,6 +41,8 @@ import {
   Tag,
   ExternalLink,
   Plus,
+  Send,
+  Loader2,
 } from 'lucide-react'
 import { mockPayments } from '@/lib/mock-data/vastgoed'
 import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
@@ -61,6 +63,31 @@ export default function TenantDetailPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [tags, setTags] = useState<string[]>(isDemo ? ['Langdurige huurder'] : [])
   const [newTag, setNewTag] = useState('')
+  const [inviteSending, setInviteSending] = useState(false)
+  const [inviteSent, setInviteSent] = useState(false)
+
+  async function handleSendInvitation() {
+    if (isDemo || !tenant?.email) return
+    setInviteSending(true)
+    try {
+      const res = await fetch('/api/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId }),
+      })
+      if (!res.ok) {
+        const body = await res.json()
+        alert(body.error || 'Versturen mislukt')
+        return
+      }
+      setInviteSent(true)
+      setTimeout(() => setInviteSent(false), 4000)
+    } catch {
+      alert('Uitnodiging versturen mislukt')
+    } finally {
+      setInviteSending(false)
+    }
+  }
 
   useEffect(() => {
     if (tenantId === 'new') {
@@ -222,6 +249,23 @@ export default function TenantDetailPage() {
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">
                       Up-to-date
                     </Badge>
+                  )}
+                  {tenant?.email && !tenant?.profile_id && (
+                    <Button
+                      variant="outline"
+                      className="rounded-full gap-2 text-sm"
+                      onClick={handleSendInvitation}
+                      disabled={inviteSending || inviteSent}
+                    >
+                      {inviteSending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : inviteSent ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      {inviteSent ? 'Verstuurd!' : 'Uitnodigen'}
+                    </Button>
                   )}
                   <Button
                     variant="outline"

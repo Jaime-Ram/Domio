@@ -241,10 +241,20 @@ export interface Database {
           id: string
           owner_id: string
           unit_id: string | null
+          property_id: string | null
+          lease_id: string | null
+          scope: 'pand' | 'persoon' | null
           title: string
           description: string | null
-          status: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
+          status: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
           priority: 'laag' | 'normaal' | 'hoog' | 'urgent'
+          due_date: string | null
+          category: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
+          source: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          ticket_number: number | null
+          assignee_id: string | null
+          sla_deadline: string | null
+          resolved_at: string | null
           created_at: string
           updated_at: string
         }
@@ -252,10 +262,19 @@ export interface Database {
           id?: string
           owner_id: string
           unit_id?: string | null
+          property_id?: string | null
+          lease_id?: string | null
+          scope?: 'pand' | 'persoon' | null
           title: string
           description?: string | null
-          status?: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
+          status?: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
           priority?: 'laag' | 'normaal' | 'hoog' | 'urgent'
+          due_date?: string | null
+          category?: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
+          source?: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          assignee_id?: string | null
+          sla_deadline?: string | null
+          resolved_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -263,10 +282,19 @@ export interface Database {
           id?: string
           owner_id?: string
           unit_id?: string | null
+          property_id?: string | null
+          lease_id?: string | null
+          scope?: 'pand' | 'persoon' | null
           title?: string
           description?: string | null
-          status?: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
+          status?: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
           priority?: 'laag' | 'normaal' | 'hoog' | 'urgent'
+          due_date?: string | null
+          category?: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
+          source?: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          assignee_id?: string | null
+          sla_deadline?: string | null
+          resolved_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -277,6 +305,7 @@ export interface Database {
           ticket_id: string
           sender_id: string | null
           content: string
+          visibility: 'public' | 'internal' | null
           created_at: string
         }
         Insert: {
@@ -284,6 +313,7 @@ export interface Database {
           ticket_id: string
           sender_id?: string | null
           content: string
+          visibility?: 'public' | 'internal' | null
           created_at?: string
         }
         Update: {
@@ -291,6 +321,112 @@ export interface Database {
           ticket_id?: string
           sender_id?: string | null
           content?: string
+          visibility?: 'public' | 'internal' | null
+          created_at?: string
+        }
+      }
+      ticket_events: {
+        Row: {
+          id: string
+          ticket_id: string
+          actor_id: string | null
+          event_type: string
+          from_value: string | null
+          to_value: string | null
+          metadata: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ticket_id: string
+          actor_id?: string | null
+          event_type: string
+          from_value?: string | null
+          to_value?: string | null
+          metadata?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ticket_id?: string
+          actor_id?: string | null
+          event_type?: string
+          from_value?: string | null
+          to_value?: string | null
+          metadata?: Json | null
+          created_at?: string
+        }
+      }
+      work_orders: {
+        Row: {
+          id: string
+          ticket_id: string
+          owner_id: string
+          vendor_name: string | null
+          description: string | null
+          scheduled_at: string | null
+          cost_estimate: number | null
+          cost_actual: number | null
+          status: 'concept' | 'ingepland' | 'uitgevoerd' | 'gefactureerd'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          ticket_id: string
+          owner_id: string
+          vendor_name?: string | null
+          description?: string | null
+          scheduled_at?: string | null
+          cost_estimate?: number | null
+          cost_actual?: number | null
+          status?: 'concept' | 'ingepland' | 'uitgevoerd' | 'gefactureerd'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          ticket_id?: string
+          owner_id?: string
+          vendor_name?: string | null
+          description?: string | null
+          scheduled_at?: string | null
+          cost_estimate?: number | null
+          cost_actual?: number | null
+          status?: 'concept' | 'ingepland' | 'uitgevoerd' | 'gefactureerd'
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      ticket_attachments: {
+        Row: {
+          id: string
+          ticket_id: string
+          owner_id: string
+          uploader_id: string | null
+          file_name: string
+          mime_type: string | null
+          storage_path: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ticket_id: string
+          owner_id: string
+          uploader_id?: string | null
+          file_name: string
+          mime_type?: string | null
+          storage_path: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ticket_id?: string
+          owner_id?: string
+          uploader_id?: string | null
+          file_name?: string
+          mime_type?: string | null
+          storage_path?: string
           created_at?: string
         }
       }
@@ -542,6 +678,9 @@ export type Tenant = Database['public']['Tables']['tenants']['Row']
 export type Lease = Database['public']['Tables']['leases']['Row']
 export type Ticket = Database['public']['Tables']['tickets']['Row']
 export type Message = Database['public']['Tables']['messages']['Row']
+export type TicketEvent = Database['public']['Tables']['ticket_events']['Row']
+export type WorkOrder = Database['public']['Tables']['work_orders']['Row']
+export type TicketAttachment = Database['public']['Tables']['ticket_attachments']['Row']
 export type WWS = Database['public']['Tables']['wws']['Row']
 export type Document = Database['public']['Tables']['documents']['Row']
 export type Payment = Database['public']['Tables']['payments']['Row']

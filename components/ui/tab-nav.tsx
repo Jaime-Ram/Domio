@@ -62,13 +62,13 @@ export function TabNav<T extends string = string>({
             'pb-2 font-semibold transition-colors duration-200 whitespace-nowrap',
             i < tabs.length - 1 && 'mr-6',
             activeTab === tab.id
-              ? 'text-[#163300] dark:text-[#9FE870]'
+              ? 'text-[#15803D] dark:text-[#4ADE80]'
               : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
           )}
         >
           <span ref={setLabelRef(tab.id)} className="inline-block">{tab.label}</span>
           {tab.count !== undefined && (
-            <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870] px-1">
+            <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#15803D]/15 text-[11px] font-medium text-[#15803D] dark:bg-[#4ADE80]/20 dark:text-[#4ADE80] px-1">
               {tab.count}
             </span>
           )}
@@ -77,7 +77,7 @@ export function TabNav<T extends string = string>({
 
       {/* Animated underline indicator */}
       <div
-        className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
+        className="absolute bottom-0 h-[2px] rounded-full bg-[#15803D] dark:bg-[#4ADE80] transition-all duration-200"
         style={{ left: indicator.left, width: indicator.width }}
       />
     </div>

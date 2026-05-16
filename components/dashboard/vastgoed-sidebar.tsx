@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/Logo'
-import { 
+import {
   LayoutDashboard,
   Building2,
   Users,
@@ -13,23 +13,11 @@ import {
   CreditCard,
   Receipt,
   Calculator,
-  Eye,
   Settings,
-  FolderOpen,
-  UserCircle,
-  Bell,
-  Scan,
-  CheckCircle,
-  Calendar,
   BarChart3,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   PanelLeftClose,
   PanelRightClose,
-  Briefcase,
-  MessageSquare,
-  Archive,
   ShieldCheck,
   Euro,
   BookOpen,
@@ -38,14 +26,14 @@ import {
   HardDrive,
   HelpCircle,
   Ticket,
-  CalendarClock,
-  Percent,
+  Calendar,
   Workflow,
   Sparkles,
+  Smartphone,
+  Plug,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
 
 export interface SidebarItem {
   label: string
@@ -53,6 +41,12 @@ export interface SidebarItem {
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   children?: { label: string; href: string; icon?: React.ComponentType<{ className?: string; strokeWidth?: number }> }[]
   badge?: string | number
+  comingSoon?: boolean
+}
+
+export interface MenuGroup {
+  label?: string
+  items: SidebarItem[]
 }
 
 interface VastgoedSidebarProps {
@@ -60,28 +54,21 @@ interface VastgoedSidebarProps {
   onClose?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
-  /** Base path voor links (default: /dashboard/landlord). Voor demo: /demo/app */
   basePath?: string
-  /** Demo-modus: cleaner look, nav grijs zonder rand */
   demoMode?: boolean
-  /** Overschrijf de standaard menugroepen (bijv. voor huurderportal) */
-  menuGroups?: SidebarItem[][]
-  /** Toon de hulp-link onderaan (default: true) */
+  menuGroups?: MenuGroup[]
   showHulp?: boolean
 }
 
 export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, onToggleCollapse, basePath = '/dashboard/landlord', demoMode = false, menuGroups: menuGroupsProp, showHulp = true }: VastgoedSidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [openItems, setOpenItems] = useState<string[]>([])
   const [pendingHref, setPendingHref] = useState<string | null>(null)
 
-  // Zodra de echte pathname bijgewerkt is, wis de pending state
   useEffect(() => {
     setPendingHref(null)
   }, [pathname])
 
-  // Auto-expand alleen de sectie van de actieve route; maximaal één accordion open
   useEffect(() => {
     const menuItemsWithChildren = [
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
@@ -94,74 +81,80 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     setOpenItems(toOpen)
   }, [pathname, basePath])
 
-
   const toggleItem = (id: string) => {
-    setOpenItems(prev => 
-      prev.includes(id) 
+    setOpenItems(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [id]
     )
   }
 
-  const defaultMenuGroups: SidebarItem[][] = [
-    [
-      { label: 'Dashboard', href: basePath, icon: LayoutDashboard },
-      { label: 'Taken', href: `${basePath}/tasks`, icon: ClipboardCheck },
-      { label: 'Portefeuille', href: `${basePath}/portfolio`, icon: Building2 },
-      { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
-      { label: 'Communicatie', href: `${basePath}/messages`, icon: MessageSquare },
-      { label: 'Documenten', href: `${basePath}/documents`, icon: HardDrive },
-      {
-        label: 'Financieel',
-        icon: Euro,
-        children: [
-          { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
-          { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
-          { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: AlertTriangle },
-          { label: 'Huurafrekeningen', href: `${basePath}/financial/huurafrekening`, icon: Receipt },
-          { label: 'Betaalflow', href: `${basePath}/financial/betaalflow`, icon: Workflow },
-          { label: 'Verdeelsleutel', href: `${basePath}/financial/verdeelsleutel`, icon: BookOpen },
-        ],
-      },
-      {
-        label: 'Compliance',
-        icon: ShieldCheck,
-        children: [
-          { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-          { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-          { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-        ],
-      },
-      {
-        label: 'Onderhoud',
-        icon: Wrench,
-        children: [
-          { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
-          { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
-          { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
-        ],
-      },
-    ],
-    [
-      { label: 'Flow', href: `${basePath}/flow`, icon: Workflow },
-      { label: 'Domio Assist', href: `${basePath}/assist`, icon: Sparkles },
-    ],
-    [
-      { label: 'Accountinstellingen', href: `${basePath}/settings`, icon: Settings },
-    ],
+  const defaultMenuGroups: MenuGroup[] = [
+    {
+      label: 'Overzicht',
+      items: [
+        { label: 'Dashboard', href: basePath, icon: LayoutDashboard },
+        { label: 'Taken', href: `${basePath}/tasks`, icon: ClipboardCheck },
+      ],
+    },
+    {
+      label: 'Vastgoedbeheer',
+      items: [
+        { label: 'Portefeuille', href: `${basePath}/portfolio`, icon: Building2 },
+        { label: 'Huurders', href: `${basePath}/tenants`, icon: Users },
+        { label: 'Documenten', href: `${basePath}/documents`, icon: HardDrive },
+        {
+          label: 'Financieel',
+          icon: Euro,
+          children: [
+            { label: 'Dashboard', href: `${basePath}/financial`, icon: LayoutDashboard },
+            { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
+            { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: AlertTriangle },
+            { label: 'Huurafrekeningen', href: `${basePath}/financial/huurafrekening`, icon: Receipt },
+            { label: 'Verdeelsleutel', href: `${basePath}/financial/verdeelsleutel`, icon: BookOpen },
+          ],
+        },
+        {
+          label: 'Compliance',
+          icon: ShieldCheck,
+          children: [
+            { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
+            { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
+            { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
+          ],
+        },
+        {
+          label: 'Onderhoud',
+          icon: Wrench,
+          children: [
+            { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
+            { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
+            { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
+          ],
+        },
+        { label: 'Flows', href: `${basePath}/flows`, icon: Workflow },
+      ],
+    },
+    {
+      label: 'Meer',
+      items: [
+        { label: 'Integraties', href: `${basePath}/integrations`, icon: Plug, comingSoon: true },
+        { label: 'Domio Assist', href: `${basePath}/assist`, icon: Sparkles, comingSoon: true },
+        { label: 'App', href: `${basePath}/app`, icon: Smartphone, comingSoon: true },
+        { label: 'Accountinstellingen', href: `${basePath}/settings`, icon: Settings },
+      ],
+    },
   ]
 
   const menuGroups = menuGroupsProp ?? defaultMenuGroups
-
   const activePath = pendingHref ?? pathname
 
   const isActive = (href?: string) => {
-    if (!href) return false
+    if (!href || href === '#') return false
     if (href === basePath) return activePath === href
     return activePath === href || activePath?.startsWith(href + '/')
   }
 
-  /** Binnen een accordion alleen het meest specifieke (langste) pad als actief. */
   const getActiveChildHref = (children: SidebarItem['children']): string | null => {
     if (!children?.length) return null
     const matching = children.filter((c) => activePath === c.href || activePath.startsWith(c.href + '/'))
@@ -174,12 +167,23 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     return getActiveChildHref(children) !== null
   }
 
+  const itemClass = (active: boolean) => cn(
+    "flex items-center w-full py-[5px] px-3 text-[14px] rounded-md transition-colors duration-150 focus:outline-none text-left",
+    active
+      ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+      : "text-gray-700 hover:bg-gray-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
+  )
+
+  const labelClass = cn(
+    "min-w-0 whitespace-nowrap overflow-hidden transition-[max-width,opacity,margin-left] duration-300 ease-in-out",
+    collapsed ? "max-w-0 opacity-0 ml-0 flex-none" : "max-w-[200px] opacity-100 ml-3 flex-1"
+  )
+
   return (
     <>
-      {/* Overlay for mobile - hoge z-index zodat boven header en dropdowns */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-gray-900/50 z-[100] lg:hidden"
+          className="fixed inset-0 bg-gray-900/50 z-[100] md:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -187,66 +191,57 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       <div
         data-vastgoed-sidebar
         className={cn(
-          "fixed top-0 bottom-0 start-0 z-[110] bg-[#f4f4f4] dark:bg-neutral-800 transform rounded-tr-3xl rounded-br-3xl",
+          "fixed top-0 bottom-0 start-0 z-[110] bg-gray-50 dark:bg-neutral-800 transform rounded-tr-2xl rounded-br-2xl overflow-hidden",
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:fixed lg:z-auto lg:flex-shrink-0",
-          collapsed ? "lg:w-16" : "lg:w-64"
+          "md:translate-x-0 md:fixed md:z-auto md:flex-shrink-0",
+          collapsed ? "md:w-14" : "md:w-60"
         )}
-        style={{
-          transitionProperty: 'width, transform',
-          transitionDuration: '300ms',
-          transitionTimingFunction: 'ease-in-out',
-          willChange: 'width'
-        }}
+        style={{ transitionProperty: 'width, transform', transitionDuration: '300ms', transitionTimingFunction: 'ease-in-out', willChange: 'width' }}
       >
-        {/* Depth gradient — simuleert dat de sidebar achter de content ligt */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-5 rounded-tr-3xl rounded-br-3xl bg-gradient-to-l from-black/[0.035] to-transparent dark:from-black/[0.10] z-10"
+          className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-tr-2xl rounded-br-2xl bg-gradient-to-l from-black/[0.03] to-transparent dark:from-black/[0.08] z-10"
         />
+
         <div className="relative flex flex-col h-full max-h-full">
+          {/* Header */}
           <div className={cn(
-            "h-[5.25rem] flex items-center transition-all duration-300",
-            collapsed ? "pl-3 pr-2 justify-start" : "px-6 justify-between"
+            "h-14 flex items-center transition-all duration-300 flex-shrink-0",
+            collapsed ? "justify-center px-0" : "pl-[26px] pr-3 justify-between"
           )}>
-            {/* Logo - Disappears when collapsed */}
             <div className={cn(
               "flex items-center transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              <Logo width={100} height={28} href={basePath} />
+              <Logo width={58} height={16} href={basePath} />
             </div>
-            {/* Toggle button and mobile close - Same position as icons when collapsed */}
-            <div className={cn(
-              "flex items-center gap-2 transition-all duration-300",
-              collapsed ? "" : "ml-auto"
-            )}>
+            <div className={cn("flex items-center gap-1.5 transition-all duration-300", collapsed ? "" : "ml-auto")}>
               {onToggleCollapse && (
                 <button
                   type="button"
-                  className="hidden lg:flex items-center py-2 px-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="hidden md:flex items-center py-1.5 px-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
                   onClick={onToggleCollapse}
                   title={collapsed ? "Uitklappen" : "Inklappen"}
                 >
-                  {collapsed ? <PanelRightClose className="size-5 shrink-0" /> : <PanelLeftClose className="size-5 shrink-0" />}
+                  {collapsed ? <PanelRightClose className="size-4 shrink-0" /> : <PanelLeftClose className="size-4 shrink-0" />}
                 </button>
               )}
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden flex items-center justify-center h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-neutral-700"
+                className="md:hidden flex items-center justify-center h-7 w-7 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-neutral-700"
                 onClick={onClose}
-                title="Sluiten"
               >
                 <PanelLeftClose className="size-4 shrink-0" />
               </Button>
             </div>
           </div>
 
+          {/* Nav */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
             <nav
-              className={cn("w-full flex flex-col transition-[padding] duration-300 ease-in-out", collapsed ? "px-3 py-2" : "p-3")}
+              className="w-full flex flex-col py-2 px-2"
               onClick={(e) => {
                 const link = (e.target as HTMLElement).closest('a[href]')
                 if (link && onClose) onClose()
@@ -254,59 +249,41 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             >
               <div className="flex flex-col">
                 {menuGroups.map((group, groupIndex) => {
+                  const items = 'items' in group ? group.items : (group as unknown as SidebarItem[])
+                  const groupLabel = 'label' in group ? group.label : undefined
                   const renderItem = (item: SidebarItem) => {
                     const itemId = item.label.toLowerCase().replace(/\s+/g, '-') + '-accordion'
-                    const isOpen = openItems.includes(itemId)
+                    const isOpenAccordion = openItems.includes(itemId)
                     const hasActiveChild = isParentActive(item.children)
                     const Icon = item.icon
 
                     if (item.children) {
                       return (
-                        <li key={item.label} id={itemId} className="relative group">
+                        <li key={item.label} id={itemId} className="relative">
                           <button
                             type="button"
-                            onClick={() => {
-                              const firstHref = item.children![0].href
-                              toggleItem(itemId)
-                              if (!isOpen) {
-                                setPendingHref(firstHref)
-                                router.push(firstHref)
-                              }
-                            }}
-                            className={cn(
-                              "text-start flex items-center w-full py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-600 dark:text-neutral-200 transition-colors duration-150 focus:outline-none",
-                              hasActiveChild && "bg-gray-200 dark:bg-neutral-700"
-                            )}
+                            onClick={() => toggleItem(itemId)}
+                            className={itemClass(false)}
                             title={collapsed ? item.label : undefined}
                           >
-                            <Icon className="shrink-0 size-5 w-5 h-5" strokeWidth={hasActiveChild ? 2.5 : 2} />
-                            <span className={cn(
-                              "flex-1 ml-3.5 min-w-0 whitespace-nowrap transition-all duration-300 ease-in-out",
-                              collapsed ? "opacity-0 max-w-0 h-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
-                            )}>{item.label}</span>
-                            {item.badge && (
-                              <span className={cn(
-                                "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
-                                collapsed && "opacity-0 max-w-0 overflow-hidden"
-                              )}>
-                                {item.badge}
-                              </span>
-                            )}
-                            <ChevronDown
-                              className={cn(
-                                "ms-auto shrink-0 size-5 w-5 h-5 transition-all duration-300 ease-in-out",
-                                isOpen && "rotate-180",
-                                collapsed && "opacity-0 max-w-0 overflow-hidden w-0 ms-0"
-                              )}
-                            />
+                            <Icon className="shrink-0 size-[17px]" strokeWidth={hasActiveChild ? 2.5 : 2} />
+                            <span className={labelClass}>{item.label}</span>
+                            <ChevronDown className={cn(
+                              "shrink-0 size-3.5 text-gray-400 transition-[transform,opacity,max-width,margin] duration-300",
+                              isOpenAccordion && "rotate-180",
+                              collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[1rem] opacity-100 ml-auto"
+                            )} />
                           </button>
                           <div
-                            className={cn(
-                              "w-full overflow-hidden transition-all duration-300 ease-in-out",
-                              collapsed ? "hidden" : isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                            )}
+                            className={cn("w-full", collapsed && "hidden")}
+                            style={{
+                              display: collapsed ? 'none' : 'grid',
+                              gridTemplateRows: isOpenAccordion ? '1fr' : '0fr',
+                              transition: 'grid-template-rows 350ms cubic-bezier(0.22, 1, 0.36, 1)',
+                            }}
                           >
-                            <ul className="ps-8 pt-1 space-y-1">
+                            <div className="overflow-hidden">
+                            <ul className="ps-5 pt-0.5 pb-0.5 space-y-px">
                               {item.children.map((child) => {
                                 const ChildIcon = child.icon || FileText
                                 const active = getActiveChildHref(item.children) === child.href
@@ -315,20 +292,16 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                     <Link
                                       href={child.href}
                                       onClick={() => setPendingHref(child.href)}
-                                      className={cn(
-                                        "flex items-center py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-600 transition-all duration-150 focus:outline-none",
-                                        active
-                                          ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
-                                          : "text-gray-800 dark:text-neutral-200"
-                                      )}
+                                      className={itemClass(active, false)}
                                     >
-                                      <ChildIcon className="shrink-0 size-5 w-5 h-5" strokeWidth={active ? 2.5 : 2} />
-                                      <span className="ml-3.5">{child.label}</span>
+                                      <ChildIcon className="shrink-0 size-[15px]" strokeWidth={active ? 2.5 : 2} />
+                                      <span className="ml-3">{child.label}</span>
                                     </Link>
                                   </li>
                                 )
                               })}
                             </ul>
+                            </div>
                           </div>
                         </li>
                       )
@@ -336,33 +309,32 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
 
                     const active = isActive(item.href)
                     return (
-                      <li key={item.label} className="relative group">
+                      <li key={item.label} className="relative">
                         <Link
                           href={item.href || '#'}
-                          onClick={() => item.href && setPendingHref(item.href)}
-                          className={cn(
-                            "flex items-center w-full py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-600 transition-colors duration-150 focus:outline-none",
-                            active
-                              ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
-                              : "text-gray-800 dark:text-neutral-200"
-                          )}
+                          onClick={() => item.href && item.href !== '#' && setPendingHref(item.href)}
+                          className={itemClass(active)}
                           title={collapsed ? item.label : undefined}
                         >
-                          <Icon className="shrink-0 size-5 w-5 h-5" strokeWidth={active ? 2.5 : 2} />
-                          <span className={cn(
-                            "flex-1 ml-3.5 min-w-0 whitespace-nowrap transition-all duration-300 ease-in-out",
-                            collapsed ? "opacity-0 max-w-0 h-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
-                          )}>{item.label}</span>
+                          <Icon className="shrink-0 size-[17px]" strokeWidth={active ? 2.5 : 2} />
+                          <span className={labelClass}>{item.label}</span>
+                          {item.comingSoon && (
+                            <span className={cn(
+                              "text-[10px] font-medium text-gray-400 dark:text-neutral-500 shrink-0 overflow-hidden whitespace-nowrap transition-[max-width,opacity,margin] duration-300",
+                              collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[80px] opacity-100 ml-auto"
+                            )}>Binnenkort</span>
+                          )}
+                          {item.badge && !item.comingSoon && (
+                            <span className={cn(
+                              "px-1.5 py-0.5 text-[10px] font-medium bg-[#163300] text-white rounded-full shrink-0 overflow-hidden transition-[max-width,opacity,margin] duration-300",
+                              collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-auto"
+                            )}>{item.badge}</span>
+                          )}
                           {item.badge && (
                             <span className={cn(
-                              "px-2 py-0.5 text-xs font-medium bg-[#163300] text-white rounded-full shrink-0 transition-all duration-300 ease-in-out",
-                              collapsed && "opacity-0 max-w-0 overflow-hidden"
-                            )}>
-                              {item.badge}
-                            </span>
-                          )}
-                          {item.badge && collapsed && (
-                            <span className="absolute top-0 right-0 w-2 h-2 bg-[#163300] rounded-full" />
+                              "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#163300] rounded-full transition-opacity duration-300",
+                              collapsed ? "opacity-100" : "opacity-0"
+                            )} />
                           )}
                         </Link>
                       </li>
@@ -370,15 +342,17 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                   }
 
                   return (
-                    <div key={groupIndex}>
-                      {groupIndex > 0 && (
-                        <hr className={cn(
-                          "my-2 border-gray-200 dark:border-neutral-700",
-                          collapsed && "mx-1"
-                        )} />
+                    <div key={groupIndex} className={groupIndex > 0 ? "mt-4" : ""}>
+                      {groupLabel && (
+                        <p className={cn(
+                          "px-3 pt-0.5 pb-1 text-[12px] font-normal text-gray-500 dark:text-neutral-400 select-none transition-opacity duration-300",
+                          collapsed ? "opacity-0" : "opacity-100"
+                        )}>
+                          {groupLabel}
+                        </p>
                       )}
-                      <ul className="flex flex-col space-y-1">
-                        {group.map(renderItem)}
+                      <ul className="flex flex-col space-y-px">
+                        {items.map(renderItem)}
                       </ul>
                     </div>
                   )
@@ -387,34 +361,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             </nav>
           </div>
 
-          {/* Hulp - subtiel onderaan, geen apart blok */}
-          {showHulp && <div className="flex-shrink-0 px-3 py-2">
-            <Link
-              href={`${basePath}/hulp`}
-              className="flex items-center w-full py-2 px-2.5 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors text-gray-800 dark:text-neutral-200"
-              title={collapsed ? "Hulp nodig?" : undefined}
-            >
-              <HelpCircle className="shrink-0 size-5 w-5 h-5" />
-              <span className={cn(
-                "flex-1 ml-3.5 min-w-0 whitespace-nowrap transition-all duration-300 ease-in-out",
-                collapsed ? "opacity-0 max-w-0 h-0 overflow-hidden ml-0" : "opacity-100 max-w-full"
-              )}>Hulp nodig?</span>
-              <span className={cn(
-                "text-xs text-gray-500 dark:text-gray-400 font-normal shrink-0 transition-all duration-300 ease-in-out",
-                collapsed ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-full"
-              )}>Live</span>
-              {!collapsed && (
-                <span className="relative shrink-0 ml-1.5">
-                  <span className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-brand-accent animate-ping opacity-60" aria-hidden />
-                  <span className="relative block w-1.5 h-1.5 rounded-full bg-brand-accent" />
-                </span>
-              )}
-            </Link>
-          </div>}
-
         </div>
       </div>
     </>
   )
 }
-

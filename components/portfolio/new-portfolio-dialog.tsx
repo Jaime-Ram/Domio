@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/add-dialog-layout'
 import { Briefcase, Building2, Landmark } from 'lucide-react'
 import { portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
+import { DialogField } from '@/components/ui/dialog-field'
+import { Input } from '@/components/ui/input'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 
@@ -41,12 +43,6 @@ const ENTITY_TYPES = [
   'Overig',
 ]
 
-const tile = 'bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3'
-const label = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'
-const inputCls =
-  'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
-const selectTriggerCls =
-  'h-auto w-full p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
 
 export function NewPortfolioDialog({
   open,
@@ -169,41 +165,27 @@ export function NewPortfolioDialog({
             </p>
           )}
 
-          {/* Naam */}
-          <div className={tile}>
-            <p className={label}>
-              <Briefcase className="inline h-3 w-3 mr-1" />
-              Naam portefeuille *
-            </p>
-            <input
+          <DialogField label="Naam portefeuille" required>
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Privé — Jan Jansen of Jansen Vastgoed BV"
-              className={inputCls}
+              className="rounded-xl"
               autoFocus
             />
-          </div>
+          </DialogField>
 
-          {/* Rechtspersoon */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 px-1">
-              Eigenaar / rechtspersoon (optioneel)
+          <div className="space-y-3">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Eigenaar / rechtspersoon <span className="font-normal text-gray-400">(optioneel)</span>
             </p>
 
-            {/* Koppel aan bestaande rechtspersoon */}
             {!isDemo && (
-              <div className={tile}>
-                <p className={label}>
-                  <Landmark className="inline h-3 w-3 mr-1" />
-                  {loadingEntities ? 'Laden…' : existingEntities.length > 0 ? 'Koppel bestaande rechtspersoon' : 'Rechtspersoon'}
-                </p>
+              <DialogField label={loadingEntities ? 'Laden…' : existingEntities.length > 0 ? 'Koppel bestaande rechtspersoon' : 'Rechtspersoon'}>
                 {existingEntities.length > 0 ? (
-                  <Select
-                    value={selectedEntityId || '__nieuw'}
-                    onValueChange={handleEntitySelect}
-                  >
-                    <SelectTrigger className={selectTriggerCls}>
+                  <Select value={selectedEntityId || '__nieuw'} onValueChange={handleEntitySelect}>
+                    <SelectTrigger className="rounded-xl">
                       <SelectValue placeholder="— Nieuwe aanmaken —" />
                     </SelectTrigger>
                     <SelectContent>
@@ -218,31 +200,25 @@ export function NewPortfolioDialog({
                 ) : (
                   <p className="text-xs text-gray-400">Nog geen rechtspersonen — vul hieronder in</p>
                 )}
-              </div>
+              </DialogField>
             )}
 
-            {/* Naam + type + kvk (alleen tonen als geen bestaande geselecteerd) */}
             {!selectedEntityId && (
               <>
-                <div className={tile}>
-                  <p className={label}>
-                    <Building2 className="inline h-3 w-3 mr-1" />
-                    Naam eigenaar
-                  </p>
-                  <input
+                <DialogField label="Naam eigenaar" optional>
+                  <Input
                     type="text"
                     value={ownerName}
                     onChange={(e) => setOwnerName(e.target.value)}
                     placeholder="bijv. J.P. van der Berg of Jansen BV"
-                    className={inputCls}
+                    className="rounded-xl"
                   />
-                </div>
+                </DialogField>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div className={tile}>
-                    <p className={label}>Type rechtspersoon</p>
+                  <DialogField label="Type rechtspersoon" optional>
                     <Select value={entityType || '__geen'} onValueChange={(v) => setEntityType(v === '__geen' ? '' : v)}>
-                      <SelectTrigger className={selectTriggerCls}>
+                      <SelectTrigger className="rounded-xl">
                         <SelectValue placeholder="Kies type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -252,22 +228,21 @@ export function NewPortfolioDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className={tile}>
-                    <p className={label}>KvK-nummer</p>
-                    <input
+                  </DialogField>
+                  <DialogField label="KvK-nummer" optional>
+                    <Input
                       type="text"
                       value={kvk}
                       onChange={(e) => setKvk(e.target.value)}
                       placeholder="12345678"
-                      className={inputCls}
+                      className="rounded-xl"
                       maxLength={8}
                     />
-                  </div>
+                  </DialogField>
                 </div>
 
                 {ownerName.trim() && !isDemo && (
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 px-1">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     Er wordt automatisch een nieuwe rechtspersoon aangemaakt voor <strong className="text-gray-600 dark:text-gray-300">{ownerName}</strong>.
                   </p>
                 )}

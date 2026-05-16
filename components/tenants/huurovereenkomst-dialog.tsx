@@ -12,8 +12,11 @@ import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
   CreateDialogShell,
 } from '@/components/ui/add-dialog-layout'
-import { Building2, Calendar, Euro, FileText, StickyNote, Send } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Euro, FileText, StickyNote, Send } from 'lucide-react'
+import { DialogField } from '@/components/ui/dialog-field'
+import { DialogDateField } from '@/components/ui/dialog-date-field'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { leaseQueries, propertyQueries, unitQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -250,13 +253,6 @@ export function HuurovereenkomstDialog({
     }
   }
 
-  const tile = 'bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3'
-  const label = 'text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-1.5'
-  const inputCls =
-    'w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-neutral-600 outline-none border-0 p-0'
-  const selectTrigger =
-    'h-auto w-full p-0 text-sm font-medium text-gray-900 dark:text-white bg-transparent border-0 shadow-none focus:ring-0 [&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:text-gray-400'
-
   return (
     <CreateDialogShell
       open={open}
@@ -280,19 +276,14 @@ export function HuurovereenkomstDialog({
           </p>
         )}
 
-        {/* Object */}
-        <div className={tile}>
-          <p className={label}>
-            <Building2 className="inline h-3 w-3 mr-1" />
-            Object / eenheid *
-          </p>
+        <DialogField label="Object / eenheid" required>
           {loadingUnits ? (
             <p className="text-sm text-gray-400">Eenheden laden…</p>
           ) : unitOptions.length === 0 ? (
             <p className="text-sm text-gray-400">Geen vrije eenheden beschikbaar.</p>
           ) : (
             <Select value={unitId || '__geen'} onValueChange={(v) => handleUnitChange(v === '__geen' ? '' : v)}>
-              <SelectTrigger className={selectTrigger}>
+              <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder="Kies een eenheid" />
               </SelectTrigger>
               <SelectContent>
@@ -303,47 +294,35 @@ export function HuurovereenkomstDialog({
               </SelectContent>
             </Select>
           )}
-        </div>
+        </DialogField>
 
-        {/* Huurprijs + Borg */}
         <div className="grid grid-cols-2 gap-3">
-          <div className={tile}>
-            <p className={label}><Euro className="inline h-3 w-3 mr-1" />Huurprijs / mnd *</p>
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-gray-400">€</span>
-              <input type="number" min="0" step="0.01" value={monthlyRent}
+          <DialogField label="Huurprijs / mnd" required>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">€</span>
+              <Input type="number" min="0" step="0.01" value={monthlyRent}
                 onChange={(e) => setMonthlyRent(e.target.value)}
-                placeholder="0,00" className={cn(inputCls, 'flex-1')} />
+                placeholder="0,00" className="rounded-xl pl-7" />
             </div>
-          </div>
-          <div className={tile}>
-            <p className={label}><Euro className="inline h-3 w-3 mr-1" />Borg</p>
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-gray-400">€</span>
-              <input type="number" min="0" step="0.01" value={deposit}
+          </DialogField>
+          <DialogField label="Borg" optional>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">€</span>
+              <Input type="number" min="0" step="0.01" value={deposit}
                 onChange={(e) => setDeposit(e.target.value)}
-                placeholder="0,00" className={cn(inputCls, 'flex-1')} />
+                placeholder="0,00" className="rounded-xl pl-7" />
             </div>
-          </div>
+          </DialogField>
         </div>
 
-        {/* Datums */}
         <div className="grid grid-cols-2 gap-3">
-          <div className={tile}>
-            <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Startdatum *</p>
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={inputCls} />
-          </div>
-          <div className={tile}>
-            <p className={label}><Calendar className="inline h-3 w-3 mr-1" />Einddatum</p>
-            <input type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)} className={inputCls} />
-          </div>
+          <DialogDateField label="Startdatum" value={startDate} onChange={setStartDate} required />
+          <DialogDateField label="Einddatum" value={endDate} onChange={setEndDate} min={startDate} optional />
         </div>
 
-        {/* Factuurperiode */}
-        <div className={tile}>
-          <p className={label}><FileText className="inline h-3 w-3 mr-1" />Factuurperiode</p>
+        <DialogField label="Factuurperiode">
           <Select value={factuurPeriode} onValueChange={setFactuurPeriode}>
-            <SelectTrigger className={selectTrigger}><SelectValue /></SelectTrigger>
+            <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="maandelijks">Maandelijks</SelectItem>
               <SelectItem value="kwartaal">Per kwartaal</SelectItem>
@@ -351,15 +330,13 @@ export function HuurovereenkomstDialog({
               <SelectItem value="jaarlijks">Jaarlijks</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </DialogField>
 
-        {/* Notities */}
-        <div className={tile}>
-          <p className={label}><StickyNote className="inline h-3 w-3 mr-1" />Notities</p>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+        <DialogField label="Notities" optional>
+          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)}
             placeholder="Bijzondere voorwaarden…" rows={2}
-            className={cn(inputCls, 'resize-none leading-relaxed')} />
-        </div>
+            className="rounded-xl resize-none" />
+        </DialogField>
 
         {/* Contract preview */}
         {previewHtml && (

@@ -10,16 +10,11 @@ import {
   ArrowRight, ShieldCheck,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { mockWwsAlerts, type WWSAlert } from '@/lib/mock-data/wws-compliance'
 
-const getComplianceNav = (basePath: string) => [
-  { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-  { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-  { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-]
 
 const URGENCY_LABEL: Record<WWSAlert['urgency'], string> = {
   hoog: 'Hoog',
@@ -28,7 +23,6 @@ const URGENCY_LABEL: Record<WWSAlert['urgency'], string> = {
 
 export default function ComplianceAlertsPage() {
   const { basePath, isDemo } = useDashboardUser()
-  const COMPLIANCE_NAV = getComplianceNav(basePath)
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
 
   const alerts = (isDemo ? mockWwsAlerts : []).filter((a) => !dismissed.has(a.id))
@@ -37,7 +31,6 @@ export default function ComplianceAlertsPage() {
 
   return (
     <>
-      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
 
       {/* Summary */}
       <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">

@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { VastgoedSidebar } from "@/components/dashboard/vastgoed-sidebar"
 import { ContentHeader } from "@/components/dashboard/content-header"
+import { PageTitleBar } from "@/components/dashboard/page-title-bar"
 import { DocumentPreviewPanel } from '@/components/documents/document-preview-panel'
 import { DocumentPreviewProvider, useDocumentPreview } from '@/providers/document-preview-provider'
 import { cn } from '@/lib/utils'
-import { Logo } from '@/components/Logo'
 import { DashboardUserProvider, useDashboardUser } from '@/providers/dashboard-user-provider'
 import { usePathname } from 'next/navigation'
 import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
@@ -46,7 +46,7 @@ export default function EmployerDashboardLayout({
   }, [])
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1023px)')
+    const mq = window.matchMedia('(max-width: 767px)')
     setIsMobile(mq.matches)
     const onChange = () => setIsMobile(mq.matches)
     mq.addEventListener('change', onChange)
@@ -108,6 +108,18 @@ function EmployerLayoutInner({
     return () => mq.removeEventListener('change', fn)
   }, [])
 
+  // Auto-collapse sidebar at medium widths (768–1023px), expand at large (≥1024px)
+  useEffect(() => {
+    const mqMedium = window.matchMedia('(min-width: 768px) and (max-width: 1023px)')
+    const mqLarge = window.matchMedia('(min-width: 1024px)')
+    if (mqMedium.matches) setSidebarCollapsed(true)
+    const onMedium = (e: MediaQueryListEvent) => { if (e.matches) setSidebarCollapsed(true) }
+    const onLarge = (e: MediaQueryListEvent) => { if (e.matches) setSidebarCollapsed(false) }
+    mqMedium.addEventListener('change', onMedium)
+    mqLarge.addEventListener('change', onLarge)
+    return () => { mqMedium.removeEventListener('change', onMedium); mqLarge.removeEventListener('change', onLarge) }
+  }, [])
+
   const prevPreviewIdRef = useRef<string | null>(null)
   const sidebarCollapsedBeforePreviewRef = useRef<boolean>(false)
 
@@ -146,6 +158,7 @@ function EmployerLayoutInner({
   const showPreviewPanel = !!previewDocId && isLargeScreen
 
   return (
+    <DashboardUserProvider>
     <div className="flex flex-1 min-h-0 w-full">
       <VastgoedSidebar
         isOpen={sidebarOpen}
@@ -157,7 +170,7 @@ function EmployerLayoutInner({
         className={cn(
           'flex-1 flex flex-col min-w-0 w-full',
           'transition-[margin-left] duration-300 ease-in-out',
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64',
+          sidebarCollapsed ? 'md:ml-14' : 'md:ml-60',
           showPreviewPanel && 'lg:mr-[max(400px,50vw)]',
         )}
         style={{
@@ -167,35 +180,21 @@ function EmployerLayoutInner({
           willChange: 'margin-left',
         }}
       >
-        <DashboardUserProvider>
           <Require2FaRedirect />
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
-          {/* Vaste witruimte onder de header — consistent op alle pagina's */}
-          <div className="h-12 shrink-0" aria-hidden="true" />
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
-                'mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 pb-10 flex flex-col gap-content-blocks h-full min-h-0',
+                'mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 flex flex-col h-full min-h-0',
                 isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
               )}
             >
+              <PageTitleBar />
               <div className="flex min-h-0 flex-1 flex-col gap-content-blocks">
                 {children}
               </div>
-              {!isChatShell && (
-                <div className="flex justify-center items-center mt-16 pt-8">
-                  <Logo
-                    width={80}
-                    height={24}
-                    href="/dashboard/landlord"
-                    className="opacity-25 dark:opacity-15 hover:opacity-35 dark:hover:opacity-25 transition-opacity text-gray-400 dark:text-gray-600"
-                    imgClassName="grayscale brightness-90 dark:brightness-110"
-                  />
-                </div>
-              )}
             </div>
           </main>
-        </DashboardUserProvider>
       </div>
       {showPreviewPanel && previewDocId && (
         <div
@@ -206,6 +205,7 @@ function EmployerLayoutInner({
         </div>
       )}
     </div>
+    </DashboardUserProvider>
   )
 }
 

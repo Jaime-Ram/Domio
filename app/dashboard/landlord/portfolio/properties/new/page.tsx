@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { supabase } from '@/lib/supabase/client'
+import { getSubscriptionClient } from '@/lib/supabase/subscription'
 
 const PROPERTY_TYPES = [
   { value: 'appartement', label: 'Appartement' },
@@ -102,6 +103,20 @@ export default function NewPropertyPage() {
     setLoading(true)
     setError(null)
     try {
+      // Starter plan: max 50 panden
+      const sub = await getSubscriptionClient(user.id)
+      if (sub && sub.plan === 'starter') {
+        const { count } = await supabase
+          .from('properties')
+          .select('*', { count: 'exact', head: true })
+          .eq('owner_id', user.id)
+        if ((count ?? 0) >= 50) {
+          setError('Je Starter-abonnement heeft een limiet van 50 panden. Upgrade naar Pro voor onbeperkt panden.')
+          setLoading(false)
+          return
+        }
+      }
+
       const { error: err } = await supabase.from('properties').insert({
         owner_id: user.id,
         name: form.name || form.address || 'Nieuw pand',

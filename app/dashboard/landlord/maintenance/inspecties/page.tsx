@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { WiseDatePicker } from '@/components/ui/wise-date-picker'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -22,18 +22,13 @@ import {
   CheckCircle2, Clock, AlertTriangle, MapPin, Camera, ChevronRight,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
 import { nl } from 'date-fns/locale'
 
-const getMaintenanceNav = (basePath: string) => [
-  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
-  { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
-  { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
-]
 
 type InspectionStatus = 'gepland' | 'afgerond' | 'uitgesteld'
 type InspectionType = 'oplevering' | 'tussentijds' | 'einde_huur' | 'technisch' | 'brand'
@@ -75,7 +70,6 @@ function getStatusBadge(status: InspectionStatus) {
 
 export default function InspectiesPage() {
   const { basePath, isDemo } = useDashboardUser()
-  const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   const [search, setSearch] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [newPropertyId, setNewPropertyId] = useState('')
@@ -114,7 +108,6 @@ export default function InspectiesPage() {
 
   return (
     <>
-      <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
       {/* Stats */}
       <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">
@@ -227,7 +220,7 @@ export default function InspectiesPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Datum</Label>
-              <WiseDatePicker
+              <DatePicker
                 value={newDate}
                 onChange={setNewDate}
                 placeholder="Kies datum"

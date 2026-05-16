@@ -111,7 +111,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
                 onChange={(e) => { setInput(e.target.value); setError('') }}
                 onPaste={(e) => e.preventDefault()}
                 placeholder="Typ de zin hierboven..."
-                className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/30 dark:focus:ring-[#9FE870]/30 focus:border-[#163300]/40 dark:focus:border-[#9FE870]/40 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                 autoComplete="off"
                 spellCheck={false}
               />

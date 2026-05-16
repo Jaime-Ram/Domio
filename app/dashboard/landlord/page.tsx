@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { ArrowUpRight, X, Euro, Wrench, FileText, TrendingUp } from 'lucide-react'
+import { ArrowUpRight, X, Euro, Wrench, FileText, TrendingUp, AlertTriangle, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   maintenanceTickets, recentActivities,
@@ -66,8 +66,6 @@ export default function EmployerDashboardPage() {
 
   const periodSlice: Record<Period, number> = { 'Week': 1, 'Maand': 3, 'Jaar': 6 }
   const chartData = incomeHistory.slice(-periodSlice[period])
-  const openTickets = maintenanceTickets.filter(t => t.status !== 'afgerond').length
-  const urgentTickets = maintenanceTickets.filter(t => t.priority === 'urgent' && t.status !== 'afgerond').length
   const incomeDelta = monthlyFinancials.huurinkomsten - 27900
 
   return (
@@ -80,16 +78,16 @@ export default function EmployerDashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-1">
             <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-neutral-800 rounded-full p-0.5">
               {(['Week', 'Maand', 'Jaar'] as Period[]).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
                   className={cn(
-                    'h-7 px-2.5 rounded-full text-xs font-medium transition-colors',
+                    'h-6 px-2.5 rounded-full text-xs font-medium transition-all',
                     period === p
-                      ? 'bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300]'
-                      : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800',
+                      ? 'bg-white dark:bg-neutral-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
                   )}
                 >
                   {p}
@@ -136,7 +134,6 @@ export default function EmployerDashboardPage() {
               <Area type="monotone" dataKey="costs" stroke="#9FE870" strokeWidth={1.5} fill="url(#costsGradient)" dot={false} activeDot={{ r: 3, fill: '#9FE870' }} />
             </AreaChart>
           </ResponsiveContainer>
-
         </div>
 
         {/* Recente activiteit */}
@@ -240,6 +237,57 @@ export default function EmployerDashboardPage() {
           </div>
         )}
 
+        {/* Tickets widget */}
+        {!dismissed.includes('tickets') && (() => {
+          const openTickets = maintenanceTickets.filter(t => t.status !== 'afgerond')
+          const urgentOpen = openTickets.filter(t => t.priority === 'urgent' || t.priority === 'hoog')
+          const showTickets = openTickets.slice(0, 3)
+          if (openTickets.length === 0) return null
+          return (
+            <div className="relative rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-4">
+              <button onClick={() => dismiss('tickets')} className="absolute right-3.5 top-3.5 h-6 w-6 rounded-full flex items-center justify-center text-gray-300 hover:text-gray-500 hover:bg-gray-200 dark:text-neutral-600 dark:hover:text-neutral-400 dark:hover:bg-neutral-700 transition-colors">
+                <X className="h-3.5 w-3.5" />
+              </button>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-300">Open tickets</p>
+                {urgentOpen.length > 0 && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
+                    <AlertTriangle className="h-3 w-3" />
+                    {urgentOpen.length} spoed
+                  </span>
+                )}
+              </div>
+              <div className="border-b border-gray-200 dark:border-neutral-700 mb-3" />
+              <div className="space-y-2.5">
+                {showTickets.map((t) => (
+                  <Link key={t.id} href="/dashboard/landlord/maintenance" className="flex items-start gap-2.5 group">
+                    <div className={cn(
+                      'h-5 w-5 rounded-full flex items-center justify-center shrink-0 mt-0.5',
+                      t.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30'
+                        : t.priority === 'hoog' ? 'bg-orange-100 dark:bg-orange-900/30'
+                        : 'bg-gray-200 dark:bg-neutral-700',
+                    )}>
+                      {t.priority === 'urgent' || t.priority === 'hoog'
+                        ? <AlertTriangle className={cn('h-2.5 w-2.5', t.priority === 'urgent' ? 'text-red-600 dark:text-red-400' : 'text-orange-500 dark:text-orange-400')} />
+                        : <Clock className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-gray-800 dark:text-gray-200 truncate group-hover:text-[#163300] dark:group-hover:text-[#9FE870] transition-colors">{t.title}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.address} · {t.tenantName}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              {openTickets.length > 3 && (
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">+{openTickets.length - 3} meer open tickets</p>
+              )}
+              <Link href="/dashboard/landlord/maintenance" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#163300] dark:text-[#9FE870] hover:underline">
+                Alle tickets <ArrowUpRight className="h-3 w-3" />
+              </Link>
+            </div>
+          )
+        })()}
+
         {/* Financieel */}
         {!dismissed.includes('financieel') && (
           <div className="relative rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-4">
@@ -253,7 +301,7 @@ export default function EmployerDashboardPage() {
             <div className="space-y-2.5">
               {[
                 { label: 'Huurinkomsten', value: monthlyFinancials.huurinkomsten, color: 'bg-[#163300] dark:bg-[#9FE870]' },
-                { label: 'Onderhoud', value: monthlyFinancials.onderhoud, color: 'bg-[#9FE870]/50' },
+                { label: 'Onderhoud', value: monthlyFinancials.onderhoud, color: 'bg-[#15803D] dark:bg-[#4ADE80]' },
                 { label: 'Beheerkosten', value: monthlyFinancials.beheerkosten, color: 'bg-gray-200 dark:bg-neutral-700' },
               ].map(({ label, value, color }) => (
                 <div key={label}>
@@ -272,7 +320,6 @@ export default function EmployerDashboardPage() {
             </Link>
           </div>
         )}
-
 
       </div>
     </div>

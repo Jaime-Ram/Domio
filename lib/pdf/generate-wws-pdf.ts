@@ -58,7 +58,7 @@ export function generateWWSHTML(data: WWSPDFData): string {
     .score-card.primary { border-color: #163300; background: #f0fdf4; }
     .score-value { font-size: 28px; font-weight: 700; }
     .score-label { font-size: 12px; color: #64748b; margin-top: 4px; }
-    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; text-align: center; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; }
     .disclaimer { margin-top: 20px; padding: 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12px; color: #92400e; }
   </style>
 </head>
@@ -132,7 +132,12 @@ export function generateWWSHTML(data: WWSPDFData): string {
   </div>
 
   <div class="footer">
-    Gegenereerd door Domio Vastgoedbeheer — ${formatDate()}
+    <span>Gegenereerd door Domio Vastgoedbeheer — ${formatDate()}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 360" role="img" aria-label="powered by Domio" style="height:22px;width:auto;">
+      <text x="30" y="290" font-family="'Manrope','Inter',system-ui,sans-serif" font-weight="400" font-size="130" fill="#002A1F" opacity="0.7">powered by</text>
+      <g transform="translate(647.82 -26.03) scale(0.7471)"><path fill="#002A1F" fill-rule="evenodd" d="M110 80 L185 80 L185 140 L250 75 L390 215 L390 348 L315 348 L315 423 L170 423 L110 365 Z M250 185 L185 250 L185 348 L315 348 L315 250 Z"></path></g>
+      <text x="974" y="290" font-family="'Manrope','Inter',system-ui,sans-serif" font-weight="600" font-size="320" letter-spacing="-8" fill="#002A1F">Domio</text>
+    </svg>
   </div>
 </body>
 </html>`

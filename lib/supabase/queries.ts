@@ -1,5 +1,5 @@
 import { supabase } from "./client";
-import type { Profile, Property, Unit, Tenant, Lease, Ticket, Message, WWS, Document, Payment, Database } from "./types";
+import type { Profile, Property, Unit, Tenant, Lease, Ticket, Message, TicketEvent, WorkOrder, TicketAttachment, WWS, Document, Payment, Database } from "./types";
 
 // Type helpers for cleaner code
 type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
@@ -550,20 +550,75 @@ export const leaseQueries = {
 // ============================================================================
 
 export const ticketQueries = {
-  // Get tickets by owner
+  // Get tickets by owner (list view)
   async getByOwner(ownerId: string) {
     const { data, error } = await supabase
       .from('tickets')
       .select(`
         *,
-        profiles:owner_id(*),
-        units(*)
+        units(unit_number, properties(name)),
+        properties:property_id(name),
+        leases:lease_id(tenants(full_name), units(unit_number, properties(name)))
       `)
       .eq('owner_id', ownerId)
-      .order('created_at', { ascending: false });
-    
+      .order('ticket_number', { ascending: false });
+
     if (error) throw error;
     return data;
+  },
+
+  // Get single ticket with all related data (detail view)
+  async getDetail(ticketId: string) {
+    const { data, error } = await supabaseAny
+      .from('tickets')
+      .select(`
+        *,
+        units(unit_number, properties(name, address)),
+        properties:property_id(name, address),
+        leases:lease_id(
+          id,
+          tenants(id, full_name, email, phone),
+          units(unit_number, properties(name, address))
+        ),
+        assignee:assignee_id(id, full_name),
+        ticket_events(*, profiles:actor_id(full_name, email)),
+        messages(*, profiles:sender_id(full_name, email)),
+        work_orders(*)
+      `)
+      .eq('id', ticketId)
+      .order('created_at', { foreignTable: 'ticket_events', ascending: true })
+      .order('created_at', { foreignTable: 'messages', ascending: true })
+      .order('created_at', { foreignTable: 'work_orders', ascending: false })
+      .single()
+
+    if (error) throw error
+    return data as any
+  },
+
+  // Log een audit event op een ticket
+  async addEvent(
+    ticketId: string,
+    eventType: string,
+    fromValue?: string | null,
+    toValue?: string | null,
+    metadata?: Record<string, unknown> | null,
+    actorId?: string | null,
+  ) {
+    const { data, error } = await supabaseAny
+      .from('ticket_events')
+      .insert({
+        ticket_id: ticketId,
+        actor_id: actorId ?? null,
+        event_type: eventType,
+        from_value: fromValue ?? null,
+        to_value: toValue ?? null,
+        metadata: metadata ?? null,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as TicketEvent
   },
 
   // Get tickets by unit
@@ -609,8 +664,8 @@ export const ticketQueries = {
       .insert(ticket as any)
       .select()
       .single();
-    
-    if (error) throw error;
+
+    if (error) throw new Error(`${error.message} (code: ${error.code}, details: ${error.details})`)
     return data as Ticket;
   },
 
@@ -648,17 +703,22 @@ export const ticketQueries = {
 // ============================================================================
 
 export const messageQueries = {
-  // Get messages for a ticket
-  async getByTicket(ticketId: string) {
-    const { data, error } = await supabase
+  // Get messages for a ticket (optioneel gefilterd op visibility)
+  async getByTicket(ticketId: string, visibility?: 'public' | 'internal') {
+    let query = supabase
       .from('messages')
       .select(`
         *,
-        profiles:sender_id(*)
+        profiles:sender_id(full_name, email)
       `)
       .eq('ticket_id', ticketId)
       .order('created_at', { ascending: true });
-    
+
+    if (visibility) {
+      query = query.eq('visibility', visibility)
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return data;
   },
@@ -668,11 +728,11 @@ export const messageQueries = {
     const { data, error } = await supabase
       .from('messages')
       .insert(message as any)
-      .select()
+      .select(`*, profiles:sender_id(full_name, email)`)
       .single();
-    
+
     if (error) throw error;
-    return data as Message;
+    return data as Message & { profiles: { full_name: string | null; email: string } | null };
   },
 
   // Subscribe to new messages for a ticket
@@ -993,6 +1053,107 @@ export const paymentQueries = {
     if (error) throw error;
   },
 };
+
+// ============================================================================
+// WORK ORDERS
+// ============================================================================
+
+export const workOrderQueries = {
+  async getByTicket(ticketId: string) {
+    const { data, error } = await supabaseAny
+      .from('work_orders')
+      .select('*')
+      .eq('ticket_id', ticketId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as WorkOrder[]
+  },
+
+  async create(workOrder: {
+    ticket_id: string
+    owner_id: string
+    vendor_name?: string | null
+    description?: string | null
+    scheduled_at?: string | null
+    cost_estimate?: number | null
+    status?: 'concept' | 'ingepland' | 'uitgevoerd' | 'gefactureerd'
+  }) {
+    const { data, error } = await supabaseAny
+      .from('work_orders')
+      .insert(workOrder)
+      .select()
+      .single()
+    if (error) throw error
+    return data as WorkOrder
+  },
+
+  async update(workOrderId: string, updates: {
+    vendor_name?: string | null
+    description?: string | null
+    scheduled_at?: string | null
+    cost_estimate?: number | null
+    cost_actual?: number | null
+    status?: 'concept' | 'ingepland' | 'uitgevoerd' | 'gefactureerd'
+  }) {
+    const { data, error } = await supabaseAny
+      .from('work_orders')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', workOrderId)
+      .select()
+      .single()
+    if (error) throw error
+    return data as WorkOrder
+  },
+
+  async delete(workOrderId: string) {
+    const { error } = await supabaseAny
+      .from('work_orders')
+      .delete()
+      .eq('id', workOrderId)
+    if (error) throw error
+  },
+}
+
+// ============================================================================
+// TICKET ATTACHMENTS
+// ============================================================================
+
+export const attachmentQueries = {
+  async getByTicket(ticketId: string) {
+    const { data, error } = await supabaseAny
+      .from('ticket_attachments')
+      .select('*')
+      .eq('ticket_id', ticketId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as TicketAttachment[]
+  },
+
+  async create(attachment: {
+    ticket_id: string
+    owner_id: string
+    uploader_id?: string | null
+    file_name: string
+    mime_type?: string | null
+    storage_path: string
+  }) {
+    const { data, error } = await supabaseAny
+      .from('ticket_attachments')
+      .insert(attachment)
+      .select()
+      .single()
+    if (error) throw error
+    return data as TicketAttachment
+  },
+
+  async delete(attachmentId: string) {
+    const { error } = await supabaseAny
+      .from('ticket_attachments')
+      .delete()
+      .eq('id', attachmentId)
+    if (error) throw error
+  },
+}
 
 // ============================================================================
 // TASKS

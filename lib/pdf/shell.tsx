@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+import { Document, Page, View, Text, StyleSheet, Svg, Path, G } from '@react-pdf/renderer'
 import type { ReactNode } from 'react'
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
@@ -151,6 +151,20 @@ const pageStyles = StyleSheet.create({
     fontSize: 8,
     color: C.muted,
   },
+  footerBrand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  footerBrandText: {
+    fontSize: 7,
+    color: C.muted,
+  },
+  footerBrandName: {
+    fontSize: 7,
+    fontFamily: 'Helvetica-Bold',
+    color: C.primary,
+  },
   accentBar: {
     position: 'absolute',
     top: 56,
@@ -198,6 +212,15 @@ export function DomioDocument({ docType, reference, children }: DomioDocumentPro
             style={pageStyles.footerRight}
             render={({ pageNumber, totalPages }) => `Pagina ${pageNumber} van ${totalPages}`}
           />
+          <View style={pageStyles.footerBrand}>
+            <Text style={pageStyles.footerBrandText}>powered by </Text>
+            <Svg viewBox="0 0 390 423" width={10} height={10}>
+              <G>
+                <Path fill={C.primary} fillRule="evenodd" d="M110 80 L185 80 L185 140 L250 75 L390 215 L390 348 L315 348 L315 423 L170 423 L110 365 Z M250 185 L185 250 L185 348 L315 348 L315 250 Z" />
+              </G>
+            </Svg>
+            <Text style={pageStyles.footerBrandName}>Domio</Text>
+          </View>
         </View>
       </Page>
     </Document>

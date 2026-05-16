@@ -89,7 +89,7 @@ export default function DemoAppLayout({
               className={cn(
                 'flex-1 flex flex-col min-w-0 w-full',
                 'transition-[margin-left] duration-300 ease-in-out',
-                sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+                sidebarCollapsed ? 'lg:ml-14' : 'lg:ml-60'
               )}
               style={{
                 transitionProperty: 'margin-left',

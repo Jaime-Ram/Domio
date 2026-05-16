@@ -28,7 +28,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light dark",
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f4f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#262626" },
+  ],
 };
 
 export default function RootLayout({
@@ -40,7 +43,7 @@ export default function RootLayout({
     <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
         {/* Theme color for browser chrome */}
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#f4f4f4" />
         {process.env.NODE_ENV === 'production' && (
           <>
             <link rel="preconnect" href="https://consent.cookiebot.com" />

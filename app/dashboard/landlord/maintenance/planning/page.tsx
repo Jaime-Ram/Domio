@@ -23,16 +23,11 @@ import {
   Wrench, Paintbrush, Zap, Droplets, TreePine, ChevronRight,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
 
-const getMaintenanceNav = (basePath: string) => [
-  { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
-  { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
-  { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
-]
 
 type TaskCategory = 'schilderwerk' | 'installaties' | 'dak' | 'tuin' | 'elektra' | 'loodgieter' | 'overig'
 type TaskStatus = 'gepland' | 'in_uitvoering' | 'afgerond'
@@ -88,7 +83,6 @@ function getStatusBadge(status: TaskStatus) {
 
 export default function PlanningPage() {
   const { basePath, isDemo } = useDashboardUser()
-  const MAINTENANCE_NAV = getMaintenanceNav(basePath)
   const [tasks, setTasks] = useState<PlanningTask[]>(isDemo ? mockTasks : [])
   const [createOpen, setCreateOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -124,7 +118,6 @@ export default function PlanningPage() {
 
   return (
     <>
-      <SectionNavDashboard title="Onderhoud" items={MAINTENANCE_NAV} titleVariant="hero" />
 
       {/* Summary */}
       <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3">

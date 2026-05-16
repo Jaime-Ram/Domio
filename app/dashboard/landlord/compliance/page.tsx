@@ -34,7 +34,7 @@ import {
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { format } from 'date-fns'
 import { nl } from 'date-fns/locale'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { cn } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -131,15 +131,9 @@ function SectorDonutChart({ data }: { data: { sector: string; count: number; col
   )
 }
 
-const getComplianceNav = (basePath: string) => [
-  { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-  { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-  { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-]
 
 export default function CompliancePage() {
   const { isDemo, basePath } = useDashboardUser()
-  const COMPLIANCE_NAV = getComplianceNav(basePath)
   const [sectorFilter, setSectorFilter] = useState<Record<WWSSector, boolean>>({ sociaal: true, midden: true, vrij: true })
   const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({ compliant: true, verlopen: true, te_hoog: true, pdf_mist: true })
   const [sortKey, setSortKey] = useState<SortKey>('address')
@@ -195,7 +189,6 @@ export default function CompliancePage() {
 
   return (
     <>
-      <SectionNavDashboard title="Compliance" items={COMPLIANCE_NAV} titleVariant="hero" />
 
       {/* KPI cards */}
       <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">

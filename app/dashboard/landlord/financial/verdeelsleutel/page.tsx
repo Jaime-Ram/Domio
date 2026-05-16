@@ -47,7 +47,7 @@ import {
   AlertCircle,
   Scale,
 } from 'lucide-react'
-import { SectionNavDashboard } from '@/components/dashboard/section-nav-dashboard'
+
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
@@ -56,7 +56,7 @@ import {
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
-import { getFinancialNav } from '../nav'
+
 import {
   costAllocationKeyQueries,
   previewAllocation,
@@ -193,7 +193,6 @@ function AllocationPreview({ keyObj, amount }: { keyObj: CostAllocationKey; amou
 
 export default function VerdeelsleutelPage() {
   const { user, isDemo, basePath } = useDashboardUser()
-  const FINANCIAL_NAV = getFinancialNav(basePath)
 
   const [keys, setKeys] = useState<CostAllocationKey[]>([])
   const [loading, setLoading] = useState(true)
