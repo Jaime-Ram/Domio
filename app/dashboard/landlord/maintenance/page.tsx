@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -234,7 +234,6 @@ function PriorityPill({ priority, ticketId, onUpdate }: {
 
 export default function MaintenancePage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { user, isDemo, basePath } = useDashboardUser()
   const [tickets, setTickets] = useState<TicketRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -278,13 +277,14 @@ export default function MaintenancePage() {
   const [detailTicketId, setDetailTicketId] = useState<string | null>(null)
 
   useEffect(() => {
-    const ticket = new URLSearchParams(window.location.search).get('ticket')
+    const params = new URLSearchParams(window.location.search)
+    const ticket = params.get('ticket')
     if (ticket) setDetailTicketId(ticket)
     // Deep-link: ?create=1&leaseId=X&category=Y opent het aanmaakformulier pre-filled
-    const create = searchParams.get('create')
+    const create = params.get('create')
     if (create === '1') {
-      const leaseId = searchParams.get('leaseId')
-      const category = searchParams.get('category')
+      const leaseId = params.get('leaseId')
+      const category = params.get('category')
       if (category) setNewCategory(category)
       if (leaseId) pendingLeaseId.current = leaseId
       setCreateOpen(true)
