@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { DetailShell } from '@/components/ui/detail-shell'
 import { ActivityTimeline, type TimelineEvent } from '@/components/ui/activity-timeline'
 import { TabNav } from '@/components/ui/tab-nav'
@@ -273,7 +274,8 @@ function buildDemoTimeline(tenantName: string, monthlyRent: number): TimelineEve
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheetProps) {
-  const { isDemo } = useDashboardUser()
+  const router = useRouter()
+  const { isDemo, basePath } = useDashboardUser()
 
   const [tenant, setTenant] = useState<any>(null)
   const [leases, setLeases] = useState<any[]>([])
@@ -287,14 +289,10 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     full_name: '', email: '', phone: '', date_of_birth: '',
   })
 
-  const [ticketTitle, setTicketTitle] = useState('')
-  const [ticketOpen, setTicketOpen] = useState(false)
-  const [ticketSaving, setTicketSaving] = useState(false)
-
   const [inviteSending, setInviteSending] = useState(false)
   const [inviteStatus, setInviteStatus] = useState<'idle' | 'sent' | 'error'>('idle')
 
-  type ActiveAction = 'betalingsherinnering' | 'inspectie' | 'huurverhoging' | 'indexatie' | 'opzeggen' | 'einddatum' | null
+  type ActiveAction = 'betalingsherinnering' | 'huurverhoging' | 'indexatie' | 'opzeggen' | 'einddatum' | null
   const [activeAction, setActiveAction] = useState<ActiveAction>(null)
   const [actionSaving, setActionSaving] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -302,14 +300,12 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
   const [huurverhogingForm, setHuurverhogingForm] = useState({ bedrag: '', datum: '' })
   const [opzegForm, setOpzegForm] = useState({ datum: '', reden: '' })
   const [einddatumForm, setEinddatumForm] = useState({ datum: '' })
-  const [inspectieForm, setInspectieForm] = useState({ datum: '', notitie: '' })
 
   const openAction = (action: ActiveAction) => {
     setActionError(null); setActionSuccess(null)
     if (action === 'huurverhoging') setHuurverhogingForm({ bedrag: activeLease ? String(activeLease.monthly_rent) : '', datum: '' })
     if (action === 'einddatum') setEinddatumForm({ datum: activeLease?.end_date ?? '' })
     if (action === 'opzeggen') setOpzegForm({ datum: '', reden: '' })
-    if (action === 'inspectie') setInspectieForm({ datum: '', notitie: '' })
     setActiveAction(action)
   }
 
@@ -425,32 +421,6 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     onClose()
   }
 
-  const handleCreateTicket = async () => {
-    if (!ticketTitle.trim() || !tenantId) return
-    setTicketSaving(true)
-    try {
-      const { user } = await getUser()
-      if (!user) return
-      await ticketQueries.create({
-        owner_id: user.id,
-        title: ticketTitle.trim(),
-        scope: 'persoon',
-        lease_id: activeLease?.id ?? null,
-        unit_id: activeLease?.unit_id ?? null,
-        source: 'landlord',
-        status: 'open',
-        priority: 'normaal',
-        category: 'huurgebeurtenis',
-      } as any)
-      setTicketTitle('')
-      setTicketOpen(false)
-    } catch (err) {
-      console.error('[tenant-sheet] ticket aanmaken mislukt:', err)
-    } finally {
-      setTicketSaving(false)
-    }
-  }
-
   const handleSendInvite = async () => {
     if (!tenantId || !tenant?.email || inviteSending) return
     setInviteSending(true)
@@ -485,12 +455,6 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     const { user } = await getUser(); if (!user) throw new Error('Niet ingelogd')
     await ticketQueries.create({ owner_id: user.id, title: 'Betalingsherinnering verstuurd', scope: 'persoon', lease_id: activeLease?.id ?? null, unit_id: activeLease?.unit_id ?? null, source: 'landlord', status: 'open', priority: 'hoog', category: 'huurgebeurtenis' } as any)
     return 'Betalingsherinnering aangemaakt'
-  })
-
-  const handleInspectie = () => runAction(async () => {
-    const { user } = await getUser(); if (!user) throw new Error('Niet ingelogd')
-    await ticketQueries.create({ owner_id: user.id, title: inspectieForm.notitie.trim() || 'Inspectie gepland', description: inspectieForm.notitie.trim() || null, scope: 'pand', lease_id: activeLease?.id ?? null, unit_id: activeLease?.unit_id ?? null, source: 'landlord', status: 'gepland', priority: 'normaal', category: 'inspectie', due_date: inspectieForm.datum || null } as any)
-    return 'Inspectie ingepland'
   })
 
   const [indexatiePreview, setIndexatiePreview] = useState<{ oldRent: number; newRent: number; percentage: number } | null>(null)
@@ -581,45 +545,6 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
 
   return (
     <>
-    {/* Ticket mini-dialog */}
-    {ticketOpen && (
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/40" onClick={() => setTicketOpen(false)} />
-        <div className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-4">
-          <p className="text-base font-semibold text-gray-900 dark:text-white">Nieuw ticket aanmaken</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
-            Wordt gekoppeld aan {tenant?.full_name ?? 'deze huurder'} als persoonlijk ticket.
-          </p>
-          <input
-            autoFocus
-            value={ticketTitle}
-            onChange={e => setTicketTitle(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleCreateTicket() }}
-            placeholder="Omschrijf het ticket…"
-            className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#9FE870]"
-          />
-          <div className="flex gap-2 justify-end">
-            <button
-              type="button"
-              onClick={() => { setTicketOpen(false); setTicketTitle('') }}
-              className="text-sm text-gray-500 px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
-            >
-              Annuleren
-            </button>
-            <button
-              type="button"
-              onClick={handleCreateTicket}
-              disabled={!ticketTitle.trim() || ticketSaving}
-              className="text-sm font-semibold bg-[#163300] text-white px-4 py-2 rounded-full hover:bg-[#1f4a00] disabled:opacity-40 transition-colors flex items-center gap-1.5"
-            >
-              {ticketSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Aanmaken
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-
     {/* ── Action mini-dialogs ─────────────────────────────────────────── */}
     {activeAction && (
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -676,15 +601,6 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
             </ActionField>
           </>)}
 
-          {activeAction === 'inspectie' && (<>
-            <p className="text-base font-semibold text-gray-900 dark:text-white">Inspectie inplannen</p>
-            <ActionField label="Datum (optioneel)">
-              <input autoFocus type="date" value={inspectieForm.datum} onChange={e => setInspectieForm(f => ({ ...f, datum: e.target.value }))} className={FIELD_CLS} />
-            </ActionField>
-            <ActionField label="Notitie (optioneel)">
-              <input type="text" value={inspectieForm.notitie} onChange={e => setInspectieForm(f => ({ ...f, notitie: e.target.value }))} className={FIELD_CLS} placeholder="Bijv. intrede-inspectie" />
-            </ActionField>
-          </>)}
 
           {actionError && <p className="text-xs text-red-500">{actionError}</p>}
 
@@ -700,7 +616,6 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
                 activeAction === 'huurverhoging' ? handleHuurverhoging :
                 activeAction === 'einddatum'     ? handleEinddatum :
                 activeAction === 'opzeggen'      ? handleOpzeggen :
-                activeAction === 'inspectie'     ? handleInspectie :
                 undefined
               }
               className={cn(
@@ -850,7 +765,18 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
             )}
 
             <ActionListSection title="Communicatie">
-              <ActionListRow icon={TicketPlus} title="Ticket aanmaken" subtitle="Persoonlijk ticket gekoppeld aan deze huurder" onClick={() => setTicketOpen(true)} slim />
+              <ActionListRow
+                icon={TicketPlus}
+                title="Ticket aanmaken"
+                subtitle="Opent ticketbeheer met huurder pre-ingevuld"
+                onClick={() => {
+                  const params = new URLSearchParams({ create: '1' })
+                  if (activeLease?.id) params.set('leaseId', activeLease.id)
+                  router.push(`${basePath}/maintenance?${params.toString()}`)
+                  onClose()
+                }}
+                slim
+              />
               <ActionListRow icon={Bell} title="Betalingsherinnering sturen" subtitle="Registreert een herinnering in de activiteitenlog" onClick={handleBetalingsherinnering} slim />
               <ActionListRow icon={MessageSquare} title="Bericht sturen" subtitle="Directe chat met huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
               <ActionListRow icon={FileUp} title="Document versturen" subtitle="Stuur een PDF of brief naar de huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
@@ -872,7 +798,18 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
             </ActionListSection>
 
             <ActionListSection title="Inspectie & onderhoud">
-              <ActionListRow icon={Wrench} title="Inspectie inplannen" subtitle="Maakt een inspecticket aan" onClick={() => openAction('inspectie')} slim />
+              <ActionListRow
+                icon={Wrench}
+                title="Inspectie inplannen"
+                subtitle="Opent ticketbeheer met categorie inspectie pre-ingevuld"
+                onClick={() => {
+                  const params = new URLSearchParams({ create: '1', category: 'inspectie' })
+                  if (activeLease?.id) params.set('leaseId', activeLease.id)
+                  router.push(`${basePath}/maintenance?${params.toString()}`)
+                  onClose()
+                }}
+                slim
+              />
               <ActionListRow icon={ClipboardList} title="Plaatsbeschrijving aanmaken" subtitle="Intrede/uittrede staat van de woning" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
             </ActionListSection>
 

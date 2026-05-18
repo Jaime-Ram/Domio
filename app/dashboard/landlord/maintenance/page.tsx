@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -27,7 +26,9 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -39,15 +40,10 @@ import {
 } from '@/components/ui/select'
 import {
   MessageCircle,
-  Wrench,
-  Clock,
-  CheckCircle2,
-  Calendar,
-  Ticket,
+  MoreHorizontal,
   Plus,
   Filter,
-  MapPin,
-  Ban,
+  Search,
   CheckSquare,
   Square,
   X,
@@ -66,7 +62,7 @@ import {
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
 
-import { ticketQueries, propertyQueries } from '@/lib/supabase/queries'
+import { ticketQueries } from '@/lib/supabase/queries'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { cn } from '@/lib/utils'
@@ -79,10 +75,27 @@ type TicketRow = {
   priority: string
   created_at: string
   due_date?: string | null
+  sla_deadline?: string | null
   unitLabel?: string | null
   propertyName?: string | null
   category?: string | null
   ticket_number?: number | null
+}
+
+const SLA_HOURS: Record<string, number> = { urgent: 4, hoog: 24, normaal: 72, laag: 168 }
+
+function getSlaVariant(t: TicketRow): 'over' | 'warning' | 'ok' | null {
+  if (t.status === 'afgerond' || t.status === 'geannuleerd') return null
+  const created = new Date(t.created_at)
+  const deadline = t.sla_deadline
+    ? new Date(t.sla_deadline)
+    : new Date(created.getTime() + (SLA_HOURS[t.priority] ?? 72) * 3600000)
+  const now = Date.now()
+  const remaining = deadline.getTime() - now
+  if (remaining <= 0) return 'over'
+  const total = deadline.getTime() - created.getTime()
+  if (remaining / total < 0.2) return 'warning'
+  return 'ok'
 }
 
 const STATUS_KEYS = ['open', 'in_behandeling', 'gepland', 'afgerond', 'geannuleerd'] as const
@@ -94,8 +107,134 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 type SortColumn = 'title' | 'status' | 'priority' | 'due_date'
 
+const STATUS_LABEL: Record<string, string> = {
+  open: 'Open', in_behandeling: 'In behandeling', gepland: 'Gepland',
+  afgerond: 'Afgerond', geannuleerd: 'Geannuleerd',
+}
+const STATUS_PILL_CLS: Record<string, string> = {
+  open:           'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  in_behandeling: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  gepland:        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  afgerond:       'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  geannuleerd:    'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-500',
+}
+const STATUS_DOT_CLS: Record<string, string> = {
+  open: 'bg-yellow-500', in_behandeling: 'bg-blue-500', gepland: 'bg-purple-500',
+  afgerond: 'bg-green-600', geannuleerd: 'bg-gray-400',
+}
+const PRIORITY_LABEL: Record<string, string> = {
+  urgent: 'Spoed', hoog: 'Hoog', normaal: 'Normaal', laag: 'Laag',
+}
+const PRIORITY_PILL_CLS: Record<string, string> = {
+  urgent: 'bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+  hoog:   'bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400',
+  normaal:'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400',
+  laag:   'bg-gray-50 text-gray-400 dark:bg-neutral-900/50 dark:text-gray-600',
+}
+
+function StatusPill({ status, ticketId, onUpdate }: {
+  status: string
+  ticketId: string
+  onUpdate: (id: string, updates: { status: string }) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const handleChange = async (next: string) => {
+    if (next === status || busy) return
+    setBusy(true)
+    try {
+      await fetch(`/api/tickets/${ticketId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      })
+      onUpdate(ticketId, { status: next })
+    } finally { setBusy(false) }
+  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          onClick={e => e.stopPropagation()}
+          disabled={busy}
+          suppressHydrationWarning
+          className={cn(
+            'flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-opacity hover:opacity-75 disabled:opacity-50 cursor-pointer select-none whitespace-nowrap',
+            STATUS_PILL_CLS[status] ?? STATUS_PILL_CLS.open,
+          )}
+        >
+          {STATUS_LABEL[status] ?? status}
+          <ChevronDown className="h-3 w-3 opacity-40 shrink-0" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="rounded-xl min-w-[168px] p-1" onClick={e => e.stopPropagation()}>
+        {STATUS_KEYS.map(s => (
+          <DropdownMenuItem
+            key={s}
+            onClick={() => handleChange(s)}
+            className={cn('text-xs rounded-lg cursor-pointer flex items-center gap-2 px-2.5 py-1.5', s === status && 'font-semibold')}
+          >
+            <span className={cn('w-2 h-2 rounded-full shrink-0', STATUS_DOT_CLS[s])} />
+            {STATUS_LABEL[s]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function PriorityPill({ priority, ticketId, onUpdate }: {
+  priority: string
+  ticketId: string
+  onUpdate: (id: string, updates: { priority: string }) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const norm = priority === 'spoed' ? 'urgent' : priority
+  const handleChange = async (next: string) => {
+    if (next === norm || busy) return
+    setBusy(true)
+    try {
+      await fetch(`/api/tickets/${ticketId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: next }),
+      })
+      onUpdate(ticketId, { priority: next })
+    } finally { setBusy(false) }
+  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          onClick={e => e.stopPropagation()}
+          disabled={busy}
+          suppressHydrationWarning
+          className={cn(
+            'flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full transition-opacity hover:opacity-75 disabled:opacity-50 cursor-pointer select-none whitespace-nowrap',
+            PRIORITY_PILL_CLS[norm] ?? PRIORITY_PILL_CLS.normaal,
+          )}
+        >
+          {PRIORITY_LABEL[norm] ?? priority}
+          <ChevronDown className="h-3 w-3 opacity-40 shrink-0" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="rounded-xl min-w-[120px] p-1" onClick={e => e.stopPropagation()}>
+        {PRIORITY_KEYS.map(p => (
+          <DropdownMenuItem
+            key={p}
+            onClick={() => handleChange(p)}
+            className={cn('text-xs rounded-lg cursor-pointer px-2.5 py-1.5', p === norm && 'font-semibold')}
+          >
+            {PRIORITY_LABEL[p]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 export default function MaintenancePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, isDemo, basePath } = useDashboardUser()
   const [tickets, setTickets] = useState<TicketRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -110,15 +249,15 @@ export default function MaintenancePage() {
     Object.fromEntries(Object.keys(CATEGORY_LABELS).map(k => [k, true]))
   )
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchExpanded, setSearchExpanded] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const { sort: ticketSort, toggleSort } = useSortable<string>()
 
-  // Bulk selection
-  const [selectionMode, setSelectionMode] = useState(false)
+  // Bulk selection (Notion-style: checkbox on hover)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [bulkStatus, setBulkStatus] = useState('')
   const [bulkBusy, setBulkBusy] = useState(false)
-  const contentRef = useRef<HTMLDivElement | null>(null)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -133,10 +272,30 @@ export default function MaintenancePage() {
   const [newCategory, setNewCategory] = useState<string>('')
   const [propertyOptions, setPropertyOptions] = useState<{ id: string; label: string }[]>([])
   const [leaseOptions, setLeaseOptions] = useState<{ id: string; unitId: string | null; label: string }[]>([])
+  const pendingLeaseId = useRef<string | null>(null)
 
   // Detail panel
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
-  const [detailTicketId, setDetailTicketId] = useState<string | null>(() => searchParams?.get('ticket') ?? null)
+  const [detailTicketId, setDetailTicketId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const ticket = new URLSearchParams(window.location.search).get('ticket')
+    if (ticket) setDetailTicketId(ticket)
+    // Deep-link: ?create=1&leaseId=X&category=Y opent het aanmaakformulier pre-filled
+    const create = searchParams.get('create')
+    if (create === '1') {
+      const leaseId = searchParams.get('leaseId')
+      const category = searchParams.get('category')
+      if (category) setNewCategory(category)
+      if (leaseId) pendingLeaseId.current = leaseId
+      setCreateOpen(true)
+      // Verwijder de params uit de URL zonder reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('create')
+      url.searchParams.delete('leaseId')
+      url.searchParams.delete('category')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const openDetail = (id: string) => {
     setDetailTicketId(id)
     const url = new URL(window.location.href)
@@ -151,62 +310,22 @@ export default function MaintenancePage() {
     window.history.replaceState({}, '', url.toString())
   }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'open':
-        return (
-          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-500">
-            <Clock className="h-3 w-3 mr-1" />
-            Open
-          </Badge>
-        )
-      case 'in_behandeling':
-        return (
-          <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-500">
-            <Wrench className="h-3 w-3 mr-1" />
-            In behandeling
-          </Badge>
-        )
-      case 'gepland':
-        return (
-          <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-500">
-            <Clock className="h-3 w-3 mr-1" />
-            Gepland
-          </Badge>
-        )
-      case 'afgerond':
-        return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-500">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
-            Afgerond
-          </Badge>
-        )
-      case 'geannuleerd':
-        return (
-          <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-500/10 dark:text-gray-400">
-            <Ban className="h-3 w-3 mr-1" />
-            Geannuleerd
-          </Badge>
-        )
-      default:
-        return <Badge>{status}</Badge>
-    }
+  const updateTicketField = (id: string, updates: Partial<TicketRow>) =>
+    setTickets(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
+
+  const quickStatus = (id: string, status: string) => {
+    fetch(`/api/tickets/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    updateTicketField(id, { status })
   }
 
-  const getPriorityBadge = (value: string) => {
-    const v = value === 'spoed' ? 'urgent' : value
-    switch (v) {
-      case 'urgent':
-        return <Badge variant="destructive">Spoed</Badge>
-      case 'hoog':
-        return <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-500">Hoog</Badge>
-      case 'normaal':
-        return <Badge variant="outline">Normaal</Badge>
-      case 'laag':
-        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-500/10 dark:text-gray-500">Laag</Badge>
-      default:
-        return <Badge>{value}</Badge>
-    }
+  const deleteTicket = (id: string) => {
+    fetch(`/api/tickets/${id}`, { method: 'DELETE' })
+    setTickets(prev => prev.filter(t => t.id !== id))
+    setSelectedIds(prev => prev.filter(sid => sid !== id))
   }
 
   useEffect(() => {
@@ -238,20 +357,12 @@ export default function MaintenancePage() {
       .then((rows) => {
         setTickets(
           (rows || []).map((t: any) => {
-            let unitLabel: string | null = null
-            if (t.scope === 'persoon' && t.leases) {
-              const tenantName = t.leases.tenants?.full_name ?? null
-              const propName = t.leases.units?.properties?.name ?? null
-              const unitNum = t.leases.units?.unit_number ?? null
-              unitLabel = [tenantName, propName, unitNum ? `nr. ${unitNum}` : null].filter(Boolean).join(' — ')
-            } else if (t.scope === 'pand' && t.properties) {
-              unitLabel = t.properties.name ?? null
-            } else if (t.units) {
-              const propName = t.units.properties?.name ?? null
-              const unitNum = t.units.unit_number ?? null
-              unitLabel = [propName, unitNum ? `nr. ${unitNum}` : null].filter(Boolean).join(' ')
-            }
-            const propName = t.leases?.units?.properties?.name ?? t.properties?.name ?? t.units?.properties?.name ?? null
+            // Label: alleen huurder naam (persoon) of pandnaam (pand)
+            const unitLabel: string | null =
+              t.scope === 'persoon'
+                ? (t.leases?.tenants?.full_name ?? null)
+                : (t.properties?.name ?? t.leases?.units?.properties?.name ?? t.units?.properties?.name ?? null)
+            const propName = t.properties?.name ?? t.leases?.units?.properties?.name ?? t.units?.properties?.name ?? null
             return {
               id: t.id,
               title: t.title || 'Ticket',
@@ -259,6 +370,7 @@ export default function MaintenancePage() {
               priority: t.priority || 'normaal',
               created_at: t.created_at || new Date().toISOString(),
               due_date: (t as any).due_date ?? null,
+              sla_deadline: (t as any).sla_deadline ?? null,
               category: (t as any).category ?? null,
               ticket_number: (t as any).ticket_number ?? null,
               unitLabel: unitLabel || null,
@@ -271,12 +383,15 @@ export default function MaintenancePage() {
   }, [user?.id, isDemo])
 
   useEffect(() => {
-    if (!user?.id || isDemo) return
-    propertyQueries.getByOwner(user.id).then((props) => {
-      setPropertyOptions(
-        (props ?? []).map((p: any) => ({ id: p.id, label: p.name || p.address }))
-      )
-    }).catch(() => {})
+    if (isDemo || !user?.id) return
+    fetch('/api/properties')
+      .then(r => r.json())
+      .then(({ properties }) => {
+        setPropertyOptions(
+          (properties ?? []).map((p: any) => ({ id: p.id, label: p.name || p.address || 'Pand' }))
+        )
+      })
+      .catch(e => console.error('[properties]', e))
   }, [user?.id, isDemo])
 
   useEffect(() => {
@@ -326,7 +441,7 @@ export default function MaintenancePage() {
   const toggleSelectAll = () =>
     setSelectedIds(prev => prev.length === sortedTickets.length ? [] : sortedTickets.map(t => t.id))
 
-  const exitSelectionMode = () => { setSelectionMode(false); setSelectedIds([]); setBulkStatus('') }
+  const exitSelectionMode = () => { setSelectedIds([]); setBulkStatus('') }
 
   const handleBulkStatusChange = async (newStatus: string) => {
     if (!newStatus || selectedIds.length === 0) return
@@ -357,6 +472,14 @@ export default function MaintenancePage() {
       return null
     })
   , [filteredTickets, ticketSort])
+
+  // Zodra leaseOptions geladen zijn en er een pending deep-link leaseId is: pre-fill
+  useEffect(() => {
+    if (pendingLeaseId.current && leaseOptions.length > 0) {
+      handleLeaseSelect(pendingLeaseId.current)
+      pendingLeaseId.current = null
+    }
+  }, [leaseOptions]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetCreateForm = () => {
     setNewTitle('')
@@ -451,38 +574,45 @@ export default function MaintenancePage() {
             {filteredTickets.length} van {tickets.length} ticket{tickets.length === 1 ? '' : 's'}
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto min-w-0">
-          {/* Selectie-modus knop */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => { setSelectionMode(v => !v); setSelectedIds([]) }}
-            className={cn('h-9 rounded-full px-3', selectionMode && 'bg-[#163300]/5 border-[#163300] dark:bg-[#9FE870]/10 dark:border-[#9FE870]')}
-          >
-            <CheckSquare className="h-4 w-4" />
-          </Button>
-
-          {/* Zoekbalk */}
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <Input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Zoeken…"
-              className="pl-8 h-9 w-full sm:w-44 rounded-full text-sm"
-            />
+        <div className="flex items-center gap-1">
+          {/* Zoeken — icon, balk vouwt geanimeerd naar links uit */}
+          <div className="flex flex-row-reverse items-center">
+            <button
+              type="button"
+              onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
+              className={cn(
+                'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
+                searchQuery && 'text-[#163300] dark:text-[#9FE870]',
+              )}
+            >
+              <Search className="h-4 w-4" />
+            </button>
+            <div className={cn(
+              'overflow-hidden transition-all duration-200 ease-out',
+              searchExpanded ? 'max-w-[160px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
+            )}>
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onBlur={() => { if (!searchQuery) setSearchExpanded(false) }}
+                onKeyDown={e => { if (e.key === 'Escape') { setSearchQuery(''); setSearchExpanded(false) } }}
+                placeholder="Zoeken…"
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
+              />
+            </div>
           </div>
+
+          {/* Filter — icon only */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
+                suppressHydrationWarning
+                className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
               >
-                <Filter className="h-4 w-4 md:mr-1.5" />
-                <span className="hidden md:inline">Filter</span>
-              </Button>
+                <Filter className="h-4 w-4" />
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
@@ -577,7 +707,7 @@ export default function MaintenancePage() {
       </div>
 
       {/* List — ActionList style */}
-      <div className="rounded-2xl overflow-hidden" ref={contentRef}>
+      <div className="rounded-2xl overflow-hidden">
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
@@ -589,29 +719,24 @@ export default function MaintenancePage() {
         ) : (
           <>
             {/* Column headers */}
-            <div className={cn(
-              'items-center gap-5 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800',
-              selectionMode
-                ? 'grid grid-cols-[32px_56px_1fr_110px_110px_140px_48px]'
-                : 'grid grid-cols-[56px_1fr_110px_110px_140px_48px]'
-            )}>
-              {selectionMode && (
-                <button
-                  type="button"
-                  onClick={toggleSelectAll}
-                  className="flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                >
-                  {selectedIds.length === sortedTickets.length && sortedTickets.length > 0
-                    ? <CheckSquare className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                    : <Square className="h-4 w-4" />}
-                </button>
-              )}
-              <span className="text-sm font-medium text-gray-400 dark:text-gray-500">#</span>
-              <SortableHeader label="Titel" sortKey="title" sort={ticketSort} onSort={toggleSort} />
-              <SortableHeader label="Status" sortKey="status" sort={ticketSort} onSort={toggleSort} />
-              <SortableHeader label="Prioriteit" sortKey="priority" sort={ticketSort} onSort={toggleSort} />
-              <SortableHeader label="Deadline" sortKey="due_date" sort={ticketSort} onSort={toggleSort} />
-              <span className="text-sm font-medium text-gray-400 dark:text-gray-500 text-right">Chat</span>
+            <div className="grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] items-center gap-4 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+              {/* Action zone header: # normally, select-all when items selected */}
+              <div className="flex items-center">
+                {selectedIds.length > 0 ? (
+                  <button type="button" onClick={toggleSelectAll} className="ml-[26px] flex items-center justify-center">
+                    {selectedIds.length === sortedTickets.length
+                      ? <CheckSquare className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
+                      : <Square className="h-3.5 w-3.5 text-gray-400" />}
+                  </button>
+                ) : (
+                  <span className="text-xs font-medium text-gray-400 dark:text-gray-500">#</span>
+                )}
+              </div>
+              <SortableHeader label="Titel" sortKey="title" sort={ticketSort} onSort={toggleSort} className="text-xs" />
+              <SortableHeader label="Status" sortKey="status" sort={ticketSort} onSort={toggleSort} className="text-xs pl-2.5" />
+              <SortableHeader label="Prioriteit" sortKey="priority" sort={ticketSort} onSort={toggleSort} className="text-xs pl-2.5" />
+              <SortableHeader label="Deadline" sortKey="due_date" sort={ticketSort} onSort={toggleSort} className="text-xs pl-2.5" />
+              <span />
             </div>
 
             <div className="divide-y divide-gray-100 dark:divide-neutral-800">
@@ -619,68 +744,142 @@ export default function MaintenancePage() {
                 <div
                   key={t.id}
                   className={cn(
-                    'w-full items-center gap-5 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl cursor-pointer',
-                    selectionMode
-                      ? 'grid grid-cols-[32px_56px_1fr_110px_110px_140px_48px]'
-                      : 'grid grid-cols-[56px_1fr_110px_110px_140px_48px]',
-                    selectionMode && selectedIds.includes(t.id) && 'bg-[#9FE870]/5 dark:bg-[#9FE870]/5',
+                    'group grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] w-full items-center gap-4 px-3 py-3 transition-colors rounded-xl cursor-pointer',
+                    selectedIds.includes(t.id)
+                      ? 'bg-[#9FE870]/20 dark:bg-[#9FE870]/10'
+                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800/40',
                   )}
-                  onClick={() => selectionMode ? toggleSelectTicket(t.id) : openDetail(t.id)}
+                  onClick={() => openDetail(t.id)}
                 >
-                  {selectionMode && (
-                    <div className="flex items-center justify-center" onClick={e => { e.stopPropagation(); toggleSelectTicket(t.id) }}>
-                      {selectedIds.includes(t.id)
-                        ? <CheckSquare className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                        : <Square className="h-4 w-4 text-gray-300 dark:text-neutral-600" />}
-                    </div>
-                  )}
-                  {/* Ticket number */}
-                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500 truncate">
-                    {t.ticket_number ? `#${t.ticket_number}` : '—'}
-                  </span>
-                  {/* Title + category + location */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                      <Ticket className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{t.title}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                        {t.category && (
-                          <span className="text-xs text-[#163300] dark:text-[#9FE870] bg-[#9FE870]/20 dark:bg-[#9FE870]/10 rounded px-1.5 py-0.5 font-medium capitalize">
-                            {CATEGORY_LABELS[t.category] ?? t.category}
-                          </span>
-                        )}
-                        {t.unitLabel ? (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center gap-1">
-                            <MapPin className="h-3 w-3 shrink-0" />{t.unitLabel}
-                          </p>
-                        ) : null}
-                      </div>
+                  {/* Notion-style left action zone */}
+                  <div className="relative flex items-center h-full" onClick={e => e.stopPropagation()}>
+                    {/* Ticket number — hidden on hover or when selected */}
+                    <span className={cn(
+                      'text-xs font-mono text-gray-400 dark:text-gray-500 transition-opacity absolute pointer-events-none',
+                      selectedIds.includes(t.id) ? 'opacity-0' : 'group-hover:opacity-0',
+                    )}>
+                      {t.ticket_number ? `#${t.ticket_number}` : '—'}
+                    </span>
+                    {/* ⋮ + checkbox — shown on hover or when selected */}
+                    <div className={cn(
+                      'flex items-center gap-1 transition-opacity',
+                      selectedIds.includes(t.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+                    )}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button suppressHydrationWarning className="h-5 w-5 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                            <MoreHorizontal className="h-3.5 w-3.5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="rounded-xl min-w-[180px] p-1">
+                          <DropdownMenuItem onClick={() => openDetail(t.id)} className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5">
+                            Openen
+                          </DropdownMenuItem>
+                          {t.ticket_number && (
+                            <DropdownMenuItem
+                              onClick={() => navigator.clipboard?.writeText(`#${t.ticket_number}`)}
+                              className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5"
+                            >
+                              Kopieer #{t.ticket_number}
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          {t.status === 'open' && (
+                            <DropdownMenuItem
+                              onClick={() => quickStatus(t.id, 'in_behandeling')}
+                              className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5"
+                            >
+                              In behandeling nemen
+                            </DropdownMenuItem>
+                          )}
+                          {t.status !== 'afgerond' && (
+                            <DropdownMenuItem
+                              onClick={() => quickStatus(t.id, 'afgerond')}
+                              className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5"
+                            >
+                              Markeer als afgerond
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              fetch(`/api/tickets/${t.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ assignee_id: user?.id }) })
+                            }}
+                            className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5"
+                          >
+                            Aan mij toewijzen
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => router.push(`${basePath}/messages?ticket=${t.id}`)}
+                            className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5"
+                          >
+                            Huurder berichtje sturen
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {t.status !== 'geannuleerd' && (
+                            <DropdownMenuItem
+                              onClick={() => quickStatus(t.id, 'geannuleerd')}
+                              className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5 text-red-600 dark:text-red-400"
+                            >
+                              Annuleren
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            onClick={() => deleteTicket(t.id)}
+                            className="text-xs rounded-lg cursor-pointer px-2.5 py-1.5 text-red-600 dark:text-red-400"
+                          >
+                            Verwijderen
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <button
+                        onClick={() => toggleSelectTicket(t.id)}
+                        className="h-5 w-5 flex items-center justify-center"
+                      >
+                        {selectedIds.includes(t.id)
+                          ? <CheckSquare className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
+                          : <Square className="h-3.5 w-3.5 text-gray-400" />}
+                      </button>
                     </div>
                   </div>
-                  <div>{getStatusBadge(t.status)}</div>
-                  <div>{getPriorityBadge(t.priority)}</div>
-                  <p className="text-sm whitespace-nowrap">
-                    {t.due_date
-                      ? <span className={new Date(t.due_date) < new Date() ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-700 dark:text-gray-300'}>
-                          {format(new Date(t.due_date), 'd MMM yyyy', { locale: nl })}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{t.title}</p>
+                    {t.unitLabel && (
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{t.unitLabel}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center" onClick={e => e.stopPropagation()}>
+                    <StatusPill status={t.status} ticketId={t.id} onUpdate={updateTicketField} />
+                  </div>
+                  <div className="flex items-center" onClick={e => e.stopPropagation()}>
+                    <PriorityPill priority={t.priority} ticketId={t.id} onUpdate={updateTicketField} />
+                  </div>
+                  <div className="pl-2.5 flex flex-col gap-0.5 justify-center">
+                    <span className={cn('text-xs whitespace-nowrap', t.due_date
+                      ? (new Date(t.due_date) < new Date() ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-600 dark:text-gray-300')
+                      : 'text-gray-300 dark:text-neutral-600')}>
+                      {t.due_date ? format(new Date(t.due_date), 'd MMM yy', { locale: nl }) : '—'}
+                    </span>
+                    {(() => {
+                      const sla = getSlaVariant(t)
+                      if (!sla || sla === 'ok') return null
+                      return (
+                        <span className={cn('text-[10px] font-medium leading-none', sla === 'over' ? 'text-red-500 dark:text-red-400' : 'text-orange-500 dark:text-orange-400')}>
+                          {sla === 'over' ? 'SLA over' : 'SLA bijna'}
                         </span>
-                      : <span className="text-gray-300 dark:text-neutral-600">—</span>}
-                  </p>
-                  <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+                      )
+                    })()}
+                  </div>
+                  <div className="flex justify-end" onClick={e => e.stopPropagation()}>
                     <Button
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 hover:text-[#163300] dark:hover:text-[#9FE870]"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        router.push(`${basePath}/messages?ticket=${t.id}`)
-                      }}
+                      className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
+                      onClick={e => { e.stopPropagation(); router.push(`${basePath}/messages?ticket=${t.id}`) }}
                       aria-label="Open chat"
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <MessageCircle className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
@@ -688,7 +887,7 @@ export default function MaintenancePage() {
             </div>
 
             {/* Floating bulk action bar */}
-            {selectionMode && selectedIds.length > 0 && (
+            {selectedIds.length > 0 && (
               <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
                 <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white dark:bg-neutral-800 shadow-lg border border-gray-200/80 dark:border-neutral-700">
                   <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 tabular-nums">
