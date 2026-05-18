@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/sla-check",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/indexation",
+      "schedule": "0 6 1 * *"
     }
   ]
 }

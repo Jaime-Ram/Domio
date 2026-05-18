@@ -53,17 +53,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { DialogField } from '@/components/ui/dialog-field'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+  DataTable,
+  DataTableHeader,
+  DataTableHeadCell,
+  DataTableBody,
+  DataTableRow,
+  DataTableEmpty,
+} from '@/components/ui/data-table'
 import {
   dashboardCardClass,
-  DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
   DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
@@ -602,52 +600,38 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
           {/* Table */}
           <div className="flex-1 overflow-y-auto">
-            {filteredTx.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-sm text-gray-400">Geen transacties gevonden</p>
-              </div>
-            ) : (
-              <DashboardTableBlock empty={false}>
-                <Table className="w-full">
-                  <TableHeader className="sticky top-0 z-10 bg-white dark:bg-neutral-900">
-                    <TableRow>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-[30%]')}>
-                        <span className="flex items-center gap-1">Omschrijving <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
-                      </TableHead>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-[20%]')}>
-                        <span className="flex items-center gap-1">Categorie <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
-                      </TableHead>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'hidden md:table-cell')}>
-                        <span className="flex items-center gap-1">Pand / Huurder <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
-                      </TableHead>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-[15%] hidden sm:table-cell')}>
-                        <span className="flex items-center gap-1">Datum <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
-                      </TableHead>
-                      <TableHead className={cn(DASHBOARD_TABLE_HEAD_SHADCN_CLASS, 'w-[12%] text-right')}>
-                        <span className="flex items-center justify-end gap-1">Bedrag <ChevronsUpDown className="h-3 w-3 opacity-40" /></span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTx.map(tx => {
+            {(() => {
+              const COLS = 'grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.75fr)_96px]'
+              return (
+                <DataTable>
+                  <DataTableHeader cols={COLS} className="sticky top-0 z-10 bg-white dark:bg-neutral-900">
+                    <DataTableHeadCell><span className="flex items-center gap-1">Omschrijving <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
+                    <DataTableHeadCell><span className="flex items-center gap-1">Categorie <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
+                    <DataTableHeadCell><span className="flex items-center gap-1">Pand / Huurder <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
+                    <DataTableHeadCell><span className="flex items-center gap-1">Datum <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
+                    <DataTableHeadCell className="text-right"><span className="flex items-center justify-end gap-1">Bedrag <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
+                  </DataTableHeader>
+                  <DataTableBody>
+                    {filteredTx.length === 0 ? (
+                      <DataTableEmpty>Geen transacties gevonden</DataTableEmpty>
+                    ) : filteredTx.map(tx => {
                       const isSelected = selectedTxId === tx.id && rightMode === 'detail'
                       const isMatched = !!tx.assignment
 
                       return (
-                        <TableRow
+                        <DataTableRow
                           key={tx.id}
+                          cols={COLS}
                           onClick={() => handleSelectTx(tx)}
                           className={cn(
-                            'cursor-pointer transition-colors',
+                            'border-l-2',
                             isSelected
-                              ? 'bg-[#163300]/[0.04] dark:bg-[#9FE870]/[0.04]'
-                              : 'hover:bg-gray-50/80 dark:hover:bg-neutral-800/30'
+                              ? 'bg-[#163300]/[0.04] dark:bg-[#9FE870]/[0.04] border-l-[#163300] dark:border-l-[#9FE870]'
+                              : 'border-l-transparent'
                           )}
                         >
-                          <TableCell className={cn(
-                            'border-l-2',
-                            isSelected ? 'border-l-[#163300] dark:border-l-[#9FE870]' : 'border-l-transparent'
-                          )}>
+                          {/* Omschrijving */}
+                          <div>
                             <div className="flex items-center gap-2 min-w-0">
                               <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
                               {tx.is_manual_transaction && (
@@ -659,9 +643,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             {tx.counterparty_name && (
                               <p className="text-xs text-gray-400 truncate mt-0.5">{tx.counterparty_name}</p>
                             )}
-                          </TableCell>
+                          </div>
 
-                          <TableCell>
+                          {/* Categorie */}
+                          <div>
                             {!isMatched ? (
                               <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
                                 <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-amber-400" />
@@ -677,9 +662,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                 </span>
                               )
                             })()}
-                          </TableCell>
+                          </div>
 
-                          <TableCell className="hidden md:table-cell">
+                          {/* Pand / Huurder */}
+                          <div>
                             {tx.assignment?.property_name ? (
                               <div className="flex items-center gap-1.5">
                                 {tx.assignment.unit_id
@@ -696,27 +682,29 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             ) : (
                               <span className="text-gray-300 dark:text-neutral-600">—</span>
                             )}
-                          </TableCell>
+                          </div>
 
-                          <TableCell className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap hidden sm:table-cell">
+                          {/* Datum */}
+                          <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             {formatDate(tx.value_date)}
-                          </TableCell>
+                          </div>
 
-                          <TableCell className="text-right">
+                          {/* Bedrag */}
+                          <div className="text-right">
                             <span className={cn(
                               'font-semibold whitespace-nowrap',
                               tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                             )}>
                               {formatEur(tx.amount)}
                             </span>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </DataTableRow>
                       )
                     })}
-                  </TableBody>
-                </Table>
-              </DashboardTableBlock>
-            )}
+                  </DataTableBody>
+                </DataTable>
+              )
+            })()}
           </div>
         </div>
 

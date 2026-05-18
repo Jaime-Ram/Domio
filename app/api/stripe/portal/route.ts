@@ -10,11 +10,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
   }
 
-  const { data: sub } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: sub } = await (supabase as any)
     .from('subscriptions')
     .select('stripe_customer_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { stripe_customer_id: string | null } | null }
 
   if (!sub?.stripe_customer_id) {
     return NextResponse.json({ error: 'Geen Stripe klant gevonden' }, { status: 404 })

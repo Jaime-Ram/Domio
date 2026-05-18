@@ -198,12 +198,18 @@ export interface Database {
           owner_id: string
           unit_id: string
           tenant_id: string | null
+          payment_profile_id: string
           start_date: string
           end_date: string | null
           monthly_rent: number
           deposit: number | null
           status: 'actief' | 'verlopen' | 'opgezegd' | 'concept'
           notes: string | null
+          base_rent: number | null
+          indexation_method: 'none' | 'cpi' | 'cpi_plus' | 'fixed'
+          indexation_pct: number | null
+          index_month: number | null
+          last_indexed_at: string | null
           created_at: string
           updated_at: string
         }
@@ -212,12 +218,18 @@ export interface Database {
           owner_id: string
           unit_id: string
           tenant_id?: string | null
+          payment_profile_id: string
           start_date: string
           end_date?: string | null
           monthly_rent: number
           deposit?: number | null
           status?: 'actief' | 'verlopen' | 'opgezegd' | 'concept'
           notes?: string | null
+          base_rent?: number | null
+          indexation_method?: 'none' | 'cpi' | 'cpi_plus' | 'fixed'
+          indexation_pct?: number | null
+          index_month?: number | null
+          last_indexed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -226,12 +238,18 @@ export interface Database {
           owner_id?: string
           unit_id?: string
           tenant_id?: string | null
+          payment_profile_id?: string
           start_date?: string
           end_date?: string | null
           monthly_rent?: number
           deposit?: number | null
           status?: 'actief' | 'verlopen' | 'opgezegd' | 'concept'
           notes?: string | null
+          base_rent?: number | null
+          indexation_method?: 'none' | 'cpi' | 'cpi_plus' | 'fixed'
+          indexation_pct?: number | null
+          index_month?: number | null
+          last_indexed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -635,6 +653,45 @@ export interface Database {
           imported_at?: string
         }
       }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          plan: 'starter' | 'pro' | null
+          status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'paused'
+          trial_ends_at: string
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan?: 'starter' | 'pro' | null
+          status?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'paused'
+          trial_ends_at?: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan?: 'starter' | 'pro' | null
+          status?: 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'paused'
+          trial_ends_at?: string
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -685,3 +742,4 @@ export type WWS = Database['public']['Tables']['wws']['Row']
 export type Document = Database['public']['Tables']['documents']['Row']
 export type Payment = Database['public']['Tables']['payments']['Row']
 export type BankConnection = Database['public']['Tables']['bank_connections']['Row']
+export type Subscription = Database['public']['Tables']['subscriptions']['Row']

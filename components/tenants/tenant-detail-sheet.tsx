@@ -37,8 +37,19 @@ import {
   Upload,
   UserPlus,
   AlertCircle,
+  TicketPlus,
+  Loader2,
+  Bell,
+  MessageSquare,
+  FileUp,
+  CalendarDays,
+  FileX,
+  ClipboardList,
+  UserX,
+  Pencil,
 } from 'lucide-react'
-import { tenantQueries, leaseQueries } from '@/lib/supabase/queries'
+import { tenantQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
+import { ActionListRow, ActionListSection } from '@/components/ui/action-list'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { getUser } from '@/lib/supabase/auth'
 import { mockTenants, mockLeases, mockPayments } from '@/lib/mock-data/vastgoed'
@@ -64,8 +75,9 @@ const TICKET_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
 // ─── Tab nav ──────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'tijdlijn', label: 'Activiteit' },
-  { id: 'info',     label: 'Info' },
+  { id: 'tijdlijn',   label: 'Activiteit' },
+  { id: 'info',       label: 'Info' },
+  { id: 'acties',     label: 'Acties' },
   { id: 'betalingen', label: 'Betalingen' },
   { id: 'documenten', label: 'Documenten' },
 ] as const
@@ -275,6 +287,32 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     full_name: '', email: '', phone: '', date_of_birth: '',
   })
 
+  const [ticketTitle, setTicketTitle] = useState('')
+  const [ticketOpen, setTicketOpen] = useState(false)
+  const [ticketSaving, setTicketSaving] = useState(false)
+
+  const [inviteSending, setInviteSending] = useState(false)
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'sent' | 'error'>('idle')
+
+  type ActiveAction = 'betalingsherinnering' | 'inspectie' | 'huurverhoging' | 'indexatie' | 'opzeggen' | 'einddatum' | null
+  const [activeAction, setActiveAction] = useState<ActiveAction>(null)
+  const [actionSaving, setActionSaving] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null)
+  const [huurverhogingForm, setHuurverhogingForm] = useState({ bedrag: '', datum: '' })
+  const [opzegForm, setOpzegForm] = useState({ datum: '', reden: '' })
+  const [einddatumForm, setEinddatumForm] = useState({ datum: '' })
+  const [inspectieForm, setInspectieForm] = useState({ datum: '', notitie: '' })
+
+  const openAction = (action: ActiveAction) => {
+    setActionError(null); setActionSuccess(null)
+    if (action === 'huurverhoging') setHuurverhogingForm({ bedrag: activeLease ? String(activeLease.monthly_rent) : '', datum: '' })
+    if (action === 'einddatum') setEinddatumForm({ datum: activeLease?.end_date ?? '' })
+    if (action === 'opzeggen') setOpzegForm({ datum: '', reden: '' })
+    if (action === 'inspectie') setInspectieForm({ datum: '', notitie: '' })
+    setActiveAction(action)
+  }
+
   const initEditForm = (t: any) => setEditForm({
     full_name: t.full_name || '',
     email: t.email || '',
@@ -327,7 +365,14 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
         ])
         setTenant(tenantData)
         initEditForm(tenantData)
-        setLeases((allLeases || []).filter((l: any) => l.tenant_id === tenantId))
+        setLeases(
+          (allLeases || [])
+            .filter((l: any) => l.tenant_id === tenantId)
+            .map((l: any) => ({
+              ...l,
+              unit: l.units ? { ...l.units, property: l.units.properties ?? null } : null,
+            }))
+        )
       } catch (err) {
         const code = (err as { code?: string })?.code
         if (code !== 'PGRST116' && err instanceof Error) console.error(err)
@@ -349,6 +394,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
       } as never)
       setTenant((t: any) => ({ ...t, ...updated }))
       setIsEditing(false)
+      initEditForm(updated)
     } catch (err) {
       setEditError(err instanceof Error ? err.message : 'Er is een fout opgetreden')
     } finally { setSaving(false) }
@@ -356,6 +402,155 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
 
   const activeLease = leases.find((l: any) => l.status === 'actief')
   const monthlyRent = activeLease?.monthly_rent ?? 1250
+
+  const isDirty = tenant && (
+    editForm.full_name !== (tenant.full_name ?? '') ||
+    editForm.email !== (tenant.email ?? '') ||
+    editForm.phone !== (tenant.phone ?? '') ||
+    editForm.date_of_birth !== (tenant.date_of_birth ?? '')
+  )
+
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false)
+
+  const handleClose = () => {
+    if (isEditing && isDirty) { setConfirmDiscardOpen(true); return }
+    if (isEditing) { setIsEditing(false); return }
+    onClose()
+  }
+
+  const handleDiscard = () => {
+    setConfirmDiscardOpen(false)
+    if (tenant) initEditForm(tenant)
+    setIsEditing(false)
+    onClose()
+  }
+
+  const handleCreateTicket = async () => {
+    if (!ticketTitle.trim() || !tenantId) return
+    setTicketSaving(true)
+    try {
+      const { user } = await getUser()
+      if (!user) return
+      await ticketQueries.create({
+        owner_id: user.id,
+        title: ticketTitle.trim(),
+        scope: 'persoon',
+        lease_id: activeLease?.id ?? null,
+        unit_id: activeLease?.unit_id ?? null,
+        source: 'landlord',
+        status: 'open',
+        priority: 'normaal',
+        category: 'huurgebeurtenis',
+      } as any)
+      setTicketTitle('')
+      setTicketOpen(false)
+    } catch (err) {
+      console.error('[tenant-sheet] ticket aanmaken mislukt:', err)
+    } finally {
+      setTicketSaving(false)
+    }
+  }
+
+  const handleSendInvite = async () => {
+    if (!tenantId || !tenant?.email || inviteSending) return
+    setInviteSending(true)
+    setInviteStatus('idle')
+    try {
+      const res = await fetch('/api/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId }),
+      })
+      setInviteStatus(res.ok ? 'sent' : 'error')
+    } catch {
+      setInviteStatus('error')
+    } finally {
+      setInviteSending(false)
+    }
+  }
+
+  const runAction = async (fn: () => Promise<string>) => {
+    setActionSaving(true); setActionError(null); setActionSuccess(null)
+    try {
+      const msg = await fn()
+      setActionSuccess(msg)
+      setActiveAction(null)
+    } catch (err: any) {
+      setActionError(err?.message ?? 'Er is een fout opgetreden')
+    } finally {
+      setActionSaving(false) }
+  }
+
+  const handleBetalingsherinnering = () => runAction(async () => {
+    const { user } = await getUser(); if (!user) throw new Error('Niet ingelogd')
+    await ticketQueries.create({ owner_id: user.id, title: 'Betalingsherinnering verstuurd', scope: 'persoon', lease_id: activeLease?.id ?? null, unit_id: activeLease?.unit_id ?? null, source: 'landlord', status: 'open', priority: 'hoog', category: 'huurgebeurtenis' } as any)
+    return 'Betalingsherinnering aangemaakt'
+  })
+
+  const handleInspectie = () => runAction(async () => {
+    const { user } = await getUser(); if (!user) throw new Error('Niet ingelogd')
+    await ticketQueries.create({ owner_id: user.id, title: inspectieForm.notitie.trim() || 'Inspectie gepland', description: inspectieForm.notitie.trim() || null, scope: 'pand', lease_id: activeLease?.id ?? null, unit_id: activeLease?.unit_id ?? null, source: 'landlord', status: 'gepland', priority: 'normaal', category: 'inspectie', due_date: inspectieForm.datum || null } as any)
+    return 'Inspectie ingepland'
+  })
+
+  const [indexatiePreview, setIndexatiePreview] = useState<{ oldRent: number; newRent: number; percentage: number } | null>(null)
+
+  const handleIndexatiePreview = async () => {
+    if (!activeLease?.id) return
+    setIndexatiePreview(null)
+    const res = await fetch('/api/leases/index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leaseId: activeLease.id, preview: true }),
+    })
+    if (res.ok) {
+      const { result } = await res.json()
+      setIndexatiePreview(result)
+    }
+  }
+
+  const handleIndexatie = () => runAction(async () => {
+    if (!activeLease?.id) throw new Error('Geen actief contract')
+    const res = await fetch('/api/leases/index', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leaseId: activeLease.id, preview: false }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.error || 'Indexatie mislukt')
+    }
+    const { result } = await res.json()
+    setLeases(ls => ls.map(l => l.id === activeLease.id ? { ...l, monthly_rent: result.newRent } : l))
+    return `Huur geïndexeerd naar €${Number(result.newRent).toLocaleString('nl-NL', { minimumFractionDigits: 2 })}`
+  })
+
+  const handleHuurverhoging = () => runAction(async () => {
+    if (!activeLease?.id) throw new Error('Geen actief contract')
+    const nieuw = parseFloat(huurverhogingForm.bedrag)
+    if (!nieuw || nieuw <= 0) throw new Error('Voer een geldig bedrag in')
+    await leaseQueries.update(activeLease.id, { monthly_rent: nieuw } as any)
+    setLeases(ls => ls.map(l => l.id === activeLease.id ? { ...l, monthly_rent: nieuw } : l))
+    const { user } = await getUser(); if (!user) throw new Error('Niet ingelogd')
+    await ticketQueries.create({ owner_id: user.id, title: `Huurverhoging naar €${nieuw.toLocaleString('nl-NL')}${huurverhogingForm.datum ? ` per ${huurverhogingForm.datum}` : ''}`, scope: 'persoon', lease_id: activeLease.id, unit_id: activeLease.unit_id ?? null, source: 'landlord', status: 'afgerond', priority: 'normaal', category: 'huurgebeurtenis' } as any)
+    return 'Huurverhoging doorgevoerd'
+  })
+
+  const handleOpzeggen = () => runAction(async () => {
+    if (!activeLease?.id) throw new Error('Geen actief contract')
+    if (!opzegForm.datum) throw new Error('Voer een opzegdatum in')
+    await leaseQueries.endLease(activeLease.id, opzegForm.datum)
+    setLeases(ls => ls.map(l => l.id === activeLease.id ? { ...l, status: 'opgezegd', end_date: opzegForm.datum } : l))
+    return 'Contract opgezegd'
+  })
+
+  const handleEinddatum = () => runAction(async () => {
+    if (!activeLease?.id) throw new Error('Geen actief contract')
+    if (!einddatumForm.datum) throw new Error('Voer een datum in')
+    await leaseQueries.update(activeLease.id, { end_date: einddatumForm.datum } as any)
+    setLeases(ls => ls.map(l => l.id === activeLease.id ? { ...l, end_date: einddatumForm.datum } : l))
+    return 'Einddatum aangepast'
+  })
 
   const STATUS_MAP: Record<string, string> = { betaald: 'Betaald', openstaand: 'Openstaand', achterstallig: 'Te laat' }
   const paymentHistory = isDemo && tenantId
@@ -385,11 +580,170 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     : []
 
   return (
+    <>
+    {/* Ticket mini-dialog */}
+    {ticketOpen && (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40" onClick={() => setTicketOpen(false)} />
+        <div className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-4">
+          <p className="text-base font-semibold text-gray-900 dark:text-white">Nieuw ticket aanmaken</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+            Wordt gekoppeld aan {tenant?.full_name ?? 'deze huurder'} als persoonlijk ticket.
+          </p>
+          <input
+            autoFocus
+            value={ticketTitle}
+            onChange={e => setTicketTitle(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleCreateTicket() }}
+            placeholder="Omschrijf het ticket…"
+            className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2.5 outline-none focus:ring-2 focus:ring-[#9FE870]"
+          />
+          <div className="flex gap-2 justify-end">
+            <button
+              type="button"
+              onClick={() => { setTicketOpen(false); setTicketTitle('') }}
+              className="text-sm text-gray-500 px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              Annuleren
+            </button>
+            <button
+              type="button"
+              onClick={handleCreateTicket}
+              disabled={!ticketTitle.trim() || ticketSaving}
+              className="text-sm font-semibold bg-[#163300] text-white px-4 py-2 rounded-full hover:bg-[#1f4a00] disabled:opacity-40 transition-colors flex items-center gap-1.5"
+            >
+              {ticketSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Aanmaken
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* ── Action mini-dialogs ─────────────────────────────────────────── */}
+    {activeAction && (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40" onClick={() => setActiveAction(null)} />
+        <div className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-6 w-full max-w-sm flex flex-col gap-4">
+
+          {activeAction === 'indexatie' && (<>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">Huurindexatie toepassen</p>
+            {indexatiePreview ? (
+              <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Huidige huur</span>
+                  <span>€{indexatiePreview.oldRent.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Verhoging ({indexatiePreview.percentage.toFixed(2)}%)</span>
+                  <span>+ €{(indexatiePreview.newRent - indexatiePreview.oldRent).toLocaleString('nl-NL', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between font-semibold border-t border-gray-200 dark:border-neutral-700 pt-2">
+                  <span>Nieuwe huur</span>
+                  <span className="text-[#163300] dark:text-[#9FE870]">€{indexatiePreview.newRent.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 dark:text-gray-500">Berekening ophalen via CBS…</p>
+            )}
+          </>)}
+
+          {activeAction === 'huurverhoging' && (<>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">Huurverhoging handmatig</p>
+            <ActionField label="Nieuw maandbedrag (€)">
+              <input autoFocus type="number" min="0" step="0.01" value={huurverhogingForm.bedrag} onChange={e => setHuurverhogingForm(f => ({ ...f, bedrag: e.target.value }))} className={FIELD_CLS} placeholder="1250" />
+            </ActionField>
+            <ActionField label="Ingangsdatum (optioneel)">
+              <input type="date" value={huurverhogingForm.datum} onChange={e => setHuurverhogingForm(f => ({ ...f, datum: e.target.value }))} className={FIELD_CLS} />
+            </ActionField>
+          </>)}
+
+          {activeAction === 'einddatum' && (<>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">Einddatum aanpassen</p>
+            <ActionField label="Nieuwe einddatum">
+              <input autoFocus type="date" value={einddatumForm.datum} onChange={e => setEinddatumForm({ datum: e.target.value })} className={FIELD_CLS} />
+            </ActionField>
+          </>)}
+
+          {activeAction === 'opzeggen' && (<>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">Contract opzeggen</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">Het contract wordt op de gekozen datum beëindigd.</p>
+            <ActionField label="Opzegdatum">
+              <input autoFocus type="date" value={opzegForm.datum} onChange={e => setOpzegForm(f => ({ ...f, datum: e.target.value }))} className={FIELD_CLS} />
+            </ActionField>
+            <ActionField label="Reden (optioneel)">
+              <textarea value={opzegForm.reden} onChange={e => setOpzegForm(f => ({ ...f, reden: e.target.value }))} rows={2} className={FIELD_CLS} placeholder="Bijv. einde huurperiode, wederzijds akkoord…" />
+            </ActionField>
+          </>)}
+
+          {activeAction === 'inspectie' && (<>
+            <p className="text-base font-semibold text-gray-900 dark:text-white">Inspectie inplannen</p>
+            <ActionField label="Datum (optioneel)">
+              <input autoFocus type="date" value={inspectieForm.datum} onChange={e => setInspectieForm(f => ({ ...f, datum: e.target.value }))} className={FIELD_CLS} />
+            </ActionField>
+            <ActionField label="Notitie (optioneel)">
+              <input type="text" value={inspectieForm.notitie} onChange={e => setInspectieForm(f => ({ ...f, notitie: e.target.value }))} className={FIELD_CLS} placeholder="Bijv. intrede-inspectie" />
+            </ActionField>
+          </>)}
+
+          {actionError && <p className="text-xs text-red-500">{actionError}</p>}
+
+          <div className="flex gap-2 justify-end pt-1">
+            <button type="button" onClick={() => setActiveAction(null)} className="text-sm text-gray-500 px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors">
+              Annuleren
+            </button>
+            <button
+              type="button"
+              disabled={actionSaving}
+              onClick={
+                activeAction === 'indexatie'     ? handleIndexatie :
+                activeAction === 'huurverhoging' ? handleHuurverhoging :
+                activeAction === 'einddatum'     ? handleEinddatum :
+                activeAction === 'opzeggen'      ? handleOpzeggen :
+                activeAction === 'inspectie'     ? handleInspectie :
+                undefined
+              }
+              className={cn(
+                'text-sm font-semibold px-4 py-2 rounded-full disabled:opacity-40 transition-colors flex items-center gap-1.5',
+                activeAction === 'opzeggen'
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                  : 'bg-[#163300] hover:bg-[#1f4a00] text-white'
+              )}
+            >
+              {actionSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {activeAction === 'opzeggen' ? 'Opzeggen bevestigen' : 'Bevestigen'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
     <DetailShell
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title={loading ? '…' : (tenant?.full_name ?? 'Huurder')}
       subtitle={tenant?.email ?? undefined}
+      footer={
+        <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end gap-3 shrink-0">
+          {editError && <p className="text-xs text-red-500 flex-1">{editError}</p>}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1"
+          >
+            {isEditing ? 'Annuleren' : 'Sluiten'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !isEditing || !isDirty}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-40 text-[#163300] text-sm font-semibold px-5 py-2 transition-colors"
+          >
+            {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Opslaan
+          </button>
+        </div>
+      }
       headerLeft={
         <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
           <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
@@ -441,23 +795,97 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
               <p className="text-sm text-gray-400">Geen gegevens gevonden.</p>
             ) : (
               <>
-                <InfoRow icon={User}     label="Naam"           value={tenant.full_name} />
-                <InfoRow icon={Mail}     label="E-mail"         value={tenant.email} />
-                <InfoRow icon={Phone}    label="Telefoon"       value={tenant.phone} />
-                <InfoRow icon={Calendar} label="Geboortedatum"  value={tenant.date_of_birth} />
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Persoonlijke info</p>
+                  {!isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(true)}
+                      className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                    >
+                      Bewerken
+                    </button>
+                  )}
+                </div>
+                {isEditing ? (
+                  <>
+                    <EditRow icon={User}     label="Naam"          value={editForm.full_name}     onChange={v => setEditForm(f => ({ ...f, full_name: v }))} />
+                    <EditRow icon={Mail}     label="E-mail"        value={editForm.email}         onChange={v => setEditForm(f => ({ ...f, email: v }))}     type="email" />
+                    <EditRow icon={Phone}    label="Telefoon"      value={editForm.phone}         onChange={v => setEditForm(f => ({ ...f, phone: v }))} />
+                    <EditRow icon={Calendar} label="Geboortedatum" value={editForm.date_of_birth} onChange={v => setEditForm(f => ({ ...f, date_of_birth: v }))} type="date" />
+                  </>
+                ) : (
+                  <>
+                    <InfoRow icon={User}     label="Naam"          value={tenant.full_name} />
+                    <InfoRow icon={Mail}     label="E-mail"        value={tenant.email} />
+                    <InfoRow icon={Phone}    label="Telefoon"      value={tenant.phone} />
+                    <InfoRow icon={Calendar} label="Geboortedatum" value={tenant.date_of_birth} />
+                  </>
+                )}
                 {activeLease && (
                   <>
                     <div className="border-t border-gray-100 dark:border-neutral-800 pt-4 mt-4">
                       <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-3">Huurcontract</p>
                     </div>
-                    <InfoRow icon={Home}       label="Object"       value={activeLease.unit?.property?.name ?? '—'} />
-                    <InfoRow icon={Euro}       label="Huurprijs"    value={activeLease.monthly_rent ? `€ ${Number(activeLease.monthly_rent).toLocaleString('nl-NL')} / mnd` : '—'} />
-                    <InfoRow icon={Calendar}   label="Startdatum"   value={activeLease.start_date} />
-                    <InfoRow icon={CreditCard} label="Waarborgsom"  value={activeLease.deposit ? `€ ${Number(activeLease.deposit).toLocaleString('nl-NL')}` : '—'} />
+                    <InfoRow icon={Home}       label="Object"      value={activeLease.unit?.property?.name ?? '—'} />
+                    <InfoRow icon={Euro}       label="Huurprijs"   value={activeLease.monthly_rent ? `€ ${Number(activeLease.monthly_rent).toLocaleString('nl-NL')} / mnd` : '—'} />
+                    <InfoRow icon={Calendar}   label="Startdatum"  value={activeLease.start_date} />
+                    <InfoRow icon={CreditCard} label="Waarborgsom" value={activeLease.deposit ? `€ ${Number(activeLease.deposit).toLocaleString('nl-NL')}` : '—'} />
                   </>
                 )}
+
               </>
             )}
+          </div>
+        )}
+
+        {/* ── Acties ────────────────────────────────────────────────────── */}
+        {activeTab === 'acties' && (
+          <div className="space-y-6">
+            {actionSuccess && (
+              <div className="flex items-center gap-2 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/40 px-4 py-2.5">
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
+                <p className="text-sm text-green-800 dark:text-green-300">{actionSuccess}</p>
+              </div>
+            )}
+
+            <ActionListSection title="Communicatie">
+              <ActionListRow icon={TicketPlus} title="Ticket aanmaken" subtitle="Persoonlijk ticket gekoppeld aan deze huurder" onClick={() => setTicketOpen(true)} slim />
+              <ActionListRow icon={Bell} title="Betalingsherinnering sturen" subtitle="Registreert een herinnering in de activiteitenlog" onClick={handleBetalingsherinnering} slim />
+              <ActionListRow icon={MessageSquare} title="Bericht sturen" subtitle="Directe chat met huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
+              <ActionListRow icon={FileUp} title="Document versturen" subtitle="Stuur een PDF of brief naar de huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
+            </ActionListSection>
+
+            <ActionListSection title="Contract">
+              <ActionListRow
+                icon={TrendingUp}
+                title="Huurindexatie toepassen"
+                subtitle={activeLease?.indexation_method && activeLease.indexation_method !== 'none'
+                  ? `Methode: ${activeLease.indexation_method === 'cpi' ? 'CBS CPI' : activeLease.indexation_method === 'cpi_plus' ? `CBS CPI + ${activeLease.indexation_pct}%` : `Vast ${activeLease.indexation_pct}%`}`
+                  : 'Geen indexatie ingesteld op contract'}
+                onClick={activeLease?.indexation_method && activeLease.indexation_method !== 'none' ? () => { openAction('indexatie'); handleIndexatiePreview() } : undefined}
+                slim
+              />
+              <ActionListRow icon={TrendingUp} title="Huurverhoging handmatig" subtitle={activeLease ? `Huidig: €${Number(activeLease.monthly_rent).toLocaleString('nl-NL')} / mnd` : 'Geen actief contract'} onClick={activeLease ? () => openAction('huurverhoging') : undefined} slim />
+              <ActionListRow icon={CalendarDays} title="Einddatum aanpassen" subtitle={activeLease?.end_date ? `Huidig: ${activeLease.end_date}` : 'Onbepaalde tijd'} onClick={activeLease ? () => openAction('einddatum') : undefined} slim />
+              <ActionListRow icon={FileX} title="Contract opzeggen" subtitle="Zet huurovereenkomst op opgezegd" onClick={activeLease ? () => openAction('opzeggen') : undefined} danger slim />
+            </ActionListSection>
+
+            <ActionListSection title="Inspectie & onderhoud">
+              <ActionListRow icon={Wrench} title="Inspectie inplannen" subtitle="Maakt een inspecticket aan" onClick={() => openAction('inspectie')} slim />
+              <ActionListRow icon={ClipboardList} title="Plaatsbeschrijving aanmaken" subtitle="Intrede/uittrede staat van de woning" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
+            </ActionListSection>
+
+            <ActionListSection title="Account">
+              <ActionListRow
+                icon={inviteStatus === 'sent' ? CheckCircle2 : inviteStatus === 'error' ? AlertCircle : Send}
+                title={inviteStatus === 'sent' ? 'Uitnodiging verstuurd' : inviteStatus === 'error' ? 'Opnieuw proberen' : 'Uitnodiging versturen'}
+                subtitle={tenant?.email ? `Stuurt toegangslink naar ${tenant.email}` : 'Geen e-mailadres bekend'}
+                onClick={!inviteSending && tenant?.email ? handleSendInvite : undefined}
+                slim
+              />
+              <ActionListRow icon={UserX} title="Account deactiveren" subtitle="Trek huurder toegang tot het portaal in" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
+            </ActionListSection>
           </div>
         )}
 
@@ -511,6 +939,24 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
 
       </div>
     </DetailShell>
+
+    <AlertDialog open={confirmDiscardOpen} onOpenChange={setConfirmDiscardOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Wijzigingen annuleren?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Je hebt aanpassingen gedaan die nog niet zijn opgeslagen. Als je annuleert gaan deze verloren.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Terug</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDiscard} className="bg-red-600 hover:bg-red-700 text-white">
+            Wijzigingen verwerpen
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }
 
@@ -529,3 +975,40 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label:
     </div>
   )
 }
+
+function EditRow({ icon: Icon, label, value, onChange, type = 'text' }: {
+  icon: React.ElementType
+  label: string
+  value: string
+  onChange: (v: string) => void
+  type?: 'text' | 'email' | 'date'
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="h-8 w-8 rounded-lg bg-gray-50 dark:bg-neutral-800 flex items-center justify-center shrink-0 mt-5">
+        <Icon className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{label}</p>
+        <input
+          type={type}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#9FE870] transition-shadow"
+        />
+      </div>
+    </div>
+  )
+}
+
+const FIELD_CLS = 'w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#9FE870] transition-shadow resize-none'
+
+function ActionField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{label}</p>
+      {children}
+    </div>
+  )
+}
+

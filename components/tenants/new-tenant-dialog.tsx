@@ -11,12 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Building2, FileText, X } from 'lucide-react'
+import { Building2, FileText, X, ScrollText, Mail } from 'lucide-react'
 import { generateContractHTML } from '@/lib/pdf/generate-contract-pdf'
 import { DialogDateField } from '@/components/ui/dialog-date-field'
 import { DialogField } from '@/components/ui/dialog-field'
 import { Input } from '@/components/ui/input'
-import { tenantQueries, propertyQueries, leaseQueries, unitQueries } from '@/lib/supabase/queries'
+import { tenantQueries, propertyQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { mockProperties } from '@/lib/mock-data/vastgoed'
@@ -24,7 +24,11 @@ import { cn } from '@/lib/utils'
 
 function formatIBAN(raw: string): string {
   const clean = raw.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 18)
-  return (clean.match(/.{1,4}/g) ?? []).join(' ')
+  if (!clean) return ''
+  // NL IBAN: LL NN LLLL NNNN NNNN NN (18 chars) → group as 4-4-4-4-2
+  return [clean.slice(0, 4), clean.slice(4, 8), clean.slice(8, 12), clean.slice(12, 16), clean.slice(16, 18)]
+    .filter(Boolean)
+    .join(' ')
 }
 
 const EMPTY = {
@@ -39,7 +43,9 @@ const EMPTY = {
   contractType: 'onbepaald',
   billingPeriod: 'maandelijks',
   billingDay: '1',
-  indexation: 'cbs',
+  indexation: 'cpi',
+  indexationPct: '',
+  indexMonth: '1',
   noticePeriodMonths: '1',
 }
 
@@ -52,6 +58,7 @@ export type CreatedTenantPayload = {
   monthlyRent?: number
   startDate?: string | null
   leaseLinkFailed?: boolean
+  inviteSent?: boolean
 }
 
 type UnitOption = {
@@ -66,7 +73,6 @@ interface NewTenantDialogProps {
   onClose: () => void
   onCreated: (tenant: CreatedTenantPayload) => void
 }
-
 
 function safeValue(v: string) {
   if (!v || v.includes('NaN') || v.includes('undefined') || v.trim() === '') return 'Niet gedefinieerd'
@@ -85,6 +91,56 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   )
 }
 
+function OptInCard({
+  icon,
+  title,
+  description,
+  checked,
+  onChange,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'w-full flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all duration-150',
+        checked
+          ? 'border-[#163300] bg-[#163300]/[0.03] dark:border-[#9FE870] dark:bg-[#9FE870]/[0.06]'
+          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600',
+      )}
+    >
+      <div className={cn(
+        'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-colors',
+        checked
+          ? 'bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300]'
+          : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 dark:text-gray-500',
+      )}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-900 dark:text-white">{title}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{description}</p>
+      </div>
+      {/* Toggle pill */}
+      <div className={cn(
+        'relative h-6 w-10 rounded-full shrink-0 transition-colors duration-150',
+        checked ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700',
+      )}>
+        <div className={cn(
+          'absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-150',
+          checked ? 'left-5' : 'left-1',
+        )} />
+      </div>
+    </button>
+  )
+}
+
 export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogProps) {
   const { isDemo } = useDashboardUser()
   const [step, setStep] = useState(1)
@@ -96,12 +152,18 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
   const [error, setError] = useState<string | null>(null)
   const [showPreview, setShowPreview] = useState(false)
 
+  // New opt-in choices
+  const [createContract, setCreateContract] = useState(true)
+  const [inviteTenant, setInviteTenant] = useState(true)
+
   useEffect(() => {
     if (!open) return
     setForm({ ...EMPTY })
     setUnitId('')
     setStep(1)
     setError(null)
+    setCreateContract(true)
+    setInviteTenant(true)
 
     if (isDemo) {
       setUnitOptions(
@@ -140,7 +202,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
       .finally(() => setLoadingUnits(false))
   }, [open, isDemo])
 
-  // Prefill huurprijs van geselecteerde eenheid
   useEffect(() => {
     const unit = unitOptions.find((o) => o.unitId === unitId)
     if (unit && !form.monthlyRent) {
@@ -152,18 +213,44 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
   const setField = (key: keyof typeof EMPTY, val: string) =>
     setForm((f) => ({ ...f, [key]: val }))
 
-  const step1Valid = !!form.full_name.trim() && !!form.monthlyRent && !!unitId
-  const step2Valid = !!form.startDate
+  // Step navigation — step 3 (contract details) is skipped if createContract=false
+  const totalSteps = createContract ? 4 : 3
+  const displayStep = createContract ? step : (step === 4 ? 3 : step)
 
-  const handleStep1Next = () => {
-    // Auto-fill borg = 1x maandhuur als nog niet ingevuld
-    if (!form.deposit && form.monthlyRent) {
-      setField('deposit', form.monthlyRent)
+  const step1Valid = !!form.full_name.trim() && !!form.monthlyRent && !!unitId
+  const step3Valid = !!form.startDate // only relevant when createContract=true
+
+  const goNext = () => {
+    if (step === 1) {
+      if (!form.deposit && form.monthlyRent) setField('deposit', form.monthlyRent)
+      setStep(2)
+    } else if (step === 2) {
+      setStep(createContract ? 3 : 4)
+    } else if (step === 3) {
+      setStep(4)
     }
-    setStep(2)
   }
 
-  const handleSave = async (sendToTenant: boolean) => {
+  const goBack = () => {
+    if (step === 4) setStep(createContract ? 3 : 2)
+    else if (step === 3) setStep(2)
+    else if (step === 2) setStep(1)
+  }
+
+  const primaryDisabled =
+    saving ||
+    (step === 1 && !step1Valid) ||
+    (step === 3 && !step3Valid)
+
+  const stepTitles = ['Nieuwe huurder', 'Instellen', 'Contractdetails', 'Controleer & afronden']
+  const stepSubtitles = [
+    'Persoonsgegevens en contactinformatie van de huurder.',
+    'Kies wat je wilt aanmaken voor deze huurder.',
+    'Standaardwaarden zijn alvast ingevuld, pas aan waar nodig.',
+    'Controleer de samenvatting voordat je opslaat.',
+  ]
+
+  const handleSave = async () => {
     setSaving(true)
     setError(null)
     try {
@@ -176,12 +263,14 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
           propertyName: selectedUnit?.propertyName ?? '',
           monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
           startDate: form.startDate || null,
+          inviteSent: inviteTenant,
         })
         onClose()
         return
       }
       const { user } = await getUser()
       if (!user) throw new Error('Niet ingelogd')
+
       const created = await tenantQueries.create({
         owner_id: user.id,
         full_name: form.full_name.trim(),
@@ -191,22 +280,53 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
 
       if (unitId && selectedUnit) {
         try {
-          await leaseQueries.create({
-            owner_id: user.id,
-            unit_id: unitId,
-            tenant_id: created.id,
-            start_date: form.startDate,
-            end_date: form.endDate || null,
-            monthly_rent: parseFloat(form.monthlyRent) || selectedUnit.monthlyRent,
-            deposit: form.deposit ? parseFloat(form.deposit) : null,
-            status: 'actief',
-            notes: null,
+          const res = await fetch('/api/leases', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              unitId,
+              tenantId: created.id,
+              startDate: form.startDate || new Date().toISOString().slice(0, 10),
+              endDate: form.endDate || null,
+              monthlyRent: parseFloat(form.monthlyRent) || selectedUnit.monthlyRent,
+              deposit: form.deposit ? parseFloat(form.deposit) : null,
+              indexationMethod: form.indexation === 'geen' ? 'none' : form.indexation,
+              indexationPct: (form.indexation === 'cpi_plus' || form.indexation === 'fixed')
+                ? parseFloat(form.indexationPct) || null
+                : null,
+              indexMonth: form.indexation !== 'geen' ? parseInt(form.indexMonth) || 1 : null,
+            }),
           })
-          await unitQueries.update(unitId, { status: 'verhuurd' } as never)
-        } catch {
-          onCreated({ id: created.id, full_name: created.full_name, email: created.email, phone: created.phone, leaseLinkFailed: true, propertyName: selectedUnit?.propertyName ?? '', monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0 })
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}))
+            throw new Error(body.error || `HTTP ${res.status}`)
+          }
+        } catch (leaseErr: any) {
+          console.error('[new-tenant] lease creation failed:', leaseErr?.message ?? leaseErr)
+          onCreated({
+            id: created.id,
+            full_name: created.full_name,
+            email: created.email,
+            phone: created.phone,
+            leaseLinkFailed: true,
+            propertyName: selectedUnit?.propertyName ?? '',
+            monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
+          })
           onClose()
           return
+        }
+      }
+
+      // Send platform invite if chosen — uses /api/invitations/send (tenant already created)
+      if (inviteTenant && created.email) {
+        try {
+          await fetch('/api/invitations/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tenantId: created.id }),
+          })
+        } catch (inviteErr) {
+          console.error('[new-tenant] invite failed (non-fatal):', inviteErr)
         }
       }
 
@@ -218,6 +338,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
         startDate: form.startDate || null,
         propertyName: selectedUnit?.propertyName ?? '',
         monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
+        inviteSent: inviteTenant && !!created.email,
       })
       onClose()
     } catch (err) {
@@ -231,40 +352,22 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
     ? `Maandelijks, dag ${form.billingDay}`
     : form.billingPeriod === 'kwartaal' ? 'Per kwartaal' : 'Jaarlijks'
 
-  const stepTitles = [
-    'Nieuwe huurovereenkomst',
-    'Contractdetails',
-    'Controleer & verstuur',
-  ]
-  const stepSubtitles = [
-    'Persoonsgegevens en contactinformatie van de huurder.',
-    'Standaardwaarden zijn alvast ingevuld, pas aan waar nodig.',
-    'Controleer de samenvatting voordat je verzendt.',
-  ]
-
   return (
     <CreateDialogShell
       open={open}
       onOpenChange={(v) => { if (!v) onClose() }}
       title={stepTitles[step - 1]}
       subtitle={stepSubtitles[step - 1]}
-      primaryLabel={step < 3 ? 'Verder' : 'Verzenden naar huurder'}
-      onPrimary={
-        step === 1 ? handleStep1Next
-        : step === 2 ? () => setStep(3)
-        : () => handleSave(true)
-      }
-      primaryDisabled={saving || (step === 1 ? !step1Valid : step === 2 ? !step2Valid : false)}
+      primaryLabel={step < 4 ? 'Verder' : 'Opslaan'}
+      onPrimary={step < 4 ? goNext : handleSave}
+      primaryDisabled={primaryDisabled}
       primaryLoading={saving}
-      secondaryLabel={step === 3 ? 'Opslaan' : undefined}
-      onSecondary={step === 3 ? () => handleSave(false) : undefined}
-      secondaryDisabled={saving}
-      secondaryLoading={saving}
-      step={step}
-      totalSteps={3}
-      onBack={step > 1 ? () => setStep(step - 1) : undefined}
+      step={displayStep}
+      totalSteps={totalSteps}
+      onBack={step > 1 ? goBack : undefined}
       scrollBody
     >
+      {/* Step 1 — Persoonsgegevens */}
       {step === 1 && (
         <div className="space-y-3">
           {error && (
@@ -272,7 +375,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               {error}
             </p>
           )}
-
           <DialogField label="Naam huurder" required>
             <Input
               autoFocus
@@ -283,7 +385,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               autoComplete="name"
             />
           </DialogField>
-
           <div className="grid grid-cols-2 gap-3">
             <DialogField label="Email" optional>
               <Input type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} placeholder="naam@voorbeeld.nl" className="rounded-xl" autoComplete="email" />
@@ -292,7 +393,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               <Input type="tel" value={form.phone} onChange={(e) => setField('phone', e.target.value)} placeholder="+31 6 12345678" className="rounded-xl" autoComplete="tel" />
             </DialogField>
           </div>
-
           <DialogField label="Object / eenheid" required>
             {loadingUnits ? (
               <p className="text-sm text-gray-500">Eenheden laden…</p>
@@ -313,7 +413,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               </Select>
             )}
           </DialogField>
-
           <DialogField label="Huurprijs per maand" required>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500">€</span>
@@ -327,7 +426,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               />
             </div>
           </DialogField>
-
           <DialogField label="Bankrekeningnummer huurder" optional>
             <Input
               value={form.bankAccount}
@@ -342,7 +440,42 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
         </div>
       )}
 
+      {/* Step 2 — Opt-in keuzes */}
       {step === 2 && (
+        <div className="space-y-3">
+          <OptInCard
+            icon={<ScrollText className="h-5 w-5" />}
+            title="Contract aanmaken"
+            description="Genereer een huurovereenkomst op basis van de ingevoerde gegevens. Zet dit uit als het contract al bestaat."
+            checked={createContract}
+            onChange={setCreateContract}
+          />
+          <OptInCard
+            icon={<Mail className="h-5 w-5" />}
+            title="Huurder uitnodigen voor platform"
+            description="Stuur een uitnodigingsmail zodat de huurder toegang krijgt tot hun eigen portaal."
+            checked={inviteTenant}
+            onChange={(v) => {
+              // Can only invite if email is known
+              if (v && !form.email.trim()) return
+              setInviteTenant(v)
+            }}
+          />
+          {inviteTenant && !form.email.trim() && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 px-1">
+              Vul een e-mailadres in bij stap 1 om de huurder te kunnen uitnodigen.
+            </p>
+          )}
+          {!inviteTenant && !form.email.trim() && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 px-1">
+              Geen e-mailadres ingevuld — uitnodiging is uitgeschakeld.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Step 3 — Contractdetails (only when createContract=true) */}
+      {step === 3 && createContract && (
         <div className="space-y-3">
           <DialogField label="Borg">
             <div className="relative">
@@ -357,7 +490,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               />
             </div>
           </DialogField>
-
           <DialogField label="Contractvorm">
             <Select value={form.contractType} onValueChange={(v) => setField('contractType', v)}>
               <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
@@ -367,14 +499,12 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               </SelectContent>
             </Select>
           </DialogField>
-
           <div className={cn('grid gap-3', form.contractType === 'bepaald' ? 'grid-cols-2' : 'grid-cols-1')}>
             <DialogDateField label="Startdatum" value={form.startDate} onChange={(v) => setField('startDate', v)} required />
             {form.contractType === 'bepaald' && (
               <DialogDateField label="Einddatum" value={form.endDate} onChange={(v) => setField('endDate', v)} min={form.startDate || undefined} />
             )}
           </div>
-
           <div className={cn('grid gap-3', form.billingPeriod === 'maandelijks' ? 'grid-cols-2' : 'grid-cols-1')}>
             <DialogField label="Facturatie periode">
               <Select value={form.billingPeriod} onValueChange={(v) => setField('billingPeriod', v)}>
@@ -405,18 +535,51 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               </DialogField>
             )}
           </div>
-
+          <div className="space-y-3">
+            <div className={cn('grid gap-3', form.indexation !== 'geen' ? 'grid-cols-2' : 'grid-cols-1')}>
+              <DialogField label="Jaarlijkse indexatie">
+                <Select value={form.indexation} onValueChange={(v) => setField('indexation', v)}>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cpi">CPI – CBS-inflatie</SelectItem>
+                    <SelectItem value="cpi_plus">CPI + opslag %</SelectItem>
+                    <SelectItem value="fixed">Vast percentage</SelectItem>
+                    <SelectItem value="geen">Geen indexatie</SelectItem>
+                  </SelectContent>
+                </Select>
+              </DialogField>
+              {form.indexation !== 'geen' && (
+                <DialogField label="Indexatiemaand">
+                  <Select value={form.indexMonth} onValueChange={(v) => setField('indexMonth', v)}>
+                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'].map((m, i) => (
+                        <SelectItem key={i+1} value={String(i+1)}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </DialogField>
+              )}
+            </div>
+            {(form.indexation === 'cpi_plus' || form.indexation === 'fixed') && (
+              <DialogField label={form.indexation === 'cpi_plus' ? 'Opslag bovenop CPI (%)' : 'Vast percentage (%)'}>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min={0}
+                    max={20}
+                    placeholder="bijv. 1.5"
+                    value={form.indexationPct}
+                    onChange={(e) => setField('indexationPct', e.target.value)}
+                    className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="text-xs text-gray-400 shrink-0">%</span>
+                </div>
+              </DialogField>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <DialogField label="Jaarlijkse indexatie">
-              <Select value={form.indexation} onValueChange={(v) => setField('indexation', v)}>
-                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cbs">CBS-inflatie (standaard)</SelectItem>
-                  <SelectItem value="vast">Vast percentage</SelectItem>
-                  <SelectItem value="geen">Geen indexatie</SelectItem>
-                </SelectContent>
-              </Select>
-            </DialogField>
             <DialogField label="Opzegtermijn huurder">
               <div className="flex items-center gap-2">
                 <Input
@@ -439,38 +602,77 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
         </div>
       )}
 
-      {step === 3 && (
+      {/* Step 4 — Samenvatting */}
+      {step === 4 && (
         <div className="space-y-4">
-          <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
-            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Samenvatting</p>
-            <SummaryRow label="Huurder" value={form.full_name} />
-            <SummaryRow label="Object" value={selectedUnit?.label ?? ''} />
-            <SummaryRow label="Huurprijs" value={form.monthlyRent ? `€ ${parseFloat(form.monthlyRent).toLocaleString('nl-NL')} / mnd` : ''} />
-            <SummaryRow label="Borg" value={form.deposit ? `€ ${parseFloat(form.deposit).toLocaleString('nl-NL')}` : ''} />
-            <SummaryRow label="Bankrekeningnummer" value={form.bankAccount} />
-            <SummaryRow label="Contractvorm" value={form.contractType === 'onbepaald' ? 'Onbepaalde tijd' : 'Bepaalde tijd'} />
-            <SummaryRow label="Startdatum" value={form.startDate} />
-            {form.contractType === 'bepaald' && (
-              <SummaryRow label="Einddatum" value={form.endDate} />
-            )}
-            <SummaryRow label="Facturatie" value={billingLabel} />
-            <SummaryRow label="Indexatie" value={form.indexation === 'cbs' ? 'CBS-inflatie' : form.indexation === 'vast' ? 'Vast %' : 'Geen'} />
-            <SummaryRow label="Opzegtermijn" value={`${form.noticePeriodMonths} ${Number(form.noticePeriodMonths) === 1 ? 'maand' : 'maanden'}`} />
+
+          {/* Opt-in badges */}
+          <div className="flex flex-wrap gap-2">
+            <span className={cn(
+              'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full',
+              createContract
+                ? 'bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
+                : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
+            )}>
+              <ScrollText className="h-3 w-3" />
+              {createContract ? 'Contract wordt aangemaakt' : 'Geen contract'}
+            </span>
+            <span className={cn(
+              'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full',
+              inviteTenant && form.email.trim()
+                ? 'bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
+                : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
+            )}>
+              <Mail className="h-3 w-3" />
+              {inviteTenant && form.email.trim() ? 'Uitnodiging wordt verstuurd' : 'Geen uitnodiging'}
+            </span>
           </div>
 
-          {/* Contract preview (popup) */}
-          <button
-            type="button"
-            onClick={() => setShowPreview(true)}
-            className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-          >
-            <FileText className="h-4 w-4 shrink-0" />
-            Contractvoorbeeld bekijken
-          </button>
+          <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
+            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Huurder</p>
+            <SummaryRow label="Naam" value={form.full_name} />
+            <SummaryRow label="Email" value={form.email} />
+            <SummaryRow label="Telefoon" value={form.phone} />
+            <SummaryRow label="Bankrekeningnummer" value={form.bankAccount} />
+          </div>
+
+          <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
+            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Object & huur</p>
+            <SummaryRow label="Object" value={selectedUnit?.label ?? ''} />
+            <SummaryRow label="Huurprijs" value={form.monthlyRent ? `€ ${parseFloat(form.monthlyRent).toLocaleString('nl-NL')} / mnd` : ''} />
+            {createContract && <SummaryRow label="Borg" value={form.deposit ? `€ ${parseFloat(form.deposit).toLocaleString('nl-NL')}` : ''} />}
+          </div>
+
+          {createContract && (
+            <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
+              <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Contract</p>
+              <SummaryRow label="Contractvorm" value={form.contractType === 'onbepaald' ? 'Onbepaalde tijd' : 'Bepaalde tijd'} />
+              <SummaryRow label="Startdatum" value={form.startDate} />
+              {form.contractType === 'bepaald' && <SummaryRow label="Einddatum" value={form.endDate} />}
+              <SummaryRow label="Facturatie" value={billingLabel} />
+              <SummaryRow label="Indexatie" value={
+                form.indexation === 'cpi' ? 'CBS CPI' :
+                form.indexation === 'cpi_plus' ? `CBS CPI + ${form.indexationPct || '?'}%` :
+                form.indexation === 'fixed' ? `Vast ${form.indexationPct || '?'}%` :
+                'Geen'
+              } />
+              <SummaryRow label="Opzegtermijn" value={`${form.noticePeriodMonths} ${Number(form.noticePeriodMonths) === 1 ? 'maand' : 'maanden'}`} />
+            </div>
+          )}
+
+          {createContract && (
+            <button
+              type="button"
+              onClick={() => setShowPreview(true)}
+              className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <FileText className="h-4 w-4 shrink-0" />
+              Contractvoorbeeld bekijken
+            </button>
+          )}
 
           {showPreview && (
             <div className="fixed inset-0 z-[60] flex flex-col bg-neutral-900/95 backdrop-blur-sm">
-              {/* Toolbar */}
               <div className="flex items-center justify-between px-4 py-3 bg-neutral-900 border-b border-neutral-800 shrink-0">
                 <div className="flex items-center gap-3">
                   <FileText className="h-4 w-4 text-gray-400" />
@@ -484,7 +686,6 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              {/* Document area */}
               <div className="flex-1 overflow-auto p-6 flex justify-center">
                 <div className="w-full max-w-3xl bg-white rounded shadow-2xl overflow-hidden">
                   <iframe

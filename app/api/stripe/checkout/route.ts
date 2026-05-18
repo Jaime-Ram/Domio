@@ -22,11 +22,13 @@ export async function POST(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
   // Retrieve or create Stripe customer
-  const { data: sub } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
+  const { data: sub } = await db
     .from('subscriptions')
     .select('stripe_customer_id')
     .eq('user_id', user.id)
-    .single()
+    .single() as { data: { stripe_customer_id: string | null } | null }
 
   let customerId = sub?.stripe_customer_id ?? null
 
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
     })
     customerId = customer.id
 
-    await supabase
+    await db
       .from('subscriptions')
       .upsert({ user_id: user.id, stripe_customer_id: customerId }, { onConflict: 'user_id' })
   }
