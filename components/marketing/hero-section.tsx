@@ -9,13 +9,6 @@ interface HeroSectionProps {
   onSignupClick?: () => void
 }
 
-const TRUSTED_LOGOS = [
-  { name: 'Vesteda', src: null },
-  { name: 'Bouwinvest', src: null },
-  { name: 'Amvest', src: null },
-  { name: 'Syntrus Achmea', src: null },
-  { name: 'NSI', src: null },
-]
 
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -80,12 +73,10 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-          className="text-[2.75rem] sm:text-6xl md:text-7xl lg:text-8xl font-light text-white leading-[1.0] tracking-tight max-w-4xl"
+          className="text-[2.75rem] sm:text-6xl md:text-7xl lg:text-8xl font-light text-white leading-[1.05] tracking-tight max-w-4xl"
         >
-          Eén platform voor{' '}
-          <span className="font-semibold text-[#9FE870]">heel</span>{' '}
-          <br className="hidden sm:block" />
-          je vastgoed.
+          Eén platform voor<br />
+          <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
         </motion.h1>
 
         {/* Subtitel */}
@@ -109,7 +100,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           <button
             type="button"
             onClick={onSignupClick}
-            className="rounded-full bg-[#9FE870] text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-[#8AD45F] transition-colors shadow-lg"
+            className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
           >
             Gratis aan de slag
           </button>
@@ -131,30 +122,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           30 dagen gratis · Geen creditcard · Maandelijks opzegbaar
         </motion.p>
       </div>
-
-      {/* ── Vertrouwd door strip ───────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        className="relative z-10 w-full px-6 md:px-12 lg:px-20 pb-10 pt-14"
-      >
-        <div className="max-w-7xl mx-auto">
-          <p className="text-xs text-white/35 uppercase tracking-widest font-medium mb-6">
-            Vertrouwd door verhuurders en beheerders in heel Nederland
-          </p>
-          <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
-            {TRUSTED_LOGOS.map((logo) => (
-              <div
-                key={logo.name}
-                className="text-white/25 text-sm font-medium tracking-wide hover:text-white/50 transition-colors"
-              >
-                {logo.name}
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
 
     </section>
   )

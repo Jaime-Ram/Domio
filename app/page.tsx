@@ -143,7 +143,7 @@ export default function Home() {
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
             <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
-            <Logo width={84} height={23} />
+            <Logo width={68} height={19} />
           </div>
 
             {/* Desktop Navigation - links uitgelijnd */}
