@@ -21,7 +21,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
   }, [])
 
   return (
-    <section className="relative w-full min-h-[100svh] flex flex-col overflow-hidden bg-black">
+    <section className="relative w-full min-h-[72vh] flex flex-col overflow-hidden bg-black">
 
       {/* ── Achtergrond video ─────────────────────────────────────────── */}
       <video
@@ -54,26 +54,14 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
       {/* ── Content ───────────────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 justify-center px-6 pt-28 pb-0 md:px-12 lg:px-20 max-w-7xl mx-auto w-full">
+      <div className="relative z-10 flex flex-col flex-1 justify-center px-4 pt-24 pb-10 md:px-8 max-w-7xl mx-auto w-full">
 
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-white/80 mb-8 tracking-wide uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#9FE870] animate-pulse" />
-            Vastgoedbeheer voor elk portfolio
-          </span>
-        </motion.div>
-
-        {/* Headline — dun, groot, authentiek */}
+        {/* Headline — dun, authentiek */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-          className="text-[2.75rem] sm:text-6xl md:text-7xl lg:text-8xl font-light text-white leading-[1.05] tracking-tight max-w-4xl"
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="text-4xl sm:text-5xl md:text-[3.25rem] font-light text-white leading-[1.1] tracking-tight max-w-2xl"
         >
           Eén platform voor<br />
           <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
@@ -83,7 +71,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.22 }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
           className="mt-6 text-base sm:text-lg text-white/60 font-light max-w-xl leading-relaxed"
         >
           Van één woning tot duizenden eenheden. Domio beheert huurders,
@@ -94,7 +82,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.35 }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.25 }}
           className="mt-10 flex flex-col sm:flex-row items-start gap-4"
         >
           <button
@@ -116,7 +104,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.6, delay: 0.38 }}
           className="mt-6 text-xs text-white/40 font-light"
         >
           30 dagen gratis · Geen creditcard · Maandelijks opzegbaar
