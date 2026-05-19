@@ -53,7 +53,7 @@ export function FunctiesSection() {
   return (
     <section
       id="features"
-      className="w-full py-24 sm:py-32 pb-16 sm:pb-20 bg-[#9FE870] dark:bg-[#7bc755]"
+      className="w-full py-24 sm:py-32 pb-16 sm:pb-20 bg-white dark:bg-neutral-950"
     >
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         <div className="mb-12 text-center md:mb-16">

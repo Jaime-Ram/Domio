@@ -61,7 +61,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-4xl sm:text-5xl md:text-[3.25rem] font-light text-white leading-[1.1] tracking-tight max-w-2xl"
+          className="text-5xl sm:text-6xl md:text-7xl font-light text-white leading-[1.05] tracking-tight max-w-3xl"
         >
           Eén platform voor<br />
           <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
