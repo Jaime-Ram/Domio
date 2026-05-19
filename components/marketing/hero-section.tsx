@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
+import { Pause, Play } from 'lucide-react'
 
 interface HeroSectionProps {
   onSignupClick?: () => void
@@ -12,12 +13,20 @@ interface HeroSectionProps {
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [playing, setPlaying] = useState(true)
 
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
     v.play().catch(() => {})
   }, [])
+
+  const togglePlay = () => {
+    const v = videoRef.current
+    if (!v) return
+    if (playing) { v.pause(); setPlaying(false) }
+    else { v.play().catch(() => {}); setPlaying(true) }
+  }
 
   return (
     <section className="relative w-full min-h-[72vh] flex flex-col overflow-hidden bg-black">
@@ -82,28 +91,34 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           </button>
         </motion.div>
 
-        {/* Trusted by */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
-          className="mt-10"
-        >
-          <p className="text-[11px] uppercase tracking-widest text-white/30 font-medium mb-4">
-            Trusted by
-          </p>
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-            {['Vesteda', 'Bouwinvest', 'Amvest', 'Heimstaden', 'NSI', 'CBRE'].map((name) => (
-              <span
-                key={name}
-                className="text-white/40 text-sm font-semibold tracking-wide"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
-        </motion.div>
       </div>
+
+      {/* ── Trusted by — onderaan, zelfde lijn als Fiverr ─────────────── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="relative z-10 w-full px-4 md:px-8 pb-6 pt-2"
+      >
+        <div className="max-w-7xl mx-auto flex items-center gap-8 flex-wrap">
+          <span className="text-white/70 text-sm font-normal shrink-0">Trusted by:</span>
+          {['Vesteda', 'Bouwinvest', 'Amvest', 'Heimstaden', 'NSI', 'CBRE'].map((name) => (
+            <span key={name} className="text-white text-sm font-semibold tracking-wide">
+              {name}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ── Play / pause knop rechtsonder ─────────────────────────────── */}
+      <button
+        type="button"
+        onClick={togglePlay}
+        className="absolute bottom-5 right-5 z-20 h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        aria-label={playing ? 'Video pauzeren' : 'Video afspelen'}
+      >
+        {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+      </button>
 
     </section>
   )
