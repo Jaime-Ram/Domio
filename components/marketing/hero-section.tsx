@@ -61,54 +61,53 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       {/* Subtiele vignette onderaan voor soepele overgang */}
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
-      {/* ── Content ───────────────────────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 justify-center px-4 pt-24 pb-10 md:px-8 max-w-7xl mx-auto w-full">
+      {/* ── Eén container voor alles — zelfde marge links ─────────────── */}
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-6 md:px-10">
 
-        {/* Headline — dun, authentiek */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-5xl sm:text-6xl md:text-7xl font-light text-white leading-[1.05] tracking-tight max-w-3xl"
-        >
-          Eén platform voor<br />
-          <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
-        </motion.h1>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
-          className="mt-10"
-        >
-          <button
-            type="button"
-            onClick={onSignupClick}
-            className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
+        {/* Titel + knop — verticaal gecentreerd */}
+        <div className="flex flex-col flex-1 justify-center pt-24 pb-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="text-5xl sm:text-6xl md:text-7xl font-light text-white leading-[1.05] tracking-tight max-w-3xl"
           >
-            Start direct
-          </button>
-        </motion.div>
+            Eén platform voor<br />
+            <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
+          </motion.h1>
 
-      </div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
+            className="mt-10"
+          >
+            <button
+              type="button"
+              onClick={onSignupClick}
+              className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
+            >
+              Start direct
+            </button>
+          </motion.div>
+        </div>
 
-      {/* ── Trusted by — onderaan, zelfde lijn als Fiverr ─────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="relative z-10 w-full px-4 md:px-8 pb-6 pt-2"
-      >
-        <div className="max-w-7xl mx-auto flex items-center gap-8 flex-wrap">
-          <span className="text-white/70 text-sm font-normal shrink-0">Trusted by:</span>
+        {/* Trusted by — onderkant, zelfde linkermarge */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex items-center gap-8 flex-wrap pb-6"
+        >
+          <span className="text-white text-sm font-normal shrink-0">Trusted by:</span>
           {['Vesteda', 'Bouwinvest', 'Amvest', 'Heimstaden', 'NSI', 'CBRE'].map((name) => (
             <span key={name} className="text-white text-sm font-semibold tracking-wide">
               {name}
             </span>
           ))}
-        </div>
-      </motion.div>
+        </motion.div>
+
+      </div>
 
       {/* ── Play / pause knop rechtsonder ─────────────────────────────── */}
       <button
