@@ -78,19 +78,31 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             onClick={onSignupClick}
             className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
           >
-            Gratis aan de slag
+            Start direct
           </button>
         </motion.div>
 
-        {/* Sociale proof */}
-        <motion.p
+        {/* Trusted by */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.38 }}
-          className="mt-6 text-xs text-white/40 font-light"
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="mt-10"
         >
-          30 dagen gratis · Geen creditcard · Maandelijks opzegbaar
-        </motion.p>
+          <p className="text-[11px] uppercase tracking-widest text-white/30 font-medium mb-4">
+            Trusted by
+          </p>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            {['Vesteda', 'Bouwinvest', 'Amvest', 'Heimstaden', 'NSI', 'CBRE'].map((name) => (
+              <span
+                key={name}
+                className="text-white/40 text-sm font-semibold tracking-wide"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
     </section>
