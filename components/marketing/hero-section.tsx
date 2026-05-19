@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'motion/react'
 
@@ -67,23 +66,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
         </motion.h1>
 
-        {/* Subtitel */}
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
-          className="mt-6 text-base sm:text-lg text-white/60 font-light max-w-xl leading-relaxed"
-        >
-          Van één woning tot duizenden eenheden. Domio beheert huurders,
-          contracten, financiën en onderhoud — zonder gedoe.
-        </motion.p>
-
-        {/* CTA's */}
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.25 }}
-          className="mt-10 flex flex-col sm:flex-row items-start gap-4"
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
+          className="mt-10"
         >
           <button
             type="button"
@@ -92,12 +80,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           >
             Gratis aan de slag
           </button>
-          <Link
-            href="/demo"
-            className="rounded-full border border-white/30 text-white px-8 py-3.5 text-sm font-medium hover:bg-white/10 transition-colors backdrop-blur-sm"
-          >
-            Bekijk demo →
-          </Link>
         </motion.div>
 
         {/* Sociale proof */}
