@@ -129,7 +129,7 @@ export default function Home() {
         onMouseLeave={handleHeaderMouseLeave}
         onMouseEnter={handleHeaderMouseEnter}
       >
-          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
+          <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-5">
             {/* Mobile: Hamburger Menu (Left) */}
             <Button
               variant="ghost"
@@ -314,7 +314,7 @@ export default function Home() {
               aria-hidden={!functionsMenuOpen}
             >
               <div key={functionsMenuOpen ? 'f-open' : 'f-closed'}>
-                <div className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-3 gap-x-8 gap-y-1">
+                <div className="mx-auto w-full max-w-7xl px-4 pt-4 pb-2 grid grid-cols-3 gap-x-8 gap-y-1">
                   {[
                     { title: 'Object- en Portfoliobeheer', desc: 'Beheer al je panden en portefeuilles', icon: Building2 },
                     { title: 'Huurdersbeheer', desc: 'Huurders en contracten inzichtelijk', icon: Users },
@@ -357,7 +357,7 @@ export default function Home() {
               }}
               aria-hidden={!helpMenuOpen}
             >
-              <div key={helpMenuOpen ? 'h-open' : 'h-closed'} className="mx-auto w-full max-w-7xl px-6 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
+              <div key={helpMenuOpen ? 'h-open' : 'h-closed'} className="mx-auto w-full max-w-7xl px-4 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-1 place-content-start md:min-h-[200px]">
                   <Link href="/hulp" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '0ms' }}>
                     <MessageCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
@@ -588,7 +588,7 @@ export default function Home() {
 
       {/* Beheerder Types Section – Wise-achtige layout: headline + CTA links, drie componenten met icoon + tekst eronder */}
       <section className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 lg:px-6">
           {/* Boven: headline + tekst + CTA (geen illustratie) */}
           <div className="max-w-2xl">
             <h2 className="text-base font-semibold leading-7 text-[#163300] mb-2">Beheerder types</h2>
@@ -641,7 +641,7 @@ export default function Home() {
 
       {/* App Section — tijdelijk uitgeschakeld, activeren zodra de app live is
       <section className="relative z-20 pt-24 pb-12">
-        <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+        <div className="container mx-auto w-full max-w-7xl px-4 md:px-6 relative z-10">
           <div className="rounded-3xl bg-[#163300] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <GeometricShapes
               variant="trapezoid"
@@ -701,7 +701,7 @@ export default function Home() {
 
         {/* Over Ons Section - Large section with building background and fade overlay */}
         <section id="over-ons" className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
-          <div className="container mx-auto w-full max-w-7xl px-6 md:px-8">
+          <div className="container mx-auto w-full max-w-7xl px-4 md:px-6">
             <div className="rounded-3xl relative overflow-hidden min-h-[650px] md:min-h-[600px]">
               {/* Background Image with buildings */}
               <div className="absolute inset-0">
@@ -764,7 +764,7 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         {/* Background that extends from middle of CTA into footer */}
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
-        <div className="container mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
+        <div className="container mx-auto w-full max-w-7xl px-4 md:px-6 relative z-10">
           <div className="rounded-3xl bg-[#163300] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
             {/* Geometric decorative element - positioned where no text (bottom right, shifted more right/bottom on mobile) */}
             <GeometricShapes 

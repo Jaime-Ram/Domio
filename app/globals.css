@@ -2,14 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Klikbare elementen: pointer-cursor */
-@layer base {
-  button:not(:disabled),
-  a[href],
-  [role="button"]:not([aria-disabled="true"]),
-  [role="menuitem"] {
-    cursor: pointer;
-  }
+/* Klikbare elementen: pointer-cursor
+   Buiten @layer geschreven zodat het wint van Tailwind utility classes (cursor-default etc.) */
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+[role="menuitem"]:not([data-disabled]),
+[role="option"]:not([data-disabled]),
+[role="checkbox"]:not([data-disabled]),
+[role="radio"]:not([data-disabled]),
+[role="tab"]:not([data-disabled]),
+[role="combobox"]:not(:disabled),
+[role="switch"]:not([data-disabled]),
+[role="listbox"] [data-radix-collection-item]:not([data-disabled]),
+select:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled),
+input[type="file"]:not(:disabled),
+input[type="range"]:not(:disabled),
+label:has(input:not(:disabled)),
+[data-radix-collection-item]:not([data-disabled]) {
+  cursor: pointer;
 }
 
 /* Geen focus-ringen op interactieve elementen */

@@ -14,21 +14,27 @@ import {
   Euro,
   HardDrive,
   Settings,
+  MessageCircle,
 } from 'lucide-react'
-import type { SidebarItem } from '@/components/dashboard/vastgoed-sidebar'
+import type { MenuGroup } from '@/components/dashboard/vastgoed-sidebar'
 
 const TENANT_BASE_PATH = '/dashboard/tenant'
 
-const TENANT_MENU_GROUPS: SidebarItem[][] = [
-  [
-    { label: 'Dashboard', href: TENANT_BASE_PATH, icon: LayoutDashboard },
-    { label: 'Tickets', href: `${TENANT_BASE_PATH}/tickets`, icon: Ticket },
-    { label: 'Betalingen', href: `${TENANT_BASE_PATH}/betalingen`, icon: Euro },
-    { label: 'Documenten', href: `${TENANT_BASE_PATH}/documenten`, icon: HardDrive },
-  ],
-  [
-    { label: 'Account', href: `${TENANT_BASE_PATH}/account`, icon: Settings },
-  ],
+const TENANT_MENU_GROUPS: MenuGroup[] = [
+  {
+    items: [
+      { label: 'Dashboard', href: TENANT_BASE_PATH, icon: LayoutDashboard },
+      { label: 'Tickets', href: `${TENANT_BASE_PATH}/tickets`, icon: Ticket },
+      { label: 'Berichten', href: `${TENANT_BASE_PATH}/messages`, icon: MessageCircle },
+      { label: 'Betalingen', href: `${TENANT_BASE_PATH}/betalingen`, icon: Euro },
+      { label: 'Documenten', href: `${TENANT_BASE_PATH}/documenten`, icon: HardDrive },
+    ],
+  },
+  {
+    items: [
+      { label: 'Account', href: `${TENANT_BASE_PATH}/account`, icon: Settings },
+    ],
+  },
 ]
 
 const ENTER_DURATION_MS = 420

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, Fragment, Suspense } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -9,6 +9,8 @@ import {
   ChevronDown,
   ChevronsUpDown,
   ChevronRight,
+  AlertCircle,
+  X,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import { cn } from '@/lib/utils'
@@ -23,6 +25,7 @@ import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
 
 type TenantRow = {
   id: string
@@ -56,11 +59,17 @@ function TenantsPageContent() {
   })
   const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [newTenantOpen, setNewTenantOpen] = useState(false)
+  const [leaseLinkError, setLeaseLinkError] = useState<string | null>(null)
 
 
   useEffect(() => {
     if (searchParams.get('nieuw') === '1') {
       setNewTenantOpen(true)
+      router.replace(`${basePath}/tenants`, { scroll: false })
+    }
+    const tenantParam = searchParams.get('tenant')
+    if (tenantParam) {
+      setSelectedTenantId(tenantParam)
       router.replace(`${basePath}/tenants`, { scroll: false })
     }
   }, [searchParams, router, basePath])
@@ -122,7 +131,7 @@ function TenantsPageContent() {
       ...prev,
     ])
     if (!isDemo && t.leaseLinkFailed) {
-      router.push(`${basePath}/tenants/${t.id}?koppeling=mislukt`)
+      setLeaseLinkError(`${t.full_name} is aangemaakt, maar koppeling aan het object is mislukt. Koppel een huurovereenkomst via het object of via de huurdersheet.`)
     }
   }
 
@@ -272,83 +281,78 @@ function TenantsPageContent() {
 
   return (
     <>
+      {leaseLinkError && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-900/10 px-4 py-3">
+          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-300 flex-1">{leaseLinkError}</p>
+          <button type="button" onClick={() => setLeaseLinkError(null)} className="text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 shrink-0">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
             <div className="flex flex-col gap-8">
             <TableToolbar
+              title="Huurders"
+              count={`${filteredTenants.length} van ${tenants.length} huurder${tenants.length === 1 ? '' : 's'}`}
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder="Zoek huurder, e-mail, object…"
               filterContent={filterContent}
-
               onAdd={() => setNewTenantOpen(true)}
               addLabel="Nieuw contract"
             />
 
-            {/* Lijst */}
-            <div className="rounded-2xl overflow-hidden">
-              {/* Grijs header */}
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+            <DataTable>
+              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]">
                 <SortableHeader label="Huurder" sortKey="name" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Object" sortKey="object" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Status" sortKey="status" sort={tenantSort} onSort={toggleSort} />
                 <span />
-              </div>
-
-              {/* Rijen */}
-              {sortedTenants.length === 0 ? (
-                <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">
-                  Geen huurders gevonden.
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100 dark:divide-neutral-800">
-                  {sortedTenants.map((tenant) => (
-                    <Fragment key={tenant.id}>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedTenantId(tenant.id)}
-                        className="w-full grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left rounded-xl"
-                      >
-                        {/* Huurder */}
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                            <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{tenant.name}</p>
-                            <a
-                              href={`mailto:${tenant.email}`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-gray-500 dark:text-gray-400 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
-                            >{tenant.email}</a>
-                          </div>
-                        </div>
-                        {/* Object */}
-                        <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.propertyName}</p>
-                        {/* Huurprijs */}
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          €{tenant.monthlyRent?.toLocaleString('nl-NL') || '0'}
-                        </p>
-                        {/* Status */}
-                        <div>
-                          <span className={cn(
-                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                            tenant.status === 'actief'
-                              ? 'bg-[#2F5711] text-white'
-                              : tenant.status === 'concept'
-                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-[#A8200D] text-white'
-                          )}>
-                            {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status}
-                          </span>
-                        </div>
-                        {/* Chevron */}
-                        <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
-                      </button>
-                    </Fragment>
-                  ))}
-                </div>
-              )}
-            </div>
+              </DataTableHeader>
+              <DataTableBody>
+                {sortedTenants.length === 0 ? (
+                  <DataTableEmpty>Geen huurders gevonden.</DataTableEmpty>
+                ) : sortedTenants.map((tenant) => (
+                  <DataTableRow
+                    key={tenant.id}
+                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]"
+                    onClick={() => setSelectedTenantId(tenant.id)}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                        <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{tenant.name}</p>
+                        <a
+                          href={`mailto:${tenant.email}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs text-gray-500 dark:text-gray-400 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+                        >{tenant.email}</a>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.propertyName}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      €{tenant.monthlyRent?.toLocaleString('nl-NL') || '0'}
+                    </p>
+                    <div>
+                      <span className={cn(
+                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                        tenant.status === 'actief'
+                          ? 'bg-[#2F5711] text-white'
+                          : tenant.status === 'concept'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                          : 'bg-[#A8200D] text-white'
+                      )}>
+                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status}
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                  </DataTableRow>
+                ))}
+              </DataTableBody>
+            </DataTable>
             </div>
 
       <NewTenantDialog

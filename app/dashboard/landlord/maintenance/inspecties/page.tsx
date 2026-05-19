@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
+import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,10 +20,12 @@ import {
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
 import {
-  ClipboardCheck, Calendar, Ticket, Plus, Search,
+  ClipboardCheck, Calendar, Ticket, Plus,
   CheckCircle2, Clock, AlertTriangle, MapPin, Camera, ChevronRight,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
+import { DropdownMenuCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
@@ -71,6 +75,7 @@ function getStatusBadge(status: InspectionStatus) {
 export default function InspectiesPage() {
   const { basePath, isDemo } = useDashboardUser()
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<Record<InspectionStatus, boolean>>({ gepland: true, afgerond: true, uitgesteld: true })
   const [createOpen, setCreateOpen] = useState(false)
   const [newPropertyId, setNewPropertyId] = useState('')
   const [newType, setNewType] = useState<InspectionType>('tussentijds')
@@ -79,15 +84,30 @@ export default function InspectiesPage() {
   const [newNotes, setNewNotes] = useState('')
   const [inspecties, setInspecties] = useState<Inspection[]>(isDemo ? mockInspecties : [])
 
-  const filtered = inspecties.filter((i) =>
-    !search || i.address.toLowerCase().includes(search.toLowerCase()) || i.inspector.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = inspecties.filter((i) => {
+    if (!statusFilter[i.status]) return false
+    if (search && !i.address.toLowerCase().includes(search.toLowerCase()) && !i.inspector.toLowerCase().includes(search.toLowerCase())) return false
+    return true
+  })
 
   const geplandCount = inspecties.filter((i) => i.status === 'gepland').length
   const afgerondCount = inspecties.filter((i) => i.status === 'afgerond').length
   const uitgesteldCount = inspecties.filter((i) => i.status === 'uitgesteld').length
 
-  const propertyOptions = isDemo ? mockProperties : []
+  const [propertyOptions, setPropertyOptions] = useState<{ id: string; name: string; address: string }[]>(
+    isDemo ? mockProperties : []
+  )
+
+  useEffect(() => {
+    if (isDemo) return
+    fetch('/api/properties')
+      .then(r => r.json())
+      .then(({ properties }) => {
+        setPropertyOptions((properties ?? []).map((p: any) => ({ id: p.id, name: p.name || p.address || 'Pand', address: p.address || '' })))
+      })
+      .catch(e => console.error('[inspecties properties]', e))
+  }, [isDemo])
+
   const selectedProperty = propertyOptions.find((p) => p.id === newPropertyId)
 
   const handleCreate = () => {
@@ -116,66 +136,66 @@ export default function InspectiesPage() {
         <MetricCard label="Uitgesteld" value={String(uitgesteldCount)} icon={<AlertTriangle />} />
       </div>
 
-      {/* Toolbar — no Card wrapper */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">Inspecties</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{filtered.length} inspecties</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:w-[200px]">
-            <Search className="h-4 w-4 text-gray-400 shrink-0" />
-            <Input placeholder="Zoek adres..." value={search} onChange={(e) => setSearch(e.target.value)}
-              className="border-0 focus-visible:ring-0 h-8 px-2 text-sm bg-transparent" />
-          </div>
-          <Button onClick={() => setCreateOpen(true)}
-            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0">
-            <Plus className="h-4 w-4 mr-2" />
-            Nieuwe inspectie
-          </Button>
-        </div>
-      </div>
+      {/* Toolbar */}
+      <TableToolbar
+        title="Inspecties"
+        count={`${filtered.length} van ${inspecties.length} inspectie${inspecties.length === 1 ? '' : 's'}`}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Zoek adres, inspecteur…"
+        filterContent={
+          <>
+            <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Status</DropdownMenuLabel>
+            <div className="space-y-1">
+              {(['gepland', 'afgerond', 'uitgesteld'] as InspectionStatus[]).map((key) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={statusFilter[key] !== false}
+                  onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </div>
+          </>
+        }
+        onAdd={() => setCreateOpen(true)}
+        addLabel="Nieuwe inspectie"
+      />
 
-      {/* List — ActionList style */}
-      <div className="rounded-2xl overflow-hidden">
-        {/* Column headers */}
-        <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Adres</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Type</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Status</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Datum</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Inspecteur</span>
-          <span className="text-sm font-medium text-gray-400 dark:text-gray-500">Notities</span>
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen inspecties gevonden.</div>
-        ) : (
-          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
-            {filtered.map((insp) => (
-              <div
-                key={insp.id}
-                className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
-              >
-                {/* Adres with icon */}
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                    <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                  </div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{insp.address}</p>
+      <DataTable>
+        <DataTableHeader cols="grid-cols-[1fr_auto_auto_auto_auto_auto]">
+          <DataTableHeadCell>Adres</DataTableHeadCell>
+          <DataTableHeadCell>Type</DataTableHeadCell>
+          <DataTableHeadCell>Status</DataTableHeadCell>
+          <DataTableHeadCell>Datum</DataTableHeadCell>
+          <DataTableHeadCell>Inspecteur</DataTableHeadCell>
+          <DataTableHeadCell>Notities</DataTableHeadCell>
+        </DataTableHeader>
+        <DataTableBody>
+          {filtered.length === 0 ? (
+            <DataTableEmpty>Geen inspecties gevonden.</DataTableEmpty>
+          ) : filtered.map((insp) => (
+            <DataTableRow key={insp.id} cols="grid-cols-[1fr_auto_auto_auto_auto_auto]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                  <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{TYPE_LABELS[insp.type]}</p>
-                <div>{getStatusBadge(insp.status)}</div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                  {format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}
-                </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{insp.inspector}</p>
-                <p className="text-sm text-gray-400 dark:text-gray-500 max-w-[200px] truncate">{insp.notes ?? '—'}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{insp.address}</p>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{TYPE_LABELS[insp.type]}</p>
+              <div>{getStatusBadge(insp.status)}</div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                {format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}
+              </p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{insp.inspector}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 max-w-[200px] truncate">{insp.notes ?? '—'}</p>
+            </DataTableRow>
+          ))}
+        </DataTableBody>
+      </DataTable>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent

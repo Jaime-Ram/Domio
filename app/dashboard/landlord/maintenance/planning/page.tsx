@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { dashboardCardClass } from '@/app/dashboard/landlord/dashboard-ui'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,9 @@ import {
   Wrench, Paintbrush, Zap, Droplets, TreePine, ChevronRight,
 } from 'lucide-react'
 import { MetricCard } from '@/components/finance/MetricCard'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
+import { DropdownMenuCheckboxItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
+import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
@@ -92,11 +95,38 @@ export default function PlanningPage() {
   const [newBudget, setNewBudget] = useState('')
   const [newDesc, setNewDesc] = useState('')
 
-  const years = Array.from(new Set(tasks.map((t) => t.plannedYear))).sort()
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({ gepland: true, in_uitvoering: true, afgerond: true })
+  const [catFilter, setCatFilter] = useState<Record<string, boolean>>(
+    Object.fromEntries(Object.keys(CAT_LABELS).map(k => [k, true]))
+  )
+
+  const visibleTasks = tasks.filter(t => {
+    const q = search.toLowerCase()
+    if (q && !t.title.toLowerCase().includes(q) && !t.address.toLowerCase().includes(q)) return false
+    if (statusFilter[t.status] === false) return false
+    if (catFilter[t.category] === false) return false
+    return true
+  })
+
+  const years = Array.from(new Set(visibleTasks.map((t) => t.plannedYear))).sort()
   const totalBudget = tasks.filter((t) => t.status !== 'afgerond').reduce((s, t) => s + t.budget, 0)
   const inUitvoering = tasks.filter((t) => t.status === 'in_uitvoering').length
 
-  const propertyOptions = isDemo ? mockProperties : []
+  const [propertyOptions, setPropertyOptions] = useState<{ id: string; name: string; address: string }[]>(
+    isDemo ? mockProperties : []
+  )
+
+  useEffect(() => {
+    if (isDemo) return
+    fetch('/api/properties')
+      .then(r => r.json())
+      .then(({ properties }) => {
+        setPropertyOptions((properties ?? []).map((p: any) => ({ id: p.id, name: p.name || p.address || 'Pand', address: p.address || '' })))
+      })
+      .catch(e => console.error('[planning properties]', e))
+  }, [isDemo])
+
   const selectedProperty = propertyOptions.find((p) => p.id === newPropertyId)
 
   const handleCreate = () => {
@@ -126,14 +156,48 @@ export default function PlanningPage() {
         <MetricCard label="Totaalbudget gepland" value={`€${totalBudget.toLocaleString('nl-NL')}`} icon={<Euro />} />
       </div>
 
-      {/* Per year */}
-      <div className="flex justify-end">
-        <Button onClick={() => setCreateOpen(true)}
-          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium">
-          <Plus className="h-4 w-4 mr-2" />
-          Taak inplannen
-        </Button>
-      </div>
+      {/* Toolbar */}
+      <TableToolbar
+        title="Planning"
+        count={`${visibleTasks.filter(t => t.status !== 'afgerond').length} van ${tasks.filter(t => t.status !== 'afgerond').length} actieve taken`}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Zoek taak, adres…"
+        filterContent={
+          <>
+            <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Status</DropdownMenuLabel>
+            <div className="space-y-1 pb-2">
+              {(['gepland', 'in_uitvoering', 'afgerond'] as const).map((key) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={statusFilter[key] !== false}
+                  onCheckedChange={(v) => setStatusFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={cn(DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS, 'capitalize')}
+                >
+                  {key.replace('_', ' ')}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </div>
+            <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Categorie</DropdownMenuLabel>
+            <div className="space-y-1">
+              {(Object.entries(CAT_LABELS) as [TaskCategory, string][]).map(([key, label]) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={catFilter[key] !== false}
+                  onCheckedChange={(v) => setCatFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                  onSelect={(e) => e.preventDefault()}
+                  className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+                >
+                  {label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </div>
+          </>
+        }
+        onAdd={() => setCreateOpen(true)}
+        addLabel="Taak inplannen"
+      />
 
       {tasks.length === 0 ? (
         <Card className={dashboardCardClass()}>
@@ -144,7 +208,7 @@ export default function PlanningPage() {
         </Card>
       ) : (
         years.map((year) => {
-          const yearTasks = tasks.filter((t) => t.plannedYear === year)
+          const yearTasks = visibleTasks.filter((t) => t.plannedYear === year)
           const yearBudget = yearTasks.reduce((s, t) => s + t.budget, 0)
           return (
             <Card key={year} className={dashboardCardClass()}>

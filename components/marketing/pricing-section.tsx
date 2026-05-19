@@ -5,166 +5,121 @@ import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Switch } from '@/components/ui/switch'
 
+const FEATURES = [
+  'Onbeperkt huurders & contracten',
+  'Ticketsysteem & onderhoudsbeheer',
+  'Huurder portal met live chat',
+  'Documenten & contracten beheren',
+  'Betalingen & financieel overzicht',
+  'Compliance checklist (NL)',
+  'Flows & automatiseringen',
+  'Puntentelling (WWS)',
+  'E-mailnotificaties',
+]
+
 interface PricingSectionProps {
   onSignupClick?: () => void
 }
 
-const tiers = [
-  {
-    name: 'Individuele vastgoedhouder',
-    id: 'tier-individual',
-    href: '/signup',
-    priceMonthly: '€49',
-    priceYearly: '€39',
-    description: 'Perfect voor individuele vastgoedhouders met een kleinere portefeuille.',
-    features: [
-      'Tot 5 panden',
-      'Huurders & basisgegevens',
-      'Documenten opslaan',
-      'Onderhoudsmeldingen registreren',
-    ],
-    featured: false,
-  },
-  {
-    name: 'Uitgebreide portefeuille',
-    id: 'tier-extended',
-    href: '/signup',
-    priceMonthly: '€249',
-    priceYearly: '€199',
-    description: 'Voor vastgoedbeheerders met een groeiende portefeuille.',
-    features: [
-      'Tot 50 panden',
-      'Betalingen bijhouden (open/te laat)',
-      'Onderhoud workflow (status/notes/kosten)',
-      'Compliance checklist (NL)',
-      'Export naar CSV/Excel',
-      'Prioriteit support',
-    ],
-    featured: true,
-  },
-]
-
 export function PricingSection({ onSignupClick }: PricingSectionProps) {
   const [isYearly, setIsYearly] = useState(false)
+
+  const priceSmall = isYearly ? '€39' : '€49'
+  const priceLarge = isYearly ? '€79' : '€99'
+
   return (
-    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl text-center">
+    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-4 lg:px-6">
+      <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-base font-semibold leading-7 text-[#163300]">Pricing</h2>
         <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">
-          <span className="hidden sm:inline">Passende, simpele pricing</span>
-          <span className="sm:hidden">Passende simpele pricing</span>
+          Één product. Simpele prijs.
+        </p>
+        <p className="mx-auto mt-6 max-w-xl text-center text-lg font-medium text-gray-600 leading-8">
+          Domio is voor iedereen hetzelfde. Je betaalt gewoon meer bij een grotere portefeuille.
         </p>
       </div>
-      <p className="mx-auto mt-6 max-w-2xl text-center text-lg font-medium text-pretty text-gray-600 sm:text-xl leading-8">
-        Kies een betaalbaar plan met de beste functies voor het beheren van je vastgoedportefeuille en het verhogen van je rendement.
-      </p>
-      
+
       {/* Billing Toggle */}
-      <div className="mt-8 flex items-center justify-center gap-4">
-        <span className={cn("text-sm font-medium", !isYearly ? "text-gray-900" : "text-gray-500")}>
+      <div className="mt-10 flex items-center justify-center gap-4">
+        <span className={cn('text-sm font-medium', !isYearly ? 'text-gray-900' : 'text-gray-400')}>
           Maandelijks
         </span>
-        <Switch
-          checked={isYearly}
-          onCheckedChange={setIsYearly}
-        />
+        <Switch checked={isYearly} onCheckedChange={setIsYearly} />
         <div className="flex items-center gap-2">
-          <span className={cn("text-sm font-medium", isYearly ? "text-gray-900" : "text-gray-500")}>
+          <span className={cn('text-sm font-medium', isYearly ? 'text-gray-900' : 'text-gray-400')}>
             Jaarlijks
           </span>
-          <span className={cn(
-            "text-sm font-medium",
-            isYearly ? "text-[#356258]" : "text-gray-400"
-          )}>
-            (Bespaar 20%)
+          <span className={cn('text-sm font-medium', isYearly ? 'text-[#163300]' : 'text-gray-300')}>
+            (2 maanden gratis)
           </span>
         </div>
       </div>
-      
-      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
-        {tiers.map((tier, tierIdx) => (
-          <div
-            key={tier.id}
-            className={cn(
-              tier.featured ? 'relative bg-[#163300] shadow-2xl' : 'bg-white/60 sm:mx-8 lg:mx-0',
-              tier.featured
-                ? ''
-                : tierIdx === 0
-                  ? 'rounded-t-3xl sm:rounded-b-none lg:rounded-tr-none lg:rounded-bl-3xl'
-                  : 'sm:rounded-t-none lg:rounded-tr-3xl lg:rounded-bl-none',
-              'rounded-3xl p-8 ring-1 ring-gray-900/10 sm:p-10',
-            )}
-          >
-            <h3
-              id={tier.id}
-              className={cn(
-                tier.featured ? 'text-[#9FE870]' : 'text-[#163300]',
-                'text-base font-semibold leading-7',
-              )}
-            >
-              {tier.name}
-            </h3>
-            <p className="mt-4 flex items-baseline gap-x-2">
-              <span
-                className={cn(
-                  tier.featured ? 'text-white' : 'text-gray-900',
-                  'text-5xl font-semibold tracking-tight',
-                )}
-              >
-                {isYearly ? tier.priceYearly : tier.priceMonthly}
-              </span>
-              <span className={cn(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-base')}>
-                /maand
-              </span>
-              {isYearly && (
-                <span className={cn(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-sm')}>
-                  (jaarlijks)
-                </span>
-              )}
-              {isYearly && (
-                <span className={cn(tier.featured ? 'text-gray-400' : 'text-gray-500', 'text-sm ml-2 line-through')}>
-                  {tier.priceMonthly}
-                </span>
-              )}
-            </p>
-            <p className={cn(tier.featured ? 'text-gray-300' : 'text-gray-600', 'mt-6 text-base leading-7')}>
-              {tier.description}
-            </p>
-            <ul
-              role="list"
-              className={cn(
-                tier.featured ? 'text-gray-300' : 'text-gray-600',
-                'mt-8 space-y-3 text-sm leading-6 sm:mt-10',
-              )}
-            >
-              {tier.features.map((feature) => (
-                <li key={feature} className="flex gap-x-3">
-                  <Check
-                    aria-hidden="true"
-                    className={cn(
-                      tier.featured ? 'text-[#9FE870]' : 'text-[#163300]',
-                      'h-6 w-5 flex-none',
-                    )}
-                  />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={onSignupClick}
-              aria-describedby={tier.id}
-              className={cn(
-                tier.featured
-                  ? 'bg-[#9FE870] text-[#163300] shadow-sm hover:bg-[#9FE870]/90 focus-visible:outline-[#9FE870]'
-                  : 'bg-transparent text-[#163300] border-2 border-[#163300] hover:bg-[#163300]/5 focus-visible:outline-[#163300]',
-                'mt-8 w-full rounded-2xl px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
-              )}
-            >
-              Registreren
-            </button>
+
+      {/* Two price cards — same product, different scale */}
+      <div className="mx-auto mt-14 max-w-3xl grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+        {/* ≤ 50 panden */}
+        <div className="rounded-3xl border border-gray-200 bg-white p-8 flex flex-col">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-[#163300]">Tot 50 panden</span>
+            <span className="text-xs font-medium bg-gray-100 text-gray-500 rounded-full px-2.5 py-1">Standaard</span>
           </div>
-        ))}
+          <div className="mt-6 flex items-baseline gap-1">
+            <span className="text-5xl font-semibold tracking-tight text-gray-900">{priceSmall}</span>
+            <span className="text-base text-gray-500">/maand</span>
+          </div>
+          {isYearly && (
+            <p className="mt-1 text-sm text-gray-400 line-through">€49/maand</p>
+          )}
+          <p className="mt-4 text-sm text-gray-500">
+            Alles wat je nodig hebt om je portefeuille professioneel te beheren.
+          </p>
+          <button
+            type="button"
+            onClick={onSignupClick}
+            className="mt-8 w-full rounded-2xl border-2 border-[#163300] px-4 py-2.5 text-sm font-semibold text-[#163300] hover:bg-[#163300]/5 transition-colors"
+          >
+            Gratis starten
+          </button>
+        </div>
+
+        {/* > 50 panden */}
+        <div className="rounded-3xl bg-[#163300] p-8 flex flex-col shadow-xl">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-[#9FE870]">Meer dan 50 panden</span>
+            <span className="text-xs font-medium bg-[#9FE870]/20 text-[#9FE870] rounded-full px-2.5 py-1">Grootschalig</span>
+          </div>
+          <div className="mt-6 flex items-baseline gap-1">
+            <span className="text-5xl font-semibold tracking-tight text-white">{priceLarge}</span>
+            <span className="text-base text-gray-400">/maand</span>
+          </div>
+          {isYearly && (
+            <p className="mt-1 text-sm text-gray-500 line-through">€99/maand</p>
+          )}
+          <p className="mt-4 text-sm text-gray-300">
+            Dezelfde volledige Domio-ervaring, voor grotere portefeuilles.
+          </p>
+          <button
+            type="button"
+            onClick={onSignupClick}
+            className="mt-8 w-full rounded-2xl bg-[#9FE870] px-4 py-2.5 text-sm font-semibold text-[#163300] hover:bg-[#8AD45F] transition-colors"
+          >
+            Gratis starten
+          </button>
+        </div>
+      </div>
+
+      {/* Features — one list, applies to both */}
+      <div className="mx-auto mt-12 max-w-3xl">
+        <p className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6">Alles inbegrepen bij beide plannen</p>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+          {FEATURES.map(f => (
+            <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">
+              <Check className="h-4 w-4 shrink-0 text-[#163300]" />
+              {f}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )

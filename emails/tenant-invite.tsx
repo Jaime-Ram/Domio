@@ -1,4 +1,4 @@
-import { Hr, Text, Section } from '@react-email/components'
+import { Hr, Text, Section, Link } from '@react-email/components'
 import * as React from 'react'
 import { EmailLayout, emailStyles } from './_components/layout'
 import { CtaButton } from './_components/button'
@@ -8,6 +8,7 @@ interface TenantInviteEmailProps {
   landlordName: string
   propertyAddress: string
   portalUrl: string
+  magicLinkUrl?: string | null
   expiresInHours?: number
 }
 
@@ -16,6 +17,7 @@ export default function TenantInviteEmail({
   landlordName,
   propertyAddress,
   portalUrl,
+  magicLinkUrl,
   expiresInHours = 72,
 }: TenantInviteEmailProps) {
   const firstName = tenantName.split(' ')[0]
@@ -36,11 +38,27 @@ export default function TenantInviteEmail({
         <strong style={{ color: '#111111' }}>{propertyAddress}</strong>.
       </Text>
 
-      <Section style={{ margin: '32px 0 24px' }}>
+      <Section style={{ margin: '32px 0 16px' }}>
         <CtaButton href={portalUrl}>
-          Bekijk uitnodiging
+          Account aanmaken
         </CtaButton>
       </Section>
+
+      {/* Magic link optie — URL wordt ingevuld zodra magic links zijn geïmplementeerd */}
+      <Text style={{ ...emailStyles.small, margin: '0 0 32px' }}>
+        {magicLinkUrl ? (
+          <Link
+            href={magicLinkUrl}
+            style={{ color: '#aaaaaa', textDecoration: 'underline', fontFamily: emailStyles.font }}
+          >
+            Ik maak liever geen gebruik van Domio en bekijk mijn info graag zonder account
+          </Link>
+        ) : (
+          <span style={{ color: '#cccccc' }}>
+            Ik maak liever geen gebruik van Domio en bekijk mijn info graag zonder account
+          </span>
+        )}
+      </Text>
 
       <Hr style={emailStyles.divider} />
 
@@ -58,5 +76,6 @@ TenantInviteEmail.PreviewProps = {
   landlordName: 'Jaime Blok',
   propertyAddress: 'Keizersgracht 123, Amsterdam',
   portalUrl: 'https://domiovastgoedbeheer.nl/portal/abc123',
+  magicLinkUrl: null,
   expiresInHours: 72,
 } satisfies TenantInviteEmailProps

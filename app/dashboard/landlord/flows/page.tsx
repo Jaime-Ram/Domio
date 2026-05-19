@@ -27,7 +27,6 @@ import { DetailShell } from '@/components/ui/detail-shell'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { GrayBlock } from '@/components/ui/gray-block'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { propertyQueries } from '@/lib/supabase/queries'
 
 /* ─── Template library ─── */
 
@@ -280,9 +279,9 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
 
 /* ─── Flow card ─── */
 
-function FlowCard({ template, isActive, onOpen }: {
+function FlowCard({ template, activeCount, onOpen }: {
   template: FlowTemplate
-  isActive: boolean
+  activeCount: number
   onOpen: () => void
 }) {
   const Icon = template.icon
@@ -296,10 +295,10 @@ function FlowCard({ template, isActive, onOpen }: {
         <div className="w-10 h-10 rounded-xl bg-white/60 dark:bg-neutral-700 flex items-center justify-center shrink-0">
           <Icon className="h-[18px] w-[18px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
         </div>
-        {isActive ? (
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
-            <CheckCircle2 className="h-3 w-3" />
-            Actief
+        {activeCount > 0 ? (
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+            <CheckCircle2 className="h-3 w-3 shrink-0" />
+            {activeCount > 1 ? `${activeCount}× actief` : 'Actief'}
           </span>
         ) : (
           <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600 group-hover:text-gray-400 transition-colors mt-1" />
@@ -319,8 +318,9 @@ function FlowCard({ template, isActive, onOpen }: {
 
 /* ─── Active flow card ─── */
 
-function ActiveFlowCard({ flow, onToggle, onEdit }: {
+function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
   flow: ActiveFlow
+  properties: { id: string; name: string }[]
   onToggle: () => void
   onEdit: () => void
 }) {
@@ -371,6 +371,13 @@ function ActiveFlowCard({ flow, onToggle, onEdit }: {
           <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
             {flow.configuredSteps.filter((s) => s.enabled).length} stappen actief
           </span>
+          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
+            {flow.propertyScope.type === 'all'
+              ? 'Alle panden'
+              : flow.propertyScope.propertyIds
+                  .map(id => properties.find(p => p.id === id)?.name ?? '?')
+                  .join(', ') || 'Geen panden'}
+          </span>
         </div>
       </div>
     </GrayBlock>
@@ -389,6 +396,31 @@ export default function FlowsPage() {
   const [tab, setTab] = useState<FlowTab>('bibliotheek')
   const [properties, setProperties] = useState<{ id: string; name: string }[]>([])
 
+  // Load flows from localStorage on mount
+  useEffect(() => {
+    if (isDemo) return
+    try {
+      const saved = localStorage.getItem('domio:activeFlows')
+      if (!saved) return
+      const parsed: Omit<ActiveFlow, 'icon'>[] = JSON.parse(saved)
+      const restored = parsed.map(f => {
+        const template = TEMPLATES.find(t => t.id === f.templateId)
+        return { ...f, icon: template?.icon ?? Zap }
+      })
+      setActiveFlows(restored)
+    } catch {}
+  }, [isDemo])
+
+  // Save flows to localStorage whenever they change
+  useEffect(() => {
+    if (isDemo) return
+    try {
+      const toSave = activeFlows.map(({ icon, ...rest }) => rest)
+      localStorage.setItem('domio:activeFlows', JSON.stringify(toSave))
+    } catch {}
+  }, [activeFlows, isDemo])
+
+  // Load properties via server-side API route
   useEffect(() => {
     if (isDemo) {
       setProperties([
@@ -399,12 +431,19 @@ export default function FlowsPage() {
       return
     }
     if (!user?.id) return
-    propertyQueries.getByOwner(user.id).then((props) => {
-      setProperties((props ?? []).map((p: any) => ({ id: p.id, name: p.name || p.address })))
-    }).catch(() => {})
+    fetch('/api/properties')
+      .then(r => r.json())
+      .then(({ properties: props }) => {
+        setProperties((props ?? []).map((p: any) => ({ id: p.id, name: p.name || p.address || 'Pand' })))
+      })
+      .catch(e => console.error('[flows/properties]', e))
   }, [user?.id, isDemo])
 
-  const activeIds = new Set(activeFlows.map((f) => f.templateId))
+  // Count active instances per template
+  const activeCounts = activeFlows.reduce<Record<string, number>>((acc, f) => {
+    acc[f.templateId] = (acc[f.templateId] ?? 0) + 1
+    return acc
+  }, {})
 
   const handleSetup = () => {
     if (!selectedTemplate) return
@@ -413,11 +452,7 @@ export default function FlowsPage() {
   }
 
   const handleActivate = (flow: ActiveFlow) => {
-    setActiveFlows((prev) => {
-      const exists = prev.find((f) => f.templateId === flow.templateId)
-      if (exists) return prev.map((f) => (f.templateId === flow.templateId ? flow : f))
-      return [flow, ...prev]
-    })
+    setActiveFlows(prev => [flow, ...prev])
     setBuilderTemplate(null)
     setTab('actief')
   }
@@ -435,6 +470,7 @@ export default function FlowsPage() {
 
   return (
     <>
+      <div className="flex flex-col gap-8">
       <TabNav
         tabs={[
           { id: 'actief', label: 'Actief', count: activeFlows.length > 0 ? activeFlows.length : undefined },
@@ -483,7 +519,7 @@ export default function FlowsPage() {
                       <FlowCard
                         key={template.id}
                         template={template}
-                        isActive={activeIds.has(template.id)}
+                        activeCount={activeCounts[template.id] ?? 0}
                         onOpen={() => setSelectedTemplate(template)}
                       />
                     ))}
@@ -523,6 +559,7 @@ export default function FlowsPage() {
               <ActiveFlowCard
                 key={flow.id}
                 flow={flow}
+                properties={properties}
                 onToggle={() => toggleFlowStatus(flow.id)}
                 onEdit={() => editFlow(flow)}
               />
@@ -530,6 +567,8 @@ export default function FlowsPage() {
           </div>
         )
       )}
+
+      </div>
 
       <FlowDetailSheet
         open={selectedTemplate !== null}

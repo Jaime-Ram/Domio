@@ -292,7 +292,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                                     <Link
                                       href={child.href}
                                       onClick={() => setPendingHref(child.href)}
-                                      className={itemClass(active, false)}
+                                      className={itemClass(active)}
                                     >
                                       <ChildIcon className="shrink-0 size-[15px]" strokeWidth={active ? 2.5 : 2} />
                                       <span className="ml-3">{child.label}</span>

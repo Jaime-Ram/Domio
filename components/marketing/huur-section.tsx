@@ -32,7 +32,7 @@ export function HuurSection({ onSignupClick }: HuurSectionProps) {
 
   return (
     <section className="relative z-20 bg-white py-20 sm:py-24 md:py-28">
-      <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 lg:px-6">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-center">
           {/* Left: Slideshow met alle hoeken rond */}
           <div className="lg:col-span-5 order-2 lg:order-1">

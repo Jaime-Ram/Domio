@@ -98,4 +98,15 @@ export const paymentProfileQueries = {
 
     if (error) throw error
   },
+
+  async getOrCreateDefault(ownerId: string): Promise<PaymentProfile> {
+    const existing = await paymentProfileQueries.getByOwner(ownerId)
+    if (existing.length > 0) return existing[0]
+    return paymentProfileQueries.create({
+      owner_id: ownerId,
+      name: 'Standaard',
+      pay_date: 1,
+      reminders: [-3, 7, 14],
+    })
+  },
 }

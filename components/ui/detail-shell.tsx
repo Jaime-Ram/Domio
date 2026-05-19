@@ -17,6 +17,8 @@ interface DetailShellProps {
   subtitle?: string
   /** Node rendered to the left of the title/subtitle block (e.g. icon circle) */
   headerLeft?: React.ReactNode
+  /** Action buttons rendered in the top-right of the header */
+  headerActions?: React.ReactNode
   /** Replaces the default footer when provided */
   footer?: React.ReactNode
   children?: React.ReactNode
@@ -29,6 +31,7 @@ export function DetailShell({
   title,
   subtitle,
   headerLeft,
+  headerActions,
   footer,
   children,
   className,
@@ -47,7 +50,7 @@ export function DetailShell({
         {headerLeft || subtitle ? (
           <div className="px-6 pt-6 pb-5 border-b border-gray-100 dark:border-neutral-800 pr-14 shrink-0 flex items-center gap-3">
             {headerLeft}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <DialogPrimitive.Title className="text-xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight truncate">
                 {title}
               </DialogPrimitive.Title>
@@ -57,6 +60,11 @@ export function DetailShell({
                 </DialogPrimitive.Description>
               )}
             </div>
+            {headerActions && (
+              <div className="flex items-center gap-1 shrink-0">
+                {headerActions}
+              </div>
+            )}
           </div>
         ) : (
           <div className="pr-14 shrink-0">

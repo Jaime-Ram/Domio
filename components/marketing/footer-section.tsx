@@ -7,7 +7,7 @@ import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-
 export function FooterSection() {
   return (
     <footer className="bg-white py-16 dark:bg-gray-900">
-      <div className="container mx-auto w-full max-w-7xl px-6 md:px-8">
+      <div className="container mx-auto w-full max-w-7xl px-4 md:px-6">
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           {/* Left Side - Logo, Description, and App Store Buttons */}
           <div className="flex flex-col gap-6 lg:max-w-md lg:flex-1">

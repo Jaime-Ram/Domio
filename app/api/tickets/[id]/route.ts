@@ -165,3 +165,29 @@ export async function PATCH(
 
   return NextResponse.json({ success: true, ticket: updated })
 }
+
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id: ticketId } = await params
+  const db = supabase as any
+
+  const { data: ticket } = await db
+    .from('tickets')
+    .select('owner_id')
+    .eq('id', ticketId)
+    .single()
+
+  if (!ticket || ticket.owner_id !== user.id)
+    return NextResponse.json({ error: 'Niet gevonden' }, { status: 404 })
+
+  const { error } = await db.from('tickets').delete().eq('id', ticketId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ success: true })
+}

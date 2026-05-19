@@ -12,7 +12,7 @@ import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
-import { Eye, Download, Trash2, Upload, X, Plus } from 'lucide-react'
+import { Eye, Download, Trash2, Upload, X, Plus, CheckSquare } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -417,6 +417,8 @@ export default function DocumentsPage() {
           />
         )}
         <TableToolbar
+          title="Documenten"
+          count={`${filteredDocuments.length} van ${documents.length} document${documents.length === 1 ? '' : 'en'}`}
           search={search}
           onSearchChange={setSearch}
           searchPlaceholder="Zoek document, type, adres…"
@@ -466,20 +468,20 @@ export default function DocumentsPage() {
           addLabel={uploading ? 'Bezig…' : 'Document uploaden'}
           addDisabled={uploading}
           extra={
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={toggleSelectionMode}
               disabled={bulkBusy}
+              title={selectionMode ? 'Annuleer selectie' : 'Selecteer documenten'}
               className={cn(
-                'h-9 rounded-full border-gray-200 dark:border-neutral-700 text-sm font-medium bg-white dark:bg-neutral-900 px-3 md:px-4',
+                'h-8 w-8 flex items-center justify-center rounded-full transition-colors',
                 selectionMode
-                  ? 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/60 hover:bg-red-50 dark:hover:bg-red-950/40'
-                  : 'text-gray-700 dark:text-gray-200'
+                  ? 'text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800',
               )}
             >
-              {selectionMode ? 'Annuleer' : 'Selecteer'}
-            </Button>
+              {selectionMode ? <X className="h-4 w-4" /> : <CheckSquare className="h-4 w-4" />}
+            </button>
           }
         />
         {!isDemo && (

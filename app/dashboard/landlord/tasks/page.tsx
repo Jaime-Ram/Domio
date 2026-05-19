@@ -27,7 +27,6 @@ import {
 import { MetricCard } from '@/components/finance/MetricCard'
 import { AddTaskTile } from '@/components/tasks/add-task-tile'
 import {
-  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
@@ -124,6 +123,8 @@ export default function TasksPage() {
   const [loading, setLoading]     = useState(true)
   const [filter, setFilter]       = useState<FilterKey>('alle')
   const [search, setSearch]       = useState('')
+  const [searchExpanded, setSearchExpanded] = useState(false)
+  const taskSearchRef = useRef<HTMLInputElement>(null)
   const tabsContainerRef = useRef<HTMLDivElement>(null)
   const filterButtonRefs = useRef<Partial<Record<FilterKey, HTMLButtonElement | null>>>({})
   const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
@@ -253,24 +254,46 @@ export default function TasksPage() {
         />
       </div>
 
-      <div className="flex items-center gap-3 w-full sm:w-auto justify-end min-w-0 flex-wrap">
-        <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[220px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-          <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
-          <Input
-            placeholder="Zoek taken..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-          />
+      <div className="flex items-center gap-1 shrink-0">
+        {/* Search — icon, expands left */}
+        <div className="flex flex-row-reverse items-center">
+          <button
+            type="button"
+            onClick={() => { setSearchExpanded(true); setTimeout(() => taskSearchRef.current?.focus(), 0) }}
+            className={cn(
+              'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
+              search && 'text-[#163300] dark:text-[#9FE870]',
+            )}
+          >
+            <Search className="h-4 w-4" />
+          </button>
+          <div className={cn(
+            'overflow-hidden transition-all duration-200 ease-out',
+            searchExpanded ? 'max-w-[160px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
+          )}>
+            <input
+              ref={taskSearchRef}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onBlur={() => { if (!search) setSearchExpanded(false) }}
+              onKeyDown={e => { if (e.key === 'Escape') { setSearch(''); setSearchExpanded(false) } }}
+              placeholder="Zoeken…"
+              className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
+            />
+          </div>
         </div>
+        {/* Filter — icon only */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="button" variant="outline" className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}>
-              <Filter className="h-4 w-4 md:mr-1.5" />
-              <span className="hidden md:inline">Filter</span>
-            </Button>
+            <button
+              type="button"
+              suppressHydrationWarning
+              className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <Filter className="h-4 w-4" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={8} className={DASHBOARD_FILTER_MENU_CONTENT_CLASS}>
+          <DropdownMenuContent align="end" sideOffset={8} className={cn(DASHBOARD_FILTER_MENU_CONTENT_CLASS, 'max-h-[min(70vh,480px)] overflow-y-auto')}>
             <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
               Categorie
             </DropdownMenuLabel>
@@ -289,10 +312,11 @@ export default function TasksPage() {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+        {/* Add button */}
         <Button
           type="button"
           onClick={openNew}
-          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium"
+          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium ml-1"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe taak

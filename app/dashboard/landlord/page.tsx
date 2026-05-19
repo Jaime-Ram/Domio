@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -12,6 +12,8 @@ import {
   complianceAlerts, upcomingTasks, monthlyFinancials,
 } from '@/lib/mock-data/domio-dashboard'
 import { ActionListRow } from '@/components/ui/action-list'
+import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { ticketQueries } from '@/lib/supabase/queries'
 
 const incomeHistory = [
   { month: 'Okt', income: 26200, costs: 4800 },
@@ -56,10 +58,54 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
   )
 }
 
+const SLA_HOURS: Record<string, number> = { urgent: 4, hoog: 24, normaal: 72, laag: 168 }
+
+type LiveTicket = {
+  id: string
+  title: string
+  status: string
+  priority: string
+  created_at: string
+  source?: string | null
+  sla_deadline?: string | null
+  category?: string | null
+  tenant?: string | null
+  property?: string | null
+}
+
+function isSlaOver(t: LiveTicket) {
+  if (t.status === 'afgerond' || t.status === 'geannuleerd') return false
+  const created = new Date(t.created_at)
+  const deadline = t.sla_deadline
+    ? new Date(t.sla_deadline)
+    : new Date(created.getTime() + (SLA_HOURS[t.priority] ?? 72) * 3600000)
+  return deadline.getTime() < Date.now()
+}
+
 export default function EmployerDashboardPage() {
+  const { user, isDemo } = useDashboardUser()
   const [period, setPeriod] = useState<Period>('Maand')
   const [dismissed, setDismissed] = useState<string[]>([])
   const [checkedTasks, setCheckedTasks] = useState<string[]>([])
+  const [liveTickets, setLiveTickets] = useState<LiveTicket[] | null>(null)
+
+  useEffect(() => {
+    if (isDemo || !user?.id) return
+    ticketQueries.getByOwner(user.id).then((rows) => {
+      setLiveTickets((rows ?? []).map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+        priority: t.priority,
+        created_at: t.created_at,
+        source: t.source ?? null,
+        sla_deadline: t.sla_deadline ?? null,
+        category: t.category ?? null,
+        tenant: t.leases?.tenants?.full_name ?? null,
+        property: t.properties?.name ?? t.leases?.units?.properties?.name ?? null,
+      })))
+    }).catch(() => {})
+  }, [user?.id, isDemo])
 
   const dismiss = (id: string) => setDismissed(prev => [...prev, id])
   const toggleTask = (id: string) => setCheckedTasks(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
@@ -239,9 +285,25 @@ export default function EmployerDashboardPage() {
 
         {/* Tickets widget */}
         {!dismissed.includes('tickets') && (() => {
-          const openTickets = maintenanceTickets.filter(t => t.status !== 'afgerond')
+          const source = liveTickets ?? maintenanceTickets.map(t => ({
+            id: t.id, title: t.title, status: t.status,
+            priority: t.priority,
+            created_at: t.createdAt ?? new Date().toISOString(),
+            source: 'tenant', sla_deadline: null, category: null,
+            tenant: t.tenantName ?? null, property: t.address ?? null,
+          }))
+          const openTickets = source.filter(t => t.status !== 'afgerond' && t.status !== 'geannuleerd')
           const urgentOpen = openTickets.filter(t => t.priority === 'urgent' || t.priority === 'hoog')
-          const showTickets = openTickets.slice(0, 3)
+          const slaOver = openTickets.filter(isSlaOver)
+          const tenantTickets = openTickets.filter(t => t.source === 'tenant')
+          // Show: SLA-over first, then urgent/hoog, then tenant-submitted, then rest
+          const ranked = [
+            ...slaOver,
+            ...urgentOpen.filter(t => !slaOver.some(s => s.id === t.id)),
+            ...tenantTickets.filter(t => !slaOver.some(s => s.id === t.id) && !urgentOpen.some(u => u.id === t.id)),
+            ...openTickets.filter(t => !slaOver.some(s => s.id === t.id) && !urgentOpen.some(u => u.id === t.id) && !tenantTickets.some(n => n.id === t.id)),
+          ]
+          const showTickets = ranked.slice(0, 3)
           if (openTickets.length === 0) return null
           return (
             <div className="relative rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-4">
@@ -250,33 +312,53 @@ export default function EmployerDashboardPage() {
               </button>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-xs font-medium text-gray-600 dark:text-gray-300">Open tickets</p>
-                {urgentOpen.length > 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
-                    <AlertTriangle className="h-3 w-3" />
-                    {urgentOpen.length} spoed
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {slaOver.length > 0 && (
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
+                      <Clock className="h-3 w-3" />
+                      {slaOver.length} SLA over
+                    </span>
+                  )}
+                  {urgentOpen.length > 0 && (
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-500 dark:text-orange-400">
+                      <AlertTriangle className="h-3 w-3" />
+                      {urgentOpen.length} spoed
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="border-b border-gray-200 dark:border-neutral-700 mb-3" />
               <div className="space-y-2.5">
-                {showTickets.map((t) => (
-                  <Link key={t.id} href="/dashboard/landlord/maintenance" className="flex items-start gap-2.5 group">
-                    <div className={cn(
-                      'h-5 w-5 rounded-full flex items-center justify-center shrink-0 mt-0.5',
-                      t.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30'
-                        : t.priority === 'hoog' ? 'bg-orange-100 dark:bg-orange-900/30'
-                        : 'bg-gray-200 dark:bg-neutral-700',
-                    )}>
-                      {t.priority === 'urgent' || t.priority === 'hoog'
-                        ? <AlertTriangle className={cn('h-2.5 w-2.5', t.priority === 'urgent' ? 'text-red-600 dark:text-red-400' : 'text-orange-500 dark:text-orange-400')} />
-                        : <Clock className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-gray-800 dark:text-gray-200 truncate group-hover:text-[#163300] dark:group-hover:text-[#9FE870] transition-colors">{t.title}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.address} · {t.tenantName}</p>
-                    </div>
-                  </Link>
-                ))}
+                {showTickets.map((t) => {
+                  const over = isSlaOver(t)
+                  return (
+                    <Link key={t.id} href={`/dashboard/landlord/maintenance?ticket=${t.id}`} className="flex items-start gap-2.5 group">
+                      <div className={cn(
+                        'h-5 w-5 rounded-full flex items-center justify-center shrink-0 mt-0.5',
+                        over ? 'bg-red-100 dark:bg-red-900/30'
+                          : t.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30'
+                          : t.priority === 'hoog' ? 'bg-orange-100 dark:bg-orange-900/30'
+                          : 'bg-gray-200 dark:bg-neutral-700',
+                      )}>
+                        {over || t.priority === 'urgent'
+                          ? <AlertTriangle className="h-2.5 w-2.5 text-red-600 dark:text-red-400" />
+                          : t.priority === 'hoog'
+                          ? <AlertTriangle className="h-2.5 w-2.5 text-orange-500 dark:text-orange-400" />
+                          : <Clock className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-gray-800 dark:text-gray-200 truncate group-hover:text-[#163300] dark:group-hover:text-[#9FE870] transition-colors">{t.title}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {over && <span className="text-[10px] font-semibold text-red-500 dark:text-red-400">SLA over</span>}
+                          {t.source === 'tenant' && <span className="text-[10px] font-medium text-[#163300]/60 dark:text-[#9FE870]/60">huurder</span>}
+                          {(t.property || t.tenant) && (
+                            <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{[t.property, t.tenant].filter(Boolean).join(' · ')}</p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
               {openTickets.length > 3 && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">+{openTickets.length - 3} meer open tickets</p>

@@ -18,6 +18,7 @@ import { DialogDateField } from '@/components/ui/dialog-date-field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { leaseQueries, propertyQueries, unitQueries } from '@/lib/supabase/queries'
+import { paymentProfileQueries } from '@/lib/supabase/betaalflow'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { mockProperties, mockLegalEntities } from '@/lib/mock-data/vastgoed'
@@ -171,11 +172,13 @@ export function HuurovereenkomstDialog({
 
     const { user } = await getUser()
     if (!user) throw new Error('Niet ingelogd')
+    const paymentProfile = await paymentProfileQueries.getOrCreateDefault(user.id)
     const periodNotes = `Factuurperiode: ${factuurPeriode}${notes ? `\n${notes}` : ''}`
     const created = await leaseQueries.create({
       owner_id: user.id,
       unit_id: unitId,
       tenant_id: tenant.id,
+      payment_profile_id: paymentProfile.id,
       start_date: startDate,
       end_date: endDate || null,
       monthly_rent: rent,

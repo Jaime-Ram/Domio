@@ -62,7 +62,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
       {/* ── Eén container voor alles — zelfde marge links ─────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-6 md:px-10">
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-4 md:px-5">
 
         {/* Titel + knop — verticaal gecentreerd */}
         <div className="flex flex-col flex-1 justify-center pt-24 pb-10">

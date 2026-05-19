@@ -1,14 +1,17 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { Search, Filter, Grid3x3, Table2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AppDropdownContent } from '@/components/ui/app-dropdown'
 import { cn } from '@/lib/utils'
-import { DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
+import { DASHBOARD_FILTER_MENU_CONTENT_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 
 interface TableToolbarProps {
+  // Left side
+  title?: string
+  count?: string | number
   // Search
   search?: string
   onSearchChange?: (v: string) => void
@@ -23,12 +26,14 @@ interface TableToolbarProps {
   addLabel?: string
   addDisabled?: boolean
   secondaryAction?: { label: string; onClick: () => void }
-  // Slot for extra controls rendered before search (e.g. "Selecteer" for bulk)
+  // Slot for extra controls rendered before the icons
   extra?: React.ReactNode
   className?: string
 }
 
 export function TableToolbar({
+  title,
+  count,
   search,
   onSearchChange,
   searchPlaceholder = 'Zoeken…',
@@ -42,83 +47,111 @@ export function TableToolbar({
   extra,
   className,
 }: TableToolbarProps) {
+  const [searchExpanded, setSearchExpanded] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const hasLeft = title || count !== undefined
+
   return (
-    <div className={cn('flex items-center gap-3 w-full min-w-0', className)}>
-      {onSearchChange !== undefined && (
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-          <Input
-            type="search"
-            value={search ?? ''}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="h-9 pl-9 pr-3 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm w-64"
-          />
+    <div className={cn('flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between', className)}>
+      {hasLeft && (
+        <div>
+          {title && (
+            <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">{title}</p>
+          )}
+          {count !== undefined && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{count}</p>
+          )}
         </div>
       )}
 
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-1 shrink-0">
         {extra}
 
-      {filterContent && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
+        {/* Search — icon, expands left */}
+        {onSearchChange !== undefined && (
+          <div className="flex flex-row-reverse items-center">
+            <button
               type="button"
-              variant="outline"
-              className={cn('inline-flex', DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS)}
+              onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
+              className={cn(
+                'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
+                search && 'text-[#163300] dark:text-[#9FE870]',
+              )}
             >
-              <Filter className="h-4 w-4 md:mr-1.5" />
-              <span className="hidden md:inline">Filter</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <AppDropdownContent align="end">
-            {filterContent}
-          </AppDropdownContent>
-        </DropdownMenu>
-      )}
+              <Search className="h-4 w-4" />
+            </button>
+            <div className={cn(
+              'overflow-hidden transition-all duration-200 ease-out',
+              searchExpanded ? 'max-w-[160px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
+            )}>
+              <input
+                ref={searchInputRef}
+                value={search ?? ''}
+                onChange={e => onSearchChange(e.target.value)}
+                onBlur={() => { if (!search) setSearchExpanded(false) }}
+                onKeyDown={e => { if (e.key === 'Escape') { onSearchChange(''); setSearchExpanded(false) } }}
+                placeholder={searchPlaceholder}
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
+              />
+            </div>
+          </div>
+        )}
 
-      {viewMode !== undefined && onViewModeChange && (
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            'hidden md:inline-flex h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200',
-            'hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
-          )}
-          onClick={() => onViewModeChange(viewMode === 'table' ? 'grid' : 'table')}
-          aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
-        >
-          {viewMode === 'table' ? (
-            <Grid3x3 className="h-4 w-4" />
-          ) : (
-            <Table2 className="h-4 w-4" />
-          )}
-        </Button>
-      )}
+        {/* Filter — icon only */}
+        {filterContent && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                suppressHydrationWarning
+                className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                <Filter className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <AppDropdownContent align="end" className={cn(DASHBOARD_FILTER_MENU_CONTENT_CLASS, 'max-h-[min(70vh,480px)] overflow-y-auto')}>
+              {filterContent}
+            </AppDropdownContent>
+          </DropdownMenu>
+        )}
 
-      {secondaryAction && (
-        <Button
-          type="button"
-          onClick={secondaryAction.onClick}
-          variant="outline"
-          className="rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0"
-        >
-          {secondaryAction.label}
-        </Button>
-      )}
-      {onAdd && (
-        <Button
-          type="button"
-          onClick={onAdd}
-          disabled={addDisabled}
-          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0"
-        >
-          <Plus className="h-4 w-4" />
-          {addLabel}
-        </Button>
-      )}
+        {/* View toggle — icon only */}
+        {viewMode !== undefined && onViewModeChange && (
+          <button
+            type="button"
+            suppressHydrationWarning
+            onClick={() => onViewModeChange(viewMode === 'table' ? 'grid' : 'table')}
+            aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
+            className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
+          </button>
+        )}
+
+        {secondaryAction && (
+          <Button
+            type="button"
+            onClick={secondaryAction.onClick}
+            variant="outline"
+            className="rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
+          >
+            {secondaryAction.label}
+          </Button>
+        )}
+
+        {/* Add button */}
+        {onAdd && (
+          <Button
+            type="button"
+            onClick={onAdd}
+            disabled={addDisabled}
+            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
+          >
+            <Plus className="h-4 w-4" />
+            {addLabel}
+          </Button>
+        )}
       </div>
     </div>
   )
