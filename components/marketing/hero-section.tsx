@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { motion } from 'motion/react'
 import { Pause, Play } from 'lucide-react'
 
+const PARTNER_LOGOS = [1, 2, 3, 4, 5]
+
 interface HeroSectionProps {
   onSignupClick?: () => void
 }
@@ -62,7 +64,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
       {/* ── Eén container voor alles — zelfde marge links ─────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-4 md:px-5">
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-5 md:px-6">
 
         {/* Titel + knop — verticaal gecentreerd */}
         <div className="flex flex-col flex-1 justify-center pt-24 pb-10">
@@ -72,15 +74,15 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-5xl sm:text-6xl md:text-7xl font-light text-white leading-[1.05] tracking-tight max-w-3xl"
           >
-            Eén platform voor<br />
-            <span className="font-semibold text-[#9FE870]">heel</span> je vastgoed.
+            Een nieuwe standaard<br />
+            voor <span className="font-semibold text-[#9FE870]">vastgoedbeheer.</span>
           </motion.h1>
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
-            className="mt-10"
+            className="mt-10 flex items-center gap-4"
           >
             <button
               type="button"
@@ -88,6 +90,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
               className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
             >
               Start direct
+            </button>
+            <button
+              type="button"
+              className="rounded-full bg-transparent border border-white text-white px-8 py-3.5 text-sm font-semibold hover:bg-white/10 transition-colors"
+            >
+              Ontdek meer
             </button>
           </motion.div>
         </div>
@@ -97,14 +105,21 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex items-center gap-8 flex-wrap pb-6"
+          className="flex items-center gap-10 flex-wrap pb-12"
         >
-          <span className="text-white text-sm font-normal shrink-0">Trusted by:</span>
-          {['Vesteda', 'Bouwinvest', 'Amvest', 'Heimstaden', 'NSI', 'CBRE'].map((name) => (
-            <span key={name} className="text-white text-sm font-semibold tracking-wide">
-              {name}
-            </span>
-          ))}
+          <span className="text-white/60 text-base font-normal shrink-0">Onze partners:</span>
+          <div className="flex items-center gap-10 flex-wrap">
+            {PARTNER_LOGOS.map((n) => (
+              <Image
+                key={n}
+                src={`/logos/partners-${n}.svg`}
+                alt={`Partner ${n}`}
+                width={130}
+                height={22}
+                className="brightness-0 invert object-contain"
+              />
+            ))}
+          </div>
         </motion.div>
 
       </div>

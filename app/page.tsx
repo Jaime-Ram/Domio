@@ -335,15 +335,6 @@ export default function Home() {
                       </div>
                     </Link>
                   ))}
-                  <Link
-                    href="/functies"
-                    className="col-start-3 row-start-4 py-2.5 px-3 flex items-center justify-end dropdown-item-in"
-                  >
-                    <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-5 py-2 text-sm font-semibold shadow-sm hover:bg-[#9FE870]/90 transition-colors">
-                      Meer info
-                      <ArrowUpRight className="h-4 w-4 shrink-0" />
-                    </span>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -588,7 +579,7 @@ export default function Home() {
 
       {/* Beheerder Types Section – Wise-achtige layout: headline + CTA links, drie componenten met icoon + tekst eronder */}
       <section className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-4 lg:px-6">
+        <div className="mx-auto max-w-7xl px-5 lg:px-6">
           {/* Boven: headline + tekst + CTA (geen illustratie) */}
           <div className="max-w-2xl">
             <h2 className="text-base font-semibold leading-7 text-[#163300] mb-2">Beheerder types</h2>
@@ -641,7 +632,7 @@ export default function Home() {
 
       {/* App Section — tijdelijk uitgeschakeld, activeren zodra de app live is
       <section className="relative z-20 pt-24 pb-12">
-        <div className="container mx-auto w-full max-w-7xl px-4 md:px-6 relative z-10">
+        <div className="container mx-auto w-full max-w-7xl px-5 md:px-6 relative z-10">
           <div className="rounded-3xl bg-[#163300] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <GeometricShapes
               variant="trapezoid"
@@ -701,7 +692,7 @@ export default function Home() {
 
         {/* Over Ons Section - Large section with building background and fade overlay */}
         <section id="over-ons" className="relative z-20 pt-16 pb-16 md:pt-24 md:pb-24">
-          <div className="container mx-auto w-full max-w-7xl px-4 md:px-6">
+          <div className="container mx-auto w-full max-w-7xl px-5 md:px-6">
             <div className="rounded-3xl relative overflow-hidden min-h-[650px] md:min-h-[600px]">
               {/* Background Image with buildings */}
               <div className="absolute inset-0">
@@ -764,7 +755,7 @@ export default function Home() {
       <section className="relative z-20 pt-24 pb-12">
         {/* Background that extends from middle of CTA into footer */}
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
-        <div className="container mx-auto w-full max-w-7xl px-4 md:px-6 relative z-10">
+        <div className="container mx-auto w-full max-w-7xl px-5 md:px-6 relative z-10">
           <div className="rounded-3xl bg-[#163300] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
             {/* Geometric decorative element - positioned where no text (bottom right, shifted more right/bottom on mobile) */}
             <GeometricShapes 

@@ -55,7 +55,7 @@ export function FunctiesSection() {
       id="features"
       className="w-full py-24 sm:py-32 pb-16 sm:pb-20 bg-white dark:bg-neutral-950"
     >
-      <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-2xl px-5 lg:max-w-7xl lg:px-8">
         <div className="mb-12 text-center md:mb-16">
           <h2 className="text-base font-semibold leading-7 text-[#163300]">
             Functies
@@ -118,10 +118,10 @@ export function FunctiesSection() {
           {/* 2. Recente activiteit – SaaS transactie-widget */}
           <div className="w-full">
             <TransactionListWidget
-              elevatedShadow
               title="Recente activiteit"
               seeAllHref="/dashboard/landlord"
               seeAllLabel="Alles"
+              className="!rounded-2xl !shadow-soft-lg !border-gray-200/60"
               items={ACTIVITIES.map((item, i) => ({
                 icon: activityIcon(item.type),
                 iconAccent: i === 0,
@@ -134,7 +134,7 @@ export function FunctiesSection() {
 
           {/* 3. Maandoverzicht */}
           <div className="w-full">
-            <div className={cn(CARD_CLASS, 'p-5')}>
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 shadow-soft-lg border border-gray-200/60 dark:border-neutral-700 p-5">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
                 Maandoverzicht
               </h3>

@@ -28,7 +28,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
   const priceLarge = isYearly ? '€79' : '€99'
 
   return (
-    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-4 lg:px-6">
+    <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-5 lg:px-6">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-base font-semibold leading-7 text-[#163300]">Pricing</h2>
         <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">

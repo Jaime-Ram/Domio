@@ -1159,6 +1159,51 @@ export const attachmentQueries = {
 // TASKS
 // ============================================================================
 
+export const contactQueries = {
+  async getByOwner(ownerId: string) {
+    // @ts-ignore - contacts table not yet in generated types
+    const { data, error } = await supabase
+      .from('contacts')
+      .select('*')
+      .eq('owner_id', ownerId)
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as any[];
+  },
+
+  async create(contact: Record<string, any>) {
+    // @ts-ignore
+    const { data, error } = await supabase
+      .from('contacts')
+      .insert(contact as any)
+      .select('*')
+      .single();
+    if (error) throw error;
+    return data as any;
+  },
+
+  async update(id: string, updates: Record<string, any>) {
+    // @ts-ignore
+    const { data, error } = await (supabase as any)
+      .from('contacts')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw error;
+    return data as any;
+  },
+
+  async delete(id: string) {
+    // @ts-ignore
+    const { error } = await supabase
+      .from('contacts')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+};
+
 export const taskQueries = {
   async getByOwner(ownerId: string) {
     // @ts-ignore - tasks table not yet in generated types

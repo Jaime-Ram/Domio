@@ -31,6 +31,7 @@ import {
   Sparkles,
   Smartphone,
   Plug,
+  BookUser,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -132,6 +133,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
           ],
         },
+        { label: 'Contactboek', href: `${basePath}/contacts`, icon: BookUser },
         { label: 'Flows', href: `${basePath}/flows`, icon: Workflow },
       ],
     },

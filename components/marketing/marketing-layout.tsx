@@ -54,7 +54,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
         onMouseLeave={handleHeaderMouseLeave}
         onMouseEnter={handleHeaderMouseEnter}
       >
-        <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
+        <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-5 md:px-8">
           <Button
             variant="ghost"
             size="icon"
@@ -77,6 +77,9 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
               </button>
             </div>
+            <Link href="/api" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
+              API
+            </Link>
             <Link href="/#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
               Prijzen
             </Link>
@@ -145,15 +148,6 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                   </div>
                 </Link>
               ))}
-              <Link
-                href="/functies"
-                className="col-start-3 row-start-4 py-2.5 px-3 flex items-center justify-end dropdown-item-in"
-              >
-                <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-5 py-2 text-sm font-semibold shadow-sm hover:bg-[#9FE870]/90 transition-colors">
-                  Meer info
-                  <ArrowUpRight className="h-4 w-4 shrink-0" />
-                </span>
-              </Link>
             </div>
           </div>
           <div className="absolute inset-x-0 top-0 bg-white" style={{ opacity: helpMenuOpen ? 1 : 0, pointerEvents: helpMenuOpen ? 'auto' : 'none', transition: 'opacity 200ms ease-out' }} aria-hidden={!helpMenuOpen}>
@@ -258,6 +252,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
               </div>
               <div className="space-y-1 mb-4">
                 <Link href="/functies" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Functies</Link>
+                <Link href="/api" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>API</Link>
                 <Link href="/#pricing" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Prijzen</Link>
                 <Link href="/blog" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(false)}>Kennisbank</Link>
                 <Link href="/hulp" className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]" onClick={() => setMobileMenuOpen(false)}>Hulp & Contact</Link>
