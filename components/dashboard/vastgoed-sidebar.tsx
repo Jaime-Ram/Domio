@@ -32,6 +32,7 @@ import {
   Smartphone,
   Plug,
   BookUser,
+  CalendarRange,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -74,7 +75,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
     const menuItemsWithChildren = [
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
       { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
-      { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`] },
+      { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`, `${basePath}/mjop`] },
     ]
     const toOpen = menuItemsWithChildren
       .filter(({ paths }) => paths.some((p) => pathname === p || pathname.startsWith(p + '/')))
@@ -131,6 +132,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
             { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
             { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
+            { label: 'MJOP', href: `${basePath}/mjop`, icon: CalendarRange },
           ],
         },
         { label: 'Contactboek', href: `${basePath}/contacts`, icon: BookUser },
@@ -172,7 +174,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const itemClass = (active: boolean) => cn(
     "flex items-center w-full py-[5px] px-3 text-[14px] rounded-md transition-colors duration-150 focus:outline-none text-left",
     active
-      ? "bg-gray-200 text-[#163300] font-semibold dark:bg-neutral-700 dark:text-[#9FE870]"
+      ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
       : "text-gray-700 hover:bg-gray-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
   )
 

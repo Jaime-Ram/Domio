@@ -1,22 +1,19 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import {
-  Plus,
-  Search,
-  Phone,
-  Mail,
-  Pencil,
-  Trash2,
-  BookUser,
-  X,
-} from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Plus, Search, Phone, Mail, Pencil, Trash2, BookUser, User, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { CreateDialogShell } from '@/components/ui/add-dialog-layout'
+import { DetailShell } from '@/components/ui/detail-shell'
+import { DialogField } from '@/components/ui/dialog-field'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { contactQueries } from '@/lib/supabase/queries'
+import { useContacts, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
 
 type Category = 'alle' | 'loodgieter' | 'aannemer' | 'elektricien' | 'schilder' | 'schoonmaak' | 'overig'
 
@@ -33,22 +30,22 @@ interface Contact {
 }
 
 const CATEGORIES: { value: Category; label: string }[] = [
-  { value: 'alle', label: 'Alle' },
-  { value: 'loodgieter', label: 'Loodgieter' },
-  { value: 'aannemer', label: 'Aannemer' },
+  { value: 'alle',        label: 'Alle' },
+  { value: 'loodgieter',  label: 'Loodgieter' },
+  { value: 'aannemer',    label: 'Aannemer' },
   { value: 'elektricien', label: 'Elektricien' },
-  { value: 'schilder', label: 'Schilder' },
-  { value: 'schoonmaak', label: 'Schoonmaak' },
-  { value: 'overig', label: 'Overig' },
+  { value: 'schilder',    label: 'Schilder' },
+  { value: 'schoonmaak',  label: 'Schoonmaak' },
+  { value: 'overig',      label: 'Overig' },
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  loodgieter: 'bg-blue-100 text-blue-700',
-  aannemer: 'bg-orange-100 text-orange-700',
+  loodgieter:  'bg-blue-100 text-blue-700',
+  aannemer:    'bg-orange-100 text-orange-700',
   elektricien: 'bg-yellow-100 text-yellow-700',
-  schilder: 'bg-purple-100 text-purple-700',
-  schoonmaak: 'bg-green-100 text-green-700',
-  overig: 'bg-gray-100 text-gray-600',
+  schilder:    'bg-purple-100 text-purple-700',
+  schoonmaak:  'bg-green-100 text-green-700',
+  overig:      'bg-gray-100 text-gray-600',
 }
 
 const EMPTY_FORM = {
@@ -61,48 +58,64 @@ const EMPTY_FORM = {
 }
 
 export default function ContactsPage() {
-  const { user, isDemo } = useDashboardUser()
-  const [contacts, setContacts] = useState<Contact[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user } = useDashboardUser()
+  const queryClient = useQueryClient()
+  const { data: contacts = [], isLoading: loading } = useContacts(user?.id)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<Category>('alle')
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [editContact, setEditContact] = useState<Contact | null>(null)
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [saving, setSaving] = useState(false)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!user) return
-    setLoading(true)
-    contactQueries.getByOwner(user.id)
-      .then(setContacts)
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [user])
+  // Toevoegen — popup
+  const [addOpen, setAddOpen] = useState(false)
+  const [addForm, setAddForm] = useState(EMPTY_FORM)
+  const [addSaving, setAddSaving] = useState(false)
 
-  const filtered = useMemo(() => {
-    return contacts.filter((c) => {
-      const matchSearch =
-        !search ||
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        (c.company ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (c.phone ?? '').includes(search) ||
-        (c.email ?? '').toLowerCase().includes(search.toLowerCase())
-      const matchCat = activeCategory === 'alle' || c.category === activeCategory
-      return matchSearch && matchCat
-    })
-  }, [contacts, search, activeCategory])
+  // Bekijken/bewerken — slide-out
+  const [detailContact, setDetailContact] = useState<Contact | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [editForm, setEditForm] = useState(EMPTY_FORM)
+  const [editSaving, setEditSaving] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
 
-  const openCreate = () => {
-    setEditContact(null)
-    setForm(EMPTY_FORM)
-    setSheetOpen(true)
+  const filtered = useMemo(() => contacts.filter((c) => {
+    const matchSearch =
+      !search ||
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      (c.company ?? '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.phone ?? '').includes(search) ||
+      (c.email ?? '').toLowerCase().includes(search.toLowerCase())
+    const matchCat = activeCategory === 'alle' || c.category === activeCategory
+    return matchSearch && matchCat
+  }), [contacts, search, activeCategory])
+
+  // ── Toevoegen ──
+  const handleAdd = async () => {
+    if (!user || !addForm.name.trim()) return
+    setAddSaving(true)
+    try {
+      const created = await contactQueries.create({
+        owner_id: user.id,
+        name: addForm.name.trim(),
+        company: addForm.company.trim() || null,
+        category: addForm.category,
+        phone: addForm.phone.trim() || null,
+        email: addForm.email.trim() || null,
+        notes: addForm.notes.trim() || null,
+      })
+      queryClient.setQueryData(QK.contacts(user!.id), (old: Contact[] = []) =>
+        [...old, created].sort((a, b) => a.name.localeCompare(b.name))
+      )
+      setAddOpen(false)
+      setAddForm(EMPTY_FORM)
+    } catch (e) { console.error(e) }
+    finally { setAddSaving(false) }
   }
 
-  const openEdit = (c: Contact) => {
-    setEditContact(c)
-    setForm({
+  // ── Bekijken/bewerken ──
+  const openDetail = (c: Contact) => {
+    setDetailContact(c)
+    setEditMode(false)
+    setDeleteConfirm(false)
+    setEditForm({
       name: c.name,
       company: c.company ?? '',
       category: c.category,
@@ -110,45 +123,52 @@ export default function ContactsPage() {
       email: c.email ?? '',
       notes: c.notes ?? '',
     })
-    setSheetOpen(true)
   }
 
-  const handleSave = async () => {
-    if (!user || !form.name.trim()) return
-    setSaving(true)
-    try {
-      const payload = {
-        name: form.name.trim(),
-        company: form.company.trim() || null,
-        category: form.category,
-        phone: form.phone.trim() || null,
-        email: form.email.trim() || null,
-        notes: form.notes.trim() || null,
-      }
-      if (editContact) {
-        const updated = await contactQueries.update(editContact.id, payload)
-        setContacts((prev) => prev.map((c) => c.id === updated.id ? updated : c))
-      } else {
-        const created = await contactQueries.create({ ...payload, owner_id: user.id })
-        setContacts((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))
-      }
-      setSheetOpen(false)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setSaving(false)
-    }
+  const enterEditMode = () => {
+    if (!detailContact) return
+    setEditMode(true)
+    setDeleteConfirm(false)
+    setEditForm({
+      name: detailContact.name,
+      company: detailContact.company ?? '',
+      category: detailContact.category,
+      phone: detailContact.phone ?? '',
+      email: detailContact.email ?? '',
+      notes: detailContact.notes ?? '',
+    })
   }
 
-  const handleDelete = async (id: string) => {
+  const handleSaveEdit = async () => {
+    if (!detailContact || !editForm.name.trim()) return
+    setEditSaving(true)
     try {
-      await contactQueries.delete(id)
-      setContacts((prev) => prev.filter((c) => c.id !== id))
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setDeleteId(null)
-    }
+      const updated = await contactQueries.update(detailContact.id, {
+        name: editForm.name.trim(),
+        company: editForm.company.trim() || null,
+        category: editForm.category,
+        phone: editForm.phone.trim() || null,
+        email: editForm.email.trim() || null,
+        notes: editForm.notes.trim() || null,
+      })
+      queryClient.setQueryData(QK.contacts(user!.id), (old: Contact[] = []) =>
+        old.map(c => c.id === updated.id ? updated : c).sort((a, b) => a.name.localeCompare(b.name))
+      )
+      setDetailContact(updated)
+      setEditMode(false)
+    } catch (e) { console.error(e) }
+    finally { setEditSaving(false) }
+  }
+
+  const handleDelete = async () => {
+    if (!detailContact) return
+    try {
+      await contactQueries.delete(detailContact.id)
+      queryClient.setQueryData(QK.contacts(user!.id), (old: Contact[] = []) =>
+        old.filter(c => c.id !== detailContact.id)
+      )
+      setDetailContact(null)
+    } catch (e) { console.error(e) }
   }
 
   return (
@@ -160,7 +180,10 @@ export default function ContactsPage() {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Contactboek</h1>
           <p className="mt-1 text-sm text-gray-500">Loodgieters, aannemers en andere vaste contacten.</p>
         </div>
-        <Button onClick={openCreate} className="bg-[#163300] text-white hover:bg-[#163300]/90 rounded-full gap-2">
+        <Button
+          onClick={() => { setAddForm(EMPTY_FORM); setAddOpen(true) }}
+          className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-full gap-2 font-semibold"
+        >
           <Plus className="h-4 w-4" />
           Contact toevoegen
         </Button>
@@ -200,7 +223,7 @@ export default function ContactsPage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-36 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={i} className="h-36 rounded-2xl bg-gray-100 dark:bg-neutral-800 animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -210,7 +233,12 @@ export default function ContactsPage() {
             {contacts.length === 0 ? 'Nog geen contacten toegevoegd.' : 'Geen contacten gevonden.'}
           </p>
           {contacts.length === 0 && (
-            <Button variant="outline" size="sm" onClick={openCreate} className="rounded-full mt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setAddForm(EMPTY_FORM); setAddOpen(true) }}
+              className="rounded-full mt-1"
+            >
               Eerste contact toevoegen
             </Button>
           )}
@@ -218,13 +246,15 @@ export default function ContactsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((c) => (
-            <div
+            <button
               key={c.id}
-              className="group rounded-2xl border border-gray-200 bg-white p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all"
+              type="button"
+              onClick={() => openDetail(c)}
+              className="group rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">{c.name}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white truncate">{c.name}</p>
                   {c.company && (
                     <p className="text-xs text-gray-500 truncate mt-0.5">{c.company}</p>
                   )}
@@ -233,156 +263,218 @@ export default function ContactsPage() {
                   {CATEGORIES.find((cat) => cat.value === c.category)?.label ?? c.category}
                 </Badge>
               </div>
-
               <div className="flex flex-col gap-1.5">
                 {c.phone && (
-                  <a href={`tel:${c.phone}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#163300] transition-colors">
+                  <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
                     <Phone className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{c.phone}</span>
-                  </a>
+                  </p>
                 )}
                 {c.email && (
-                  <a href={`mailto:${c.email}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#163300] transition-colors">
+                  <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
                     <Mail className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{c.email}</span>
-                  </a>
+                  </p>
                 )}
               </div>
-
               {c.notes && (
                 <p className="text-xs text-gray-400 leading-5 line-clamp-2">{c.notes}</p>
               )}
-
-              <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  type="button"
-                  onClick={() => openEdit(c)}
-                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#163300] transition-colors"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Bewerken
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeleteId(c.id)}
-                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors ml-auto"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Verwijderen
-                </button>
-              </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
 
-      {/* Add/Edit Sheet */}
-      {sheetOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSheetOpen(false)} />
-          <div className="relative ml-auto w-full max-w-md bg-white dark:bg-neutral-900 h-full flex flex-col shadow-xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-                {editContact ? 'Contact bewerken' : 'Contact toevoegen'}
-              </h2>
-              <button type="button" onClick={() => setSheetOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="h-5 w-5" />
+      {/* ── TOEVOEGEN — CreateDialogShell (popup) ── */}
+      <CreateDialogShell
+        open={addOpen}
+        onOpenChange={open => { if (!open) setAddOpen(false) }}
+        title="Contact toevoegen"
+        primaryLabel="Toevoegen"
+        onPrimary={handleAdd}
+        primaryDisabled={addSaving || !addForm.name.trim()}
+        primaryLoading={addSaving}
+      >
+        <DialogField label="Naam" required>
+          <Input className="rounded-xl" placeholder="Jan de Vries" value={addForm.name}
+            onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))} />
+        </DialogField>
+        <div className="grid grid-cols-2 gap-3">
+          <DialogField label="Bedrijfsnaam" optional>
+            <Input className="rounded-xl" placeholder="De Vries Installaties" value={addForm.company}
+              onChange={e => setAddForm(f => ({ ...f, company: e.target.value }))} />
+          </DialogField>
+          <DialogField label="Categorie">
+            <Select value={addForm.category} onValueChange={v => setAddForm(f => ({ ...f, category: v }))}>
+              <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.filter(c => c.value !== 'alle').map(cat => (
+                  <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </DialogField>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <DialogField label="Telefoon" optional>
+            <Input className="rounded-xl" placeholder="+31 6 12345678" value={addForm.phone}
+              onChange={e => setAddForm(f => ({ ...f, phone: e.target.value }))} />
+          </DialogField>
+          <DialogField label="E-mail" optional>
+            <Input className="rounded-xl" type="email" placeholder="jan@devries.nl" value={addForm.email}
+              onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} />
+          </DialogField>
+        </div>
+        <DialogField label="Notities" optional>
+          <Textarea className="rounded-xl resize-none" rows={3} placeholder="Bijv. goede loodgieter, werkt snel..."
+            value={addForm.notes} onChange={e => setAddForm(f => ({ ...f, notes: e.target.value }))} />
+        </DialogField>
+      </CreateDialogShell>
+
+      {/* ── BEKIJKEN — DetailShell (slide-out, read-only by default) ── */}
+      <DetailShell
+        open={!!detailContact}
+        onClose={() => { setDetailContact(null); setEditMode(false); setDeleteConfirm(false) }}
+        title={detailContact?.name ?? ''}
+        subtitle={detailContact ? (CATEGORIES.find(c => c.value === detailContact.category)?.label ?? detailContact.category) : undefined}
+        headerLeft={
+          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+            <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          </div>
+        }
+        headerActions={
+          !editMode && !deleteConfirm ? (
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={enterEditMode}
+                className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 transition-colors">
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button type="button" onClick={() => setDeleteConfirm(true)}
+                className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">Naam *</label>
-                <Input
-                  placeholder="Jan de Vries"
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">Bedrijfsnaam</label>
-                <Input
-                  placeholder="De Vries Installaties"
-                  value={form.company}
-                  onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">Categorie</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#163300]/20"
-                >
-                  {CATEGORIES.filter((c) => c.value !== 'alle').map((cat) => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">Telefoon</label>
-                <Input
-                  placeholder="+31 6 12345678"
-                  value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">E-mail</label>
-                <Input
-                  placeholder="jan@devries.nl"
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-gray-700">Notities</label>
-                <textarea
-                  placeholder="Bijv. goede loodgieter, werkt snel..."
-                  value={form.notes}
-                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-[#163300]/20"
-                />
+          ) : undefined
+        }
+        footer={
+          deleteConfirm ? (
+            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex flex-col gap-3">
+              <p className="text-sm text-gray-700 dark:text-neutral-300 font-medium">Contact verwijderen?</p>
+              <p className="text-xs text-gray-500">Dit kan niet ongedaan worden gemaakt.</p>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setDeleteConfirm(false)}
+                  className="flex-1 text-sm text-gray-500 hover:text-gray-800 transition-colors py-2">
+                  Annuleren
+                </button>
+                <button type="button" onClick={handleDelete}
+                  className="flex-1 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 transition-colors">
+                  Verwijderen
+                </button>
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex gap-3">
-              <Button variant="outline" onClick={() => setSheetOpen(false)} className="flex-1 rounded-full">
+          ) : editMode ? (
+            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end gap-3">
+              <button type="button" onClick={() => setEditMode(false)}
+                className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">
                 Annuleren
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={saving || !form.name.trim()}
-                className="flex-1 rounded-full bg-[#163300] text-white hover:bg-[#163300]/90"
-              >
-                {saving ? 'Opslaan...' : 'Opslaan'}
-              </Button>
+              </button>
+              <button type="button" onClick={handleSaveEdit} disabled={editSaving || !editForm.name.trim()}
+                className="inline-flex items-center justify-center rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-5 py-2 transition-colors">
+                {editSaving ? 'Opslaan…' : 'Opslaan'}
+              </button>
             </div>
-          </div>
-        </div>
-      )}
+          ) : (
+            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end">
+              <button type="button" onClick={() => setDetailContact(null)}
+                className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">
+                Sluiten
+              </button>
+            </div>
+          )
+        }
+      >
+        {detailContact && (
+          editMode ? (
+            /* ── Bewerken ── */
+            <div className="px-6 py-5 space-y-4">
+              <DialogField label="Naam" required>
+                <Input className="rounded-xl" value={editForm.name}
+                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
+              </DialogField>
+              <div className="grid grid-cols-2 gap-3">
+                <DialogField label="Bedrijfsnaam" optional>
+                  <Input className="rounded-xl" value={editForm.company}
+                    onChange={e => setEditForm(f => ({ ...f, company: e.target.value }))} />
+                </DialogField>
+                <DialogField label="Categorie">
+                  <Select value={editForm.category} onValueChange={v => setEditForm(f => ({ ...f, category: v }))}>
+                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.filter(c => c.value !== 'alle').map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </DialogField>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <DialogField label="Telefoon" optional>
+                  <Input className="rounded-xl" value={editForm.phone}
+                    onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} />
+                </DialogField>
+                <DialogField label="E-mail" optional>
+                  <Input className="rounded-xl" type="email" value={editForm.email}
+                    onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} />
+                </DialogField>
+              </div>
+              <DialogField label="Notities" optional>
+                <Textarea className="rounded-xl resize-none" rows={3} value={editForm.notes}
+                  onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />
+              </DialogField>
+            </div>
+          ) : (
+            /* ── Read-only weergave ── */
+            <div className="px-6 py-5 space-y-5">
+              {/* Categorie badge */}
+              <span className={cn('inline-flex rounded-full px-3 py-1 text-xs font-medium', CATEGORY_COLORS[detailContact.category] ?? CATEGORY_COLORS.overig)}>
+                {CATEGORIES.find(c => c.value === detailContact.category)?.label ?? detailContact.category}
+              </span>
 
-      {/* Delete bevestiging */}
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteId(null)} />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl flex flex-col gap-4">
-            <h3 className="text-base font-semibold text-gray-900">Contact verwijderen?</h3>
-            <p className="text-sm text-gray-500">Dit kan niet ongedaan worden gemaakt.</p>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setDeleteId(null)} className="flex-1 rounded-full">
-                Annuleren
-              </Button>
-              <Button
-                onClick={() => handleDelete(deleteId)}
-                className="flex-1 rounded-full bg-red-600 text-white hover:bg-red-700"
-              >
-                Verwijderen
-              </Button>
+              {/* Contactgegevens */}
+              <div className="space-y-3">
+                {detailContact.company && (
+                  <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300">
+                    <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
+                    {detailContact.company}
+                  </div>
+                )}
+                {detailContact.phone && (
+                  <a href={`tel:${detailContact.phone}`}
+                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors">
+                    <Phone className="h-4 w-4 text-gray-400 shrink-0" />
+                    {detailContact.phone}
+                  </a>
+                )}
+                {detailContact.email && (
+                  <a href={`mailto:${detailContact.email}`}
+                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors">
+                    <Mail className="h-4 w-4 text-gray-400 shrink-0" />
+                    {detailContact.email}
+                  </a>
+                )}
+              </div>
+
+              {/* Notities */}
+              {detailContact.notes && (
+                <div>
+                  <p className="text-xs font-medium text-gray-400 dark:text-neutral-500 uppercase tracking-wide mb-2">Notities</p>
+                  <p className="text-sm text-gray-600 dark:text-neutral-300 leading-relaxed">{detailContact.notes}</p>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
+          )
+        )}
+      </DetailShell>
     </div>
   )
 }

@@ -1,72 +1,91 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
 import { Pause, Play } from 'lucide-react'
 
 const PARTNER_LOGOS = [1, 2, 3, 4, 5]
 
+const SLIDES = [
+  '/images/Achtergrond1.jpg',
+  '/images/Achtergrond2.jpg',
+  '/images/Achtergrond3.jpg',
+  '/images/Achtergrond4.jpg',
+  '/images/Achtergrond5.jpg',
+  '/images/achtergrond6.jpg',
+  '/images/Achtergrond7.jpg',
+  '/images/Achtergrond8.jpg',
+  '/images/Achtergrond9.jpg',
+  '/images/Achtergrond10.jpg',
+  '/images/Achtergrond11.jpg',
+  '/images/Achtergrond12.jpg',
+  '/images/Achtergrond13.jpg',
+  '/images/Achtergrond14.jpg',
+  '/images/AchtergrondX.jpg',
+  '/images/AchtergrondY.jpg',
+]
+
+const INTERVAL = 5000
+
 interface HeroSectionProps {
   onSignupClick?: () => void
 }
 
-
 export function HeroSection({ onSignupClick }: HeroSectionProps) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [videoLoaded, setVideoLoaded] = useState(false)
+  const [current, setCurrent] = useState(0)
+  const [prev, setPrev] = useState<number | null>(null)
   const [playing, setPlaying] = useState(true)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const advance = () => {
+    setCurrent((c) => {
+      setPrev(c)
+      return (c + 1) % SLIDES.length
+    })
+  }
 
   useEffect(() => {
-    const v = videoRef.current
-    if (!v) return
-    v.play().catch(() => {})
-  }, [])
+    if (!playing) return
+    timerRef.current = setInterval(advance, INTERVAL)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [playing])
 
   const togglePlay = () => {
-    const v = videoRef.current
-    if (!v) return
-    if (playing) { v.pause(); setPlaying(false) }
-    else { v.play().catch(() => {}); setPlaying(true) }
+    if (playing && timerRef.current) clearInterval(timerRef.current)
+    setPlaying((p) => !p)
   }
 
   return (
     <section className="relative w-full min-h-[72vh] flex flex-col overflow-hidden bg-black">
 
-      {/* ── Achtergrond video ─────────────────────────────────────────── */}
-      <video
-        ref={videoRef}
-        src="/videos/hero-bg.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        onCanPlayThrough={() => setVideoLoaded(true)}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-      />
+      {/* Slideshow */}
+      {SLIDES.map((src, i) => (
+        <div
+          key={src}
+          className="absolute inset-0 transition-opacity duration-1000"
+          style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 2 : i === prev ? 1 : 0 }}
+        >
+          <Image
+            src={src}
+            alt=""
+            fill
+            className="object-cover"
+            priority={i === 0}
+            quality={85}
+          />
+        </div>
+      ))}
 
-      {/* Fallback achtergrond terwijl video laadt */}
-      <div className={`absolute inset-0 transition-opacity duration-1000 ${videoLoaded ? 'opacity-0' : 'opacity-100'}`}>
-        <Image
-          src="/images/Achtergrond5.jpg"
-          alt=""
-          fill
-          className="object-cover"
-          priority
-          quality={85}
-        />
-      </div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/55 z-10" />
 
-      {/* Overlay — donker maar niet te zwaar */}
-      <div className="absolute inset-0 bg-black/55" />
+      {/* Vignette onderaan */}
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none z-10" />
 
-      {/* Subtiele vignette onderaan voor soepele overgang */}
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+      {/* Content */}
+      <div className="relative z-20 flex flex-col flex-1 w-full max-w-7xl mx-auto px-5 md:px-6">
 
-      {/* ── Eén container voor alles — zelfde marge links ─────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 w-full max-w-7xl mx-auto px-5 md:px-6">
-
-        {/* Titel + knop — verticaal gecentreerd */}
         <div className="flex flex-col flex-1 justify-center pt-24 pb-10">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -100,7 +119,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           </motion.div>
         </div>
 
-        {/* Trusted by — onderkant, zelfde linkermarge */}
+        {/* Partners */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -124,12 +143,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
 
       </div>
 
-      {/* ── Play / pause knop rechtsonder ─────────────────────────────── */}
+      {/* Play / pause */}
       <button
         type="button"
         onClick={togglePlay}
-        className="absolute bottom-5 right-5 z-20 h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-        aria-label={playing ? 'Video pauzeren' : 'Video afspelen'}
+        className="absolute bottom-5 right-5 z-30 h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        aria-label={playing ? 'Slideshow pauzeren' : 'Slideshow afspelen'}
       >
         {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
       </button>

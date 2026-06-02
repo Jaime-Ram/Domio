@@ -7,6 +7,7 @@ import { ContentHeader } from "@/components/dashboard/content-header"
 import { PageTitleBar } from "@/components/dashboard/page-title-bar"
 import { DocumentPreviewPanel } from '@/components/documents/document-preview-panel'
 import { DocumentPreviewProvider, useDocumentPreview } from '@/providers/document-preview-provider'
+import { QueryProvider } from '@/providers/query-provider'
 import { cn } from '@/lib/utils'
 import { DashboardUserProvider, useDashboardUser } from '@/providers/dashboard-user-provider'
 import { usePathname } from 'next/navigation'
@@ -58,6 +59,7 @@ export default function EmployerDashboardLayout({
   }
 
   return (
+    <QueryProvider>
     <DocumentPreviewProvider>
       <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
         <div
@@ -83,6 +85,7 @@ export default function EmployerDashboardLayout({
         </div>
       </div>
     </DocumentPreviewProvider>
+    </QueryProvider>
   )
 }
 

@@ -1204,6 +1204,271 @@ export const contactQueries = {
   },
 };
 
+// ============================================================================
+// MJOP (Meerjarenonderhoudsplanning)
+// ============================================================================
+
+export const mjopQueries = {
+  // --- Gebouwen ---
+  async getBuildings(ownerId: string) {
+    // @ts-ignore - mjop tables not yet in generated types
+    const { data, error } = await supabaseAny
+      .from('mjop_buildings')
+      .select('*, properties(id, name)')
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createBuilding(building: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_buildings')
+      .insert(building)
+      .select('*, properties(id, name)')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async updateBuilding(id: string, updates: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_buildings')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*, properties(id, name)')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async deleteBuilding(id: string) {
+    const { error } = await supabaseAny.from('mjop_buildings').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // --- Elementen ---
+  async getElements(buildingId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_elements')
+      .select('*, mjop_element_types(nlsfb_code, nlsfb_group, name, levensduur, standard_unit)')
+      .eq('building_id', buildingId)
+      .order('created_at', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createElement(element: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_elements')
+      .insert(element)
+      .select('*, mjop_element_types(nlsfb_code, nlsfb_group, name)')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async updateElement(id: string, updates: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_elements')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*, mjop_element_types(nlsfb_code, nlsfb_group, name)')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async deleteElement(id: string) {
+    const { error } = await supabaseAny.from('mjop_elements').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // --- Catalogus & referentiedata ---
+  async getElementTypes() {
+    const { data, error } = await supabaseAny
+      .from('mjop_element_types')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async getMaintenanceTypes() {
+    const { data, error } = await supabaseAny
+      .from('mjop_maintenance_types')
+      .select('*')
+      .order('code', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async getNen2767Score(ernst: number, omvang: number, intensiteit: number): Promise<number | null> {
+    const { data, error } = await supabaseAny
+      .from('nen2767_matrix')
+      .select('conditiescore')
+      .eq('ernst', ernst)
+      .eq('omvang', omvang)
+      .eq('intensiteit', intensiteit)
+      .single()
+    if (error) return null
+    return (data as any)?.conditiescore ?? null
+  },
+
+  // --- Inspecties ---
+  async getInspections(buildingId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_inspections')
+      .select('*')
+      .eq('building_id', buildingId)
+      .order('datum', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createInspection(inspection: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_inspections')
+      .insert(inspection)
+      .select('*')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async updateInspection(id: string, updates: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_inspections')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // --- Gebreken ---
+  async getDefects(elementId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_defects')
+      .select('*')
+      .eq('element_id', elementId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async getDefectsByInspection(inspectionId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_defects')
+      .select('*, mjop_elements(naam, locatie, building_id)')
+      .eq('inspection_id', inspectionId)
+      .order('created_at', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createDefect(defect: Record<string, any>) {
+    // conditiescore wordt automatisch berekend door de trigger
+    const { data, error } = await supabaseAny
+      .from('mjop_defects')
+      .insert(defect)
+      .select('*')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async deleteDefect(id: string) {
+    const { error } = await supabaseAny.from('mjop_defects').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // --- Versies ---
+  async getVersions(buildingId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_versions')
+      .select('*')
+      .eq('building_id', buildingId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createVersion(version: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_versions')
+      .insert(version)
+      .select('*')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  async updateVersion(id: string, updates: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_versions')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) throw error
+    return data as any
+  },
+
+  // --- Taken ---
+  async getTasks(versionId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_tasks')
+      .select('*, mjop_task_years(*), mjop_elements(naam, locatie), mjop_maintenance_types(label, color)')
+      .eq('version_id', versionId)
+      .order('startjaar', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+
+  async createTask(task: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_tasks')
+      .insert(task)
+      .select('*')
+      .single()
+    if (error) throw error
+    // Genereer taakyears via de database functie
+    await supabaseAny.rpc('mjop_refresh_task_years', { p_task_id: (data as any).id })
+    return data as any
+  },
+
+  async updateTask(id: string, updates: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('mjop_tasks')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) throw error
+    await supabaseAny.rpc('mjop_refresh_task_years', { p_task_id: id })
+    return data as any
+  },
+
+  async deleteTask(id: string) {
+    const { error } = await supabaseAny.from('mjop_tasks').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // --- Kostenoverzicht per jaar (voor grafiek) ---
+  async getYearlyCosts(versionId: string) {
+    const { data, error } = await supabaseAny
+      .from('mjop_task_years')
+      .select('jaar, bedrag, mjop_tasks!inner(version_id, nlsfb_code, omschrijving, maintenance_type_code)')
+      .eq('mjop_tasks.version_id', versionId)
+      .order('jaar', { ascending: true })
+    if (error) throw error
+    return (data ?? []) as any[]
+  },
+}
+
 export const taskQueries = {
   async getByOwner(ownerId: string) {
     // @ts-ignore - tasks table not yet in generated types
