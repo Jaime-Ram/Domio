@@ -609,7 +609,7 @@ export interface Database {
           updated_at?: string
         }
       }
-      raw_transactions: {
+      payments: {
         Row: {
           id: string
           owner_id: string

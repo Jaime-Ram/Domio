@@ -696,6 +696,65 @@ export const ticketQueries = {
     if (error) throw error;
     return data as Ticket;
   },
+
+  // Get tickets visible to the current tenant (uses SECURITY DEFINER helpers)
+  async getByTenant() {
+    const [leaseRes, unitRes, propRes] = await Promise.all([
+      supabase.rpc('current_huurder_lease_ids'),
+      supabase.rpc('current_huurder_unit_ids'),
+      supabase.rpc('current_huurder_property_ids'),
+    ]);
+
+    const leaseIds: string[] = leaseRes.data ?? [];
+    const unitIds: string[]  = unitRes.data  ?? [];
+    const propIds: string[]  = propRes.data  ?? [];
+
+    const filters: string[] = [];
+    if (leaseIds.length) filters.push(`and(scope.eq.lease,lease_id.in.(${leaseIds.join(',')}))`);
+    if (unitIds.length)  filters.push(`and(scope.eq.unit,unit_id.in.(${unitIds.join(',')}))`);
+    if (propIds.length)  filters.push(`and(scope.eq.property,property_id.in.(${propIds.join(',')}))`);
+
+    if (!filters.length) return [];
+
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*, units(*)')
+      .or(filters.join(','))
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Resolve the active lease (and landlord owner_id) for a given profile.
+  async getActiveLeaseForProfile(profileId: string): Promise<{ leaseId: string; ownerId: string; unitId: string | null } | null> {
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('id')
+      .eq('profile_id', profileId)
+      .maybeSingle();
+
+    if (!tenant) return null;
+
+    const { data: leaseTenantRows } = await supabase
+      .from('lease_tenants')
+      .select('lease_id')
+      .eq('tenant_id', (tenant as any).id);
+
+    const leaseIds = (leaseTenantRows ?? []).map((r: any) => r.lease_id);
+    if (!leaseIds.length) return null;
+
+    const { data: lease } = await supabase
+      .from('leases')
+      .select('id, owner_id, unit_id')
+      .in('id', leaseIds)
+      .eq('status', 'actief')
+      .limit(1)
+      .maybeSingle();
+
+    if (!lease) return null;
+    return { leaseId: (lease as any).id, ownerId: (lease as any).owner_id, unitId: (lease as any).unit_id ?? null };
+  },
 };
 
 // ============================================================================
@@ -914,8 +973,37 @@ export const documentQueries = {
       .from('documents')
       .delete()
       .eq('id', documentId);
-    
+
     if (error) throw error;
+  },
+
+  // Get documents visible to the current tenant (uses SECURITY DEFINER helpers)
+  async getByTenant() {
+    const [leaseRes, unitRes, propRes] = await Promise.all([
+      supabase.rpc('current_huurder_lease_ids'),
+      supabase.rpc('current_huurder_unit_ids'),
+      supabase.rpc('current_huurder_property_ids'),
+    ]);
+
+    const leaseIds: string[] = leaseRes.data ?? [];
+    const unitIds: string[]  = unitRes.data  ?? [];
+    const propIds: string[]  = propRes.data  ?? [];
+
+    const filters: string[] = [];
+    if (leaseIds.length) filters.push(`and(scope.eq.lease,lease_id.in.(${leaseIds.join(',')}))`);
+    if (unitIds.length)  filters.push(`and(scope.eq.unit,unit_id.in.(${unitIds.join(',')}))`);
+    if (propIds.length)  filters.push(`and(scope.eq.property,property_id.in.(${propIds.join(',')}))`);
+
+    if (!filters.length) return [];
+
+    const { data, error } = await supabase
+      .from('documents')
+      .select('*, properties(id, name, address), units(id, unit_number)')
+      .or(filters.join(','))
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
   },
 };
 
@@ -1051,6 +1139,26 @@ export const paymentQueries = {
       .eq('id', paymentId);
 
     if (error) throw error;
+  },
+
+  // Get payments for the authenticated tenant (looks up tenant by profile_id first)
+  async getByProfile(profileId: string) {
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('id')
+      .eq('profile_id', profileId)
+      .maybeSingle();
+
+    if (!tenant) return [];
+
+    const { data, error } = await supabase
+      .from('payments')
+      .select('id, amount, due_date, paid_date, status, description')
+      .eq('tenant_id', tenant.id)
+      .order('due_date', { ascending: false });
+
+    if (error) throw error;
+    return data ?? [];
   },
 };
 

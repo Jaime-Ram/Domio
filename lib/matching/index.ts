@@ -25,7 +25,7 @@ export async function matchTransaction(rawTransactionId: string): Promise<MatchR
   const client = createAdminClient();
 
   const { data: tx, error: txErr } = await client
-    .from("raw_transactions")
+    .from("payments")
     .select("id, owner_id, booking_date, amount, counterparty_iban, counterparty_name, description")
     .eq("id", rawTransactionId)
     .single();

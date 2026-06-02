@@ -47,7 +47,7 @@ type BankConnectionIdRow = Pick<
   Database['public']['Tables']['bank_connections']['Row'],
   'id'
 >
-type RawTransactionInsert = Database['public']['Tables']['raw_transactions']['Insert']
+type RawTransactionInsert = Database['public']['Tables']['payments']['Insert']
 
 export interface TransactionRow {
   id: string
@@ -227,7 +227,7 @@ export function TransactionsInbox({
         counterparty_iban: addForm.counterparty_iban.trim() || null,
         description: addForm.description.trim() || null,
       }
-      const { error } = await supabase.from('raw_transactions').insert(row as never)
+      const { error } = await supabase.from('payments').insert(row as never)
       if (error) throw error
       setAddOpen(false)
       resetAddForm()

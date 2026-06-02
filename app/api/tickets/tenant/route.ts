@@ -22,15 +22,24 @@ export async function GET() {
 
   if (!tenant) return NextResponse.json({ tickets: [], context: null })
 
-  // Haal lease context op (unit + property)
-  const { data: lease } = await db
-    .from('leases')
-    .select('id, unit_id, owner_id, units(id, unit_number, properties(id, name, address, city))')
+  // Haal lease context op via lease_tenants join table
+  const { data: leaseTenantRows } = await db
+    .from('lease_tenants')
+    .select('lease_id')
     .eq('tenant_id', tenant.id)
-    .in('status', ['actief', 'concept'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+
+  const leaseIds = (leaseTenantRows ?? []).map((r: any) => r.lease_id)
+
+  const { data: lease } = leaseIds.length
+    ? await db
+        .from('leases')
+        .select('id, unit_id, owner_id, units(id, unit_number, properties(id, name, address, city))')
+        .in('id', leaseIds)
+        .in('status', ['actief', 'concept'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null }
 
   const unit = lease?.units
   const property = unit?.properties
@@ -60,10 +69,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { title, description, scope, unitId, propertyId, ownerId, category, priority, due_date } = await req.json()
-  if (!title || !scope || !ownerId) return NextResponse.json({ error: 'Verplichte velden ontbreken' }, { status: 400 })
-  if (scope === 'unit' && !unitId) return NextResponse.json({ error: 'unit_id vereist' }, { status: 400 })
-  if (scope === 'property' && !propertyId) return NextResponse.json({ error: 'property_id vereist' }, { status: 400 })
+  const { title, description, leaseId, ownerId, category, priority, due_date } = await req.json()
+  if (!title || !leaseId || !ownerId) return NextResponse.json({ error: 'Verplichte velden ontbreken' }, { status: 400 })
 
   const db = supabase as any
 
@@ -80,9 +87,8 @@ export async function POST(req: NextRequest) {
       description: description || null,
       status: 'open',
       priority: resolvedPriority,
-      scope,
-      unit_id: scope === 'unit' ? unitId : null,
-      property_id: scope === 'property' ? propertyId : null,
+      scope: 'lease',
+      lease_id: leaseId,
       source: 'tenant',
       category: category || 'onderhoud',
       due_date: due_date || null,
@@ -108,24 +114,16 @@ export async function POST(req: NextRequest) {
       .single() as { data: { full_name: string | null } | null }
 
     if (landlordProfile?.email) {
-      // Resolve property label
+      // Resolve property label via lease → unit → property
       let propertyLabel = 'een van je objecten'
-      if (scope === 'unit' && unitId) {
-        const { data: unit } = await db
-          .from('units')
-          .select('unit_number, properties(address, city)')
-          .eq('id', unitId)
-          .single()
-        if (unit) {
-          const prop = unit.properties as { address: string; city: string } | null
-          propertyLabel = prop ? `${prop.address}, ${prop.city}` : propertyLabel
-        }
-      } else if (scope === 'property' && propertyId) {
-        const { data: prop } = await db
-          .from('properties')
-          .select('address, city')
-          .eq('id', propertyId)
-          .single() as { data: { address: string; city: string } | null }
+      const { data: lease } = await db
+        .from('leases')
+        .select('units(unit_number, properties(address, city))')
+        .eq('id', leaseId)
+        .maybeSingle()
+      if (lease?.units) {
+        const unit = lease.units as { unit_number: string | null; properties: { address: string; city: string } | null } | null
+        const prop = unit?.properties
         if (prop) propertyLabel = `${prop.address}, ${prop.city}`
       }
 

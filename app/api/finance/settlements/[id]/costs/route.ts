@@ -92,7 +92,7 @@ export async function GET(
         unit_id,
         property_id,
         category,
-        raw_transactions (
+        payments (
           id,
           value_date,
           amount,
@@ -120,17 +120,17 @@ export async function GET(
     incomePayments = (incomeAssignments ?? [])
       .filter((a: any) => {
         // Income = positive-amount transactions within the period
-        const d = a.raw_transactions?.value_date;
-        const amt = Number(a.raw_transactions?.amount ?? 0);
+        const d = a.payments?.value_date;
+        const amt = Number(a.payments?.amount ?? 0);
         return d && d >= period_start && d <= period_end && amt > 0;
       })
       .map((a: any) => ({
-        id: a.raw_transactions?.id ?? a.id,
+        id: a.payments?.id ?? a.id,
         source: "payment" as const,
-        date: a.raw_transactions?.value_date,
-        description: a.raw_transactions?.description ?? "",
-        counterparty_name: a.raw_transactions?.counterparty_name ?? "",
-        amount: Number(a.raw_transactions?.amount ?? 0),
+        date: a.payments?.value_date,
+        description: a.payments?.description ?? "",
+        counterparty_name: a.payments?.counterparty_name ?? "",
+        amount: Number(a.payments?.amount ?? 0),
       }))
       .sort(
         (a: any, b: any) =>
@@ -149,7 +149,7 @@ export async function GET(
     property_id,
     unit_id,
     cost_allocation_key_id,
-    raw_transactions (
+    payments (
       id,
       value_date,
       amount,
@@ -223,14 +223,14 @@ export async function GET(
   const propertyUnits: PropertyUnit[] = (propertyUnitRows ?? []) as PropertyUnit[];
 
   const filteredAssignments = (assignments ?? []).filter((a: any) => {
-    const d = a.raw_transactions?.value_date;
-    const amt = Number(a.raw_transactions?.amount ?? 0);
+    const d = a.payments?.value_date;
+    const amt = Number(a.payments?.amount ?? 0);
     return d && d >= period_start && d <= period_end && amt < 0;
   });
 
   const allExpenses = filteredAssignments
     .map((a: any) => {
-      const fullAmount = Math.abs(Number(a.raw_transactions?.amount ?? 0));
+      const fullAmount = Math.abs(Number(a.payments?.amount ?? 0));
       const isPropertyLevel = a.unit_id == null;
 
       let allocatedAmount = fullAmount;
@@ -264,10 +264,10 @@ export async function GET(
           : null;
 
       return {
-        id: a.raw_transactions?.id ?? a.id,
+        id: a.payments?.id ?? a.id,
         source: "transaction" as const,
-        date: a.raw_transactions?.value_date,
-        description: a.raw_transactions?.description ?? "",
+        date: a.payments?.value_date,
+        description: a.payments?.description ?? "",
         category: a.category,
         amount: allocatedAmount,
         full_amount: fullAmount,

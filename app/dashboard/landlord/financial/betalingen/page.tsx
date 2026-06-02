@@ -38,7 +38,7 @@ export default function GeldstromenPage() {
 
     const [txRes, propRes, expRes] = await Promise.all([
       supabase
-        .from('raw_transactions')
+        .from('payments')
         .select(`
           id,
           value_date,
@@ -94,7 +94,7 @@ export default function GeldstromenPage() {
         .eq('due_period', monthStart),
     ])
 
-    if (txRes.error) console.error('[betalingen] raw_transactions:', txRes.error.message, txRes.error.code, txRes.error.details)
+    if (txRes.error) console.error('[betalingen] payments:', txRes.error.message, txRes.error.code, txRes.error.details)
     if (propRes.error) console.error('[betalingen] properties:', propRes.error.message, propRes.error.code)
     if (expRes.error) console.error('[betalingen] rent_expectations:', expRes.error.message, expRes.error.code)
 

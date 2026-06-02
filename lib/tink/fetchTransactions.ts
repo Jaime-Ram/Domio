@@ -126,7 +126,7 @@ export async function fetchTransactions(
     console.log(`Tink: skipping ${pendingCount} pending transactions without booked date`);
   }
 
-  // Map to raw_transactions schema
+  // Map to payments schema
   const rows = bookedTransactions.map((txn) => {
     const scale = parseInt(txn.amount.value.scale, 10) || 0;
     const unscaled = parseInt(txn.amount.value.unscaledValue, 10) || 0;
@@ -157,7 +157,7 @@ export async function fetchTransactions(
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
     const { data, error } = await supabaseAdmin
-      .from("raw_transactions")
+      .from("payments")
       .upsert(batch, {
         onConflict: "bank_connection_id,external_id",
         ignoreDuplicates: true,

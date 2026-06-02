@@ -36,12 +36,10 @@ export async function GET(
       .eq('id', id)
       .single()
 
+    // RLS already enforces access — if the row was returned the user is authorized.
     const doc = data as DocumentRow | null
     if (docError || !doc) {
-      return NextResponse.json({ error: 'Document niet gevonden' }, { status: 404 })
-    }
-    if (doc.owner_id !== user.id) {
-      return NextResponse.json({ error: 'Geen toegang tot dit document' }, { status: 403 })
+      return NextResponse.json({ error: 'Document niet gevonden of geen toegang' }, { status: 404 })
     }
     if (!doc.storage_path) {
       return NextResponse.json({ error: 'Geen bestand gekoppeld aan dit document' }, { status: 400 })

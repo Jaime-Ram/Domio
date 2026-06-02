@@ -8,7 +8,7 @@ const supabase = createClient(
 
 async function main() {
   const { data, error } = await supabase
-    .from("raw_transactions")
+    .from("payments")
     .select("id, owner_id, description, counterparty_iban, amount")
     .like("description", "[TEST]%");
 

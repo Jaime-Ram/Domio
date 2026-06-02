@@ -1,201 +1,6 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.bank_connections (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  provider text NOT NULL DEFAULT 'tink'::text,
-  access_token text,
-  refresh_token text,
-  iban text,
-  last_synced_at timestamp with time zone,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  account_id text,
-  CONSTRAINT bank_connections_pkey PRIMARY KEY (id),
-  CONSTRAINT bank_connections_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
-);
-CREATE TABLE public.cost_allocation_keys (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  property_id uuid,
-  name text NOT NULL,
-  method text NOT NULL CHECK (method = ANY (ARRAY['equal'::text, 'surface_area'::text, 'custom'::text])),
-  units jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(units) = 'array'),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT cost_allocation_keys_pkey PRIMARY KEY (id),
-  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE CASCADE,
-  CONSTRAINT cost_allocation_keys_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id) ON DELETE CASCADE
-);
-CREATE TABLE public.documents (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  property_id uuid,
-  name text NOT NULL,
-  type text NOT NULL DEFAULT 'Overig'::text CHECK (type = ANY (ARRAY['Contract'::text, 'Keuring'::text, 'Factuur'::text, 'Verzekering'::text, 'Overig'::text])),
-  file_name text,
-  mime_type text,
-  extracted_data jsonb,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  storage_path text,
-  source text CHECK (source IS NULL OR (source = ANY (ARRAY['upload'::text, 'generated'::text]))),
-  template_type text,
-  CONSTRAINT documents_pkey PRIMARY KEY (id),
-  CONSTRAINT documents_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
-  CONSTRAINT documents_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
-);
-CREATE TABLE public.leases (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  unit_id uuid NOT NULL,
-  tenant_id uuid,
-  start_date date NOT NULL,
-  end_date date,
-  monthly_rent numeric NOT NULL,
-  deposit numeric,
-  status text NOT NULL DEFAULT 'actief'::text CHECK (status = ANY (ARRAY['actief'::text, 'verlopen'::text, 'opgezegd'::text, 'concept'::text])),
-  notes text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  servicekosten_voorschot numeric DEFAULT 0,
-  payment_profile_id uuid NOT NULL,
-  CONSTRAINT leases_pkey PRIMARY KEY (id),
-  CONSTRAINT leases_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
-  CONSTRAINT leases_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id),
-  CONSTRAINT leases_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT leases_payment_profile_id_fkey FOREIGN KEY (payment_profile_id) REFERENCES public.payment_profiles(id)
-);
-CREATE TABLE public.legal_entities (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  parent_id uuid,
-  name text NOT NULL,
-  short_name text,
-  kvk_number text,
-  btw_number text,
-  address text,
-  postcode text,
-  city text,
-  email text,
-  phone text,
-  notes text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT legal_entities_pkey PRIMARY KEY (id),
-  CONSTRAINT legal_entities_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.legal_entities(id)
-);
-CREATE TABLE public.messages (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  ticket_id uuid NOT NULL,
-  sender_id uuid,
-  content text NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT messages_pkey PRIMARY KEY (id),
-  CONSTRAINT messages_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id),
-  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id)
-);
-CREATE TABLE public.payment_assignments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  raw_transaction_id uuid NOT NULL,
-  rent_expectation_id uuid,
-  amount_assigned numeric NOT NULL CHECK (amount_assigned > 0::numeric),
-  match_method text NOT NULL CHECK (match_method = ANY (ARRAY['iban'::text, 'description_full'::text, 'description_huur'::text, 'description_address'::text, 'manual'::text])),
-  confidence_score integer CHECK (confidence_score IS NULL OR confidence_score >= 0 AND confidence_score <= 100),
-  assigned_by uuid,
-  assigned_at timestamp with time zone NOT NULL DEFAULT now(),
-  category text,
-  property_id uuid,
-  unit_id uuid,
-  cost_allocation_key_id uuid,
-  CONSTRAINT payment_assignments_pkey PRIMARY KEY (id),
-  CONSTRAINT payment_assignments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT payment_assignments_raw_transaction_id_fkey FOREIGN KEY (raw_transaction_id) REFERENCES public.raw_transactions(id),
-  CONSTRAINT payment_assignments_rent_expectation_id_fkey FOREIGN KEY (rent_expectation_id) REFERENCES public.rent_expectations(id),
-  CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id),
-  CONSTRAINT payment_assignments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id) ON DELETE CASCADE,
-  CONSTRAINT payment_assignments_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id) ON DELETE CASCADE,
-  CONSTRAINT payment_assignments_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id) ON DELETE SET NULL,
-  CONSTRAINT payment_assignments_level_check CHECK (
-    category = 'huur'
-    OR (unit_id IS NULL AND cost_allocation_key_id IS NOT NULL)
-    OR (unit_id IS NOT NULL AND cost_allocation_key_id IS NULL)
-    OR category IS NULL
-    OR property_id IS NULL
-  )
-);
-CREATE INDEX IF NOT EXISTS idx_payment_assignments_property_category
-  ON public.payment_assignments (property_id, category)
-  WHERE category IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_payment_assignments_unit
-  ON public.payment_assignments (unit_id)
-  WHERE unit_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_raw_transactions_owner_date
-  ON public.raw_transactions (owner_id, value_date);
-CREATE TABLE public.payment_profile_events (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  tenant_id uuid NOT NULL,
-  profile_id uuid,
-  event text NOT NULL CHECK (event = ANY (ARRAY['reminder'::text, 'overdue'::text, 'paid'::text])),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT payment_profile_events_pkey PRIMARY KEY (id),
-  CONSTRAINT payment_profile_events_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
-  CONSTRAINT payment_profile_events_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id),
-  CONSTRAINT payment_profile_events_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.payment_profiles(id)
-);
-CREATE TABLE public.payment_profiles (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  name text NOT NULL,
-  description text,
-  pay_date integer NOT NULL DEFAULT 1 CHECK (pay_date >= 1 AND pay_date <= 28),
-  reminders ARRAY NOT NULL DEFAULT '{-3,7,14}'::integer[],
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT payment_profiles_pkey PRIMARY KEY (id),
-  CONSTRAINT payment_profiles_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.payments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  tenant_id uuid,
-  property_id uuid,
-  amount numeric NOT NULL,
-  due_date date NOT NULL,
-  paid_date date,
-  status text NOT NULL DEFAULT 'openstaand'::text CHECK (status = ANY (ARRAY['betaald'::text, 'openstaand'::text, 'te_laat'::text, 'geannuleerd'::text])),
-  description text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT payments_pkey PRIMARY KEY (id),
-  CONSTRAINT payments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT payments_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id),
-  CONSTRAINT payments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
-);
-CREATE TABLE public.portfolios (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  name text NOT NULL,
-  description text,
-  legal_entity_id uuid,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT portfolios_pkey PRIMARY KEY (id),
-  CONSTRAINT portfolios_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT portfolios_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id)
-);
-CREATE TABLE public.profile_legal_entities (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  profile_id uuid NOT NULL,
-  legal_entity_id uuid NOT NULL,
-  role text NOT NULL DEFAULT 'beheerder'::text CHECK (role = ANY (ARRAY['beheerder'::text, 'eigenaar'::text, 'medewerker'::text])),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT profile_legal_entities_pkey PRIMARY KEY (id),
-  CONSTRAINT profile_legal_entities_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id),
-  CONSTRAINT profile_legal_entities_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id)
-);
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
   email text NOT NULL,
@@ -218,6 +23,7 @@ CREATE TABLE public.profiles (
   language text DEFAULT 'nl'::text CHECK (language = ANY (ARRAY['nl'::text, 'en'::text])),
   notification_prefs jsonb DEFAULT '{"push": false, "email": true, "in_app": true, "new_payment": true, "payment_overdue": true, "document_expiring": true, "maintenance_request": true}'::jsonb,
   mfa_email_enabled boolean DEFAULT false,
+  transaction_categories jsonb NOT NULL DEFAULT '[{"id": "huur", "label": "Huur"}, {"id": "onderhoud", "label": "Onderhoud"}, {"id": "verzekering", "label": "Verzekering"}, {"id": "belasting", "label": "Belasting"}, {"id": "energie", "label": "Energie"}, {"id": "vve", "label": "VvE"}, {"id": "hypotheek", "label": "Hypotheek"}, {"id": "beheer", "label": "Beheer"}, {"id": "prive", "label": "Privé"}, {"id": "overig", "label": "Overig"}]'::jsonb,
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
@@ -240,41 +46,160 @@ CREATE TABLE public.properties (
   legal_entity_id uuid,
   portfolio_id uuid,
   CONSTRAINT properties_pkey PRIMARY KEY (id),
+  CONSTRAINT properties_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id),
   CONSTRAINT properties_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id),
   CONSTRAINT properties_portfolio_id_fkey FOREIGN KEY (portfolio_id) REFERENCES public.portfolios(id),
-  CONSTRAINT properties_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT properties_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id) ON DELETE RESTRICT
+  CONSTRAINT properties_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
 );
-CREATE TABLE public.raw_transactions (
+CREATE TABLE public.units (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  bank_connection_id uuid,
-  external_id text,
-  booking_date date NOT NULL,
-  value_date date,
-  amount numeric NOT NULL,
-  currency text NOT NULL DEFAULT 'EUR'::text,
-  counterparty_iban text,
-  counterparty_name text,
-  description text,
-  raw_data jsonb,
-  imported_at timestamp with time zone NOT NULL DEFAULT now(),
-  source text NOT NULL DEFAULT '''yapily''::text'::text CHECK (source = ANY (ARRAY['yapily'::text, 'manual'::text, 'camt053'::text])),
-  CONSTRAINT raw_transactions_pkey PRIMARY KEY (id),
-  CONSTRAINT raw_transactions_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT raw_transactions_bank_connection_id_fkey FOREIGN KEY (bank_connection_id) REFERENCES public.bank_connections(id)
-);
-CREATE TABLE public.rent_expectations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  owner_id uuid NOT NULL,
-  lease_id uuid NOT NULL,
-  due_period date NOT NULL CHECK (EXTRACT(day FROM due_period) = 1::numeric),
-  amount_expected numeric NOT NULL CHECK (amount_expected > 0::numeric),
+  property_id uuid NOT NULL,
+  unit_number text NOT NULL,
+  rooms integer,
+  size_m2 numeric,
+  monthly_rent numeric,
+  status text NOT NULL DEFAULT 'leegstand'::text CHECK (status = ANY (ARRAY['verhuurd'::text, 'leegstand'::text, 'onderhoud'::text, 'te_verhuren'::text])),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
-  expectation_type text NOT NULL DEFAULT 'rent'::text CHECK (expectation_type = ANY (ARRAY['rent'::text, 'service_charges'::text])),
-  CONSTRAINT rent_expectations_pkey PRIMARY KEY (id),
-  CONSTRAINT rent_expectations_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT rent_expectations_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id)
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT units_pkey PRIMARY KEY (id),
+  CONSTRAINT units_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
+);
+CREATE TABLE public.tenants (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  profile_id uuid UNIQUE,
+  full_name text NOT NULL,
+  email text,
+  phone text,
+  date_of_birth date,
+  id_number text,
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  iban text,
+  portal_status text NOT NULL DEFAULT 'niet_uitgenodigd'::text CHECK (portal_status = ANY (ARRAY['niet_uitgenodigd'::text, 'uitgenodigd'::text, 'actief'::text, 'ingetrokken'::text])),
+  invited_at timestamp with time zone,
+  claimed_at timestamp with time zone,
+  CONSTRAINT tenants_pkey PRIMARY KEY (id),
+  CONSTRAINT tenants_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT tenants_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.leases (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  unit_id uuid NOT NULL,
+  start_date date NOT NULL,
+  end_date date,
+  monthly_rent numeric NOT NULL,
+  deposit numeric,
+  status text NOT NULL DEFAULT 'actief'::text CHECK (status = ANY (ARRAY['actief'::text, 'verlopen'::text, 'opgezegd'::text, 'concept'::text])),
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  servicekosten_voorschot numeric DEFAULT 0,
+  payment_profile_id uuid NOT NULL,
+  tenant_id uuid,
+  base_rent numeric,
+  indexation_method text NOT NULL DEFAULT 'none'::text CHECK (indexation_method = ANY (ARRAY['none'::text, 'cpi'::text, 'cpi_plus'::text, 'fixed'::text])),
+  indexation_pct numeric,
+  index_month integer CHECK (index_month >= 1 AND index_month <= 12),
+  last_indexed_at date,
+  CONSTRAINT leases_pkey PRIMARY KEY (id),
+  CONSTRAINT leases_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id),
+  CONSTRAINT leases_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
+  CONSTRAINT leases_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT leases_payment_profile_id_fkey FOREIGN KEY (payment_profile_id) REFERENCES public.payment_profiles(id)
+);
+CREATE TABLE public.tickets (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  unit_id uuid,
+  title text NOT NULL,
+  description text,
+  status text NOT NULL DEFAULT 'open'::text CHECK (status = ANY (ARRAY['open'::text, 'in_behandeling'::text, 'afgerond'::text, 'geannuleerd'::text])),
+  priority text NOT NULL DEFAULT 'normaal'::text CHECK (priority = ANY (ARRAY['laag'::text, 'normaal'::text, 'hoog'::text, 'urgent'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  lease_id uuid,
+  property_id uuid,
+  scope text NOT NULL DEFAULT 'unit'::text CHECK (scope = ANY (ARRAY['lease'::text, 'unit'::text, 'property'::text])),
+  created_by uuid,
+  source text NOT NULL DEFAULT 'manual'::text CHECK (source IS NULL OR (source = ANY (ARRAY['landlord'::text, 'tenant'::text, 'upload'::text, 'generated'::text]))) NOT VALI),
+  due_date date,
+  category text CHECK (category = ANY (ARRAY['onderhoud'::text, 'inspectie'::text, 'klacht'::text, 'compliance'::text, 'huurgebeurtenis'::text])),
+  assignee_id uuid,
+  sla_deadline timestamp with time zone,
+  resolved_at timestamp with time zone,
+  ticket_number integer DEFAULT nextval('tickets_number_seq'::regclass),
+  CONSTRAINT tickets_pkey PRIMARY KEY (id),
+  CONSTRAINT tickets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT tickets_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
+  CONSTRAINT tickets_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id),
+  CONSTRAINT tickets_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
+  CONSTRAINT tickets_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.profiles(id),
+  CONSTRAINT tickets_assignee_id_fkey FOREIGN KEY (assignee_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  ticket_id uuid NOT NULL,
+  sender_id uuid,
+  content text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  visibility text DEFAULT 'public'::text CHECK (visibility = ANY (ARRAY['public'::text, 'internal'::text])),
+  CONSTRAINT messages_pkey PRIMARY KEY (id),
+  CONSTRAINT messages_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id),
+  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.wws (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  unit_id uuid NOT NULL,
+  year integer NOT NULL,
+  points integer NOT NULL,
+  sector text NOT NULL CHECK (sector = ANY (ARRAY['sociaal'::text, 'midden'::text, 'vrij'::text])),
+  max_rent numeric NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT wws_pkey PRIMARY KEY (id),
+  CONSTRAINT wws_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT wws_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id)
+);
+CREATE TABLE public.documents (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  property_id uuid,
+  name text NOT NULL,
+  type text NOT NULL DEFAULT 'Overig'::text CHECK (type = ANY (ARRAY['Contract'::text, 'Keuring'::text, 'Factuur'::text, 'Verzekering'::text, 'Overig'::text])),
+  file_name text,
+  mime_type text,
+  extracted_data jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  storage_path text,
+  source text CHECK (source IS NULL OR (source = ANY (ARRAY['upload'::text, 'generated'::text]))),
+  template_type text,
+  unit_id uuid,
+  lease_id uuid,
+  scope text NOT NULL DEFAULT 'general'::text CHECK (scope = ANY (ARRAY['general'::text, 'lease'::text, 'unit'::text, 'property'::text])),
+  CONSTRAINT documents_pkey PRIMARY KEY (id),
+  CONSTRAINT documents_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
+  CONSTRAINT documents_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT documents_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
+  CONSTRAINT documents_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id)
+);
+CREATE TABLE public.bank_connections (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  provider text NOT NULL DEFAULT 'tink'::text,
+  access_token text,
+  refresh_token text,
+  iban text,
+  last_synced_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  account_id text,
+  CONSTRAINT bank_connections_pkey PRIMARY KEY (id),
+  CONSTRAINT bank_connections_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.settlements (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -289,7 +214,6 @@ CREATE TABLE public.settlements (
   total_actual_costs numeric NOT NULL DEFAULT 0,
   balance numeric NOT NULL DEFAULT 0,
   cost_breakdown jsonb,
-  allocation_keys_snapshot jsonb,
   status text NOT NULL DEFAULT 'concept'::text CHECK (status = ANY (ARRAY['concept'::text, 'definitief'::text, 'verzonden'::text, 'verrekend'::text, 'nietig'::text])),
   notes text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
@@ -297,6 +221,7 @@ CREATE TABLE public.settlements (
   published_at timestamp with time zone,
   sent_at timestamp with time zone,
   voided_at timestamp with time zone,
+  allocation_keys_snapshot jsonb,
   CONSTRAINT settlements_pkey PRIMARY KEY (id),
   CONSTRAINT settlements_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
   CONSTRAINT settlements_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
@@ -324,61 +249,379 @@ CREATE TABLE public.tasks (
   CONSTRAINT tasks_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
   CONSTRAINT tasks_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id)
 );
-CREATE TABLE public.tenants (
+CREATE TABLE public.payment_profiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
+  name text NOT NULL,
+  description text,
+  pay_date integer NOT NULL DEFAULT 1 CHECK (pay_date >= 1 AND pay_date <= 28),
+  reminders ARRAY NOT NULL DEFAULT '{-3,7,14}'::integer[],
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT payment_profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT payment_profiles_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.payment_profile_events (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  tenant_id uuid NOT NULL,
   profile_id uuid,
-  full_name text NOT NULL,
+  event text NOT NULL CHECK (event = ANY (ARRAY['reminder'::text, 'overdue'::text, 'paid'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT payment_profile_events_pkey PRIMARY KEY (id),
+  CONSTRAINT payment_profile_events_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
+  CONSTRAINT payment_profile_events_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id),
+  CONSTRAINT payment_profile_events_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.payment_profiles(id)
+);
+CREATE TABLE public.cost_allocation_keys (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  property_id uuid,
+  name text NOT NULL,
+  method text NOT NULL CHECK (method = ANY (ARRAY['equal'::text, 'surface_area'::text, 'custom'::text])),
+  units jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(units) = 'array'::text),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT cost_allocation_keys_pkey PRIMARY KEY (id),
+  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
+  CONSTRAINT cost_allocation_keys_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
+);
+CREATE TABLE public.legal_entities (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  parent_id uuid,
+  name text NOT NULL,
+  short_name text,
+  kvk_number text,
+  btw_number text,
+  address text,
+  postcode text,
+  city text,
   email text,
   phone text,
-  date_of_birth date,
-  id_number text,
   notes text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  iban text,
-  CONSTRAINT tenants_pkey PRIMARY KEY (id),
-  CONSTRAINT tenants_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT tenants_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+  CONSTRAINT legal_entities_pkey PRIMARY KEY (id),
+  CONSTRAINT legal_entities_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.legal_entities(id)
 );
-CREATE TABLE public.tickets (
+CREATE TABLE public.profile_legal_entities (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  legal_entity_id uuid NOT NULL,
+  role text NOT NULL DEFAULT 'beheerder'::text CHECK (role = ANY (ARRAY['beheerder'::text, 'eigenaar'::text, 'medewerker'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT profile_legal_entities_pkey PRIMARY KEY (id),
+  CONSTRAINT profile_legal_entities_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id),
+  CONSTRAINT profile_legal_entities_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id)
+);
+CREATE TABLE public.portfolios (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
-  unit_id uuid,
-  title text NOT NULL,
+  name text NOT NULL,
   description text,
-  status text NOT NULL DEFAULT 'open'::text CHECK (status = ANY (ARRAY['open'::text, 'in_behandeling'::text, 'afgerond'::text, 'geannuleerd'::text])),
-  priority text NOT NULL DEFAULT 'normaal'::text CHECK (priority = ANY (ARRAY['laag'::text, 'normaal'::text, 'hoog'::text, 'urgent'::text])),
+  legal_entity_id uuid,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT tickets_pkey PRIMARY KEY (id),
-  CONSTRAINT tickets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT tickets_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id)
+  CONSTRAINT portfolios_pkey PRIMARY KEY (id),
+  CONSTRAINT portfolios_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT portfolios_legal_entity_id_fkey FOREIGN KEY (legal_entity_id) REFERENCES public.legal_entities(id)
 );
-CREATE TABLE public.units (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  property_id uuid NOT NULL,
-  unit_number text NOT NULL,
-  rooms integer,
-  size_m2 numeric,
-  monthly_rent numeric,
-  status text NOT NULL DEFAULT 'leegstand'::text CHECK (status = ANY (ARRAY['verhuurd'::text, 'leegstand'::text, 'onderhoud'::text, 'te_verhuren'::text])),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT units_pkey PRIMARY KEY (id),
-  CONSTRAINT units_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
-);
-CREATE TABLE public.wws (
+CREATE TABLE public.payments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
-  unit_id uuid NOT NULL,
-  year integer NOT NULL,
-  points integer NOT NULL,
-  sector text NOT NULL CHECK (sector = ANY (ARRAY['sociaal'::text, 'midden'::text, 'vrij'::text])),
-  max_rent numeric NOT NULL,
+  bank_connection_id uuid,
+  external_id text,
+  booking_date date NOT NULL,
+  value_date date,
+  amount numeric NOT NULL,
+  currency text NOT NULL DEFAULT 'EUR'::text,
+  counterparty_iban text,
+  counterparty_name text,
+  description text,
+  raw_data jsonb,
+  imported_at timestamp with time zone NOT NULL DEFAULT now(),
+  source text NOT NULL DEFAULT '''yapily''::text'::text CHECK (source = ANY (ARRAY['yapily'::text, 'manual'::text, 'camt053'::text])),
+  CONSTRAINT payments_pkey PRIMARY KEY (id),
+  CONSTRAINT raw_transactions_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT raw_transactions_bank_connection_id_fkey FOREIGN KEY (bank_connection_id) REFERENCES public.bank_connections(id)
+);
+CREATE TABLE public.rent_expectations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  lease_id uuid NOT NULL,
+  due_period date NOT NULL CHECK (EXTRACT(day FROM due_period) = 1::numeric),
+  amount_expected numeric NOT NULL CHECK (amount_expected > 0::numeric),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  expectation_type text NOT NULL DEFAULT 'rent'::text CHECK (expectation_type = ANY (ARRAY['rent'::text, 'service_charges'::text])),
+  CONSTRAINT rent_expectations_pkey PRIMARY KEY (id),
+  CONSTRAINT rent_expectations_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT rent_expectations_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id)
+);
+CREATE TABLE public.payment_assignments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  raw_transaction_id uuid NOT NULL,
+  rent_expectation_id uuid,
+  amount_assigned numeric NOT NULL CHECK (amount_assigned > 0::numeric),
+  match_method text NOT NULL CHECK (match_method = ANY (ARRAY['iban'::text, 'description_full'::text, 'description_huur'::text, 'description_address'::text, 'manual'::text])),
+  confidence_score integer CHECK (confidence_score IS NULL OR confidence_score >= 0 AND confidence_score <= 100),
+  assigned_by uuid,
+  assigned_at timestamp with time zone NOT NULL DEFAULT now(),
+  category text,
+  property_id uuid,
+  unit_id uuid,
+  cost_allocation_key_id uuid,
+  CONSTRAINT payment_assignments_pkey PRIMARY KEY (id),
+  CONSTRAINT payment_assignments_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id),
+  CONSTRAINT payment_assignments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT payment_assignments_raw_transaction_id_fkey FOREIGN KEY (raw_transaction_id) REFERENCES public.payments(id),
+  CONSTRAINT payment_assignments_rent_expectation_id_fkey FOREIGN KEY (rent_expectation_id) REFERENCES public.rent_expectations(id),
+  CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id),
+  CONSTRAINT payment_assignments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
+  CONSTRAINT payment_assignments_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id)
+);
+CREATE TABLE public.lease_tenants (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  lease_id uuid NOT NULL,
+  tenant_id uuid NOT NULL,
+  is_primary boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT lease_tenants_pkey PRIMARY KEY (id),
+  CONSTRAINT lease_tenants_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id),
+  CONSTRAINT lease_tenants_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id)
+);
+CREATE TABLE public.subscriptions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL UNIQUE,
+  stripe_customer_id text UNIQUE,
+  stripe_subscription_id text UNIQUE,
+  plan text CHECK (plan = ANY (ARRAY['starter'::text, 'pro'::text])),
+  status text NOT NULL DEFAULT 'trialing'::text CHECK (status = ANY (ARRAY['trialing'::text, 'active'::text, 'past_due'::text, 'canceled'::text, 'incomplete'::text, 'paused'::text])),
+  trial_ends_at timestamp with time zone NOT NULL DEFAULT (now() + '30 days'::interval),
+  current_period_end timestamp with time zone,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT wws_pkey PRIMARY KEY (id),
-  CONSTRAINT wws_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT wws_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id)
+  CONSTRAINT subscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.tenant_invitations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL,
+  owner_id uuid NOT NULL,
+  email text NOT NULL,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'cancelled'::text])),
+  accepted_at timestamp with time zone,
+  expires_at timestamp with time zone NOT NULL DEFAULT (now() + '72:00:00'::interval),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT tenant_invitations_pkey PRIMARY KEY (id),
+  CONSTRAINT tenant_invitations_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT tenant_invitations_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.tenants(id)
+);
+CREATE TABLE public.ticket_events (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  ticket_id uuid NOT NULL,
+  actor_id uuid,
+  event_type text NOT NULL,
+  from_value text,
+  to_value text,
+  metadata jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT ticket_events_pkey PRIMARY KEY (id),
+  CONSTRAINT ticket_events_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id),
+  CONSTRAINT ticket_events_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.work_orders (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  ticket_id uuid NOT NULL,
+  owner_id uuid NOT NULL,
+  vendor_name text,
+  description text,
+  scheduled_at timestamp with time zone,
+  cost_estimate numeric,
+  cost_actual numeric,
+  status text NOT NULL DEFAULT 'concept'::text CHECK (status = ANY (ARRAY['concept'::text, 'ingepland'::text, 'uitgevoerd'::text, 'gefactureerd'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT work_orders_pkey PRIMARY KEY (id),
+  CONSTRAINT work_orders_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT work_orders_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id)
+);
+CREATE TABLE public.ticket_attachments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  ticket_id uuid NOT NULL,
+  owner_id uuid NOT NULL,
+  uploader_id uuid,
+  file_name text NOT NULL,
+  mime_type text,
+  storage_path text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT ticket_attachments_pkey PRIMARY KEY (id),
+  CONSTRAINT ticket_attachments_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id),
+  CONSTRAINT ticket_attachments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT ticket_attachments_uploader_id_fkey FOREIGN KEY (uploader_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.nen2767_matrix (
+  ernst smallint NOT NULL CHECK (ernst >= 1 AND ernst <= 3),
+  omvang smallint NOT NULL CHECK (omvang >= 1 AND omvang <= 5),
+  intensiteit smallint NOT NULL CHECK (intensiteit >= 1 AND intensiteit <= 3),
+  conditiescore smallint NOT NULL CHECK (conditiescore >= 1 AND conditiescore <= 6),
+  CONSTRAINT nen2767_matrix_pkey PRIMARY KEY (ernst, omvang, intensiteit)
+);
+CREATE TABLE public.mjop_element_types (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nlsfb_code text NOT NULL,
+  nlsfb_group text NOT NULL,
+  name text NOT NULL,
+  description text,
+  levensduur smallint,
+  standard_unit text NOT NULL DEFAULT 'm2'::text,
+  sort_order smallint NOT NULL DEFAULT 0,
+  is_active boolean NOT NULL DEFAULT true,
+  CONSTRAINT mjop_element_types_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.mjop_maintenance_types (
+  code text NOT NULL,
+  label text NOT NULL,
+  description text,
+  color text,
+  CONSTRAINT mjop_maintenance_types_pkey PRIMARY KEY (code)
+);
+CREATE TABLE public.mjop_buildings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  property_id uuid,
+  name text NOT NULL,
+  address text,
+  bag_id text,
+  bouwjaar smallint,
+  gebruiksoppervlak numeric,
+  bruto_inhoud numeric,
+  herbouwwaarde numeric,
+  herbouwwaarde_jaar smallint,
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_buildings_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_buildings_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
+  CONSTRAINT mjop_buildings_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
+);
+CREATE TABLE public.mjop_elements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  building_id uuid NOT NULL,
+  element_type_id uuid,
+  owner_id uuid NOT NULL,
+  naam text NOT NULL,
+  locatie text,
+  hoeveelheid numeric,
+  eenheid text DEFAULT 'm2'::text,
+  bouwjaar smallint,
+  levensduur_override smallint,
+  conditiescore_huidig smallint CHECK (conditiescore_huidig >= 1 AND conditiescore_huidig <= 6),
+  notes text,
+  foto_url text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_elements_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_elements_building_id_fkey FOREIGN KEY (building_id) REFERENCES public.mjop_buildings(id),
+  CONSTRAINT mjop_elements_element_type_id_fkey FOREIGN KEY (element_type_id) REFERENCES public.mjop_element_types(id),
+  CONSTRAINT mjop_elements_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.mjop_inspections (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  building_id uuid NOT NULL,
+  owner_id uuid NOT NULL,
+  inspecteur text,
+  datum date NOT NULL DEFAULT CURRENT_DATE,
+  status text NOT NULL DEFAULT 'concept'::text CHECK (status = ANY (ARRAY['concept'::text, 'afgerond'::text])),
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_inspections_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_inspections_building_id_fkey FOREIGN KEY (building_id) REFERENCES public.mjop_buildings(id),
+  CONSTRAINT mjop_inspections_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.mjop_defects (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  element_id uuid NOT NULL,
+  inspection_id uuid,
+  owner_id uuid NOT NULL,
+  gebrektype text,
+  beschrijving text,
+  ernst smallint NOT NULL CHECK (ernst >= 1 AND ernst <= 3),
+  omvang smallint NOT NULL CHECK (omvang >= 1 AND omvang <= 5),
+  intensiteit smallint NOT NULL CHECK (intensiteit >= 1 AND intensiteit <= 3),
+  conditiescore smallint CHECK (conditiescore >= 1 AND conditiescore <= 6),
+  foto_url text,
+  actiejaar smallint,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_defects_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_defects_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
+  CONSTRAINT mjop_defects_inspection_id_fkey FOREIGN KEY (inspection_id) REFERENCES public.mjop_inspections(id),
+  CONSTRAINT mjop_defects_element_id_fkey FOREIGN KEY (element_id) REFERENCES public.mjop_elements(id)
+);
+CREATE TABLE public.mjop_versions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  building_id uuid NOT NULL,
+  owner_id uuid NOT NULL,
+  naam text NOT NULL DEFAULT 'MJOP'::text,
+  horizon_start smallint NOT NULL,
+  horizon_end smallint NOT NULL,
+  status text NOT NULL DEFAULT 'concept'::text CHECK (status = ANY (ARRAY['concept'::text, 'vastgesteld'::text])),
+  herbouwwaarde numeric,
+  reserve_toets boolean NOT NULL DEFAULT true,
+  reserve_percent numeric NOT NULL DEFAULT 0.5,
+  vastgesteld_at timestamp with time zone,
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_versions_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_versions_building_id_fkey FOREIGN KEY (building_id) REFERENCES public.mjop_buildings(id),
+  CONSTRAINT mjop_versions_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.mjop_tasks (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  version_id uuid NOT NULL,
+  element_id uuid,
+  owner_id uuid NOT NULL,
+  nlsfb_code text,
+  omschrijving text NOT NULL,
+  maintenance_type_code text,
+  conditiescore_trigger smallint CHECK (conditiescore_trigger >= 1 AND conditiescore_trigger <= 6),
+  startjaar smallint NOT NULL,
+  cyclus smallint,
+  stopjaar smallint,
+  hoeveelheid numeric,
+  eenheid text DEFAULT 'm2'::text,
+  prijs_per_eenheid numeric,
+  btw_percent numeric NOT NULL DEFAULT 21.0,
+  indexering_percent numeric NOT NULL DEFAULT 0.0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT mjop_tasks_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_tasks_version_id_fkey FOREIGN KEY (version_id) REFERENCES public.mjop_versions(id),
+  CONSTRAINT mjop_tasks_element_id_fkey FOREIGN KEY (element_id) REFERENCES public.mjop_elements(id),
+  CONSTRAINT mjop_tasks_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
+  CONSTRAINT mjop_tasks_maintenance_type_code_fkey FOREIGN KEY (maintenance_type_code) REFERENCES public.mjop_maintenance_types(code)
+);
+CREATE TABLE public.mjop_task_years (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  task_id uuid NOT NULL,
+  jaar smallint NOT NULL,
+  bedrag numeric NOT NULL DEFAULT 0,
+  CONSTRAINT mjop_task_years_pkey PRIMARY KEY (id),
+  CONSTRAINT mjop_task_years_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.mjop_tasks(id)
+);
+CREATE TABLE public.contacts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  name text NOT NULL,
+  company text,
+  category text NOT NULL DEFAULT 'overig'::text CHECK (category = ANY (ARRAY['loodgieter'::text, 'aannemer'::text, 'elektricien'::text, 'schilder'::text, 'schoonmaak'::text, 'overig'::text])),
+  phone text,
+  email text,
+  notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT contacts_pkey PRIMARY KEY (id),
+  CONSTRAINT contacts_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
 );

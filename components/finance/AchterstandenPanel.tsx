@@ -211,7 +211,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
           const { data: assignmentsData, error: assignErr } = await supabase
             .from('payment_assignments')
-            .select('rent_expectation_id, amount_assigned, raw_transactions(booking_date)')
+            .select('rent_expectation_id, amount_assigned, payments(booking_date)')
             .in('rent_expectation_id', expectationIds)
 
           if (assignErr) throw assignErr
@@ -219,13 +219,13 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
           for (const a of (assignmentsData ?? []) as {
             rent_expectation_id: string
             amount_assigned: number
-            raw_transactions: { booking_date: string | null } | null
+            payments: { booking_date: string | null } | null
           }[]) {
             paidByExp.set(
               a.rent_expectation_id,
               (paidByExp.get(a.rent_expectation_id) ?? 0) + Number(a.amount_assigned)
             )
-            const bookingDate = a.raw_transactions?.booking_date
+            const bookingDate = a.payments?.booking_date
             if (bookingDate) {
               const leaseId = expToLease.get(a.rent_expectation_id)
               if (leaseId) {

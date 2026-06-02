@@ -371,7 +371,6 @@ export default function TenantTicketsPage() {
   const [loading, setLoading] = useState(true)
 
   const [createOpen, setCreateOpen] = useState(false)
-  const [scope, setScope] = useState<'unit' | 'property'>('unit')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('onderhoud')
@@ -390,8 +389,6 @@ export default function TenantTicketsPage() {
       .then(({ tickets, context }) => {
         setTickets(tickets ?? [])
         setContext(context)
-        if (context?.unitId) setScope('unit')
-        else if (context?.propertyId) setScope('property')
       })
       .finally(() => setLoading(false))
   }, [])
@@ -403,7 +400,6 @@ export default function TenantTicketsPage() {
     setPriority('normaal')
     setDueDate('')
     setPhotos([])
-    setScope(context?.unitId ? 'unit' : 'property')
     setError(null)
   }
 
@@ -418,12 +414,10 @@ export default function TenantTicketsPage() {
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim() || null,
-          scope,
           category,
           priority,
           due_date: dueDate || null,
-          unitId: context.unitId,
-          propertyId: context.propertyId,
+          leaseId: context.leaseId,
           ownerId: context.ownerId,
         }),
       })
@@ -445,7 +439,7 @@ export default function TenantTicketsPage() {
         description: description.trim() || null,
         status: 'open',
         priority,
-        scope,
+        scope: 'lease',
         category,
         created_at: new Date().toISOString(),
         due_date: dueDate || null,
@@ -459,7 +453,6 @@ export default function TenantTicketsPage() {
     }
   }
 
-  const hasBothScopes = !!(context?.unitId && context?.propertyId)
 
   if (loading) {
     return (
@@ -478,15 +471,13 @@ export default function TenantTicketsPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meldingen</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Stuur een melding naar je verhuurder</p>
         </div>
-        {context && (
-          <Button
-            onClick={() => setCreateOpen(true)}
-            className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] font-semibold"
-          >
-            <Plus className="h-4 w-4 mr-1.5" />
-            Nieuwe melding
-          </Button>
-        )}
+        <Button
+          onClick={() => setCreateOpen(true)}
+          className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] font-semibold"
+        >
+          <Plus className="h-4 w-4 mr-1.5" />
+          Nieuwe melding
+        </Button>
       </div>
 
       {tickets.length === 0 ? (
@@ -567,40 +558,6 @@ export default function TenantTicketsPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            {hasBothScopes && (
-              <div className="space-y-2">
-                <Label>Gaat over</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setScope('unit')}
-                    className={cn(
-                      'flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors text-left',
-                      scope === 'unit'
-                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'
-                    )}
-                  >
-                    <Home className="h-4 w-4 shrink-0" />
-                    <span>{context?.unitLabel ?? 'Mijn object'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setScope('property')}
-                    className={cn(
-                      'flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors text-left',
-                      scope === 'property'
-                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'
-                    )}
-                  >
-                    <Building2 className="h-4 w-4 shrink-0" />
-                    <span>Het pand</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Categorie */}
             <div className="space-y-2">
               <Label>Soort melding</Label>

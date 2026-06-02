@@ -234,7 +234,7 @@ export function RendementChart({ properties }: RendementChartProps) {
 
     // Fetch raw data
     const [txRes, assignRes, manualRes] = await Promise.all([
-      supabase.from('raw_transactions').select('id, amount, value_date'),
+      supabase.from('payments').select('id, amount, value_date'),
       supabase.from('payment_assignments').select('id, transaction_id, property_id, category'),
       (supabase as any).from('manual_expenses').select('id, property_id, category, amount, date'),
     ])

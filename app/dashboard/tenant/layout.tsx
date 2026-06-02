@@ -23,16 +23,15 @@ const TENANT_BASE_PATH = '/dashboard/tenant'
 const TENANT_MENU_GROUPS: MenuGroup[] = [
   {
     items: [
-      { label: 'Dashboard', href: TENANT_BASE_PATH, icon: LayoutDashboard },
+      // { label: 'Dashboard', href: TENANT_BASE_PATH, icon: LayoutDashboard },
+      { label: 'Betalingen', href: `${TENANT_BASE_PATH}/financial`, icon: Euro },
       { label: 'Tickets', href: `${TENANT_BASE_PATH}/tickets`, icon: Ticket },
-      { label: 'Berichten', href: `${TENANT_BASE_PATH}/messages`, icon: MessageCircle },
-      { label: 'Betalingen', href: `${TENANT_BASE_PATH}/betalingen`, icon: Euro },
-      { label: 'Documenten', href: `${TENANT_BASE_PATH}/documenten`, icon: HardDrive },
+      { label: 'Documenten', href: `${TENANT_BASE_PATH}/documents`, icon: HardDrive },
     ],
   },
   {
     items: [
-      { label: 'Account', href: `${TENANT_BASE_PATH}/account`, icon: Settings },
+      { label: 'Account', href: `${TENANT_BASE_PATH}/settings`, icon: Settings },
     ],
   },
 ]

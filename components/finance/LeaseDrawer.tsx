@@ -203,7 +203,7 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
       if (expIds.length > 0) {
         const { data: assigns } = await supabase
           .from('payment_assignments')
-          .select('rent_expectation_id, amount_assigned, match_method, raw_transactions ( booking_date, description )')
+          .select('rent_expectation_id, amount_assigned, match_method, payments ( booking_date, description )')
           .in('rent_expectation_id', expIds)
 
         if (!signal.cancelled) {
@@ -211,8 +211,8 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
             rent_expectation_id: a.rent_expectation_id as string,
             amount_assigned: Number(a.amount_assigned),
             match_method: a.match_method as string,
-            booking_date: (a.raw_transactions?.booking_date ?? '') as string,
-            description: (a.raw_transactions?.description ?? null) as string | null,
+            booking_date: (a.payments?.booking_date ?? '') as string,
+            description: (a.payments?.description ?? null) as string | null,
           }))
         }
       }
@@ -324,7 +324,7 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
       if (h.tenantIban) {
         setLoadingUnmatched(true)
         const { data: txns } = await supabase
-          .from('raw_transactions')
+          .from('payments')
           .select('id, amount, booking_date, description')
           .eq('counterparty_iban', h.tenantIban)
           .order('booking_date', { ascending: false })

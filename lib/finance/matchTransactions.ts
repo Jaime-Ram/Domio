@@ -70,7 +70,7 @@ function containsIgnoreCase(haystack: string, needle: string): boolean {
 
 export async function matchTransactions(ownerId: string): Promise<MatchResult> {
   const { data: allTx, error: txErr } = await supabaseAdmin
-    .from("raw_transactions")
+    .from("payments")
     .select("id, amount, value_date, counterparty_iban, counterparty_name, description")
     .eq("owner_id", ownerId);
 

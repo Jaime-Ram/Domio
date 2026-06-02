@@ -340,7 +340,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const amountNum = payDirection === 'uitgaven' ? -Math.abs(absAmount) : Math.abs(absAmount)
     setSavingPayment(true)
     try {
-      const { data: newTx, error } = await (supabase as any).from('raw_transactions').insert({
+      const { data: newTx, error } = await (supabase as any).from('payments').insert({
         owner_id: user.id,
         source: 'manual',
         bank_connection_id: null,

@@ -38,7 +38,7 @@ export async function POST(
 
   // Verify the transaction belongs to this user
   const { data: tx, error: txErr } = await supabaseAdmin
-    .from("raw_transactions")
+    .from("payments")
     .select("id, amount, booking_date, value_date, owner_id")
     .eq("id", transactionId)
     .eq("owner_id", user.id)
