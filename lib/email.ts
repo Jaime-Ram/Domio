@@ -1,9 +1,15 @@
 import { Resend } from 'resend'
 import * as React from 'react'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM = 'Domio <noreply@domiovastgoedbeheer.nl>'
+
+let resendClient: Resend | null = null
+function getResend(): Resend {
+  if (!resendClient) {
+    resendClient = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resendClient
+}
 
 interface SendEmailOptions {
   to: string
@@ -21,7 +27,7 @@ export async function sendEmail({ to, subject, react, tags = [] }: SendEmailOpti
   // In dev: stuur naar test-adres als EMAIL_DEV_OVERRIDE is ingesteld, anders gewoon het echte adres
   const recipient = process.env.EMAIL_DEV_OVERRIDE ?? to
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM,
     to: recipient,
     subject,
