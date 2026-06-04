@@ -11,11 +11,15 @@ import {
   ChevronRight,
   AlertCircle,
   X,
+  CheckCircle2,
+  Mail,
+  RotateCcw,
+  Loader2,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import { cn } from '@/lib/utils'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { leaseQueries } from '@/lib/supabase/queries'
+import { tenantQueries } from '@/lib/supabase/queries'
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
@@ -24,6 +28,9 @@ import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/d
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
+import { DialogField } from '@/components/ui/dialog-field'
+import { Input } from '@/components/ui/input'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
 
@@ -33,11 +40,14 @@ type TenantRow = {
   email: string
   phone: string
   propertyName: string
+  unitNumber: string
   monthlyRent: number
   startDate: string | null
   endDate: string | null
   status: string
   balance?: number
+  portalStatus: 'niet_uitgenodigd' | 'uitgenodigd' | 'actief' | 'ingetrokken'
+  profileId: string | null
 }
 
 function TenantsPageContent() {
@@ -46,6 +56,10 @@ function TenantsPageContent() {
   const { user, isDemo, basePath } = useDashboardUser()
   const [tenants, setTenants] = useState<TenantRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [invitingIds, setInvitingIds] = useState<Set<string>>(new Set())
+  const [emailDialogTenantId, setEmailDialogTenantId] = useState<string | null>(null)
+  const [emailDialogValue, setEmailDialogValue] = useState('')
+  const [emailDialogSaving, setEmailDialogSaving] = useState(false)
 
   const { sort: tenantSort, toggleSort } = useSortable<string>()
 
@@ -82,11 +96,14 @@ function TenantsPageContent() {
         email: t.email,
         phone: t.phone ?? '',
         propertyName: t.property?.name ?? '',
+        unitNumber: '',
         monthlyRent: t.lease?.monthlyRent ?? 0,
         startDate: t.lease?.startDate ?? null,
         endDate: t.lease?.endDate ?? null,
         status: t.status ?? 'actief',
         balance: t.balance ?? 0,
+        portalStatus: 'actief' as const,
+        profileId: null,
       })))
       setLoading(false)
       return
@@ -95,20 +112,28 @@ function TenantsPageContent() {
       setLoading(false)
       return
     }
-    leaseQueries.getByOwner(user.id).then((leases) => {
-      const rows: TenantRow[] = (leases || [])
-        .filter((l: any) => ['actief', 'concept'].includes(l.status) && l.tenants)
-        .map((l: any) => ({
-          id: l.tenants?.id ?? l.id,
-          name: l.tenants?.full_name ?? '',
-          email: l.tenants?.email ?? '',
-          phone: l.tenants?.phone ?? '',
-          propertyName: l.units?.properties?.name ?? '',
-          monthlyRent: l.monthly_rent ?? 0,
-          startDate: l.start_date ?? null,
-          endDate: l.end_date ?? null,
-          status: l.status ?? 'actief',
-        }))
+    tenantQueries.getByOwnerWithLeases(user.id).then((tenantData) => {
+      const rows: TenantRow[] = (tenantData || []).map((t: any) => {
+        const allLeases = (t.lease_tenants ?? []).flatMap((lt: any) => lt.leases ? [lt.leases] : [])
+        const lease =
+          allLeases.find((l: any) => l.status === 'actief') ??
+          allLeases.find((l: any) => l.status === 'concept') ??
+          allLeases[0] ?? null
+        return {
+          id: t.id,
+          name: t.full_name ?? '',
+          email: t.email ?? '',
+          phone: t.phone ?? '',
+          propertyName: lease?.units?.properties?.name ?? '',
+          unitNumber: lease?.units?.unit_number ?? '',
+          monthlyRent: lease?.monthly_rent ?? 0,
+          startDate: lease?.start_date ?? null,
+          endDate: lease?.end_date ?? null,
+          status: lease?.status ?? 'geen contract',
+          portalStatus: t.portal_status ?? 'niet_uitgenodigd',
+          profileId: t.profile_id ?? null,
+        }
+      })
       setTenants(rows)
       setLoading(false)
     }).catch(() => setLoading(false))
@@ -122,16 +147,60 @@ function TenantsPageContent() {
         email: t.email ?? '',
         phone: t.phone ?? '',
         propertyName: t.propertyName ?? '',
+        unitNumber: '',
         monthlyRent: t.monthlyRent ?? 0,
         startDate: t.startDate ?? null,
         endDate: null,
         status: 'actief',
         balance: 0,
+        portalStatus: 'niet_uitgenodigd' as const,
+        profileId: null,
       },
       ...prev,
     ])
     if (!isDemo && t.leaseLinkFailed) {
       setLeaseLinkError(`${t.full_name} is aangemaakt, maar koppeling aan het object is mislukt. Koppel een huurovereenkomst via het object of via de huurdersheet.`)
+    }
+  }
+
+  const openEmailDialog = (tenantId: string) => {
+    setEmailDialogTenantId(tenantId)
+    setEmailDialogValue('')
+  }
+
+  const submitEmailAndInvite = async () => {
+    if (!emailDialogTenantId || !emailDialogValue.trim()) return
+    setEmailDialogSaving(true)
+    try {
+      await tenantQueries.update(emailDialogTenantId, { email: emailDialogValue.trim() } as any)
+      setTenants((prev) => prev.map((t) =>
+        t.id === emailDialogTenantId ? { ...t, email: emailDialogValue.trim() } : t
+      ))
+      setEmailDialogTenantId(null)
+      await sendInvite(emailDialogTenantId)
+    } catch {
+      // keep dialog open on failure
+    } finally {
+      setEmailDialogSaving(false)
+    }
+  }
+
+  const sendInvite = async (tenantId: string) => {
+    setInvitingIds((s) => new Set(s).add(tenantId))
+    try {
+      const res = await fetch('/api/invitations/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      setTenants((prev) => prev.map((t) =>
+        t.id === tenantId ? { ...t, portalStatus: 'uitgenodigd' } : t
+      ))
+    } catch {
+      // keep existing status on failure
+    } finally {
+      setInvitingIds((s) => { const n = new Set(s); n.delete(tenantId); return n })
     }
   }
 
@@ -163,7 +232,7 @@ function TenantsPageContent() {
 
   const sortedTenants = applySortedRows(filteredTenants, tenantSort, (t, k) => {
     if (k === 'name') return t.name ?? ''
-    if (k === 'object') return t.propertyName ?? ''
+    if (k === 'unit') return t.unitNumber ?? t.propertyName ?? ''
     if (k === 'rent') return t.monthlyRent ?? 0
     if (k === 'status') return t.status ?? ''
     return null
@@ -303,11 +372,12 @@ function TenantsPageContent() {
             />
 
             <DataTable>
-              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]">
+              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)_2rem]">
                 <SortableHeader label="Huurder" sortKey="name" sort={tenantSort} onSort={toggleSort} />
-                <SortableHeader label="Object" sortKey="object" sort={tenantSort} onSort={toggleSort} />
-                <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Status" sortKey="status" sort={tenantSort} onSort={toggleSort} />
+                <SortableHeader label="Eenheid" sortKey="unit" sort={tenantSort} onSort={toggleSort} />
+                <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Portaal</span>
                 <span />
               </DataTableHeader>
               <DataTableBody>
@@ -316,7 +386,7 @@ function TenantsPageContent() {
                 ) : sortedTenants.map((tenant) => (
                   <DataTableRow
                     key={tenant.id}
-                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]"
+                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)_2rem]"
                     onClick={() => setSelectedTenantId(tenant.id)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -332,10 +402,6 @@ function TenantsPageContent() {
                         >{tenant.email}</a>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.propertyName}</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      €{tenant.monthlyRent?.toLocaleString('nl-NL') || '0'}
-                    </p>
                     <div>
                       <span className={cn(
                         'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
@@ -343,10 +409,71 @@ function TenantsPageContent() {
                           ? 'bg-[#2F5711] text-white'
                           : tenant.status === 'concept'
                           ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                          : tenant.status === 'geen contract'
+                          ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
                           : 'bg-[#A8200D] text-white'
                       )}>
-                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status}
+                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status}
                       </span>
+                    </div>
+                    <div className="min-w-0">
+                      {tenant.unitNumber || tenant.propertyName ? (
+                        <>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.unitNumber || '—'}</p>
+                          {tenant.propertyName && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tenant.propertyName}</p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-gray-400 dark:text-gray-600">—</p>
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {tenant.monthlyRent ? `€${tenant.monthlyRent.toLocaleString('nl-NL')}` : '—'}
+                    </p>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      {tenant.profileId !== null ? (
+                        <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#9FE870]">
+                          <CheckCircle2 className="h-4 w-4 shrink-0" />
+                          <span className="text-xs font-medium">Actief</span>
+                        </div>
+                      ) : tenant.portalStatus === 'uitgenodigd' ? (
+                        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                          <Mail className="h-4 w-4 shrink-0" />
+                          <span className="text-xs font-medium">Uitgenodigd</span>
+                          <button
+                            onClick={() => sendInvite(tenant.id)}
+                            disabled={invitingIds.has(tenant.id)}
+                            title="Opnieuw sturen"
+                            className="ml-0.5 text-amber-400 hover:text-amber-600 dark:text-amber-500 dark:hover:text-amber-300 transition-colors disabled:opacity-50"
+                          >
+                            {invitingIds.has(tenant.id)
+                              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              : <RotateCcw className="h-3.5 w-3.5" />
+                            }
+                          </button>
+                        </div>
+                      ) : tenant.email ? (
+                        <button
+                          onClick={() => sendInvite(tenant.id)}
+                          disabled={invitingIds.has(tenant.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
+                        >
+                          {invitingIds.has(tenant.id)
+                            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            : <Mail className="h-3.5 w-3.5" />
+                          }
+                          Uitnodigen
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => openEmailDialog(tenant.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
+                        >
+                          <Mail className="h-3.5 w-3.5" />
+                          Uitnodigen
+                        </button>
+                      )}
                     </div>
                     <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
                   </DataTableRow>
@@ -354,6 +481,47 @@ function TenantsPageContent() {
               </DataTableBody>
             </DataTable>
             </div>
+
+      <Dialog open={!!emailDialogTenantId} onOpenChange={(open) => { if (!open) setEmailDialogTenantId(null) }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>E-mailadres toevoegen</DialogTitle>
+            <DialogDescription>
+              Voer het e-mailadres in van{' '}
+              <span className="font-medium text-gray-900 dark:text-white">
+                {tenants.find((t) => t.id === emailDialogTenantId)?.name}
+              </span>
+              . De uitnodiging wordt daarna direct verstuurd.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogField label="E-mailadres" required>
+            <Input
+              type="email"
+              placeholder="naam@voorbeeld.nl"
+              value={emailDialogValue}
+              onChange={(e) => setEmailDialogValue(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') submitEmailAndInvite() }}
+              className="rounded-xl"
+              autoFocus
+            />
+          </DialogField>
+          <DialogFooter className="mt-2">
+            <DialogClose asChild>
+              <button className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-2">
+                Annuleren
+              </button>
+            </DialogClose>
+            <button
+              onClick={submitEmailAndInvite}
+              disabled={emailDialogSaving || !emailDialogValue.trim()}
+              className="flex items-center gap-2 rounded-xl bg-[#163300] text-white text-sm font-medium px-4 py-2 hover:bg-[#1e4a00] disabled:opacity-50 transition-colors"
+            >
+              {emailDialogSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Opslaan & uitnodigen
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <NewTenantDialog
         open={newTenantOpen}

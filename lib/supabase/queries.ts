@@ -394,9 +394,35 @@ export const tenantQueries = {
       .select('*')
       .eq('owner_id', ownerId)
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data as Tenant[];
+  },
+
+  // Get all tenants for owner with their lease data joined via lease_tenants.
+  // Requires RLS on lease_tenants to allow SELECT where leases.owner_id = auth.uid().
+  async getByOwnerWithLeases(ownerId: string) {
+    const { data, error } = await supabase
+      .from('tenants')
+      .select(`
+        *,
+        lease_tenants(
+          is_primary,
+          leases(
+            id,
+            status,
+            monthly_rent,
+            start_date,
+            end_date,
+            units(unit_number, properties(name))
+          )
+        )
+      `)
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
   },
 
   // Get single tenant

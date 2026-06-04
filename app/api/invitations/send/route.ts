@@ -75,6 +75,12 @@ export async function POST(req: NextRequest) {
       appUrl,
     })
 
+    // Stamp portal_status and invited_at on the tenant
+    await supabase
+      .from('tenants')
+      .update({ portal_status: 'uitgenodigd', invited_at: new Date().toISOString() })
+      .eq('id', tenantId)
+
     // Send email after response — user sees instant feedback
     after(async () => {
       try {
