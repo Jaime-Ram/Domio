@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 import { DocumentCard, type DocumentCardDoc } from '@/components/documents/document-card'
@@ -404,6 +405,9 @@ export default function DocumentsPage() {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <PreviewOpener openPreview={openPreview} />
+      </Suspense>
       <div ref={contentRef}>
         {/* Hidden file input */}
         {!isDemo && (
@@ -777,6 +781,23 @@ export default function DocumentsPage() {
       </div>
     </>
   )
+}
+
+function PreviewOpener({ openPreview }: { openPreview: (id: string) => void }) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    const id = searchParams.get('preview')
+    if (!id) return
+    openPreview(id)
+    // Clean the param from the URL without adding a history entry
+    const url = new URL(window.location.href)
+    url.searchParams.delete('preview')
+    window.history.replaceState(null, '', url.toString())
+  }, [])
+
+  return null
 }
 
 

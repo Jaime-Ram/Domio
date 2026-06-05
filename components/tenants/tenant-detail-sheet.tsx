@@ -48,6 +48,7 @@ import {
   ClipboardList,
   UserX,
   Pencil,
+  Workflow,
 } from 'lucide-react'
 import { tenantQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
 import { ActionListRow, ActionListSection } from '@/components/ui/action-list'
@@ -76,11 +77,12 @@ const TICKET_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
 // ─── Tab nav ──────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'tijdlijn',   label: 'Activiteit' },
   { id: 'info',       label: 'Info' },
+  { id: 'activiteit', label: 'Activiteit' },
   { id: 'acties',     label: 'Acties' },
   { id: 'betalingen', label: 'Betalingen' },
   { id: 'documenten', label: 'Documenten' },
+  { id: 'flows',      label: 'Flows' },
 ] as const
 
 type TabId = typeof TABS[number]['id']
@@ -280,7 +282,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
   const [tenant, setTenant] = useState<any>(null)
   const [leases, setLeases] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<TabId>('tijdlijn')
+  const [activeTab, setActiveTab] = useState<TabId>('info')
 
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -322,7 +324,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     setTenant(null)
     setLeases([])
     setIsEditing(false)
-    setActiveTab('tijdlijn')
+    setActiveTab('info')
     setEditError(null)
 
     if (isDemo) {
@@ -666,7 +668,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
       }
     >
       {/* Tab navigation */}
-      <div className="px-6 pt-4 shrink-0">
+      <div className="px-6 pt-4 shrink-0 border-b border-gray-100 dark:border-neutral-800">
         <TabNav
           tabs={TABS as unknown as { id: TabId; label: string }[]}
           activeTab={activeTab}
@@ -675,10 +677,10 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6">
+      <div className="px-6 py-6 space-y-6">
 
-        {/* ── Tijdlijn ───────────────────────────────────────────────────── */}
-        {activeTab === 'tijdlijn' && (
+        {/* ── Activiteit ────────────────────────────────────────────────── */}
+        {activeTab === 'activiteit' && (
           <div>
             <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">
               Recente activiteit
@@ -871,6 +873,20 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
                 </button>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── Flows ─────────────────────────────────────────────────────── */}
+        {activeTab === 'flows' && (
+          <div>
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">Flows</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="h-12 w-12 rounded-2xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
+                <Workflow className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+              </div>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Binnenkort beschikbaar</p>
+              <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">Automatiseer processen rondom deze huurder</p>
+            </div>
           </div>
         )}
 
