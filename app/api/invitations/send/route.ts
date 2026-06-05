@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Stamp portal_status and invited_at on the tenant
-    await supabase
+    await db
       .from('tenants')
       .update({ portal_status: 'uitgenodigd', invited_at: new Date().toISOString() })
       .eq('id', tenantId)

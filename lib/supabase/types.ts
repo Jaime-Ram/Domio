@@ -530,50 +530,6 @@ export interface Database {
           updated_at?: string
         }
       }
-      payments: {
-        Row: {
-          id: string
-          owner_id: string
-          tenant_id: string | null
-          property_id: string | null
-          amount: number
-          due_date: string
-          paid_date: string | null
-          status: 'betaald' | 'openstaand' | 'te_laat' | 'geannuleerd'
-          description: string | null
-          tink_payment_request_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          owner_id: string
-          tenant_id?: string | null
-          property_id?: string | null
-          amount: number
-          due_date: string
-          paid_date?: string | null
-          status?: 'betaald' | 'openstaand' | 'te_laat' | 'geannuleerd'
-          description?: string | null
-          tink_payment_request_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          owner_id?: string
-          tenant_id?: string | null
-          property_id?: string | null
-          amount?: number
-          due_date?: string
-          paid_date?: string | null
-          status?: 'betaald' | 'openstaand' | 'te_laat' | 'geannuleerd'
-          description?: string | null
-          tink_payment_request_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
       bank_connections: {
         Row: {
           id: string
