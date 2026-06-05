@@ -16,7 +16,7 @@ export type ScoredCandidate = {
 
 export type PaymentAssignment = {
   id: string;
-  raw_transaction_id: string;
+  payment_id: string;
   rent_expectation_id: string;
   amount_assigned: number;
   match_method: ScoredCandidate["method"];

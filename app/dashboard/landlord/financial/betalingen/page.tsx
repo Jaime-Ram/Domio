@@ -121,7 +121,7 @@ export default function GeldstromenPage() {
     }
 
     const txRows: TransactionRow[] = (txRes.data ?? []).map((tx: any) => {
-      // payment_assignments returns an array (no unique constraint on raw_transaction_id)
+      // payment_assignments returns an array (no unique constraint on payment_id)
       const rawArr: any[] = Array.isArray(tx.payment_assignments)
         ? tx.payment_assignments
         : tx.payment_assignments ? [tx.payment_assignments] : []

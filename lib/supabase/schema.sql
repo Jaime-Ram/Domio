@@ -360,7 +360,7 @@ CREATE TABLE public.rent_expectations (
 CREATE TABLE public.payment_assignments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
-  raw_transaction_id uuid NOT NULL,
+  payment_id uuid NOT NULL,
   rent_expectation_id uuid,
   amount_assigned numeric NOT NULL CHECK (amount_assigned > 0::numeric),
   match_method text NOT NULL CHECK (match_method = ANY (ARRAY['iban'::text, 'description_full'::text, 'description_huur'::text, 'description_address'::text, 'manual'::text])),
@@ -374,7 +374,7 @@ CREATE TABLE public.payment_assignments (
   CONSTRAINT payment_assignments_pkey PRIMARY KEY (id),
   CONSTRAINT payment_assignments_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id),
   CONSTRAINT payment_assignments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT payment_assignments_raw_transaction_id_fkey FOREIGN KEY (raw_transaction_id) REFERENCES public.payments(id),
+  CONSTRAINT payment_assignments_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES public.payments(id),
   CONSTRAINT payment_assignments_rent_expectation_id_fkey FOREIGN KEY (rent_expectation_id) REFERENCES public.rent_expectations(id),
   CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id),
   CONSTRAINT payment_assignments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),

@@ -50,7 +50,7 @@ import {
   Pencil,
   Workflow,
 } from 'lucide-react'
-import { tenantQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
+import { tenantQueries, leaseQueries, ticketQueries, paymentQueries } from '@/lib/supabase/queries'
 import { ActionListRow, ActionListSection } from '@/components/ui/action-list'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { getUser } from '@/lib/supabase/auth'
@@ -283,6 +283,8 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
   const [leases, setLeases] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>('info')
+  const [tenantPayments, setTenantPayments] = useState<any[]>([])
+  const [paymentsLoading, setPaymentsLoading] = useState(false)
 
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -323,6 +325,7 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
     setLoading(true)
     setTenant(null)
     setLeases([])
+    setTenantPayments([])
     setIsEditing(false)
     setActiveTab('info')
     setEditError(null)
@@ -379,6 +382,15 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
       }
     }
     load()
+  }, [tenantId, open, isDemo])
+
+  useEffect(() => {
+    if (!tenantId || !open || isDemo) return
+    setPaymentsLoading(true)
+    paymentQueries.getByTenantAssignments(tenantId)
+      .then(setTenantPayments)
+      .catch(() => setTenantPayments([]))
+      .finally(() => setPaymentsLoading(false))
   }, [tenantId, open, isDemo])
 
   const handleSave = async () => {
@@ -830,27 +842,80 @@ export function TenantDetailSheet({ tenantId, open, onClose }: TenantDetailSheet
 
         {/* ── Betalingen ────────────────────────────────────────────────── */}
         {activeTab === 'betalingen' && (
-          <div className="space-y-2">
-            {paymentHistory.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-10">Geen betalingen gevonden</p>
-            ) : paymentHistory.map((p) => {
-              const cfg = PAYMENT_STATUS_CONFIG[p.status]
-              const Icon = cfg?.icon ?? Clock
-              return (
-                <div key={p.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-neutral-800 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{p.month}</p>
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Betalingen</p>
+              <button
+                type="button"
+                onClick={() => { router.push(`${basePath}/financial/betalingen`); onClose() }}
+                className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+              >
+                Alle betalingen →
+              </button>
+            </div>
+            {isDemo ? (
+              paymentHistory.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-10">Geen betalingen gevonden</p>
+              ) : paymentHistory.map((p) => {
+                const cfg = PAYMENT_STATUS_CONFIG[p.status]
+                const Icon = cfg?.icon ?? Clock
+                return (
+                  <div key={p.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-neutral-800 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{p.month}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm text-gray-500">€ {p.amount.toLocaleString('nl-NL')}</p>
+                      <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', cfg?.badge)}>
+                        {p.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm text-gray-500">€ {p.amount.toLocaleString('nl-NL')}</p>
-                    <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', cfg?.badge)}>
-                      {p.status}
-                    </span>
-                  </div>
+                )
+              })
+            ) : paymentsLoading ? (
+              <div className="space-y-3">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-12 bg-gray-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : tenantPayments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="h-12 w-12 rounded-2xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
+                  <CreditCard className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </div>
-              )
-            })}
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Geen betalingen</p>
+                <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">Betalingen verschijnen hier zodra transacties aan deze huurder zijn gekoppeld</p>
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {tenantPayments.map((a: any) => {
+                  const p = a.payment
+                  const date = p?.booking_date
+                    ? new Date(p.booking_date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : '—'
+                  const label = p?.counterparty_name || p?.description || '—'
+                  const amount = Number(p?.amount ?? a.amount_assigned)
+                  return (
+                    <div key={a.id} className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-neutral-800 last:border-0">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-8 w-8 rounded-lg bg-gray-50 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                          <CreditCard className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{label}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">{date}{a.category ? ` · ${a.category}` : ''}</p>
+                        </div>
+                      </div>
+                      <p className={cn('text-sm font-semibold shrink-0 ml-3', amount >= 0 ? 'text-[#163300] dark:text-[#9FE870]' : 'text-red-600 dark:text-red-400')}>
+                        {amount >= 0 ? '+' : ''}€ {amount.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 

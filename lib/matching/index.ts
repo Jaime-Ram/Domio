@@ -74,7 +74,7 @@ async function commitCandidate(
 ): Promise<PaymentAssignment[]> {
   const rows = enriched.assignments.map(({ expectationId, amount }) => ({
     owner_id: tx.owner_id,
-    raw_transaction_id: tx.id,
+    payment_id: tx.id,
     rent_expectation_id: expectationId,
     amount_assigned: amount,
     match_method: scored.method,
@@ -85,13 +85,13 @@ async function commitCandidate(
   const { data, error } = await client
     .from("payment_assignments")
     .insert(rows)
-    .select("id, raw_transaction_id, rent_expectation_id, amount_assigned, match_method, confidence_score, assigned_by");
+    .select("id, payment_id, rent_expectation_id, amount_assigned, match_method, confidence_score, assigned_by");
 
   if (error) throw error;
 
   return (data ?? []).map((row) => ({
     id: row.id as string,
-    raw_transaction_id: row.raw_transaction_id as string,
+    payment_id: row.payment_id as string,
     rent_expectation_id: row.rent_expectation_id as string,
     amount_assigned: row.amount_assigned as number,
     match_method: row.match_method as ScoredCandidate["method"],

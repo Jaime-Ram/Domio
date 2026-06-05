@@ -79,12 +79,12 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
   // Fetch existing assignments to exclude already-matched transactions and expectations
   const { data: assigned, error: assignErr } = await supabaseAdmin
     .from("payment_assignments")
-    .select("raw_transaction_id, rent_expectation_id")
+    .select("payment_id, rent_expectation_id")
     .eq("owner_id", ownerId);
 
   if (assignErr) throw assignErr;
 
-  const assignedTxIds = new Set((assigned ?? []).map((a) => a.raw_transaction_id));
+  const assignedTxIds = new Set((assigned ?? []).map((a) => a.payment_id));
   const assignedExpIds = new Set((assigned ?? []).map((a) => a.rent_expectation_id));
 
   const unmatched: RawTransaction[] = (allTx ?? []).filter(
@@ -178,7 +178,9 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
           return tenantIdsByLease.get(e.lease_id)?.has(tenant.id) ?? false;
         });
         if (exp) {
-          await assign(tx, exp, 95, "iban", ownerId);
+          const lease = leaseById.get(exp.lease_id);
+          const unit = lease ? unitById.get(lease.unit_id) : undefined;
+          await assign(tx, exp, 95, "iban", ownerId, lease?.unit_id ?? null, unit?.property_id ?? null);
           matchedExpIds.add(exp.id);
           details.push({ transaction_id: tx.id, method: "iban", confidence: 95 });
           console.log(`  ✓ IBAN match: tx ${tx.id} → exp ${exp.id}`);
@@ -197,7 +199,8 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
         const lease = leaseById.get(exp.lease_id);
         const tenant = lease?.tenant_id ? tenantById.get(lease.tenant_id) : undefined;
         if (tenant && containsIgnoreCase(searchText, tenant.full_name)) {
-          await assign(tx, exp, 80, "description_full", ownerId);
+          const unit = lease ? unitById.get(lease.unit_id) : undefined;
+          await assign(tx, exp, 80, "description_full", ownerId, lease?.unit_id ?? null, unit?.property_id ?? null);
           matchedExpIds.add(exp.id);
           details.push({ transaction_id: tx.id, method: "description_full", confidence: 80 });
           console.log(`  ~ Description full match: tx ${tx.id} → exp ${exp.id}`);
@@ -224,7 +227,7 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
           (containsIgnoreCase(searchText, prop.address) ||
             containsIgnoreCase(searchText, prop.name))
         ) {
-          await assign(tx, exp, 75, "description_address", ownerId);
+          await assign(tx, exp, 75, "description_address", ownerId, lease?.unit_id ?? null, unit?.property_id ?? null);
           matchedExpIds.add(exp.id);
           details.push({ transaction_id: tx.id, method: "description_address", confidence: 75 });
           console.log(`  ~ Description address match: tx ${tx.id} → exp ${exp.id}`);
@@ -245,7 +248,9 @@ export async function matchTransactions(ownerId: string): Promise<MatchResult> {
 
       if (candidates.length === 1) {
         const exp = candidates[0];
-        await assign(tx, exp, 65, "description_huur", ownerId);
+        const lease = leaseById.get(exp.lease_id);
+        const unit = lease ? unitById.get(lease.unit_id) : undefined;
+        await assign(tx, exp, 65, "description_huur", ownerId, lease?.unit_id ?? null, unit?.property_id ?? null);
         matchedExpIds.add(exp.id);
         details.push({ transaction_id: tx.id, method: "description_huur", confidence: 65 });
         console.log(`  ~ Description huur match: tx ${tx.id} → exp ${exp.id}`);
@@ -281,18 +286,23 @@ async function assign(
   exp: RentExpectation,
   confidence: number,
   method: MatchMethod,
-  ownerId: string
+  ownerId: string,
+  unitId: string | null,
+  propertyId: string | null,
 ) {
   const { error: insertErr } = await supabaseAdmin
     .from("payment_assignments")
     .insert({
       owner_id: ownerId,
-      raw_transaction_id: tx.id,
+      payment_id: tx.id,
       rent_expectation_id: exp.id,
       amount_assigned: tx.amount,
       match_method: method,
       confidence_score: method === "manual" ? null : confidence,
       assigned_by: null,
+      unit_id: unitId,
+      property_id: propertyId,
+      category: "huur",
     });
 
   if (insertErr) {

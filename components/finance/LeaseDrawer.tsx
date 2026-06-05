@@ -338,11 +338,11 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
         if (txnIds.length > 0) {
           const { data: assigned } = await supabase
             .from('payment_assignments')
-            .select('raw_transaction_id')
-            .in('raw_transaction_id', txnIds)
+            .select('payment_id')
+            .in('payment_id', txnIds)
 
           if (!signal.cancelled) {
-            assignedTxIds = new Set(((assigned ?? []) as { raw_transaction_id: string }[]).map(a => a.raw_transaction_id))
+            assignedTxIds = new Set(((assigned ?? []) as { payment_id: string }[]).map(a => a.payment_id))
           }
         }
 

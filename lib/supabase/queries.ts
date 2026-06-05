@@ -1084,6 +1084,48 @@ export const paymentQueries = {
     return data;
   },
 
+  // Get payments for a property via payment_assignments.property_id
+  async getByPropertyAssignments(propertyId: string) {
+    const { data, error } = await supabase
+      .from('payment_assignments')
+      .select(`
+        id, amount_assigned, category, assigned_at, match_method,
+        payment:payment_id(
+          id, booking_date, amount, currency, counterparty_name, description
+        )
+      `)
+      .eq('property_id', propertyId)
+      .order('assigned_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  // Get payments for a tenant via lease_tenants → leases → units → payment_assignments.unit_id
+  async getByTenantAssignments(tenantId: string) {
+    const { data: ltData, error: ltError } = await supabase
+      .from('lease_tenants')
+      .select('leases(unit_id)')
+      .eq('tenant_id', tenantId);
+    if (ltError) throw ltError;
+
+    const unitIds = (ltData ?? [])
+      .flatMap((lt: any) => lt.leases?.unit_id ? [lt.leases.unit_id] : []);
+    if (!unitIds.length) return [];
+
+    const { data, error } = await supabase
+      .from('payment_assignments')
+      .select(`
+        id, amount_assigned, category, assigned_at, match_method,
+        payment:payment_id(
+          id, booking_date, amount, currency, counterparty_name, description
+        )
+      `)
+      .in('unit_id', unitIds)
+      .order('assigned_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
   // Get overdue payments
   async getOverdue(ownerId: string) {
     const today = new Date().toISOString().split('T')[0];
@@ -1180,7 +1222,7 @@ export const paymentQueries = {
     const { data, error } = await supabase
       .from('payments')
       .select('id, amount, due_date, paid_date, status, description')
-      .eq('tenant_id', tenant.id)
+      .eq('tenant_id' as never, (tenant as any).id)
       .order('due_date', { ascending: false });
 
     if (error) throw error;

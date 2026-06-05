@@ -55,7 +55,7 @@ export async function POST(
   await supabaseAdmin
     .from("payment_assignments")
     .delete()
-    .eq("raw_transaction_id", transactionId)
+    .eq("payment_id", transactionId)
     .eq("owner_id", user.id);
 
   // ── Huur: link to a lease via rent_expectation ──────────────────────
@@ -107,7 +107,7 @@ export async function POST(
       .from("payment_assignments")
       .insert({
         owner_id: user.id,
-        raw_transaction_id: transactionId,
+        payment_id: transactionId,
         rent_expectation_id: rentExpectationId,
         amount_assigned: Math.abs(Number(tx.amount)),
         match_method: "manual",
@@ -156,7 +156,7 @@ export async function POST(
     .from("payment_assignments")
     .insert({
       owner_id: user.id,
-      raw_transaction_id: transactionId,
+      payment_id: transactionId,
       rent_expectation_id: null,
       amount_assigned: Math.abs(Number(tx.amount)),
       match_method: "manual",
