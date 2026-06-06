@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Logo } from '@/components/Logo'
 import { AppStoreButton, GooglePlayButton } from '@/components/base/buttons/app-store-buttons'
 
@@ -34,6 +35,21 @@ export function FooterSection() {
                 className="bg-transparent border-[#163300] text-[#163300] hover:bg-[#163300]/10"
               />
             </div>
+
+            {/* AVG / GDPR pill */}
+            <Link
+              href="/privacy-en-beveiliging"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-1.5 pr-3.5 text-sm font-medium text-[#163300] transition-colors hover:border-[#163300] hover:bg-[#163300]/5 dark:border-gray-800 dark:bg-gray-900"
+            >
+              <Image
+                src="/images/gdpr-compliant.webp"
+                alt="GDPR compliant"
+                width={24}
+                height={24}
+                className="size-6 rounded-full shrink-0"
+              />
+              AVG-conform &amp; veilig
+            </Link>
           </div>
 
           {/* Right Side - Link Columns */}
@@ -105,6 +121,14 @@ export function FooterSection() {
                     className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >
                     Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy-en-beveiliging"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                  >
+                    Beveiliging &amp; Privacy
                   </Link>
                 </li>
                 <li>
