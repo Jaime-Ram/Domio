@@ -7,6 +7,7 @@ import { ContentHeader } from '@/components/dashboard/content-header'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { DemoUserProvider } from '@/providers/demo-user-provider'
+import { QueryProvider } from '@/providers/query-provider'
 import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
 
 const ENTER_DURATION_MS = 420
@@ -56,6 +57,7 @@ export default function DemoAppLayout({
   }
 
   return (
+    <QueryProvider>
     <DemoUserProvider>
       <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
         {/* Groene overlay */}
@@ -125,5 +127,6 @@ export default function DemoAppLayout({
         </div>
       </div>
     </DemoUserProvider>
+    </QueryProvider>
   )
 }
