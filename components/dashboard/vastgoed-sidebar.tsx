@@ -26,7 +26,6 @@ import {
   HardDrive,
   HelpCircle,
   Ticket,
-  Calendar,
   Workflow,
   Sparkles,
   Smartphone,
@@ -131,7 +130,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
           children: [
             { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
             { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
-            { label: 'Planning', href: `${basePath}/maintenance/planning`, icon: Calendar },
             { label: 'MJOP', href: `${basePath}/mjop`, icon: CalendarRange },
           ],
         },

@@ -7,6 +7,7 @@ import {
   mjopQueries,
   ticketQueries,
   leaseQueries,
+  flowQueries,
 } from '@/lib/supabase/queries'
 
 // ── Query key factory ──────────────────────────────────────────────────────
@@ -19,6 +20,7 @@ export const QK = {
   mjopElements:   (bId: string)     => ['mjop-elements', bId]      as const,
   mjopInspections:(bId: string)     => ['mjop-inspections', bId]   as const,
   mjopElementTypes: ()              => ['mjop-element-types']      as const,
+  flows:          (ownerId: string) => ['flows', ownerId]         as const,
 }
 
 const STALE = 60_000 // 1 minute
@@ -93,6 +95,15 @@ export function useMjopElementTypes() {
     queryKey: QK.mjopElementTypes(),
     queryFn:  () => mjopQueries.getElementTypes(),
     staleTime: 10 * 60_000, // catalogus verandert zelden
+  })
+}
+
+export function useFlows(ownerId: string | undefined) {
+  return useQuery({
+    queryKey: QK.flows(ownerId ?? ''),
+    queryFn:  () => flowQueries.getByOwner(ownerId!),
+    enabled:  !!ownerId,
+    staleTime: STALE,
   })
 }
 

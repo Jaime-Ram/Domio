@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   AlertTriangle,
   Bell,
@@ -27,6 +27,8 @@ import { DetailShell } from '@/components/ui/detail-shell'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { GrayBlock } from '@/components/ui/gray-block'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
+import { useFlows, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
+import { flowQueries } from '@/lib/supabase/queries'
 
 /* ─── Template library ─── */
 
@@ -292,8 +294,8 @@ function FlowCard({ template, activeCount, onOpen }: {
       className="group w-full text-left flex flex-col gap-3 p-4 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 hover:brightness-95 transition-all"
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="w-10 h-10 rounded-xl bg-white/60 dark:bg-neutral-700 flex items-center justify-center shrink-0">
-          <Icon className="h-[18px] w-[18px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <Icon className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
         </div>
         {activeCount > 0 ? (
           <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -328,8 +330,8 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
   const isActive = flow.status === 'active'
   return (
     <GrayBlock className="flex items-start gap-4 p-4">
-      <div className="w-10 h-10 rounded-xl bg-white/60 dark:bg-neutral-700 flex items-center justify-center shrink-0">
-        <Icon className="h-[18px] w-[18px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+        <Icon className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
@@ -390,35 +392,24 @@ type FlowTab = 'bibliotheek' | 'actief'
 
 export default function FlowsPage() {
   const { user, isDemo } = useDashboardUser()
-  const [activeFlows, setActiveFlows] = useState<ActiveFlow[]>([])
+  const queryClient = useQueryClient()
   const [selectedTemplate, setSelectedTemplate] = useState<FlowTemplate | null>(null)
   const [builderTemplate, setBuilderTemplate] = useState<FlowTemplate | null>(null)
   const [tab, setTab] = useState<FlowTab>('bibliotheek')
   const [properties, setProperties] = useState<{ id: string; name: string }[]>([])
 
-  // Load flows from localStorage on mount
-  useEffect(() => {
-    if (isDemo) return
-    try {
-      const saved = localStorage.getItem('domio:activeFlows')
-      if (!saved) return
-      const parsed: Omit<ActiveFlow, 'icon'>[] = JSON.parse(saved)
-      const restored = parsed.map(f => {
-        const template = TEMPLATES.find(t => t.id === f.templateId)
-        return { ...f, icon: template?.icon ?? Zap }
-      })
-      setActiveFlows(restored)
-    } catch {}
-  }, [isDemo])
+  // Demo mode keeps flows in-memory; real users persist them in Supabase.
+  const [demoFlows, setDemoFlows] = useState<ActiveFlow[]>([])
+  const { data: dbFlows = [] } = useFlows(isDemo ? undefined : user?.id)
 
-  // Save flows to localStorage whenever they change
-  useEffect(() => {
-    if (isDemo) return
-    try {
-      const toSave = activeFlows.map(({ icon, ...rest }) => rest)
-      localStorage.setItem('domio:activeFlows', JSON.stringify(toSave))
-    } catch {}
-  }, [activeFlows, isDemo])
+  // DB flows are stored without the React icon — re-attach it from the template.
+  const activeFlows: ActiveFlow[] = useMemo(() => {
+    if (isDemo) return demoFlows
+    return (dbFlows as Omit<ActiveFlow, 'icon'>[]).map((f) => ({
+      ...f,
+      icon: TEMPLATES.find((t) => t.id === f.templateId)?.icon ?? Zap,
+    }))
+  }, [isDemo, demoFlows, dbFlows])
 
   // Load properties via server-side API route
   useEffect(() => {
@@ -451,16 +442,39 @@ export default function FlowsPage() {
     setSelectedTemplate(null)
   }
 
-  const handleActivate = (flow: ActiveFlow) => {
-    setActiveFlows(prev => [flow, ...prev])
+  const handleActivate = async (flow: ActiveFlow) => {
     setBuilderTemplate(null)
     setTab('actief')
+    if (isDemo) {
+      setDemoFlows(prev => [flow, ...prev])
+      return
+    }
+    if (!user?.id) return
+    try {
+      const created = await flowQueries.create({ ...flow, ownerId: user.id })
+      queryClient.setQueryData(QK.flows(user.id), (old: any[] = []) => [created, ...old])
+    } catch (e) {
+      console.error('[flows/activate]', e)
+    }
   }
 
-  const toggleFlowStatus = (id: string) => {
-    setActiveFlows((prev) =>
-      prev.map((f) => f.id === id ? { ...f, status: f.status === 'active' ? 'inactive' : 'active' } : f)
+  const toggleFlowStatus = async (id: string) => {
+    const current = activeFlows.find((f) => f.id === id)
+    const next: 'active' | 'inactive' = current?.status === 'active' ? 'inactive' : 'active'
+    if (isDemo) {
+      setDemoFlows(prev => prev.map(f => f.id === id ? { ...f, status: next } : f))
+      return
+    }
+    if (!user?.id) return
+    queryClient.setQueryData(QK.flows(user.id), (old: any[] = []) =>
+      old.map(f => f.id === id ? { ...f, status: next } : f)
     )
+    try {
+      await flowQueries.update(id, { status: next })
+    } catch (e) {
+      console.error('[flows/toggle]', e)
+      queryClient.invalidateQueries({ queryKey: QK.flows(user.id) })
+    }
   }
 
   const editFlow = (flow: ActiveFlow) => {

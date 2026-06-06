@@ -33,7 +33,6 @@ export function getPageDef(rel: string, firstName: string): PageDef {
     tabs: [
       { label: 'Tickets', path: '/maintenance' },
       { label: 'Inspecties', path: '/maintenance/inspecties' },
-      { label: 'Planning', path: '/maintenance/planning' },
     ],
   }
   if (rel.startsWith('/tenants')) return { title: 'Huurders' }
@@ -41,6 +40,7 @@ export function getPageDef(rel: string, firstName: string): PageDef {
   if (rel.startsWith('/tasks')) return { title: 'Taken' }
   if (rel.startsWith('/documents')) return { title: 'Documenten' }
   if (rel.startsWith('/flows')) return { title: 'Flows', noDivider: true }
+  if (rel.startsWith('/mjop')) return { title: 'MJOP', noDivider: true }
   if (rel.startsWith('/integrations')) return { title: 'Integraties' }
   if (rel.startsWith('/assist')) return { title: 'Domio Assist' }
   if (rel.startsWith('/app')) return { title: 'App' }

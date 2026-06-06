@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Select,
@@ -40,6 +40,10 @@ import {
   Search,
   Loader2,
   Workflow,
+  Clock,
+  CheckCircle2,
+  PauseCircle,
+  ArrowRight,
   Plus,
   Users,
   TrendingUp,
@@ -54,6 +58,8 @@ import { cn } from '@/lib/utils'
 import { propertyQueries, unitQueries, leaseQueries, documentQueries, paymentQueries } from '@/lib/supabase/queries'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { ActionListRow, ActionListSection } from '@/components/ui/action-list'
+import { flowAppliesToProperty } from '@/lib/flows/active-flows'
+import { useFlows } from '@/lib/hooks/use-dashboard-queries'
 
 const UNIT_STATUSES = [
   { value: 'leegstand', label: 'Leegstand' },
@@ -117,8 +123,9 @@ interface PropertyDetailSheetProps {
 }
 
 export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: PropertyDetailSheetProps) {
-  const { basePath } = useDashboardUser()
+  const { basePath, user } = useDashboardUser()
   const router = useRouter()
+  const { data: allFlows = [] } = useFlows(user?.id)
 
   const [activeTab, setActiveTab] = useState<TabId>('info')
   const [property, setProperty] = useState<any>(null)
@@ -127,6 +134,10 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
   const [propertyDocuments, setPropertyDocuments] = useState<any[]>([])
   const [propertyPayments, setPropertyPayments] = useState<any[]>([])
   const [paymentsLoading, setPaymentsLoading] = useState(false)
+  const propertyFlows = useMemo(
+    () => (propertyId ? (allFlows as any[]).filter((f) => flowAppliesToProperty(f, propertyId)) : []),
+    [allFlows, propertyId],
+  )
 
   // Edit state
   const [isEditing, setIsEditing] = useState(false)
@@ -928,14 +939,68 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
         {/* ── Flows ─────────────────────────────────────────────────────── */}
         {activeTab === 'flows' && (
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">Flows</p>
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="h-12 w-12 rounded-2xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
-                <Workflow className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-              </div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Binnenkort beschikbaar</p>
-              <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">Automatiseer processen rondom dit object</p>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Flows</p>
+              <button
+                type="button"
+                onClick={() => { router.push(`${basePath}/flows`); onClose() }}
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+              >
+                Beheer flows
+                <ArrowRight className="h-3 w-3" />
+              </button>
             </div>
+
+            {propertyFlows.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="h-12 w-12 rounded-2xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
+                  <Workflow className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Geen flows voor dit pand</p>
+                <p className="text-xs text-gray-400 dark:text-gray-600 mt-1 max-w-[15rem]">
+                  Zet een flow aan in de Flows-bibliotheek en koppel hem aan dit pand
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {propertyFlows.map((flow) => {
+                  const isActive = flow.status === 'active'
+                  const enabledSteps = flow.configuredSteps?.filter((s: any) => s.enabled).length ?? 0
+                  return (
+                    <div key={flow.id} className="flex items-start gap-3 rounded-xl border border-gray-100 dark:border-neutral-800 px-4 py-3">
+                      <div className="h-9 w-9 rounded-xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
+                        <Workflow className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{flow.name}</p>
+                          <span className={cn(
+                            'flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap',
+                            isActive
+                              ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20'
+                              : 'text-gray-400 dark:text-neutral-500 bg-gray-100 dark:bg-neutral-800'
+                          )}>
+                            {isActive ? <CheckCircle2 className="h-3 w-3" /> : <PauseCircle className="h-3 w-3" />}
+                            {isActive ? 'Actief' : 'Gepauzeerd'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-400 dark:text-neutral-500 mt-0.5 flex items-center gap-1">
+                          <Clock className="h-3 w-3 shrink-0" />
+                          {flow.trigger}
+                        </p>
+                        <div className="flex gap-1.5 mt-2 flex-wrap">
+                          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-800 px-2 py-0.5 rounded-full">{flow.category}</span>
+                          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-800 px-2 py-0.5 rounded-full">{enabledSteps} stappen actief</span>
+                          {flow.propertyScope?.type === 'all' && (
+                            <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-800 px-2 py-0.5 rounded-full">Alle panden</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 

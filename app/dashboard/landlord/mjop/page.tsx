@@ -1,31 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
-  CalendarRange,
   Building2,
   MapPin,
   ChevronRight,
   Plus,
   CheckCircle2,
+  Sparkles,
+  CalendarRange,
+  ArrowRight,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { TabNav } from '@/components/ui/tab-nav'
+import { GrayBlock } from '@/components/ui/gray-block'
+import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CreateDialogShell } from '@/components/ui/add-dialog-layout'
 import { DialogField } from '@/components/ui/dialog-field'
 import { Input } from '@/components/ui/input'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { mjopQueries } from '@/lib/supabase/queries'
 import type { Property } from '@/lib/supabase/types'
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { MjopBuildingSheet } from '@/components/mjop/mjop-building-sheet'
 import { useProperties, useMjopBuildings, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
 
 interface MjopBuilding {
   id: string
   property_id: string | null
   name: string
+  address?: string | null
   bouwjaar: number | null
   gebruiksoppervlak: number | null
   herbouwwaarde: number | null
 }
+
+type MjopTab = 'actief' | 'planning' | 'panden'
 
 export default function MjopPage() {
   const { user } = useDashboardUser()
@@ -33,6 +43,18 @@ export default function MjopPage() {
   const { data: properties = [], isLoading: propsLoading } = useProperties(user?.id)
   const { data: buildings = [], isLoading: buildingsLoading } = useMjopBuildings(user?.id)
   const loading = propsLoading || buildingsLoading
+
+  const [tab, setTab] = useState<MjopTab>('actief')
+
+  // Building detail sheet
+  const searchParams = useSearchParams()
+  const [openBuildingId, setOpenBuildingId] = useState<string | null>(null)
+
+  // Open the sheet from a ?building= deep link
+  useEffect(() => {
+    const id = searchParams.get('building')
+    if (id) setOpenBuildingId(id)
+  }, [searchParams])
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -42,10 +64,7 @@ export default function MjopPage() {
 
   const openDialog = (property: Property) => {
     setSelectedProperty(property)
-    setForm({
-      gebruiksoppervlak: '',
-      herbouwwaarde: '',
-    })
+    setForm({ gebruiksoppervlak: '', herbouwwaarde: '' })
     setDialogOpen(true)
   }
 
@@ -66,6 +85,7 @@ export default function MjopPage() {
       const created = await mjopQueries.createBuilding(payload)
       queryClient.setQueryData(QK.mjopBuildings(user!.id), (old: MjopBuilding[] = []) => [created, ...old])
       setDialogOpen(false)
+      setTab('actief')
     } catch (err) {
       console.error(err)
     } finally {
@@ -77,46 +97,165 @@ export default function MjopPage() {
     buildings.find(b => b.property_id === propertyId) ?? null
 
   return (
-    <div className="flex flex-col min-h-0 h-full">
-      {/* Header */}
-      <div className="px-6 py-5 border-b border-gray-200 dark:border-neutral-700 shrink-0">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">MJOP</h1>
-        <p className="text-sm text-gray-500 dark:text-neutral-400 mt-0.5">
-          Meerjarenonderhoudsplanning per pand — gebaseerd op NEN 2767 en NL-SfB
-        </p>
-      </div>
+    <>
+      <div className="flex flex-col gap-8">
+        <TabNav
+          tabs={[
+            { id: 'actief', label: 'Actief', count: buildings.length > 0 ? buildings.length : undefined },
+            { id: 'planning', label: 'Planning' },
+            { id: 'panden', label: 'Panden' },
+          ]}
+          activeTab={tab}
+          onChange={(id) => setTab(id as MjopTab)}
+          className="w-full"
+        />
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {[1, 2, 3].map(n => (
-              <div key={n} className="h-44 rounded-2xl bg-gray-100 dark:bg-neutral-800 animate-pulse" />
-            ))}
-          </div>
-        ) : properties.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center mb-5">
-              <CalendarRange className="h-8 w-8 text-[#163300] dark:text-[#9FE870]" />
+        {/* ── ACTIEF ── */}
+        {tab === 'actief' && (
+          loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[1, 2, 3].map(n => (
+                <div key={n} className="h-36 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 animate-pulse" />
+              ))}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Geen panden gevonden</h3>
-            <p className="text-sm text-gray-500 dark:text-neutral-400 max-w-sm">
-              Voeg eerst panden toe aan je portefeuille om een MJOP op te stellen.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {properties.map(property => {
-              const building = buildingByProperty(property.id)
-              return (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
+          ) : buildings.length === 0 ? (
+            <GrayBlock className="px-8 py-8">
+              <div className="flex flex-col gap-3 max-w-xl">
+                <h2 className="text-[26px] font-bold text-gray-900 dark:text-white leading-tight">
+                  Nog geen MJOP gestart
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Initialiseer een pand om een meerjarenonderhoudsplan op te bouwen met conditiemeting, elementen en planning.
+                </p>
+                <div className="mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setTab('panden')}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
+                  >
+                    Naar panden
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </GrayBlock>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {buildings.map(building => (
+                <BuildingCard
+                  key={building.id}
                   building={building}
-                  onStart={() => openDialog(property)}
+                  onOpen={() => setOpenBuildingId(building.id)}
                 />
-              )
-            })}
+              ))}
+            </div>
+          )
+        )}
+
+        {/* ── PLANNING ── */}
+        {tab === 'planning' && (
+          <div className="flex flex-col gap-6">
+            <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
+              <GeometricShapes variant="diagonal-stripes" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.15} layers={2} />
+              <div className="relative z-10 flex flex-col gap-3 max-w-xl">
+                <h2 className="text-[26px] font-bold text-white leading-tight">
+                  Meerjarenbegroting
+                </h2>
+                <p className="text-sm text-white/80 leading-relaxed">
+                  Zodra je panden elementen en inspecties hebben, verschijnt hier de geplande onderhoudsbegroting over de komende 10 jaar, per pand en voor je hele portefeuille.
+                </p>
+                <div className="mt-1 flex items-center gap-3">
+                  <Button
+                    disabled
+                    className="rounded-full bg-[#9FE870] text-[#163300] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#9FE870]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <CalendarRange className="h-4 w-4" />
+                    Begroting opbouwen
+                  </Button>
+                  <span className="text-xs text-white/50">Binnenkort beschikbaar</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tijdlijn scaffold */}
+            <GrayBlock className="p-5 overflow-x-auto">
+              <p className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-4">
+                Tijdlijn onderhoud
+              </p>
+              <div className="flex gap-2 min-w-max">
+                {Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + i).map(year => (
+                  <div key={year} className="flex flex-col items-center gap-2 w-16">
+                    <div className="h-32 w-full rounded-xl border border-dashed border-gray-200 dark:border-neutral-600 bg-white/50 dark:bg-neutral-700/30" />
+                    <span className="text-[11px] font-medium text-gray-400 dark:text-neutral-500">{year}</span>
+                  </div>
+                ))}
+              </div>
+            </GrayBlock>
+          </div>
+        )}
+
+        {/* ── PANDEN ── */}
+        {tab === 'panden' && (
+          <div className="flex flex-col gap-10">
+            {/* Intro / coming soon block */}
+            <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
+              <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.15} layers={2} />
+              <div className="relative z-10 flex flex-col gap-3 max-w-xl">
+                <h2 className="text-[26px] font-bold text-white leading-tight">
+                  Meerjarenonderhoudsplan
+                </h2>
+                <p className="text-sm text-white/80 leading-relaxed">
+                  Stel per pand een MJOP op volgens NEN 2767 en NL-SfB. Automatische conditiemeting, kostenraming en een meerjarenbegroting komen eraan. Initialiseer alvast je panden hieronder.
+                </p>
+                <div className="mt-1 flex items-center gap-3">
+                  <Button
+                    disabled
+                    className="rounded-full bg-[#9FE870] text-[#163300] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#9FE870]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    MJOP automatisch genereren
+                  </Button>
+                  <span className="text-xs text-white/50">Binnenkort beschikbaar</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Panden-grid */}
+            <section>
+              <h3 className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-3">
+                Jouw panden
+              </h3>
+
+              {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {[1, 2, 3].map(n => (
+                    <div key={n} className="h-36 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 animate-pulse" />
+                  ))}
+                </div>
+              ) : properties.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="h-16 w-16 rounded-2xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center mb-5">
+                    <CalendarRange className="h-8 w-8 text-[#163300] dark:text-[#9FE870]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Geen panden gevonden</h3>
+                  <p className="text-sm text-gray-500 dark:text-neutral-400 max-w-sm">
+                    Voeg eerst panden toe aan je portefeuille om een MJOP op te stellen.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {properties.map(property => (
+                    <PropertyCard
+                      key={property.id}
+                      property={property}
+                      building={buildingByProperty(property.id)}
+                      onStart={() => openDialog(property)}
+                      onOpen={() => setOpenBuildingId(buildingByProperty(property.id)!.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         )}
       </div>
@@ -152,71 +291,113 @@ export default function MjopPage() {
           Herbouwwaarde nodig voor de 0,5%-toets (art. 5:126 BW). Kan later worden bijgewerkt.
         </p>
       </CreateDialogShell>
-    </div>
+
+      {/* Building detail (uitschuif-paneel) */}
+      <MjopBuildingSheet
+        open={!!openBuildingId}
+        buildingId={openBuildingId}
+        onClose={() => setOpenBuildingId(null)}
+      />
+    </>
   )
 }
+
+/* ─── Actieve MJOP-kaart ─── */
+
+function BuildingCard({ building, onOpen }: { building: MjopBuilding; onOpen: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group w-full text-left flex flex-col gap-3 p-4 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 hover:brightness-95 transition-all"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <Building2 className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+        </div>
+        <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+          <CheckCircle2 className="h-3 w-3 shrink-0" />
+          Actief
+        </span>
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{building.name}</p>
+        {building.address && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1 truncate">
+            <MapPin className="h-3 w-3 shrink-0" />
+            {building.address}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-neutral-500">
+        <span className="flex items-center gap-1.5">
+          <CalendarRange className="h-3 w-3 shrink-0" />
+          {building.bouwjaar ? `Bouwjaar ${building.bouwjaar}` : 'Bouwjaar onbekend'}
+        </span>
+        <span className="flex items-center gap-0.5 text-[#163300] dark:text-[#9FE870] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+          Bekijk
+          <ChevronRight className="h-3.5 w-3.5" />
+        </span>
+      </div>
+    </button>
+  )
+}
+
+/* ─── Pand-kaart (initialiseren) ─── */
 
 function PropertyCard({
   property,
   building,
   onStart,
+  onOpen,
 }: {
   property: Property
   building: MjopBuilding | null
   onStart: () => void
+  onOpen: () => void
 }) {
   const hasActive = !!building
 
-  return (
-    <div className="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-4">
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-          <Building2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+  const inner = (
+    <>
+      <div className="flex items-start justify-between gap-2">
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <Building2 className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-gray-900 dark:text-white text-sm leading-snug truncate">
-            {property.name}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-neutral-400 mt-0.5 truncate flex items-center gap-1">
-            <MapPin className="h-3 w-3 shrink-0" />
-            {[property.address, property.city].filter(Boolean).join(', ')}
-          </p>
-        </div>
-        {hasActive && (
-          <span className="shrink-0 rounded-full bg-[#9FE870]/20 text-[#163300] dark:text-[#9FE870] text-[10px] font-semibold px-2 py-0.5">
+        {hasActive ? (
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+            <CheckCircle2 className="h-3 w-3 shrink-0" />
             Actief
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-[#163300] dark:text-[#9FE870] bg-[#163300]/8 dark:bg-[#9FE870]/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+            <Plus className="h-3 w-3 shrink-0" />
+            Initialiseren
           </span>
         )}
       </div>
+      <div>
+        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{property.name}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1 truncate">
+          <MapPin className="h-3 w-3 shrink-0" />
+          {[property.address, property.city].filter(Boolean).join(', ') || 'Geen adres'}
+        </p>
+      </div>
+      <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-neutral-500">
+        <span className="flex items-center gap-1.5">
+          <CalendarRange className="h-3 w-3 shrink-0" />
+          {property.build_year ? `Bouwjaar ${property.build_year}` : 'Bouwjaar onbekend'}
+        </span>
+        <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600" />
+      </div>
+    </>
+  )
 
-      {/* Meta */}
-      {property.build_year && (
-        <div className="rounded-lg bg-gray-50 dark:bg-neutral-800 px-3 py-2 flex items-center justify-between">
-          <span className="text-xs text-gray-400 dark:text-neutral-500">Bouwjaar</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">{property.build_year}</span>
-        </div>
-      )}
+  const cardClass = 'group w-full text-left flex flex-col gap-3 p-4 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 hover:brightness-95 transition-all'
 
-      {/* CTA */}
-      {hasActive ? (
-        <Link
-          href={`/dashboard/landlord/mjop/${building!.id}`}
-          className="flex items-center justify-between rounded-xl bg-[#163300] text-white px-4 py-2.5 text-sm font-medium hover:bg-[#163300]/90 transition-colors"
-        >
-          <span>Bekijk MJOP</span>
-          <ChevronRight className="h-4 w-4" />
-        </Link>
-      ) : (
-        <button
-          type="button"
-          onClick={onStart}
-          className="flex items-center justify-between rounded-xl border border-dashed border-[#163300]/30 dark:border-[#9FE870]/30 text-[#163300] dark:text-[#9FE870] px-4 py-2.5 text-sm font-medium hover:bg-[#163300]/5 dark:hover:bg-[#9FE870]/5 transition-colors"
-        >
-          <span>MJOP initialiseren</span>
-          <Plus className="h-4 w-4" />
-        </button>
-      )}
-    </div>
+  return (
+    <button type="button" onClick={hasActive ? onOpen : onStart} className={cardClass}>
+      {inner}
+    </button>
   )
 }

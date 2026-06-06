@@ -1690,3 +1690,77 @@ export const taskQueries = {
   },
 };
 
+
+// ============================================================================
+// Flows (geautomatiseerde processen) — persistent in Supabase
+// ============================================================================
+
+function rowToFlow(row: any) {
+  return {
+    id: row.id,
+    templateId: row.template_id,
+    name: row.name,
+    status: row.status,
+    category: row.category,
+    trigger: row.trigger,
+    triggerConf: row.trigger_conf,
+    configuredSteps: row.configured_steps,
+    propertyScope: row.property_scope,
+    createdAt: row.created_at,
+  }
+}
+
+export const flowQueries = {
+  async getByOwner(ownerId: string) {
+    const { data, error } = await supabaseAny
+      .from('flows')
+      .select('*')
+      .eq('owner_id', ownerId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return (data ?? []).map(rowToFlow)
+  },
+
+  async create(flow: Record<string, any>) {
+    const { data, error } = await supabaseAny
+      .from('flows')
+      .insert({
+        owner_id: flow.ownerId,
+        template_id: flow.templateId,
+        name: flow.name,
+        status: flow.status ?? 'active',
+        category: flow.category ?? null,
+        trigger: flow.trigger ?? null,
+        trigger_conf: flow.triggerConf ?? {},
+        configured_steps: flow.configuredSteps ?? [],
+        property_scope: flow.propertyScope ?? { type: 'all', propertyIds: [] },
+      })
+      .select('*')
+      .single()
+    if (error) throw error
+    return rowToFlow(data)
+  },
+
+  async update(id: string, updates: Record<string, any>) {
+    const patch: Record<string, any> = { updated_at: new Date().toISOString() }
+    if (updates.name !== undefined) patch.name = updates.name
+    if (updates.status !== undefined) patch.status = updates.status
+    if (updates.trigger !== undefined) patch.trigger = updates.trigger
+    if (updates.triggerConf !== undefined) patch.trigger_conf = updates.triggerConf
+    if (updates.configuredSteps !== undefined) patch.configured_steps = updates.configuredSteps
+    if (updates.propertyScope !== undefined) patch.property_scope = updates.propertyScope
+    const { data, error } = await supabaseAny
+      .from('flows')
+      .update(patch)
+      .eq('id', id)
+      .select('*')
+      .single()
+    if (error) throw error
+    return rowToFlow(data)
+  },
+
+  async remove(id: string) {
+    const { error } = await supabaseAny.from('flows').delete().eq('id', id)
+    if (error) throw error
+  },
+}
