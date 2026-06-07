@@ -7,6 +7,7 @@ import {
   CheckCircle2, Pencil, X, Check, Loader2, Mail, Building2,
   Landmark, BookOpen, RefreshCw, ExternalLink,
   Globe, Bell, Trash2, AlertTriangle, ChevronRight,
+  Download,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
@@ -741,6 +742,19 @@ export default function SettingsPage() {
                 </div>
               )}
             </ActionListRow>
+          </ActionListSection>
+
+          {/* Privacy & gegevens */}
+          <ActionListSection title="Privacy & gegevens">
+            <ActionListRow
+              icon={Download}
+              title="Gegevens exporteren"
+              subtitle="Download al je gegevens als JSON (AVG: recht op inzage)"
+              onClick={() => {
+                if (isDemo) return
+                window.location.href = '/api/account/export'
+              }}
+            />
           </ActionListSection>
 
           {/* Gevarenzone */}
