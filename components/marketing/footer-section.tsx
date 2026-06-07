@@ -14,7 +14,7 @@ export function FooterSection() {
           <div className="flex flex-col gap-6 lg:max-w-md lg:flex-1">
             {/* Logo */}
             <div className="overflow-visible">
-              <Logo width={120} height={34} />
+              <Logo width={100} height={28} />
             </div>
             
             {/* Description */}

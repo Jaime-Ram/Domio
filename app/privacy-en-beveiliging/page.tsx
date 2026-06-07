@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Logo } from '@/components/Logo'
+import { MarketingLayout } from '@/components/marketing/marketing-layout'
 import { FooterSection } from '@/components/marketing/footer-section'
 
 export const metadata: Metadata = {
@@ -98,24 +98,8 @@ const SUBVERWERKERS = [
 
 export default function PrivacyEnBeveiligingPage() {
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 w-full max-w-7xl items-center px-4 md:px-8">
-          <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-1">
-            <Link href="/">
-              <Logo width={100} height={28} />
-            </Link>
-          </div>
-          <div className="hidden md:flex items-center ml-auto">
-            <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
-              Terug naar home
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1">
+    <MarketingLayout>
+      <main className="bg-white">
 
         {/* Hero */}
         <section className="bg-gray-50">
@@ -287,6 +271,6 @@ export default function PrivacyEnBeveiligingPage() {
 
       </main>
       <FooterSection />
-    </div>
+    </MarketingLayout>
   )
 }
