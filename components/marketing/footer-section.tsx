@@ -133,6 +133,14 @@ export function FooterSection() {
                 </li>
                 <li>
                   <Link
+                    href="/verwerkersovereenkomst"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                  >
+                    Verwerkersovereenkomst
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/terms"
                     className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
                   >

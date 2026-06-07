@@ -20,6 +20,7 @@ const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[0]['c
   { path: '/faq', changeFrequency: 'yearly', priority: 0.7 },
   { path: '/privacy', changeFrequency: 'yearly', priority: 0.4 },
   { path: '/privacy-en-beveiliging', changeFrequency: 'yearly', priority: 0.5 },
+  { path: '/verwerkersovereenkomst', changeFrequency: 'yearly', priority: 0.4 },
   { path: '/terms', changeFrequency: 'yearly', priority: 0.4 },
   { path: '/tools/wws-calculator', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/registreren', changeFrequency: 'monthly', priority: 0.8 },
