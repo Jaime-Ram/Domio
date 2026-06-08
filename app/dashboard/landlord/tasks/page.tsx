@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { MetricCard } from '@/components/finance/MetricCard'
 import { AddTaskTile } from '@/components/tasks/add-task-tile'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import {
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
@@ -326,29 +327,9 @@ export default function TasksPage() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-8">
 
-      {/* KPI's — zelfde patroon als financieel: icoon + bedrag + één onderzin (geen extra subtitle) */}
-      <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          label="Verlopen"
-          value={String(overdue.length)}
-          icon={<AlertCircle />}
-        />
-        <MetricCard
-          label="Actie binnen 7 dagen"
-          value={String(actionNeeded.length)}
-          icon={<ClockCheck />}
-        />
-        <MetricCard
-          label="Open taken"
-          value={String(openTasks.length)}
-          icon={<CheckDone01 />}
-        />
-        <AddTaskTile className="h-full min-h-[160px]" onClick={openNew} />
-      </div>
-
-      {/* Toolbar + tabel — ActionList style (no Card wrapper) */}
+      {/* Tabs (open/afgerond/alle) + toolbar onder de titel, zoals bij Flows */}
       {tasksToolbar}
 
       <div className="rounded-2xl overflow-hidden">
@@ -493,15 +474,15 @@ export default function TasksPage() {
                     )}
                   </div>
 
-                  {/* Edit action */}
-                  <button
-                    type="button"
-                    onClick={() => openEdit(task)}
-                    className="inline-flex items-center justify-center h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-300 transition-colors justify-self-end"
-                    aria-label="Bewerken"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
+                  {/* Acties */}
+                  <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
+                    <RowActionsMenu
+                      actions={[
+                        { label: 'Bewerken', icon: Pencil, onClick: () => openEdit(task) },
+                        { label: task.status === 'afgerond' ? 'Heropenen' : 'Markeer als afgerond', icon: Check, onClick: () => toggleDone(task) },
+                      ]}
+                    />
+                  </div>
                 </div>
               )
             })}

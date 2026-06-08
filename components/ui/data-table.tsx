@@ -80,7 +80,7 @@ export function DataTableRow({
     <div
       onClick={onClick}
       className={cn(
-        'grid items-center gap-4 mx-1 px-3 py-3.5',
+        'grid items-center gap-4 mx-1 px-3 py-3',
         'hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl',
         onClick && 'cursor-pointer',
         cols,

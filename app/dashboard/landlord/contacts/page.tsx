@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Plus, Search, Phone, Mail, Pencil, Trash2, BookUser, User, Building2 } from 'lucide-react'
+import { Plus, Phone, Mail, Pencil, Trash2, BookUser, User, Building2, Layers, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -13,7 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { contactQueries } from '@/lib/supabase/queries'
-import { useContacts, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
+import { useContacts, useProperties, usePortfolios, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
+import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { DropdownMenuLabel, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu'
+import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 type Category = 'alle' | 'loodgieter' | 'aannemer' | 'elektricien' | 'schilder' | 'schoonmaak' | 'overig'
 
@@ -61,8 +67,20 @@ export default function ContactsPage() {
   const { user } = useDashboardUser()
   const queryClient = useQueryClient()
   const { data: contacts = [], isLoading: loading } = useContacts(user?.id)
+  const { data: properties = [] } = useProperties(user?.id)
+  const { data: portfolios = [] } = usePortfolios(user?.id)
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState<Category>('alle')
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set())
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
+  const { sort, toggleSort } = useSortable<string>()
+
+  const toggleCategory = (value: string) =>
+    setCategoryFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(value)) next.delete(value)
+      else next.add(value)
+      return next
+    })
 
   // Toevoegen — popup
   const [addOpen, setAddOpen] = useState(false)
@@ -76,6 +94,17 @@ export default function ContactsPage() {
   const [editSaving, setEditSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
 
+  // Koppelingen aan panden/portefeuilles
+  const [linkPropertyIds, setLinkPropertyIds] = useState<Set<string>>(new Set())
+  const [linkPortfolioIds, setLinkPortfolioIds] = useState<Set<string>>(new Set())
+
+  const toggleLinkProperty = (id: string) => setLinkPropertyIds((prev) => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n
+  })
+  const toggleLinkPortfolio = (id: string) => setLinkPortfolioIds((prev) => {
+    const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n
+  })
+
   const filtered = useMemo(() => contacts.filter((c) => {
     const matchSearch =
       !search ||
@@ -83,11 +112,55 @@ export default function ContactsPage() {
       (c.company ?? '').toLowerCase().includes(search.toLowerCase()) ||
       (c.phone ?? '').includes(search) ||
       (c.email ?? '').toLowerCase().includes(search.toLowerCase())
-    const matchCat = activeCategory === 'alle' || c.category === activeCategory
+    const matchCat = categoryFilter.size === 0 || categoryFilter.has(c.category)
     return matchSearch && matchCat
-  }), [contacts, search, activeCategory])
+  }), [contacts, search, categoryFilter])
+
+  const sortedFiltered = useMemo(
+    () => applySortedRows(filtered, sort, (c, k) =>
+      k === 'category' ? (CATEGORIES.find(cat => cat.value === c.category)?.label ?? c.category)
+      : k === 'company' ? (c.company ?? '')
+      : c.name,
+    ),
+    [filtered, sort],
+  )
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const c of contacts) counts[c.category] = (counts[c.category] ?? 0) + 1
+    return counts
+  }, [contacts])
+
+  const filterContent = (
+    <>
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        Categorie
+      </DropdownMenuLabel>
+      <div className="space-y-1">
+        {CATEGORIES.filter(c => c.value !== 'alle').map((cat) => (
+          <DropdownMenuCheckboxItem
+            key={cat.value}
+            checked={categoryFilter.has(cat.value)}
+            onCheckedChange={() => toggleCategory(cat.value)}
+            onSelect={(e) => e.preventDefault()}
+            className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+          >
+            <span>{cat.label}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{categoryCounts[cat.value] ?? 0}</span>
+          </DropdownMenuCheckboxItem>
+        ))}
+      </div>
+    </>
+  )
 
   // ── Toevoegen ──
+  const openAdd = () => {
+    setAddForm(EMPTY_FORM)
+    setLinkPropertyIds(new Set())
+    setLinkPortfolioIds(new Set())
+    setAddOpen(true)
+  }
+
   const handleAdd = async () => {
     if (!user || !addForm.name.trim()) return
     setAddSaving(true)
@@ -101,6 +174,7 @@ export default function ContactsPage() {
         email: addForm.email.trim() || null,
         notes: addForm.notes.trim() || null,
       })
+      await contactQueries.replaceLinks(created.id, user.id, [...linkPropertyIds], [...linkPortfolioIds])
       queryClient.setQueryData(QK.contacts(user!.id), (old: Contact[] = []) =>
         [...old, created].sort((a, b) => a.name.localeCompare(b.name))
       )
@@ -111,7 +185,7 @@ export default function ContactsPage() {
   }
 
   // ── Bekijken/bewerken ──
-  const openDetail = (c: Contact) => {
+  const openDetail = async (c: Contact) => {
     setDetailContact(c)
     setEditMode(false)
     setDeleteConfirm(false)
@@ -123,6 +197,13 @@ export default function ContactsPage() {
       email: c.email ?? '',
       notes: c.notes ?? '',
     })
+    setLinkPropertyIds(new Set())
+    setLinkPortfolioIds(new Set())
+    try {
+      const links = await contactQueries.getLinks(c.id)
+      setLinkPropertyIds(new Set(links.filter((l) => l.property_id).map((l) => l.property_id)))
+      setLinkPortfolioIds(new Set(links.filter((l) => l.portfolio_id).map((l) => l.portfolio_id)))
+    } catch (e) { console.error(e) }
   }
 
   const enterEditMode = () => {
@@ -151,6 +232,7 @@ export default function ContactsPage() {
         email: editForm.email.trim() || null,
         notes: editForm.notes.trim() || null,
       })
+      await contactQueries.replaceLinks(detailContact.id, user!.id, [...linkPropertyIds], [...linkPortfolioIds])
       queryClient.setQueryData(QK.contacts(user!.id), (old: Contact[] = []) =>
         old.map(c => c.id === updated.id ? updated : c).sort((a, b) => a.name.localeCompare(b.name))
       )
@@ -172,54 +254,22 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pt-6">
+    <>
+      <div className="flex flex-col gap-8">
+        <TableToolbar
+          title="Contactboek"
+          count={`${filtered.length} van ${contacts.length} contact${contacts.length === 1 ? '' : 'en'}`}
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Zoek op naam, bedrijf, telefoon…"
+          filterContent={filterContent}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onAdd={openAdd}
+          addLabel="Contact toevoegen"
+        />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Contactboek</h1>
-          <p className="mt-1 text-sm text-gray-500">Loodgieters, aannemers en andere vaste contacten.</p>
-        </div>
-        <Button
-          onClick={() => { setAddForm(EMPTY_FORM); setAddOpen(true) }}
-          className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-full gap-2 font-semibold"
-        >
-          <Plus className="h-4 w-4" />
-          Contact toevoegen
-        </Button>
-      </div>
-
-      {/* Zoek + categorie filter */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          <Input
-            placeholder="Zoek op naam, bedrijf, telefoon..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 rounded-full"
-          />
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              type="button"
-              onClick={() => setActiveCategory(cat.value)}
-              className={cn(
-                'px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors',
-                activeCategory === cat.value
-                  ? 'bg-[#163300] text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              )}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Grid */}
+        {/* Lijst / raster */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
@@ -236,16 +286,16 @@ export default function ContactsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => { setAddForm(EMPTY_FORM); setAddOpen(true) }}
+              onClick={openAdd}
               className="rounded-full mt-1"
             >
               Eerste contact toevoegen
             </Button>
           )}
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((c) => (
+          {sortedFiltered.map((c) => (
             <button
               key={c.id}
               type="button"
@@ -283,6 +333,72 @@ export default function ContactsPage() {
             </button>
           ))}
         </div>
+      ) : (
+        <DataTable>
+          <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.6fr)_2rem]">
+            <SortableHeader label="Naam" sortKey="name" sort={sort} onSort={toggleSort} />
+            <SortableHeader label="Categorie" sortKey="category" sort={sort} onSort={toggleSort} />
+            <DataTableHeadCell>Telefoon</DataTableHeadCell>
+            <DataTableHeadCell>E-mail</DataTableHeadCell>
+            <span />
+          </DataTableHeader>
+          <DataTableBody>
+            {sortedFiltered.map((c) => (
+              <DataTableRow
+                key={c.id}
+                cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.6fr)_2rem]"
+                onClick={() => openDetail(c)}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                    <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
+                    {c.company && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <Badge className={cn('text-xs font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
+                    {CATEGORIES.find((cat) => cat.value === c.category)?.label ?? c.category}
+                  </Badge>
+                </div>
+                <div className="min-w-0">
+                  {c.phone ? (
+                    <a
+                      href={`tel:${c.phone}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+                    >{c.phone}</a>
+                  ) : (
+                    <span className="text-sm text-gray-400 dark:text-gray-600">—</span>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  {c.email ? (
+                    <a
+                      href={`mailto:${c.email}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+                    >{c.email}</a>
+                  ) : (
+                    <span className="text-sm text-gray-400 dark:text-gray-600">—</span>
+                  )}
+                </div>
+                <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
+                  <RowActionsMenu
+                    actions={[
+                      { label: 'Bewerken', icon: Pencil, onClick: async () => { await openDetail(c); setEditMode(true) } },
+                      { label: 'Verwijderen', icon: Trash2, danger: true, onClick: async () => { await openDetail(c); setDeleteConfirm(true) } },
+                    ]}
+                  />
+                </div>
+              </DataTableRow>
+            ))}
+          </DataTableBody>
+        </DataTable>
       )}
 
       {/* ── TOEVOEGEN — CreateDialogShell (popup) ── */}
@@ -329,6 +445,14 @@ export default function ContactsPage() {
           <Textarea className="rounded-xl resize-none" rows={3} placeholder="Bijv. goede loodgieter, werkt snel..."
             value={addForm.notes} onChange={e => setAddForm(f => ({ ...f, notes: e.target.value }))} />
         </DialogField>
+        <LinkSelectors
+          properties={properties as any[]}
+          portfolios={portfolios as any[]}
+          propertyIds={linkPropertyIds}
+          portfolioIds={linkPortfolioIds}
+          onToggleProperty={toggleLinkProperty}
+          onTogglePortfolio={toggleLinkPortfolio}
+        />
       </CreateDialogShell>
 
       {/* ── BEKIJKEN — DetailShell (slide-out, read-only by default) ── */}
@@ -341,20 +465,6 @@ export default function ContactsPage() {
           <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
             <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           </div>
-        }
-        headerActions={
-          !editMode && !deleteConfirm ? (
-            <div className="flex items-center gap-1">
-              <button type="button" onClick={enterEditMode}
-                className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 transition-colors">
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button type="button" onClick={() => setDeleteConfirm(true)}
-                className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors">
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ) : undefined
         }
         footer={
           deleteConfirm ? (
@@ -384,7 +494,19 @@ export default function ContactsPage() {
               </button>
             </div>
           ) : (
-            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end">
+            <div className="border-t border-gray-100 dark:border-neutral-800 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <button type="button" onClick={enterEditMode}
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800">
+                  <Pencil className="h-4 w-4" />
+                  Bewerken
+                </button>
+                <button type="button" onClick={() => setDeleteConfirm(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10">
+                  <Trash2 className="h-4 w-4" />
+                  Verwijderen
+                </button>
+              </div>
               <button type="button" onClick={() => setDetailContact(null)}
                 className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">
                 Sluiten
@@ -431,6 +553,15 @@ export default function ContactsPage() {
                 <Textarea className="rounded-xl resize-none" rows={3} value={editForm.notes}
                   onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />
               </DialogField>
+
+              <LinkSelectors
+                properties={properties as any[]}
+                portfolios={portfolios as any[]}
+                propertyIds={linkPropertyIds}
+                portfolioIds={linkPortfolioIds}
+                onToggleProperty={toggleLinkProperty}
+                onTogglePortfolio={toggleLinkPortfolio}
+              />
             </div>
           ) : (
             /* ── Read-only weergave ── */
@@ -464,6 +595,33 @@ export default function ContactsPage() {
                 )}
               </div>
 
+              {/* Gekoppeld aan */}
+              {(linkPropertyIds.size > 0 || linkPortfolioIds.size > 0) && (
+                <div>
+                  <p className="text-xs font-medium text-gray-400 dark:text-neutral-500 uppercase tracking-wide mb-2">Gekoppeld aan</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[...linkPropertyIds].map((id) => {
+                      const p = (properties as any[]).find((x) => x.id === id)
+                      return (
+                        <span key={`p-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-1 text-xs text-gray-700 dark:text-gray-300">
+                          <Building2 className="h-3 w-3 text-gray-400 shrink-0" />
+                          {p?.name || p?.address || 'Pand'}
+                        </span>
+                      )
+                    })}
+                    {[...linkPortfolioIds].map((id) => {
+                      const pf = (portfolios as any[]).find((x) => x.id === id)
+                      return (
+                        <span key={`pf-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-1 text-xs text-gray-700 dark:text-gray-300">
+                          <Layers className="h-3 w-3 text-gray-400 shrink-0" />
+                          {pf?.name || 'Portefeuille'}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Notities */}
               {detailContact.notes && (
                 <div>
@@ -475,6 +633,72 @@ export default function ContactsPage() {
           )
         )}
       </DetailShell>
-    </div>
+      </div>
+    </>
+  )
+}
+
+function LinkSelectors({
+  properties,
+  portfolios,
+  propertyIds,
+  portfolioIds,
+  onToggleProperty,
+  onTogglePortfolio,
+}: {
+  properties: any[]
+  portfolios: any[]
+  propertyIds: Set<string>
+  portfolioIds: Set<string>
+  onToggleProperty: (id: string) => void
+  onTogglePortfolio: (id: string) => void
+}) {
+  return (
+    <>
+      <div>
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Koppel aan panden</p>
+        {properties.length === 0 ? (
+          <p className="text-xs text-gray-400">Nog geen panden in je portefeuille.</p>
+        ) : (
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
+            {properties.map((p) => {
+              const sel = propertyIds.has(p.id)
+              return (
+                <button key={p.id} type="button" onClick={() => onToggleProperty(p.id)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#163300] border-[#163300] dark:bg-[#9FE870] dark:border-[#9FE870]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#163300]" />}
+                  </span>
+                  <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{p.name || p.address || 'Pand'}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+      <div>
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Koppel aan portefeuilles</p>
+        {portfolios.length === 0 ? (
+          <p className="text-xs text-gray-400">Nog geen portefeuilles.</p>
+        ) : (
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
+            {portfolios.map((pf) => {
+              const sel = portfolioIds.has(pf.id)
+              return (
+                <button key={pf.id} type="button" onClick={() => onTogglePortfolio(pf.id)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#163300] border-[#163300] dark:bg-[#9FE870] dark:border-[#9FE870]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#163300]" />}
+                  </span>
+                  <Layers className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{pf.name || 'Portefeuille'}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </>
   )
 }

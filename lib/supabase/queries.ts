@@ -1378,6 +1378,30 @@ export const contactQueries = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  // --- Koppelingen aan panden / portefeuilles ---
+  async getLinks(contactId: string) {
+    const { data, error } = await (supabase as any)
+      .from('contact_links')
+      .select('*')
+      .eq('contact_id', contactId);
+    if (error) throw error;
+    return (data ?? []) as any[];
+  },
+
+  async replaceLinks(contactId: string, ownerId: string, propertyIds: string[], portfolioIds: string[]) {
+    const sb = supabase as any;
+    const { error: delErr } = await sb.from('contact_links').delete().eq('contact_id', contactId);
+    if (delErr) throw delErr;
+    const rows = [
+      ...propertyIds.map((property_id) => ({ owner_id: ownerId, contact_id: contactId, property_id })),
+      ...portfolioIds.map((portfolio_id) => ({ owner_id: ownerId, contact_id: contactId, portfolio_id })),
+    ];
+    if (rows.length === 0) return [];
+    const { data, error } = await sb.from('contact_links').insert(rows).select('*');
+    if (error) throw error;
+    return (data ?? []) as any[];
+  },
 };
 
 // ============================================================================

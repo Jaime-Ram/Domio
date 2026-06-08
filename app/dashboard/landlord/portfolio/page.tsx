@@ -20,8 +20,10 @@ import {
   Layers,
   X,
   Search,
+  Trash2,
 } from 'lucide-react'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries, portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
@@ -55,6 +57,7 @@ import { NewPropertyDialog } from '@/components/portfolio/new-property-dialog'
 import { PropertyDetailSheet } from '@/components/portfolio/property-detail-sheet'
 import { NewPortfolioDialog } from '@/components/portfolio/new-portfolio-dialog'
 import { AssignPropertiesDialog } from '@/components/portfolio/assign-properties-dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { mockProperties, mockPortfolios, mockLegalEntities } from '@/lib/mock-data/vastgoed'
 import { TabNav } from '@/components/ui/tab-nav'
 
@@ -134,6 +137,25 @@ export default function PortfolioPage() {
 
   const [portfolios, setPortfolios] = useState<PortfolioRow[]>([])
   const [unassigned, setUnassigned] = useState<PropertyRow[]>([])
+  const [deletePortfolio, setDeletePortfolio] = useState<PortfolioRow | null>(null)
+  const [deletingPortfolio, setDeletingPortfolio] = useState(false)
+
+  const handleDeletePortfolio = async () => {
+    if (!deletePortfolio) return
+    const pf = deletePortfolio
+    const propIds = pf.properties.map((p) => p.id)
+    setDeletingPortfolio(true)
+    try {
+      if (!isDemo) {
+        if (propIds.length > 0) await portfolioQueries.assignProperties(null, propIds)
+        await portfolioQueries.delete(pf.id)
+      }
+      setPortfolios((prev) => prev.filter((p) => p.id !== pf.id))
+      setUnassigned((prev) => [...prev, ...pf.properties])
+      setDeletePortfolio(null)
+    } catch (e) { console.error(e) }
+    finally { setDeletingPortfolio(false) }
+  }
   const [allProperties, setAllProperties] = useState<PropertyRow[]>([])
   const [legalEntities, setLegalEntities] = useState<LegalEntityRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -401,32 +423,6 @@ export default function PortfolioPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <>
-
-      {/* ── KPI strip ─────────────────────────────────────────────────────── */}
-      {!loading && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          {[
-            { Icon: Briefcase, label: 'Portefeuilles', value: portfolios.length },
-            { Icon: Building2, label: 'Objecten', value: totalObjects },
-            { Icon: Euro, label: 'Maandhuur', value: `€${totalMonthlyRent.toLocaleString('nl-NL')}` },
-            { Icon: Home, label: 'Bezetting', value: `${occupancyRate}%` },
-          ].map(({ Icon, label, value }) => (
-            <div
-              key={label}
-              className="bg-[#f4f4f4] dark:bg-neutral-800 rounded-2xl px-4 pt-3 pb-4 flex flex-col justify-between min-h-[110px]"
-            >
-              <div className="flex justify-end">
-                <Icon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight">{value}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-0.5">{label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
       <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
         <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -602,7 +598,16 @@ export default function PortfolioPage() {
                                 </div>
                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">{occ}%</p>
                               </div>
-                              <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 justify-self-end', isExpanded && 'rotate-180')} />
+                              <div className="flex items-center gap-1 justify-self-end">
+                                <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200', isExpanded && 'rotate-180')} />
+                                <RowActionsMenu
+                                  actions={[
+                                    { label: isExpanded ? 'Inklappen' : 'Uitklappen', icon: ChevronDown, onClick: () => setExpandedPortfolioId(isExpanded ? null : pf.id) },
+                                    { label: 'Panden toewijzen', icon: Plus, onClick: () => { setAssignPickerPortfolioId(pf.id); setAssignPickerOpen(true) } },
+                                    { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeletePortfolio(pf) },
+                                  ]}
+                                />
+                              </div>
                             </DataTableRow>
 
                             {isExpanded && (
@@ -1015,6 +1020,30 @@ export default function PortfolioPage() {
           }
         }}
       />
+
+      <Dialog open={!!deletePortfolio} onOpenChange={(o) => { if (!o) setDeletePortfolio(null) }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Portefeuille verwijderen?</DialogTitle>
+            <DialogDescription>
+              {(deletePortfolio?.properties.length ?? 0) > 0
+                ? `De ${deletePortfolio?.properties.length} panden in "${deletePortfolio?.name}" worden losgekoppeld (niet verwijderd) en verschijnen onder "Niet ingedeeld". De portefeuille zelf wordt verwijderd.`
+                : `"${deletePortfolio?.name}" wordt verwijderd. Dit kan niet ongedaan worden gemaakt.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button type="button" onClick={() => setDeletePortfolio(null)}
+              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-3 py-2">
+              Annuleren
+            </button>
+            <button type="button" onClick={handleDeletePortfolio} disabled={deletingPortfolio}
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2 transition-colors">
+              <Trash2 className="h-4 w-4" />
+              {deletingPortfolio ? 'Verwijderen…' : 'Verwijderen'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

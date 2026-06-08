@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   contactQueries,
   propertyQueries,
+  portfolioQueries,
   mjopQueries,
   ticketQueries,
   leaseQueries,
@@ -14,6 +15,7 @@ import {
 export const QK = {
   contacts:       (ownerId: string) => ['contacts', ownerId]       as const,
   properties:     (ownerId: string) => ['properties', ownerId]     as const,
+  portfolios:     (ownerId: string) => ['portfolios', ownerId]     as const,
   tickets:        (ownerId: string) => ['tickets', ownerId]        as const,
   leases:         (ownerId: string) => ['leases', ownerId]         as const,
   mjopBuildings:  (ownerId: string) => ['mjop-buildings', ownerId] as const,
@@ -95,6 +97,15 @@ export function useMjopElementTypes() {
     queryKey: QK.mjopElementTypes(),
     queryFn:  () => mjopQueries.getElementTypes(),
     staleTime: 10 * 60_000, // catalogus verandert zelden
+  })
+}
+
+export function usePortfolios(ownerId: string | undefined) {
+  return useQuery({
+    queryKey: QK.portfolios(ownerId ?? ''),
+    queryFn:  () => portfolioQueries.getByOwner(ownerId!),
+    enabled:  !!ownerId,
+    staleTime: STALE,
   })
 }
 

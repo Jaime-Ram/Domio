@@ -15,6 +15,8 @@ import {
   Mail,
   RotateCcw,
   Loader2,
+  Eye,
+  Trash2,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import { cn } from '@/lib/utils'
@@ -27,6 +29,7 @@ import {
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { DialogField } from '@/components/ui/dialog-field'
@@ -73,6 +76,19 @@ function TenantsPageContent() {
   })
   const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [newTenantOpen, setNewTenantOpen] = useState(false)
+  const [deleteTenant, setDeleteTenant] = useState<TenantRow | null>(null)
+  const [deletingTenant, setDeletingTenant] = useState(false)
+
+  const handleDeleteTenant = async () => {
+    if (!deleteTenant) return
+    setDeletingTenant(true)
+    try {
+      if (!isDemo) await tenantQueries.delete(deleteTenant.id)
+      setTenants((prev) => prev.filter((t) => t.id !== deleteTenant.id))
+      setDeleteTenant(null)
+    } catch (e) { console.error(e) }
+    finally { setDeletingTenant(false) }
+  }
   const [leaseLinkError, setLeaseLinkError] = useState<string | null>(null)
 
 
@@ -394,11 +410,11 @@ function TenantsPageContent() {
                         <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{tenant.name}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
                         <a
                           href={`mailto:${tenant.email}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="text-xs text-gray-500 dark:text-gray-400 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+                          className="inline-block max-w-full text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5 hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
                         >{tenant.email}</a>
                       </div>
                     </div>
@@ -475,7 +491,15 @@ function TenantsPageContent() {
                         </button>
                       )}
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                    <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
+                      <RowActionsMenu
+                        actions={[
+                          { label: 'Bekijken', icon: Eye, onClick: () => setSelectedTenantId(tenant.id) },
+                          { label: 'Portaaluitnodiging sturen', icon: Mail, onClick: () => sendInvite(tenant.id) },
+                          { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeleteTenant(tenant) },
+                        ]}
+                      />
+                    </div>
                   </DataTableRow>
                 ))}
               </DataTableBody>
@@ -533,6 +557,28 @@ function TenantsPageContent() {
         open={!!selectedTenantId}
         onClose={() => setSelectedTenantId(null)}
       />
+
+      <Dialog open={!!deleteTenant} onOpenChange={(o) => { if (!o) setDeleteTenant(null) }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Huurder verwijderen?</DialogTitle>
+            <DialogDescription>
+              {deleteTenant?.name} wordt permanent verwijderd. Dit kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button type="button" onClick={() => setDeleteTenant(null)}
+              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-3 py-2">
+              Annuleren
+            </button>
+            <button type="button" onClick={handleDeleteTenant} disabled={deletingTenant}
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2 transition-colors">
+              {deletingTenant ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Verwijderen
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

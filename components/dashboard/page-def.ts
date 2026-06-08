@@ -36,8 +36,9 @@ export function getPageDef(rel: string, firstName: string): PageDef {
     ],
   }
   if (rel.startsWith('/tenants')) return { title: 'Huurders' }
-  if (rel.startsWith('/portfolio')) return { title: 'Portefeuille' }
-  if (rel.startsWith('/tasks')) return { title: 'Taken' }
+  if (rel.startsWith('/contacts')) return { title: 'Contactboek' }
+  if (rel.startsWith('/portfolio')) return { title: 'Portefeuille', noDivider: true }
+  if (rel.startsWith('/tasks')) return { title: 'Taken', noDivider: true }
   if (rel.startsWith('/documents')) return { title: 'Documenten' }
   if (rel.startsWith('/flows')) return { title: 'Flows', noDivider: true }
   if (rel.startsWith('/mjop')) return { title: 'MJOP', noDivider: true }
