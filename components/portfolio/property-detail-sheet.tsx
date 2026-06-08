@@ -363,10 +363,10 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
         </div>
       }
       footer={
-        <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end gap-3 shrink-0">
-          {editError && <p className="text-xs text-red-500 flex-1">{editError}</p>}
+        <div className="border-t border-gray-100 dark:border-neutral-800 px-6 py-4 shrink-0">
+          {editError && <p className="text-xs text-red-500 mb-2">{editError}</p>}
           {isEditing ? (
-            <>
+            <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => { setIsEditing(false); if (property) initEditForm(property) }}
@@ -383,15 +383,52 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                 {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Opslaan
               </button>
-            </>
+            </div>
           ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1"
-            >
-              Sluiten
-            </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Bewerken
+                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Verwijderen
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Pand verwijderen?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Dit verwijdert het pand en alle bijbehorende eenheden permanent. Deze actie kan niet ongedaan worden gemaakt.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+                        {deleting ? 'Bezig…' : 'Verwijderen'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1"
+              >
+                Sluiten
+              </button>
+            </div>
           )}
         </div>
       }
@@ -443,15 +480,6 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Objectgegevens</p>
-                    {!isEditing && (
-                      <button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
-                      >
-                        Bewerken
-                      </button>
-                    )}
                   </div>
 
                   {isEditing ? (
@@ -532,34 +560,6 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                         </div>
                       </div>
 
-                      {/* Delete */}
-                      <div className="pt-2">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button type="button" className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 font-medium flex items-center gap-1.5 transition-colors">
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Pand verwijderen
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Pand verwijderen?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Dit verwijdert het pand en alle bijbehorende eenheden permanent. Deze actie kan niet ongedaan worden gemaakt.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleDelete}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                {deleting ? 'Bezig…' : 'Verwijderen'}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
                     </div>
                   ) : (
                     <div className="space-y-3">

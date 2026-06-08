@@ -556,6 +556,7 @@ function TenantsPageContent() {
         tenantId={selectedTenantId}
         open={!!selectedTenantId}
         onClose={() => setSelectedTenantId(null)}
+        onDeleted={(id) => setTenants((prev) => prev.filter((t) => t.id !== id))}
       />
 
       <Dialog open={!!deleteTenant} onOpenChange={(o) => { if (!o) setDeleteTenant(null) }}>
