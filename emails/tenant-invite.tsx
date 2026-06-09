@@ -63,9 +63,15 @@ export default function TenantInviteEmail({
       <Hr style={emailStyles.divider} />
 
       <Text style={emailStyles.small}>
-        Link is {expiresInHours} uur geldig. Werkt de knop niet? Kopieer:
+        Deze uitnodiging is {expiresInHours} uur geldig. Werkt de knop niet?{' '}
+        <Link
+          href={portalUrl}
+          style={{ color: '#888888', textDecoration: 'underline', fontFamily: emailStyles.font }}
+        >
+          Open de uitnodiging hier
+        </Link>
+        .
       </Text>
-      <Text style={emailStyles.monoLink}>{portalUrl}</Text>
 
     </EmailLayout>
   )
