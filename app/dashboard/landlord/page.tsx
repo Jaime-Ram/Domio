@@ -13,7 +13,7 @@ import {
 } from '@/lib/mock-data/domio-dashboard'
 import { ActionListRow } from '@/components/ui/action-list'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { ticketQueries } from '@/lib/supabase/queries'
+import { ticketQueries, propertyQueries, tenantQueries } from '@/lib/supabase/queries'
 
 const incomeHistory = [
   { month: 'Okt', income: 26200, costs: 4800 },
@@ -82,12 +82,40 @@ function isSlaOver(t: LiveTicket) {
   return deadline.getTime() < Date.now()
 }
 
+function MetricItem({ label, value, href }: { label: string; value: React.ReactNode; href?: string }) {
+  const inner = (
+    <>
+      <p className="text-xs text-gray-400 dark:text-gray-500 leading-none mb-1.5">{label}</p>
+      <p className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] leading-none">{value}</p>
+    </>
+  )
+  return href ? <Link href={href} className="group">{inner}</Link> : <div>{inner}</div>
+}
+
 export default function EmployerDashboardPage() {
   const { user, isDemo } = useDashboardUser()
   const [period, setPeriod] = useState<Period>('Maand')
   const [dismissed, setDismissed] = useState<string[]>([])
   const [checkedTasks, setCheckedTasks] = useState<string[]>([])
   const [liveTickets, setLiveTickets] = useState<LiveTicket[] | null>(null)
+  const [kpi, setKpi] = useState({ panden: 0, huurders: 0, bezetting: 0 })
+
+  useEffect(() => {
+    if (isDemo) { setKpi({ panden: 12, huurders: 18, bezetting: 92 }); return }
+    if (!user?.id) return
+    Promise.all([
+      propertyQueries.getByOwner(user.id),
+      tenantQueries.getByOwner(user.id),
+    ]).then(([props, tenants]) => {
+      const totalUnits = (props ?? []).reduce((s: number, p: any) => s + (p.units?.length ?? 0), 0)
+      const actieveHuurders = (tenants ?? []).filter((t: any) => !t.status || t.status === 'actief').length
+      setKpi({
+        panden: (props ?? []).length,
+        huurders: actieveHuurders,
+        bezetting: totalUnits > 0 ? Math.min(100, Math.round((actieveHuurders / totalUnits) * 100)) : 0,
+      })
+    }).catch(() => {})
+  }, [user?.id, isDemo])
 
   useEffect(() => {
     if (isDemo || !user?.id) return
@@ -115,13 +143,12 @@ export default function EmployerDashboardPage() {
   const incomeDelta = monthlyFinancials.huurinkomsten - 27900
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-start">
+    <div className="flex flex-col gap-8">
 
-      {/* ——— Links ——— */}
-      <div className="flex flex-col gap-8 min-w-0">
-
-        {/* Huurinkomsten chart */}
-        <div>
+      {/* KPI-kaart — volledige breedte, eerste blok */}
+      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 flex flex-col lg:flex-row">
+          {/* Links: grafiek */}
+          <div className="flex flex-col flex-1 min-w-0 p-5">
           <div className="flex items-center justify-between mb-1">
             <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
             <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-neutral-800 rounded-full p-0.5">
@@ -180,7 +207,24 @@ export default function EmployerDashboardPage() {
               <Area type="monotone" dataKey="costs" stroke="#9FE870" strokeWidth={1.5} fill="url(#costsGradient)" dot={false} activeDot={{ r: 3, fill: '#9FE870' }} />
             </AreaChart>
           </ResponsiveContainer>
+          </div>
+
+          {/* Divider */}
+          <div className="hidden lg:block w-px bg-gray-100 dark:bg-neutral-700 my-5 shrink-0" />
+
+          {/* Rechts: kerncijfers */}
+          <div className="flex flex-row lg:flex-col justify-around gap-4 px-5 lg:px-6 py-4 lg:py-5 lg:w-48 shrink-0 border-t lg:border-t-0 border-gray-100 dark:border-neutral-700">
+            <MetricItem label="Panden" value={kpi.panden} href="/dashboard/landlord/portfolio" />
+            <MetricItem label="Huurders" value={kpi.huurders} href="/dashboard/landlord/tenants" />
+            <MetricItem label="Bezetting" value={`${kpi.bezetting}%`} />
+          </div>
         </div>
+
+      {/* Daaronder: 2-koloms layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-start">
+
+        {/* ——— Links ——— */}
+        <div className="flex flex-col gap-8 min-w-0">
 
         {/* Recente activiteit */}
         <div>
@@ -404,6 +448,7 @@ export default function EmployerDashboardPage() {
         )}
 
       </div>
+    </div>
     </div>
   )
 }

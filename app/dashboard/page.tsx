@@ -1,10 +1,10 @@
+// Deze route wordt door de proxy (middleware) doorgestuurd naar het juiste
+// dashboard op basis van de rol. Tot die redirect rendert een neutrale,
+// rustige laadstaat in plaats van ruwe tekst.
 export default function DashboardPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">Loading...</h1>
-        <p className="text-gray-600">Redirecting to dashboard...</p>
-      </div>
+    <div className="min-h-screen w-full bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-neutral-700 border-t-[#163300] dark:border-t-[#9FE870] animate-spin" />
     </div>
   )
 }

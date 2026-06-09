@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -53,6 +53,9 @@ export function ContentHeader({
 
   const [menusReady, setMenusReady] = useState(false)
   const [sub, setSub] = useState<Subscription | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { setMenusReady(true) }, [])
   useEffect(() => {
@@ -85,19 +88,34 @@ export function ContentHeader({
           <Menu className="h-[18px] w-[18px]" />
         </button>
 
-        {/* Search bar */}
-        <div className="flex-1 max-w-[420px]">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-[16px] w-[16px] text-gray-400 dark:text-neutral-500" />
+        <div className="flex-1" />
+
+        {/* Search — uitklappend icoon */}
+        <div className="flex flex-row-reverse items-center">
+          <button
+            type="button"
+            onClick={() => { setSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
+            className={cn(iconBtnCls, search && 'text-[#163300] dark:text-[#9FE870]')}
+            title="Zoeken"
+          >
+            <Search className="h-[18px] w-[18px]" />
+          </button>
+          <div className={cn(
+            'overflow-hidden transition-all duration-200 ease-out',
+            searchOpen ? 'max-w-[200px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
+          )}>
             <input
+              ref={searchInputRef}
               type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onBlur={() => { if (!search) setSearchOpen(false) }}
+              onKeyDown={(e) => { if (e.key === 'Escape') { setSearch(''); setSearchOpen(false) } }}
               placeholder="Zoeken…"
-              className="h-[34px] w-full rounded-full bg-gray-100 dark:bg-neutral-800 pl-9 pr-4 text-[13px] text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#163300]/15 dark:focus:ring-[#9FE870]/15"
+              className="h-[34px] w-[200px] rounded-full bg-gray-100 dark:bg-neutral-800 px-4 text-[13px] text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#163300]/15 dark:focus:ring-[#9FE870]/15"
             />
           </div>
         </div>
-
-        <div className="flex-1" />
 
         {/* Help */}
         <Link href={`${basePath}/hulp`} className={iconBtnCls} title="Hulp">

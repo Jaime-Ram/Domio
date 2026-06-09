@@ -133,6 +133,7 @@ function LoginContent() {
       }
 
       setTransitioning(true)
+      router.replace('/dashboard')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       setError(translateAuthError(msg))
@@ -148,6 +149,7 @@ function LoginContent() {
       const { error: verifyError } = await verifyMfa(totpFactorId, totpCode)
       if (verifyError) throw verifyError
       setTransitioning(true)
+      router.replace('/dashboard')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       setError(translateAuthError(msg))
@@ -171,6 +173,7 @@ function LoginContent() {
       if (!res.ok) throw new Error(data.error || 'Code ongeldig of verlopen')
       document.cookie = 'two_fa_verified=1; path=/; max-age=86400; SameSite=Lax'
       setTransitioning(true)
+      router.replace('/dashboard')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       setError(translateAuthError(msg))
@@ -230,13 +233,7 @@ function LoginContent() {
   }
 
   if (transitioning) {
-    return (
-      <AuthLoadingScreen
-        onAnimationComplete={() => {
-          router.push('/dashboard')
-        }}
-      />
-    )
+    return <AuthLoadingScreen />
   }
 
   return (
