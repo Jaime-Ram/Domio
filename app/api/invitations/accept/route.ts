@@ -5,30 +5,51 @@ import { verifyInvitationToken } from '@/lib/invitations'
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, password } = await req.json()
-    if (!token) {
-      return NextResponse.json({ error: 'token is verplicht' }, { status: 400 })
-    }
-
-    // Verify JWT
-    let payload
-    try {
-      payload = await verifyInvitationToken(token)
-    } catch {
-      return NextResponse.json({ error: 'Uitnodigingslink is verlopen of ongeldig.' }, { status: 400 })
+    const { token, invitationId: bodyInvitationId, password } = await req.json()
+    if (!token && !bodyInvitationId) {
+      return NextResponse.json({ error: 'token of invitationId is verplicht' }, { status: 400 })
     }
 
     const admin = createAdminClient()
     if (!admin) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
 
     const db = admin as any
-    const email = payload.email.toLowerCase()
+
+    // Bepaal welke uitnodiging het betreft + het bijbehorende e-mailadres.
+    // Via e-maillink: token (JWT bewijst e-mailbezit, wachtwoord mag).
+    // In-app (al ingelogd): invitationId — altijd de password-loze authed flow.
+    let invitationDbId: string
+    let tenantId: string
+    let email: string
+    const authedOnly = !token // invitationId-pad vereist een ingelogde sessie
+
+    if (token) {
+      let payload
+      try {
+        payload = await verifyInvitationToken(token)
+      } catch {
+        return NextResponse.json({ error: 'Uitnodigingslink is verlopen of ongeldig.' }, { status: 400 })
+      }
+      invitationDbId = payload.invitationId
+      tenantId = payload.tenantId
+      email = payload.email.toLowerCase()
+    } else {
+      const { data: inv } = await db
+        .from('tenant_invitations')
+        .select('id, tenant_id, email, status')
+        .eq('id', bodyInvitationId)
+        .single()
+      if (!inv) return NextResponse.json({ error: 'Uitnodiging niet gevonden.' }, { status: 404 })
+      invitationDbId = inv.id
+      tenantId = inv.tenant_id
+      email = (inv.email ?? '').toLowerCase()
+    }
 
     // Check invitation is still pending
     const { data: invitation } = await db
       .from('tenant_invitations')
       .select('id, status, email')
-      .eq('id', payload.invitationId)
+      .eq('id', invitationDbId)
       .single()
 
     if (!invitation) return NextResponse.json({ error: 'Uitnodiging niet gevonden.' }, { status: 404 })
@@ -39,7 +60,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
     let userId: string
 
-    if (!password) {
+    if (authedOnly || !password) {
       // ── Pad 1: al ingelogd, accepteer in één klik ──
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -77,7 +98,7 @@ export async function POST(req: NextRequest) {
         if (createError) throw createError
         userId = newUser.user.id
 
-        const { data: tenantData } = await db.from('tenants').select('full_name').eq('id', payload.tenantId).single()
+        const { data: tenantData } = await db.from('tenants').select('full_name').eq('id', tenantId).single()
         await admin.from('profiles').upsert({
           id: userId,
           email,
@@ -91,13 +112,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Link profile_id to tenant record
-    await db.from('tenants').update({ profile_id: userId }).eq('id', payload.tenantId)
+    await db.from('tenants').update({ profile_id: userId }).eq('id', tenantId)
 
     // Mark invitation as accepted
     await db
       .from('tenant_invitations')
       .update({ status: 'accepted', accepted_at: new Date().toISOString() })
-      .eq('id', payload.invitationId)
+      .eq('id', invitationDbId)
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

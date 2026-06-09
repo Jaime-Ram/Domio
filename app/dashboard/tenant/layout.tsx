@@ -6,6 +6,7 @@ import { ContentHeader } from '@/components/dashboard/content-header'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/Logo'
 import { DashboardUserProvider } from '@/providers/dashboard-user-provider'
+import { PendingInvitationPopup } from '@/components/portal/pending-invitation-popup'
 import { MobileAppOnlyScreen } from '@/components/auth/mobile-app-only-screen'
 import { DASHBOARD_PAGE_GUTTER_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 import {
@@ -125,6 +126,7 @@ function TenantLayoutInner({ children }: { children: React.ReactNode }) {
         }}
       >
         <DashboardUserProvider>
+          <PendingInvitationPopup />
           <ContentHeader
             onMenuClick={() => setSidebarOpen(true)}
             basePath={TENANT_BASE_PATH}
