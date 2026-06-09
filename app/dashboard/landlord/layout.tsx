@@ -188,7 +188,7 @@ function EmployerLayoutInner({
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
-                'mx-auto max-w-7xl px-4 sm:px-6 lg:px-6 flex flex-col h-full min-h-0',
+                'mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 flex flex-col h-full min-h-0',
                 isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
               )}
             >

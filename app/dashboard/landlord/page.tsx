@@ -24,7 +24,6 @@ const incomeHistory = [
   { month: 'Mrt', income: 28400, costs: 5000 },
 ]
 
-type Period = 'Week' | 'Maand' | 'Jaar'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n)
@@ -46,13 +45,14 @@ function SectionLabel({ children, href }: { children: React.ReactNode; href?: st
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 shadow-soft px-3 py-2.5 text-sm">
-      <p className="font-medium text-gray-900 dark:text-white mb-1">{label}</p>
+    <div className="rounded-xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 shadow-soft px-3 py-2.5 text-xs space-y-1">
+      <p className="font-medium text-gray-700 dark:text-white mb-1">{label}</p>
       {payload.map((p) => (
-        <p key={p.name} className="text-gray-500 dark:text-gray-400">
-          {p.name === 'income' ? 'Inkomsten' : 'Kosten'}:{' '}
-          <span className="font-semibold text-[#163300] dark:text-[#9FE870]">{fmt(p.value)}</span>
-        </p>
+        <div key={p.name} className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: p.name === 'income' ? '#163300' : '#9ca3af' }} />
+          <span className="text-gray-500 dark:text-gray-400">{p.name === 'income' ? 'Inkomsten' : 'Kosten'}</span>
+          <span className="font-medium text-gray-800 dark:text-white ml-auto">{fmt(p.value)}</span>
+        </div>
       ))}
     </div>
   )
@@ -82,6 +82,21 @@ function isSlaOver(t: LiveTicket) {
   return deadline.getTime() < Date.now()
 }
 
+function TrendBadge({ value }: { value: number }) {
+  if (!value) return null
+  const up = value > 0
+  return (
+    <span className={cn('inline-flex items-center gap-0.5 text-xs font-semibold', up ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500')}>
+      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        {up
+          ? <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></>
+          : <><polyline points="23 18 13.5 8.5 8.5 13.5 1 6" /><polyline points="17 18 23 18 23 12" /></>}
+      </svg>
+      {Math.abs(value)}%
+    </span>
+  )
+}
+
 function MetricItem({ label, value, href }: { label: string; value: React.ReactNode; href?: string }) {
   const inner = (
     <>
@@ -94,14 +109,13 @@ function MetricItem({ label, value, href }: { label: string; value: React.ReactN
 
 export default function EmployerDashboardPage() {
   const { user, isDemo } = useDashboardUser()
-  const [period, setPeriod] = useState<Period>('Maand')
   const [dismissed, setDismissed] = useState<string[]>([])
   const [checkedTasks, setCheckedTasks] = useState<string[]>([])
   const [liveTickets, setLiveTickets] = useState<LiveTicket[] | null>(null)
-  const [kpi, setKpi] = useState({ panden: 0, huurders: 0, bezetting: 0 })
+  const [kpi, setKpi] = useState({ panden: 0, eenheden: 0, huurders: 0, bezetting: 0 })
 
   useEffect(() => {
-    if (isDemo) { setKpi({ panden: 12, huurders: 18, bezetting: 92 }); return }
+    if (isDemo) { setKpi({ panden: 12, eenheden: 24, huurders: 18, bezetting: 92 }); return }
     if (!user?.id) return
     Promise.all([
       propertyQueries.getByOwner(user.id),
@@ -111,6 +125,7 @@ export default function EmployerDashboardPage() {
       const actieveHuurders = (tenants ?? []).filter((t: any) => !t.status || t.status === 'actief').length
       setKpi({
         panden: (props ?? []).length,
+        eenheden: totalUnits,
         huurders: actieveHuurders,
         bezetting: totalUnits > 0 ? Math.min(100, Math.round((actieveHuurders / totalUnits) * 100)) : 0,
       })
@@ -138,47 +153,44 @@ export default function EmployerDashboardPage() {
   const dismiss = (id: string) => setDismissed(prev => [...prev, id])
   const toggleTask = (id: string) => setCheckedTasks(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
-  const periodSlice: Record<Period, number> = { 'Week': 1, 'Maand': 3, 'Jaar': 6 }
-  const chartData = incomeHistory.slice(-periodSlice[period])
+  const chartData = incomeHistory
   const incomeDelta = monthlyFinancials.huurinkomsten - 27900
+  const lastIncome = chartData[chartData.length - 1]?.income ?? 0
+  const prevIncome = chartData[chartData.length - 2]?.income ?? lastIncome
+  const incomeTrendPct = prevIncome ? Math.round(((lastIncome - prevIncome) / prevIncome) * 100) : 0
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-start">
 
-      {/* KPI-kaart — volledige breedte, eerste blok */}
+      {/* ——— Links ——— */}
+      <div className="flex flex-col gap-8 min-w-0">
+
+      {/* KPI-kaart */}
       <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 flex flex-col lg:flex-row">
           {/* Links: grafiek */}
           <div className="flex flex-col flex-1 min-w-0 p-5">
-          <div className="flex items-center justify-between mb-1">
-            <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
-            <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-neutral-800 rounded-full p-0.5">
-              {(['Week', 'Maand', 'Jaar'] as Period[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={cn(
-                    'h-6 px-2.5 rounded-full text-xs font-medium transition-all',
-                    period === p
-                      ? 'bg-white dark:bg-neutral-700 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
-                  )}
-                >
-                  {p}
-                </button>
-              ))}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="min-w-0">
+              <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
+              <div className="flex items-baseline gap-2 mt-1.5">
+                <p className="text-[32px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">
+                  {fmt(monthlyFinancials.huurinkomsten)}
+                </p>
+                <TrendBadge value={incomeTrendPct} />
+              </div>
             </div>
-          </div>
-
-          <div className="mt-2 mb-5">
-            <p className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] leading-none">
-              {fmt(monthlyFinancials.huurinkomsten)}
-            </p>
-            <p className={cn(
-              'text-sm mt-1 font-medium',
-              incomeDelta >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500',
-            )}>
-              {incomeDelta >= 0 ? '+' : ''}{fmt(incomeDelta)} deze maand
-            </p>
+            <div className="flex flex-col items-end gap-2.5 shrink-0">
+              <div className="flex items-center gap-3 text-[11px] text-gray-400 dark:text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-3 rounded-full bg-[#163300] dark:bg-[#9FE870] inline-block" />
+                  Inkomsten
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-px w-3 border-t-2 border-dashed border-gray-300 dark:border-neutral-600 inline-block" />
+                  Kosten
+                </span>
+              </div>
+            </div>
           </div>
 
           <ResponsiveContainer width="100%" height={180}>
@@ -189,8 +201,8 @@ export default function EmployerDashboardPage() {
                   <stop offset="100%" stopColor="#163300" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="costsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#9FE870" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#9FE870" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#9ca3af" stopOpacity={0.10} />
+                  <stop offset="100%" stopColor="#9ca3af" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
@@ -203,8 +215,8 @@ export default function EmployerDashboardPage() {
                 width={44}
               />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="income" stroke="#163300" strokeWidth={2} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#163300' }} />
-              <Area type="monotone" dataKey="costs" stroke="#9FE870" strokeWidth={1.5} fill="url(#costsGradient)" dot={false} activeDot={{ r: 3, fill: '#9FE870' }} />
+              <Area type="monotone" dataKey="costs" name="costs" stroke="#9ca3af" strokeWidth={1.5} strokeDasharray="4 3" fill="url(#costsGradient)" dot={false} activeDot={{ r: 3, fill: '#9ca3af' }} />
+              <Area type="monotone" dataKey="income" name="income" stroke="#163300" strokeWidth={2.5} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#163300' }} />
             </AreaChart>
           </ResponsiveContainer>
           </div>
@@ -215,16 +227,11 @@ export default function EmployerDashboardPage() {
           {/* Rechts: kerncijfers */}
           <div className="flex flex-row lg:flex-col justify-around gap-4 px-5 lg:px-6 py-4 lg:py-5 lg:w-48 shrink-0 border-t lg:border-t-0 border-gray-100 dark:border-neutral-700">
             <MetricItem label="Panden" value={kpi.panden} href="/dashboard/landlord/portfolio" />
+            <MetricItem label="Eenheden" value={kpi.eenheden} href="/dashboard/landlord/portfolio" />
             <MetricItem label="Huurders" value={kpi.huurders} href="/dashboard/landlord/tenants" />
             <MetricItem label="Bezetting" value={`${kpi.bezetting}%`} />
           </div>
         </div>
-
-      {/* Daaronder: 2-koloms layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-start">
-
-        {/* ——— Links ——— */}
-        <div className="flex flex-col gap-8 min-w-0">
 
         {/* Recente activiteit */}
         <div>
@@ -448,7 +455,6 @@ export default function EmployerDashboardPage() {
         )}
 
       </div>
-    </div>
     </div>
   )
 }

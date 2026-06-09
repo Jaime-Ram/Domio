@@ -82,7 +82,7 @@ export function ContentHeader({
 
   return (
     <header className={cn('sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur', stickyOffsetClassName)}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-6 h-14 flex items-center gap-3">
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 h-14 flex items-center gap-3">
 
         {/* Hamburger (mobile only) */}
         <button
