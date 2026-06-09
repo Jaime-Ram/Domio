@@ -15,6 +15,9 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Search,
+  Columns3,
+  Table2,
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isBefore, isAfter, parseISO } from 'date-fns'
 import { nl } from 'date-fns/locale'
@@ -30,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import {
@@ -65,6 +69,9 @@ import {
 import {
   DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
+  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  dashboardCardClass,
 } from '@/app/dashboard/landlord/dashboard-ui'
 import { supabase } from '@/lib/supabase/client'
 
