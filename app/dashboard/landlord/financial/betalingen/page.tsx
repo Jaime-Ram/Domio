@@ -5,25 +5,10 @@ import { RefreshCw, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { type TransactionRow, type PropertyHierarchy } from '@/components/finance/TransactionsInbox'
 import { GeldstromenPanel, type GeldstromenPanelRef } from '@/components/finance/GeldstromenPanel'
-import { AddPaymentTile } from '@/components/finance/add-payment-tile'
-import { MetricCard } from '@/components/finance/MetricCard'
-import { CoinsStacked01, BarChart01, CalendarCheck01 } from '@untitledui/icons'
-
-interface KpiData {
-  totalReceived: number
-  receivedThisMonth: number
-  expectedThisMonth: number
-}
-
-const formatEur = (amount: number) =>
-  new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount)
-
-
 export default function GeldstromenPage() {
   const panelRef = useRef<GeldstromenPanelRef>(null)
   const [transactions, setTransactions] = useState<TransactionRow[]>([])
   const [properties, setProperties] = useState<PropertyHierarchy[]>([])
-  const [kpis, setKpis] = useState<KpiData | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ imported: number; skipped: number } | null>(null)
@@ -31,12 +16,7 @@ export default function GeldstromenPage() {
   const [noConnection, setNoConnection] = useState(false)
 
   const fetchData = async () => {
-    const now = new Date()
-    const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-    const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`
-
-    const [txRes, propRes, expRes] = await Promise.all([
+    const [txRes, propRes] = await Promise.all([
       supabase
         .from('payments')
         .select(`
@@ -88,15 +68,10 @@ export default function GeldstromenPage() {
           )
         `)
         .order('name'),
-      supabase
-        .from('rent_expectations')
-        .select('amount_expected')
-        .eq('due_period', monthStart),
     ])
 
     if (txRes.error) console.error('[betalingen] payments:', txRes.error.message, txRes.error.code, txRes.error.details)
     if (propRes.error) console.error('[betalingen] properties:', propRes.error.message, propRes.error.code)
-    if (expRes.error) console.error('[betalingen] rent_expectations:', expRes.error.message, expRes.error.code)
 
     // Build lookup maps from properties data for resolving names
     const propById = new Map<string, { name: string; address: string }>()
@@ -188,15 +163,6 @@ export default function GeldstromenPage() {
       })),
     }))
 
-    const totalReceived = txRows.reduce((s, tx) => s + Number(tx.amount), 0)
-    const receivedThisMonth = txRows
-      .filter(tx => tx.value_date && tx.value_date >= monthStart && tx.value_date < monthEnd)
-      .reduce((s, tx) => s + Number(tx.amount), 0)
-    const expectedThisMonth = (expRes.data ?? []).reduce(
-      (s, e: any) => s + Number(e.amount_expected), 0
-    )
-
-    setKpis({ totalReceived, receivedThisMonth, expectedThisMonth })
     setTransactions(txRows)
     setProperties(propHierarchy)
     setLoading(false)
@@ -273,26 +239,7 @@ export default function GeldstromenPage() {
 
   return (
     <>
-      {kpis && (
-        <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            label="Totaal ontvangen"
-            value={formatEur(kpis.totalReceived)}
-            icon={<CoinsStacked01 />}
-          />
-          <MetricCard
-            label="Ontvangen deze maand"
-            value={formatEur(kpis.receivedThisMonth)}
-            icon={<BarChart01 />}
-          />
-          <MetricCard
-            label="Verwacht deze maand"
-            value={formatEur(kpis.expectedThisMonth)}
-            icon={<CalendarCheck01 />}
-          />
-          <AddPaymentTile onClick={() => panelRef.current?.openPaymentForm()} />
-        </div>
-      )}
+      {/* Metrics tiles temporarily disabled */}
 
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">

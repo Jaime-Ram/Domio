@@ -33,11 +33,7 @@ export function PageTitleBar({ basePath = '/dashboard/landlord' }: PageTitleBarP
   const displayTab = optimisticTab ?? activeTabPath ?? pageDef.tabs?.[0].path ?? ''
 
   return (
-    <div className={pageDef.noDivider ? '' : 'pb-8'}>
-      <h1 className="pt-7 pb-3 text-[30px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">
-        {pageDef.title}
-      </h1>
-
+    <div className={pageDef.noDivider ? 'pt-4' : 'pt-4 pb-6'}>
       {pageDef.tabs ? (
         <TabNav
           tabs={pageDef.tabs.map((t) => ({ id: t.path, label: t.label }))}
@@ -49,7 +45,9 @@ export function PageTitleBar({ basePath = '/dashboard/landlord' }: PageTitleBarP
           className="w-full"
         />
       ) : !pageDef.noDivider ? (
-        <div className="border-b border-gray-100 dark:border-neutral-800" />
+        <div className="h-8 flex items-end">
+          <div className="w-full h-px bg-gray-100 dark:bg-neutral-800" />
+        </div>
       ) : null}
     </div>
   )

@@ -17,7 +17,6 @@ export function getPageDef(rel: string, firstName: string): PageDef {
       { label: 'Betalingen', path: '/financial/betalingen' },
       { label: 'Achterstanden', path: '/financial/achterstanden' },
       { label: 'Huurafrekeningen', path: '/financial/huurafrekening' },
-      { label: 'Verdeelsleutel', path: '/financial/verdeelsleutel' },
     ],
   }
   if (rel.startsWith('/compliance')) return {

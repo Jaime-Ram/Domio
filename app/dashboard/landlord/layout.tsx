@@ -61,7 +61,7 @@ export default function EmployerDashboardLayout({
   return (
     <QueryProvider>
     <DocumentPreviewProvider>
-      <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
+      <div className="relative flex h-screen overflow-hidden w-full flex-col bg-white dark:bg-gray-900">
         <div
           className="pointer-events-none fixed inset-0 z-[100] bg-[#9FE870] transition-opacity"
           style={{
@@ -188,7 +188,7 @@ function EmployerLayoutInner({
           <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
-                'mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 flex flex-col h-full min-h-0',
+                'mx-auto max-w-7xl px-4 sm:px-6 lg:px-6 flex flex-col h-full min-h-0',
                 isChatShell ? 'pb-4 sm:pb-6' : 'pb-16'
               )}
             >

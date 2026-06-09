@@ -27,7 +27,32 @@ import { cn } from '@/lib/utils'
  *   </DataTable>
  */
 
-export function DataTable({ children, className }: { children: React.ReactNode; className?: string }) {
+export function DataTable({
+  children,
+  className,
+  fill,
+}: {
+  children: React.ReactNode
+  className?: string
+  /**
+   * Vul-modus: de tabel wordt één kaart die de beschikbare hoogte vult.
+   * Header blijft staan (gebruik `sticky` op `DataTableHeader`), alleen de
+   * rijen scrollen. De ouder moet een begrensde hoogte hebben (flex + min-h-0).
+   */
+  fill?: boolean
+}) {
+  if (fill) {
+    return (
+      <div
+        className={cn(
+          'flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900',
+          className,
+        )}
+      >
+        <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
+      </div>
+    )
+  }
   return (
     <div className={cn('rounded-2xl overflow-hidden', className)}>
       {children}

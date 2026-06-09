@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
+import { useState, useMemo, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  Search,
   Building2,
   Home,
   User,
@@ -21,7 +20,6 @@ import {
   Pencil,
   ChevronDown,
   ChevronLeft,
-  ChevronsUpDown,
   AlertTriangle,
   Tag,
   Trash2,
@@ -49,27 +47,26 @@ import {
 } from '@/components/ui/add-dialog-layout'
 import { DetailShell } from '@/components/ui/detail-shell'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { DialogField } from '@/components/ui/dialog-field'
 import {
   DataTable,
   DataTableHeader,
-  DataTableHeadCell,
   DataTableBody,
   DataTableRow,
   DataTableEmpty,
 } from '@/components/ui/data-table'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
+import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import {
-  dashboardCardClass,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-} from '@/app/dashboard/landlord/dashboard-ui'
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu'
+import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 
 
 // ─── Constants ────────────────────────────────────────────────────────
 
-type Filter = 'all' | 'inkomsten' | 'kosten' | 'unmatched'
 type RightPanelMode = 'empty' | 'detail'
 
 // Fixed icons for the built-in category ids; custom categories fall back to Tag
@@ -132,8 +129,11 @@ export interface GeldstromenPanelRef {
 export const GeldstromenPanel = forwardRef<GeldstromenPanelRef, GeldstromenPanelProps>(function GeldstromenPanel({ transactions, properties, onRefresh, headerActions }, ref) {
   const { user, isDemo } = useDashboardUser()
   const { categories: txCategories, addCategory, deleteCategory, renameCategory } = useTransactionCategories()
-  const [filter, setFilter] = useState<Filter>('all')
+  const { sort, toggleSort } = useSortable<string>()
   const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState({ inkomsten: true, kosten: true })
+  const [matchFilter, setMatchFilter] = useState({ gekoppeld: true, nietGekoppeld: true })
+  const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null)
   const [rightMode, setRightMode] = useState<RightPanelMode>('empty')
 
@@ -203,11 +203,6 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useImperativeHandle(ref, () => ({ openPaymentForm: handleShowManualPaymentForm }))
 
-  // Tab indicator refs
-  const tabsContainerRef = useRef<HTMLDivElement>(null)
-  const filterButtonRefs = useRef<Partial<Record<Filter, HTMLButtonElement | null>>>({})
-  const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
-
   const selectedTx = useMemo(() =>
     transactions.find(tx => tx.id === selectedTxId) ?? null,
     [transactions, selectedTxId]
@@ -215,34 +210,39 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   // Counts
   const counts = useMemo(() => {
-    let inkomsten = 0, kosten = 0, unmatched = 0
+    let inkomsten = 0, kosten = 0, gekoppeld = 0, nietGekoppeld = 0
     for (const tx of transactions) {
-      if (!tx.assignment) { unmatched++ }
+      if (tx.assignment) { gekoppeld++ } else { nietGekoppeld++ }
       if (Number(tx.amount) >= 0) { inkomsten++ }
       else { kosten++ }
     }
-    return { all: transactions.length, inkomsten, kosten, unmatched }
+    return { all: transactions.length, inkomsten, kosten, gekoppeld, nietGekoppeld }
+  }, [transactions])
+
+  // Unique panden across assigned transactions (for the filter dropdown)
+  const uniqueProperties = useMemo(() => {
+    return [...new Set(
+      transactions.map(tx => tx.assignment?.property_name).filter(Boolean) as string[]
+    )].sort()
   }, [transactions])
 
   // Filter + search
   const filteredTx = useMemo(() => {
-    let list = transactions
+    const q = searchQuery.toLowerCase()
+    return transactions.filter(tx => {
+      const isInkomst = Number(tx.amount) >= 0
+      if (isInkomst && !typeFilter.inkomsten) return false
+      if (!isInkomst && !typeFilter.kosten) return false
 
-    // Tab filter
-    if (filter === 'inkomsten') {
-      list = list.filter(tx => Number(tx.amount) >= 0)
-    } else if (filter === 'kosten') {
-      list = list.filter(tx => Number(tx.amount) < 0)
-    } else if (filter === 'unmatched') {
-      list = list.filter(tx => !tx.assignment)
-    }
+      if (tx.assignment && !matchFilter.gekoppeld) return false
+      if (!tx.assignment && !matchFilter.nietGekoppeld) return false
 
-    // Search
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      list = list.filter(tx => {
+      const propName = tx.assignment?.property_name ?? null
+      if (propName && propertyFilter[propName] === false) return false
+
+      if (searchQuery) {
         const amountStr = formatEur(tx.amount).toLowerCase()
-        return (
+        const match =
           (tx.counterparty_name ?? '').toLowerCase().includes(q) ||
           (tx.counterparty_iban ?? '').toLowerCase().includes(q) ||
           (tx.description ?? '').toLowerCase().includes(q) ||
@@ -250,22 +250,20 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           String(tx.amount).includes(q) ||
           (tx.assignment?.tenant_name ?? '').toLowerCase().includes(q) ||
           (tx.assignment?.property_name ?? '').toLowerCase().includes(q)
-        )
-      })
-    }
+        if (!match) return false
+      }
+      return true
+    })
+  }, [transactions, typeFilter, matchFilter, propertyFilter, searchQuery])
 
-    return list
-  }, [transactions, filter, searchQuery])
-
-  // Tab indicator
-  useEffect(() => {
-    const container = tabsContainerRef.current
-    const btn = filterButtonRefs.current[filter]
-    if (!container || !btn) return
-    const containerRect = container.getBoundingClientRect()
-    const btnRect = btn.getBoundingClientRect()
-    setTabIndicator({ left: btnRect.left - containerRect.left, width: btnRect.width })
-  }, [filter, counts.all, counts.inkomsten, counts.kosten, counts.unmatched])
+  const sortedTx = applySortedRows(filteredTx, sort, (tx, k) => {
+    if (k === 'description') return tx.description ?? tx.counterparty_name ?? ''
+    if (k === 'category') return tx.assignment?.category ? getCategoryLabel(tx.assignment.category) : ''
+    if (k === 'property') return tx.assignment?.property_name ?? ''
+    if (k === 'date') return tx.value_date ?? ''
+    if (k === 'amount') return tx.amount ?? 0
+    return null
+  })
 
   function handleSelectTx(tx: TransactionRow) {
     setSelectedTxId(tx.id)
@@ -531,185 +529,203 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     }
   }
 
-  const tabs: { key: Filter; label: string; count: number }[] = [
-    { key: 'all', label: 'Alle', count: counts.all },
-    { key: 'inkomsten', label: 'Inkomsten', count: counts.inkomsten },
-    { key: 'kosten', label: 'Kosten', count: counts.kosten },
-    { key: 'unmatched', label: 'Niet gekoppeld', count: counts.unmatched },
-  ]
-
   const showAssignForm = !selectedTx?.assignment || isEditing
+
+  const COLS = 'grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.75fr)_96px]'
+
+  const filterContent = (
+    <>
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        Type
+      </DropdownMenuLabel>
+      <div className="space-y-1">
+        <DropdownMenuCheckboxItem
+          checked={typeFilter.inkomsten}
+          onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, inkomsten: Boolean(v) }))}
+          onSelect={(e) => e.preventDefault()}
+          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+        >
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#2F5711' }} />
+            <span>Inkomsten</span>
+          </div>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.inkomsten}</span>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={typeFilter.kosten}
+          onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, kosten: Boolean(v) }))}
+          onSelect={(e) => e.preventDefault()}
+          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+        >
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#A8200D' }} />
+            <span>Kosten</span>
+          </div>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.kosten}</span>
+        </DropdownMenuCheckboxItem>
+      </div>
+      <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+        Koppeling
+      </DropdownMenuLabel>
+      <div className="space-y-1">
+        <DropdownMenuCheckboxItem
+          checked={matchFilter.gekoppeld}
+          onCheckedChange={(v) => setMatchFilter((f) => ({ ...f, gekoppeld: Boolean(v) }))}
+          onSelect={(e) => e.preventDefault()}
+          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+        >
+          <span>Gekoppeld</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.gekoppeld}</span>
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={matchFilter.nietGekoppeld}
+          onCheckedChange={(v) => setMatchFilter((f) => ({ ...f, nietGekoppeld: Boolean(v) }))}
+          onSelect={(e) => e.preventDefault()}
+          className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+        >
+          <span>Niet gekoppeld</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.nietGekoppeld}</span>
+        </DropdownMenuCheckboxItem>
+      </div>
+      {uniqueProperties.length > 0 && (
+        <>
+          <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+            Pand
+          </DropdownMenuLabel>
+          <div className="space-y-1">
+            {uniqueProperties.map((prop) => (
+              <DropdownMenuCheckboxItem
+                key={prop}
+                checked={propertyFilter[prop] !== false}
+                onCheckedChange={(v) => setPropertyFilter((f) => ({ ...f, [prop]: Boolean(v) }))}
+                onSelect={(e) => e.preventDefault()}
+                className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+              >
+                <span className="truncate max-w-[160px]">{prop}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {transactions.filter((t) => t.assignment?.property_name === prop).length}
+                </span>
+              </DropdownMenuCheckboxItem>
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  )
 
   return (
     <>
-    <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden flex flex-col lg:h-[calc(100vh-180px)] min-h-[500px]')}>
+      <div className="flex h-full min-h-0 flex-col gap-4">
+        <TableToolbar
+          title="Betalingen"
+          count={`${filteredTx.length} van ${transactions.length} betaling${transactions.length === 1 ? '' : 'en'}`}
+          search={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Zoek op bedrag, huurder, pand…"
+          filterContent={filterContent}
+          onAdd={handleShowManualPaymentForm}
+          addLabel="Betaling toevoegen"
+          extra={headerActions}
+        />
 
-      {/* ─── Toolbar ─── */}
-      <CardHeader className={cn(DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div
-            ref={tabsContainerRef}
-            className="relative flex w-full sm:w-auto min-w-0 overflow-x-auto text-sm border-b border-gray-200 dark:border-neutral-700 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {tabs.map((tab, index) => (
-              <button
-                key={tab.key}
-                type="button"
-                ref={(el) => { filterButtonRefs.current[tab.key] = el }}
-                onClick={() => setFilter(tab.key)}
-                className={cn(
-                  'shrink-0 flex-1 sm:flex-initial pb-2 text-left sm:text-center whitespace-nowrap transition-colors duration-200 font-semibold',
-                  index < tabs.length - 1 ? 'mr-4 sm:mr-6' : '',
-                  filter === tab.key
-                    ? 'text-[#163300] dark:text-[#9FE870]'
-                    : 'text-gray-500 dark:text-gray-400'
-                )}
-              >
-                <span>{tab.label}</span>
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]">
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-            <div
-              className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
-              style={{ left: tabIndicator.left, width: tabIndicator.width }}
-            />
-          </div>
+        <DataTable fill>
+          <DataTableHeader cols={COLS} className="sticky top-0 z-10 bg-white dark:bg-neutral-900 pt-3">
+            <SortableHeader label="Omschrijving" sortKey="description" sort={sort} onSort={toggleSort} />
+            <SortableHeader label="Categorie" sortKey="category" sort={sort} onSort={toggleSort} />
+            <SortableHeader label="Pand / Huurder" sortKey="property" sort={sort} onSort={toggleSort} />
+            <SortableHeader label="Datum" sortKey="date" sort={sort} onSort={toggleSort} />
+            <SortableHeader label="Bedrag" sortKey="amount" sort={sort} onSort={toggleSort} className="justify-self-end" />
+          </DataTableHeader>
+          <DataTableBody>
+            {sortedTx.length === 0 ? (
+              <DataTableEmpty>Geen transacties gevonden</DataTableEmpty>
+            ) : sortedTx.map(tx => {
+                const isSelected = selectedTxId === tx.id && rightMode === 'detail'
+                const isMatched = !!tx.assignment
 
-          <div className="flex items-center gap-2">
-            <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
-              <Search className="h-4 w-4 text-gray-400 shrink-0" />
-              <Input
-                placeholder="Zoek op bedrag, huurder, pand..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-              />
-            </div>
-            {headerActions}
-          </div>
+                return (
+                  <DataTableRow
+                    key={tx.id}
+                    cols={COLS}
+                    onClick={() => handleSelectTx(tx)}
+                    className={cn(
+                      isSelected && 'bg-gray-50 dark:bg-neutral-800/40'
+                    )}
+                  >
+                    {/* Omschrijving */}
+                    <div>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
+                        {tx.is_manual_transaction && (
+                          <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                            Handmatig
+                          </span>
+                        )}
+                      </div>
+                      {tx.counterparty_name && (
+                        <p className="text-xs text-gray-400 truncate mt-0.5">{tx.counterparty_name}</p>
+                      )}
+                    </div>
+
+                    {/* Categorie */}
+                    <div>
+                      {!isMatched ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
+                          <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-amber-400" />
+                          Niet gekoppeld
+                        </span>
+                      ) : (() => {
+                        const cat = tx.assignment!.category
+                        const Icon = cat ? getCategoryIcon(cat) : null
+                        return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
+                            {Icon && <Icon className="h-3 w-3 shrink-0" />}
+                            {cat ? getCategoryLabel(cat) : '—'}
+                          </span>
+                        )
+                      })()}
+                    </div>
+
+                    {/* Pand / Huurder */}
+                    <div>
+                      {tx.assignment?.property_name ? (
+                        <div className="flex items-center gap-1.5">
+                          {tx.assignment.unit_id
+                            ? <Home className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                            : <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                          }
+                          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                            {tx.assignment.unit_id
+                              ? (tx.assignment.unit_name ?? tx.assignment.property_name)
+                              : tx.assignment.property_name
+                            }
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300 dark:text-neutral-600">—</span>
+                      )}
+                    </div>
+
+                    {/* Datum */}
+                    <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {formatDate(tx.value_date)}
+                    </div>
+
+                    {/* Bedrag */}
+                    <div className="text-right">
+                      <span className={cn(
+                        'font-semibold whitespace-nowrap',
+                        tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                      )}>
+                        {formatEur(tx.amount)}
+                      </span>
+                    </div>
+                  </DataTableRow>
+                )
+              })}
+            </DataTableBody>
+          </DataTable>
         </div>
-      </CardHeader>
-
-      {/* ─── Body: table + optional detail panel ─── */}
-      <CardContent className={cn('p-0 px-0 pb-0 flex flex-col flex-1 overflow-hidden', DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
-
-        {/* ─── Table panel ─── */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-
-          {/* Table */}
-          <div className="flex-1 overflow-y-auto">
-            {(() => {
-              const COLS = 'grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.75fr)_96px]'
-              return (
-                <DataTable>
-                  <DataTableHeader cols={COLS} className="sticky top-0 z-10 bg-white dark:bg-neutral-900">
-                    <DataTableHeadCell><span className="flex items-center gap-1">Omschrijving <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
-                    <DataTableHeadCell><span className="flex items-center gap-1">Categorie <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
-                    <DataTableHeadCell><span className="flex items-center gap-1">Pand / Huurder <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
-                    <DataTableHeadCell><span className="flex items-center gap-1">Datum <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
-                    <DataTableHeadCell className="text-right"><span className="flex items-center justify-end gap-1">Bedrag <ChevronsUpDown className="h-3 w-3 opacity-40" /></span></DataTableHeadCell>
-                  </DataTableHeader>
-                  <DataTableBody>
-                    {filteredTx.length === 0 ? (
-                      <DataTableEmpty>Geen transacties gevonden</DataTableEmpty>
-                    ) : filteredTx.map(tx => {
-                      const isSelected = selectedTxId === tx.id && rightMode === 'detail'
-                      const isMatched = !!tx.assignment
-
-                      return (
-                        <DataTableRow
-                          key={tx.id}
-                          cols={COLS}
-                          onClick={() => handleSelectTx(tx)}
-                          className={cn(
-                            'border-l-2',
-                            isSelected
-                              ? 'bg-[#163300]/[0.04] dark:bg-[#9FE870]/[0.04] border-l-[#163300] dark:border-l-[#9FE870]'
-                              : 'border-l-transparent'
-                          )}
-                        >
-                          {/* Omschrijving */}
-                          <div>
-                            <div className="flex items-center gap-2 min-w-0">
-                              <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
-                              {tx.is_manual_transaction && (
-                                <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                                  Handmatig
-                                </span>
-                              )}
-                            </div>
-                            {tx.counterparty_name && (
-                              <p className="text-xs text-gray-400 truncate mt-0.5">{tx.counterparty_name}</p>
-                            )}
-                          </div>
-
-                          {/* Categorie */}
-                          <div>
-                            {!isMatched ? (
-                              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
-                                <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-amber-400" />
-                                Niet gekoppeld
-                              </span>
-                            ) : (() => {
-                              const cat = tx.assignment!.category
-                              const Icon = cat ? getCategoryIcon(cat) : null
-                              return (
-                                <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
-                                  {Icon && <Icon className="h-3 w-3 shrink-0" />}
-                                  {cat ? getCategoryLabel(cat) : '—'}
-                                </span>
-                              )
-                            })()}
-                          </div>
-
-                          {/* Pand / Huurder */}
-                          <div>
-                            {tx.assignment?.property_name ? (
-                              <div className="flex items-center gap-1.5">
-                                {tx.assignment.unit_id
-                                  ? <Home className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                                  : <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                                }
-                                <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                                  {tx.assignment.unit_id
-                                    ? (tx.assignment.unit_name ?? tx.assignment.property_name)
-                                    : tx.assignment.property_name
-                                  }
-                                </p>
-                              </div>
-                            ) : (
-                              <span className="text-gray-300 dark:text-neutral-600">—</span>
-                            )}
-                          </div>
-
-                          {/* Datum */}
-                          <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {formatDate(tx.value_date)}
-                          </div>
-
-                          {/* Bedrag */}
-                          <div className="text-right">
-                            <span className={cn(
-                              'font-semibold whitespace-nowrap',
-                              tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                            )}>
-                              {formatEur(tx.amount)}
-                            </span>
-                          </div>
-                        </DataTableRow>
-                      )
-                    })}
-                  </DataTableBody>
-                </DataTable>
-              )
-            })()}
-          </div>
-        </div>
-
-      </CardContent>
-    </Card>
 
     {/* ─── Payment detail sheet ─── */}
     <DetailShell

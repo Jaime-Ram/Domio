@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Menu, Bell, User, Mail, FileText, Wrench, LogOut, Shield,
   ExternalLink, AlertTriangle, CreditCard, Settings as SettingsIcon,
-  HelpCircle, Search,
+  HelpCircle, Search, X,
 } from 'lucide-react'
 import { getSubscriptionClient, trialDaysRemaining, type Subscription } from '@/lib/supabase/subscription'
 import {
@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils'
 import { notifications as mockNotifications } from '@/lib/mock-data/domio-dashboard'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { signOut } from '@/lib/supabase/auth'
+import { getPageDef } from './page-def'
 
 interface ContentHeaderProps {
   onMenuClick?: () => void
@@ -50,9 +51,16 @@ export function ContentHeader({
 }: ContentHeaderProps) {
   const { profile, user, isDemo, loading } = useDashboardUser()
   const router = useRouter()
+  const pathname = usePathname()
+
+  const firstName = (profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '').trim()
+  const rel = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname
+  const pageDef = getPageDef(rel, firstName)
 
   const [menusReady, setMenusReady] = useState(false)
   const [sub, setSub] = useState<Subscription | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { setMenusReady(true) }, [])
   useEffect(() => {
@@ -74,7 +82,7 @@ export function ContentHeader({
 
   return (
     <header className={cn('sticky top-0 z-40 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur', stickyOffsetClassName)}>
-      <div className="mx-auto max-w-7xl px-10 sm:px-14 lg:pl-16 lg:pr-20 h-14 flex items-center gap-2">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-6 h-14 flex items-center gap-3">
 
         {/* Hamburger (mobile only) */}
         <button
@@ -85,19 +93,51 @@ export function ContentHeader({
           <Menu className="h-[18px] w-[18px]" />
         </button>
 
-        {/* Search bar */}
-        <div className="flex-1 max-w-[420px]">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-[16px] w-[16px] text-gray-400 dark:text-neutral-500" />
-            <input
-              type="text"
-              placeholder="Zoeken…"
-              className="h-[34px] w-full rounded-full bg-gray-100 dark:bg-neutral-800 pl-9 pr-4 text-[13px] text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#163300]/15 dark:focus:ring-[#9FE870]/15"
-            />
-          </div>
-        </div>
+        {/* Page title */}
+        {pageDef.title && (
+          <h1 className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none truncate">
+            {pageDef.title}
+          </h1>
+        )}
 
         <div className="flex-1" />
+
+        {/* Collapsible search */}
+        <div className="flex items-center">
+          <div
+            className={cn(
+              'flex items-center overflow-hidden transition-all duration-200 ease-in-out',
+              searchOpen ? 'w-[200px] mr-1' : 'w-0'
+            )}
+          >
+            <div className="relative w-full">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-[14px] w-[14px] text-gray-400 dark:text-neutral-500" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Zoeken…"
+                className="h-[30px] w-full rounded-full bg-gray-100 dark:bg-neutral-800 pl-8 pr-3 text-[12px] text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#163300]/20 dark:focus:ring-[#9FE870]/20"
+                onKeyDown={(e) => { if (e.key === 'Escape') setSearchOpen(false) }}
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            className={iconBtnCls}
+            title="Zoeken"
+            onClick={() => {
+              setSearchOpen((v) => {
+                if (!v) setTimeout(() => searchInputRef.current?.focus(), 50)
+                return !v
+              })
+            }}
+          >
+            {searchOpen
+              ? <X className="h-[18px] w-[18px]" />
+              : <Search className="h-[18px] w-[18px]" />
+            }
+          </button>
+        </div>
 
         {/* Help */}
         <Link href={`${basePath}/hulp`} className={iconBtnCls} title="Hulp">

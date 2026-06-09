@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 
 export type TabNavItem<T extends string = string> = {
@@ -22,64 +21,33 @@ export function TabNav<T extends string = string>({
   onChange,
   className,
 }: TabNavProps<T>) {
-  const btnRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
-  const labelRefs = useRef<Map<string, HTMLSpanElement>>(new Map())
-  const [indicator, setIndicator] = useState({ left: 0, width: 0 })
-
-  const setBtnRef = useCallback((id: string) => (el: HTMLButtonElement | null) => {
-    if (el) btnRefs.current.set(id, el)
-    else btnRefs.current.delete(id)
-  }, [])
-
-  const setLabelRef = useCallback((id: string) => (el: HTMLSpanElement | null) => {
-    if (el) labelRefs.current.set(id, el)
-    else labelRefs.current.delete(id)
-  }, [])
-
-  useEffect(() => {
-    const btn = btnRefs.current.get(activeTab)
-    const label = labelRefs.current.get(activeTab)
-    if (!btn || !label) return
-    // offsetLeft: integer px position of button relative to the container (position:relative)
-    // offsetWidth: integer px width of the label text span only
-    setIndicator({ left: btn.offsetLeft, width: label.offsetWidth })
-  }, [activeTab, tabs])
-
   return (
-    <div
-      className={cn(
-        'relative inline-flex text-sm border-b border-gray-200 dark:border-neutral-700',
-        className,
-      )}
-    >
-      {tabs.map((tab, i) => (
+    <div className={cn('flex items-center gap-0.5', className)}>
+      {tabs.map((tab) => (
         <button
           key={tab.id}
-          ref={setBtnRef(tab.id)}
           type="button"
           onClick={() => onChange(tab.id)}
           className={cn(
-            'pb-2 font-semibold transition-colors duration-200 whitespace-nowrap',
-            i < tabs.length - 1 && 'mr-6',
+            'px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap',
             activeTab === tab.id
-              ? 'text-[#15803D] dark:text-[#4ADE80]'
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+              ? 'bg-[#9FE870] text-[#163300] dark:bg-[#9FE870] dark:text-[#163300]'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-50 dark:hover:bg-neutral-800/50',
           )}
         >
-          <span ref={setLabelRef(tab.id)} className="inline-block">{tab.label}</span>
+          {tab.label}
           {tab.count !== undefined && (
-            <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#15803D]/15 text-[11px] font-medium text-[#15803D] dark:bg-[#4ADE80]/20 dark:text-[#4ADE80] px-1">
+            <span className={cn(
+              'ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full text-[10px] font-medium px-1',
+              activeTab === tab.id
+                ? 'bg-[#163300]/15 text-[#163300]'
+                : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400'
+            )}>
               {tab.count}
             </span>
           )}
         </button>
       ))}
-
-      {/* Animated underline indicator */}
-      <div
-        className="absolute bottom-0 h-[2px] rounded-full bg-[#15803D] dark:bg-[#4ADE80] transition-all duration-200"
-        style={{ left: indicator.left, width: indicator.width }}
-      />
     </div>
   )
 }

@@ -9,9 +9,6 @@ import {
   Ban,
   Send,
   FileText,
-  Search,
-  Table2,
-  Columns3,
   Building2,
   Home,
   Check,
@@ -21,7 +18,6 @@ import {
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isBefore, isAfter, parseISO } from 'date-fns'
 import { nl } from 'date-fns/locale'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +31,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
+import {
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -62,10 +63,8 @@ import {
   addDialogContentClassName,
 } from '@/components/ui/add-dialog-layout'
 import {
-  dashboardCardClass,
   DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
 import { supabase } from '@/lib/supabase/client'
 
@@ -400,8 +399,15 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
   const [detailOpen, setDetailOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'table' | 'board'>('board')
+  const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
+
+  const uniqueProperties = [...new Set(
+    settlements.map(s => s.properties?.name).filter(Boolean) as string[]
+  )].sort()
 
   const filteredSettlements = settlements.filter(s => {
+    const propName = s.properties?.name ?? null
+    if (propName && propertyFilter[propName] === false) return false
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -414,6 +420,30 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
       s.period_end.includes(q)
     )
   })
+
+  const filterContent = uniqueProperties.length > 0 ? (
+    <>
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        Pand
+      </DropdownMenuLabel>
+      <div className="space-y-1">
+        {uniqueProperties.map(prop => (
+          <DropdownMenuCheckboxItem
+            key={prop}
+            checked={propertyFilter[prop] !== false}
+            onCheckedChange={v => setPropertyFilter(f => ({ ...f, [prop]: Boolean(v) }))}
+            onSelect={e => e.preventDefault()}
+            className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+          >
+            <span className="truncate max-w-[160px]">{prop}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {settlements.filter(s => s.properties?.name === prop).length}
+            </span>
+          </DropdownMenuCheckboxItem>
+        ))}
+      </div>
+    </>
+  ) : null
 
   const fetchSettlements = async () => {
     setLoading(true)
