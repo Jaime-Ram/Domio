@@ -1,9 +1,7 @@
 'use client'
 
-import { useState, useEffect, Fragment, useRef, useMemo } from 'react'
+import { useState, useEffect, Fragment, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import {
   Building2,
   Plus,
@@ -12,14 +10,12 @@ import {
   Table2,
   ChevronRight,
   ChevronDown,
-  Filter,
   Landmark,
   Euro,
   Home,
   Briefcase,
   Layers,
   X,
-  Search,
   Trash2,
 } from 'lucide-react'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
@@ -28,21 +24,13 @@ import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadC
 import { getUser } from '@/lib/supabase/auth'
 import { propertyQueries, portfolioQueries, legalEntityQueries } from '@/lib/supabase/queries'
 import {
-  dashboardCardClass,
   DASHBOARD_TABLE_ICON_WRAP_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
-  DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS,
-  DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
 
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { cn } from '@/lib/utils'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu'
@@ -60,6 +48,7 @@ import { AssignPropertiesDialog } from '@/components/portfolio/assign-properties
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { mockProperties, mockPortfolios, mockLegalEntities } from '@/lib/mock-data/vastgoed'
 import { TabNav } from '@/components/ui/tab-nav'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -188,8 +177,6 @@ export default function PortfolioPage() {
 
   // ── Search ─────────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('')
-  const [searchExpanded, setSearchExpanded] = useState(false)
-  const searchRef = useRef<HTMLInputElement>(null)
 
 
   // ── Load data ─────────────────────────────────────────────────────────────
@@ -420,107 +407,70 @@ export default function PortfolioPage() {
   }
 
 
+  // ── Toolbar title + count (per active tab) ───────────────────────────────
+  const toolbarTitle =
+    activeSegment === 'portefeuilles' ? 'Portefeuilles' :
+    activeSegment === 'objecten' ? 'Objecten' :
+    'Rechtspersonen'
+
+  const toolbarCount =
+    activeSegment === 'portefeuilles'
+      ? `${filteredPortfolios.length} van ${portfolios.length} portefeuille${portfolios.length === 1 ? '' : 's'}`
+      : activeSegment === 'objecten'
+      ? `${sortedProperties.length} van ${allProperties.length} object${allProperties.length === 1 ? '' : 'en'}`
+      : `${sortedLegalEntities.length} van ${legalEntities.length} rechtsperso${legalEntities.length === 1 ? 'on' : 'nen'}`
+
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <>
-      <Card className={cn(dashboardCardClass(undefined, isDemo), 'overflow-hidden')}>
-        <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            {/* Tabs */}
-            <TabNav
-              tabs={[
-                { id: 'portefeuilles',  label: 'Portefeuilles',  count: portfolios.length },
-                { id: 'objecten',       label: 'Alle objecten',  count: allProperties.length },
-                { id: 'rechtspersonen', label: 'Rechtspersonen', count: legalEntities.length },
-              ]}
-              activeTab={activeSegment}
-              onChange={(id) => { setActiveSegment(id as PortfolioSegment); setSelectedIds(new Set()) }}
-              className="w-full sm:w-auto"
-            />
+      {/* Single layout unit: tabs + toolbar + table — no gap-content-blocks between them */}
+      <div className="flex flex-col">
+        {/* Tab row — tabs only */}
+        <div className="pb-6">
+          <TabNav
+            tabs={[
+              { id: 'portefeuilles',  label: 'Portefeuilles',  count: portfolios.length },
+              { id: 'objecten',       label: 'Alle objecten',  count: allProperties.length },
+              { id: 'rechtspersonen', label: 'Rechtspersonen', count: legalEntities.length },
+            ]}
+            activeTab={activeSegment}
+            onChange={(id) => { setActiveSegment(id as PortfolioSegment); setSelectedIds(new Set()) }}
+          />
+        </div>
 
-            {/* Controls per tab */}
-            <div className="flex items-center gap-1 shrink-0">
-              {/* Search — collapsible, universal across tabs */}
-              <div className="flex flex-row-reverse items-center">
-                <button
-                  type="button"
-                  onClick={() => { setSearchExpanded(true); setTimeout(() => searchRef.current?.focus(), 0) }}
-                  className={cn(
-                    'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
-                    search && 'text-[#163300] dark:text-[#9FE870]',
-                  )}
-                >
-                  <Search className="h-4 w-4" />
-                </button>
-                <div className={cn(
-                  'overflow-hidden transition-all duration-200 ease-out',
-                  searchExpanded ? 'max-w-[160px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
-                )}>
-                  <input
-                    ref={searchRef}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onBlur={() => { if (!search) setSearchExpanded(false) }}
-                    onKeyDown={(e) => { if (e.key === 'Escape') { setSearch(''); setSearchExpanded(false) } }}
-                    placeholder="Zoeken…"
-                    className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
-              {activeSegment === 'portefeuilles' && (
-                <Button
-                  onClick={() => setNewPortfolioOpen(true)}
-                  className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium ml-1"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nieuwe portefeuille
-                </Button>
-              )}
-              {activeSegment === 'objecten' && (
-                <>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        suppressHydrationWarning
-                        className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
-                      >
-                        <Filter className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" sideOffset={8} className={cn(DASHBOARD_FILTER_MENU_CONTENT_CLASS, 'max-h-[min(70vh,480px)] overflow-y-auto')}>
-                      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Type</DropdownMenuLabel>
-                      <div className="space-y-1">
-                        {['appartement', 'huis', 'overig'].map((t) => (
-                          <DropdownMenuCheckboxItem
-                            key={t}
-                            checked={typeFilter[t] !== false}
-                            onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
-                            onSelect={(e) => e.preventDefault()}
-                            className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
-                          >
-                            {t.charAt(0).toUpperCase() + t.slice(1)}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    onClick={() => setNewPropertyOpen(true)}
-                    disabled={creating}
-                    className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium ml-1"
+        {/* Toolbar — title + count + search + per-tab filter/actions */}
+        <TableToolbar
+          title={toolbarTitle}
+          count={toolbarCount}
+          search={search}
+          onSearchChange={setSearch}
+          filterContent={activeSegment === 'objecten' ? (
+            <>
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Type</DropdownMenuLabel>
+              <div className="space-y-1">
+                {['appartement', 'huis', 'overig'].map((t) => (
+                  <DropdownMenuCheckboxItem
+                    key={t}
+                    checked={typeFilter[t] !== false}
+                    onCheckedChange={(v) => setTypeFilter((f) => ({ ...f, [t]: Boolean(v) }))}
+                    onSelect={(e) => e.preventDefault()}
+                    className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nieuw pand
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className={cn('p-0 px-0 pb-0', DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS)}>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+            </>
+          ) : undefined}
+          onAdd={
+            activeSegment === 'portefeuilles' ? () => setNewPortfolioOpen(true) :
+            activeSegment === 'objecten' ? () => setNewPropertyOpen(true) :
+            undefined
+          }
+          addLabel={activeSegment === 'portefeuilles' ? 'Nieuwe portefeuille' : 'Nieuw pand'}
+          addDisabled={activeSegment === 'objecten' && creating}
+          className="mb-8"
+        />
 
           {/* ════════════════════════════════════════
               TAB: PORTEFEUILLES
@@ -559,10 +509,81 @@ export default function PortfolioPage() {
                   <span />
                 </DataTableHeader>
                 <DataTableBody>
-                  {filteredPortfolios.length === 0 && unassigned.length === 0 ? (
-                    <DataTableEmpty>Geen portefeuilles gevonden.</DataTableEmpty>
-                  ) : (
+                  {(
                     <>
+                      {/* ── Algemene panden (always first) ── */}
+                      {(() => {
+                        const unassignedIncome = unassigned.reduce((s, p) => s + getMonthlyIncome(p), 0)
+                        const unassignedOcc = getOccupancy(unassigned)
+                        const isExpanded = expandedPortfolioId === '__unassigned'
+                        return (
+                          <div>
+                            <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(isExpanded ? null : '__unassigned')}>
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center">
+                                  <Home className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-gray-900 dark:text-white text-sm">Algemene panden</span>
+                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">Standaard</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">{unassigned.length}</p>
+                              {unassignedIncome > 0
+                                ? <p className="text-sm font-semibold text-[#163300] dark:text-[#9FE870]">€{unassignedIncome.toLocaleString('nl-NL')}</p>
+                                : <span />
+                              }
+                              {unassigned.length > 0 ? (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-14 h-1.5 rounded-full bg-gray-100 dark:bg-neutral-700 overflow-hidden">
+                                    <div className="h-full rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all" style={{ width: `${unassignedOcc}%` }} />
+                                  </div>
+                                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{unassignedOcc}%</p>
+                                </div>
+                              ) : <span />}
+                              <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 justify-self-end', isExpanded && 'rotate-180')} />
+                            </DataTableRow>
+                            {isExpanded && (
+                              <div className="bg-gray-50/60 dark:bg-neutral-900/40">
+                                {unassigned.length === 0 ? (
+                                  <div className="px-12 py-5 text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2">
+                                    <Building2 className="h-4 w-4" />
+                                    Geen panden — wijs panden toe of maak er een aan
+                                  </div>
+                                ) : unassigned.map((prop, idx) => (
+                                  <div
+                                    key={prop.id}
+                                    className={cn(
+                                      'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
+                                      idx < unassigned.length - 1 && 'border-b border-gray-100 dark:border-neutral-800'
+                                    )}
+                                    onClick={() => setSelectedPropertyId(prop.id)}
+                                  >
+                                    <div className="flex-shrink-0 w-4 flex flex-col items-center">
+                                      <div className="h-4 border-l-2 border-gray-200 dark:border-neutral-700 mb-0.5" />
+                                      <div className="h-0 w-2 border-b-2 border-gray-200 dark:border-neutral-700" />
+                                    </div>
+                                    <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
+                                      <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{prop.name}</p>
+                                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" />{prop.address}
+                                      </p>
+                                    </div>
+                                    <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600 shrink-0" />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
+
+                      {/* ── Subportefeuilles ── */}
                       {filteredPortfolios.map((pf) => {
                         const income = portfolioIncome(pf)
                         const occ = getOccupancy(pf.properties)
@@ -577,11 +598,9 @@ export default function PortfolioPage() {
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="font-semibold text-gray-900 dark:text-white text-sm">{pf.name}</span>
-                                    {pf.entityType && (
-                                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400">
-                                        {pf.entityType}
-                                      </span>
-                                    )}
+                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400">
+                                      {pf.entityType ?? 'Portefeuille'}
+                                    </span>
                                   </div>
                                   {(pf.owner || pf.kvk) && (
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
@@ -684,50 +703,6 @@ export default function PortfolioPage() {
                         )
                       })}
 
-                      {unassigned.length > 0 && (
-                        <div>
-                          <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(expandedPortfolioId === '__unassigned' ? null : '__unassigned')}>
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="h-8 w-8 rounded-xl shrink-0 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
-                                <Briefcase className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                              </div>
-                              <div className="min-w-0">
-                                <span className="font-semibold text-gray-500 dark:text-gray-400 text-sm">Niet ingedeeld</span>
-                                <p className="text-xs text-gray-400 mt-0.5">Objecten zonder portefeuille</p>
-                              </div>
-                            </div>
-                            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">{unassigned.length}</p>
-                            <span />
-                            <span />
-                            <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 justify-self-end', expandedPortfolioId === '__unassigned' && 'rotate-180')} />
-                          </DataTableRow>
-                          {expandedPortfolioId === '__unassigned' && (
-                            <div className="bg-gray-50/60 dark:bg-neutral-900/40">
-                              {unassigned.map((prop, idx) => (
-                                <div
-                                  key={prop.id}
-                                  className={cn(
-                                    'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
-                                    idx < unassigned.length - 1 && 'border-b border-gray-100 dark:border-neutral-800'
-                                  )}
-                                  onClick={() => setSelectedPropertyId(prop.id)}
-                                >
-                                  <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                    <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{prop.name}</p>
-                                    <p className="text-xs text-gray-400 flex items-center gap-1">
-                                      <MapPin className="h-3 w-3" />{prop.address}
-                                    </p>
-                                  </div>
-                                  <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600 shrink-0" />
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </>
                   )}
                 </DataTableBody>
@@ -870,8 +845,7 @@ export default function PortfolioPage() {
             )
           )}
 
-        </CardContent>
-      </Card>
+      </div>{/* end flex-col wrapper */}
 
       {/* ── Floating bulk-assign bar (Invoerpunt 2) ───────────────────────────── */}
       {selectedIds.size > 0 && (
@@ -1027,7 +1001,7 @@ export default function PortfolioPage() {
             <DialogTitle>Portefeuille verwijderen?</DialogTitle>
             <DialogDescription>
               {(deletePortfolio?.properties.length ?? 0) > 0
-                ? `De ${deletePortfolio?.properties.length} panden in "${deletePortfolio?.name}" worden losgekoppeld (niet verwijderd) en verschijnen onder "Niet ingedeeld". De portefeuille zelf wordt verwijderd.`
+                ? `De ${deletePortfolio?.properties.length} panden in "${deletePortfolio?.name}" worden losgekoppeld (niet verwijderd) en verschijnen onder "Algemene panden". De portefeuille zelf wordt verwijderd.`
                 : `"${deletePortfolio?.name}" wordt verwijderd. Dit kan niet ongedaan worden gemaakt.`}
             </DialogDescription>
           </DialogHeader>

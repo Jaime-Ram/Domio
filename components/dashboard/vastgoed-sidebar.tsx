@@ -20,7 +20,6 @@ import {
   PanelRightClose,
   ShieldCheck,
   Euro,
-  BookOpen,
   AlertTriangle,
   ClipboardCheck,
   HardDrive,
@@ -112,7 +111,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             { label: 'Betalingen', href: `${basePath}/financial/betalingen`, icon: CreditCard },
             { label: 'Achterstanden', href: `${basePath}/financial/achterstanden`, icon: AlertTriangle },
             { label: 'Huurafrekeningen', href: `${basePath}/financial/huurafrekening`, icon: Receipt },
-            { label: 'Verdeelsleutel', href: `${basePath}/financial/verdeelsleutel`, icon: BookOpen },
           ],
         },
         {

@@ -1,10 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Loader2, Search, Table2, Columns3, Building2 } from 'lucide-react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Loader2, Building2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -15,11 +12,14 @@ import {
 } from '@/components/ui/table'
 import { DashboardTableBlock } from '@/components/dashboard/dashboard-table-block'
 import { cn } from '@/lib/utils'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import {
-  dashboardCardClass,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu'
+import {
   DASHBOARD_TABLE_HEAD_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS,
-  DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS,
+  DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
 } from '@/app/dashboard/landlord/dashboard-ui'
 import { supabase } from '@/lib/supabase/client'
 import { classifyUnit, computePaymentWindow, type UnitStatus, type PaymentProfile } from '@/lib/finance/classification'
@@ -155,6 +155,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'table' | 'board'>('board')
+  const [propertyFilter, setPropertyFilter] = useState<Record<string, boolean>>({})
   const [selectedLeaseId, setSelectedLeaseId] = useState<string | null>(null)
 
   const today = new Date()
@@ -289,7 +290,12 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const uniqueProperties = [...new Set(
+    rows.map(r => r.property_name).filter(Boolean) as string[]
+  )].sort()
+
   const filtered = rows.filter(r => {
+    if (r.property_name && propertyFilter[r.property_name] === false) return false
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -302,59 +308,60 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
   const selectedRow = rows.find(r => r.lease_id === selectedLeaseId) ?? null
 
+  const filterContent = uniqueProperties.length > 0 ? (
+    <>
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+        Pand
+      </DropdownMenuLabel>
+      <div className="space-y-1">
+        {uniqueProperties.map(prop => (
+          <DropdownMenuCheckboxItem
+            key={prop}
+            checked={propertyFilter[prop] !== false}
+            onCheckedChange={v => setPropertyFilter(f => ({ ...f, [prop]: Boolean(v) }))}
+            onSelect={e => e.preventDefault()}
+            className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+          >
+            <span className="truncate max-w-[160px]">{prop}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {rows.filter(r => r.property_name === prop).length}
+            </span>
+          </DropdownMenuCheckboxItem>
+        ))}
+      </div>
+    </>
+  ) : null
+
   return (
     <>
-      <Card className={dashboardCardClass()}>
-        <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                Betalingsstatus eenheden
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                Actuele betaalstatus per eenheid op basis van ontvangen betalingen
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
-                <Search className="h-4 w-4 text-gray-400 shrink-0" />
-                <Input
-                  placeholder="Zoek op pand, eenheid..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 shrink-0"
-                onClick={() => setViewMode(v => v === 'table' ? 'board' : 'table')}
-                aria-label={viewMode === 'table' ? 'Toon als bord' : 'Toon als lijst'}
-              >
-                {viewMode === 'table' ? <Columns3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
-              </Button>
+      <div className="flex h-full min-h-0 flex-col gap-4">
+        <TableToolbar
+          title="Betalingsstatus"
+          count={`${filtered.length} van ${rows.length} eenhe${rows.length === 1 ? 'id' : 'den'}`}
+          search={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Zoek op pand, eenheid…"
+          filterContent={filterContent}
+          viewMode={viewMode === 'board' ? 'grid' : 'table'}
+          onViewModeChange={(v) => setViewMode(v === 'grid' ? 'board' : 'table')}
+        />
+
+        {loading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+          </div>
+        ) : viewMode === 'board' ? (
+          <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+            <div className="h-full overflow-y-auto p-4">
+              <BoardView rows={filtered} onSelect={setSelectedLeaseId} />
             </div>
           </div>
-        </CardHeader>
-
-        <CardContent className={cn(
-          'p-0 px-0 pb-0',
-          !loading && viewMode === 'board' ? 'px-5 pb-5 pt-2' : DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
-        )}>
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-            </div>
-          ) : viewMode === 'board' ? (
-            <BoardView rows={filtered} onSelect={setSelectedLeaseId} />
-          ) : (
+        ) : (
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <TableView rows={filtered} onSelect={setSelectedLeaseId} />
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
+      </div>
 
       <LeaseDrawer
         leaseId={selectedLeaseId}
