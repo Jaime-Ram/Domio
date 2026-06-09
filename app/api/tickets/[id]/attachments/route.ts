@@ -49,7 +49,7 @@ export async function POST(
   const admin = createAdminClient()
   if (!admin) return NextResponse.json({ error: 'Server misconfiguratie' }, { status: 500 })
 
-  const { data: ticket } = await admin
+  const { data: ticket } = await (admin as any)
     .from('tickets')
     .select('id, owner_id, created_by')
     .eq('id', ticketId)
@@ -83,7 +83,7 @@ export async function POST(
     return NextResponse.json({ error: `Upload mislukt: ${uploadError.message}` }, { status: 500 })
   }
 
-  const { data: attachment, error: dbError } = await admin
+  const { data: attachment, error: dbError } = await (admin as any)
     .from('documents')
     .insert({
       owner_id: ticket.owner_id,
@@ -128,7 +128,7 @@ export async function DELETE(
   const admin = createAdminClient()
   if (!admin) return NextResponse.json({ error: 'Server misconfiguratie' }, { status: 500 })
 
-  const { data: att } = await admin
+  const { data: att } = await (admin as any)
     .from('documents')
     .select('id, storage_path, owner_id')
     .eq('id', attachmentId)
