@@ -39,7 +39,6 @@ export default async function PortalPage({ params }: PortalPageProps) {
     : null
 
   const firstName = tenant.full_name.split(' ')[0]
-  const alreadyHasAccount = !!tenant.profile_id
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-4 pt-12 pb-16">
@@ -86,28 +85,16 @@ export default async function PortalPage({ params }: PortalPageProps) {
           ))}
         </div>
 
-        {alreadyHasAccount ? (
-          <div className="space-y-3">
-            <a
-              href={`/login?email=${encodeURIComponent(tenant.email ?? '')}&redirect=/dashboard/tenant`}
-              className="flex items-center justify-center w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors"
-            >
-              Inloggen
-            </a>
-            <p className="text-xs text-center text-gray-400">Je hebt al een account op {tenant.email}</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Link
-              href={`/portal/${token}/accept`}
-              className="flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors"
-            >
-              Uitnodiging accepteren
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <p className="text-xs text-center text-gray-400">Gratis account op {tenant.email}</p>
-          </div>
-        )}
+        <div className="space-y-3">
+          <Link
+            href={`/portal/${token}/accept`}
+            className="flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors"
+          >
+            Aanvraag accepteren
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <p className="text-xs text-center text-gray-400">Voor {tenant.email}</p>
+        </div>
       </div>
 
       {/* Footer */}

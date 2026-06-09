@@ -40,7 +40,7 @@ export default function TenantInviteEmail({
 
       <Section style={{ margin: '32px 0 16px' }}>
         <CtaButton href={portalUrl}>
-          Account aanmaken
+          Aanvraag accepteren
         </CtaButton>
       </Section>
 

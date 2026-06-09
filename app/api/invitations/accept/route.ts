@@ -6,8 +6,8 @@ import { verifyInvitationToken } from '@/lib/invitations'
 export async function POST(req: NextRequest) {
   try {
     const { token, password } = await req.json()
-    if (!token || !password) {
-      return NextResponse.json({ error: 'token en password zijn verplicht' }, { status: 400 })
+    if (!token) {
+      return NextResponse.json({ error: 'token is verplicht' }, { status: 400 })
     }
 
     // Verify JWT
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     if (!admin) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
 
     const db = admin as any
+    const email = payload.email.toLowerCase()
 
     // Check invitation is still pending
     const { data: invitation } = await db
@@ -35,53 +36,68 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Deze uitnodiging is al gebruikt of geannuleerd.' }, { status: 400 })
     }
 
-    // Check if auth user already exists
-    const { data: existingUsers } = await admin.auth.admin.listUsers()
-    const existingUser = existingUsers?.users?.find(u => u.email === payload.email)
-
+    const supabase = await createClient()
     let userId: string
 
-    if (existingUser) {
-      userId = existingUser.id
+    if (!password) {
+      // ── Pad 1: al ingelogd, accepteer in één klik ──
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        return NextResponse.json({ error: 'Log in om de aanvraag te accepteren.' }, { status: 401 })
+      }
+      if ((user.email ?? '').toLowerCase() !== email) {
+        return NextResponse.json(
+          { error: 'Je bent ingelogd met een ander account dan waarvoor deze uitnodiging bedoeld is. Log uit en probeer opnieuw.' },
+          { status: 403 }
+        )
+      }
+      userId = user.id
     } else {
-      // Create new auth user (email already verified via magic link)
-      const { data: newUser, error: createError } = await admin.auth.admin.createUser({
-        email: payload.email,
-        password,
-        email_confirm: true,
-      })
-      if (createError) throw createError
-      userId = newUser.user.id
+      // ── Pad 2: wachtwoord meegegeven ──
+      const { data: existingUsers } = await admin.auth.admin.listUsers()
+      const existingUser = existingUsers?.users?.find(u => (u.email ?? '').toLowerCase() === email)
 
-      // Create profile for the new user
-      const { data: tenantData } = await (admin as any).from('tenants').select('full_name').eq('id', payload.tenantId).single()
-      await admin.from('profiles').upsert({
-        id: userId,
-        email: payload.email,
-        full_name: (tenantData as any)?.full_name ?? '',
-        role: 'huurder',
-      } as any)
+      if (existingUser) {
+        // Bestaand account: verifieer wachtwoord door in te loggen
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) {
+          return NextResponse.json(
+            { error: 'Je hebt al een Domio-account met dit e-mailadres. Vul je bestaande wachtwoord in om de aanvraag te accepteren.' },
+            { status: 400 }
+          )
+        }
+        userId = existingUser.id
+      } else {
+        // Nieuw account aanmaken (e-mail is geverifieerd via de uitnodigingslink)
+        const { data: newUser, error: createError } = await admin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        })
+        if (createError) throw createError
+        userId = newUser.user.id
+
+        const { data: tenantData } = await db.from('tenants').select('full_name').eq('id', payload.tenantId).single()
+        await admin.from('profiles').upsert({
+          id: userId,
+          email,
+          full_name: (tenantData as any)?.full_name ?? '',
+          role: 'huurder',
+        } as any)
+
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) throw signInError
+      }
     }
 
     // Link profile_id to tenant record
-    await (admin as any)
-      .from('tenants')
-      .update({ profile_id: userId })
-      .eq('id', payload.tenantId)
+    await db.from('tenants').update({ profile_id: userId }).eq('id', payload.tenantId)
 
     // Mark invitation as accepted
     await db
       .from('tenant_invitations')
       .update({ status: 'accepted', accepted_at: new Date().toISOString() })
       .eq('id', payload.invitationId)
-
-    // Sign in the user and return a session cookie
-    const supabase = await createClient()
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: payload.email,
-      password,
-    })
-    if (signInError) throw signInError
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
