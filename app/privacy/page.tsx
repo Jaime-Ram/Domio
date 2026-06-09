@@ -27,7 +27,7 @@ export default function PrivacyPage() {
 
             {/* Mobile: Logo (Center) - Desktop: Logo (Left) */}
             <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0 md:flex-1">
-              <Logo width={100} height={28} />
+              <Logo width={68} height={19} />
             </div>
 
             {/* Desktop: Back to home link (Right) */}

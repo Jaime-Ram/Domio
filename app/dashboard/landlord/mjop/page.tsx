@@ -108,6 +108,7 @@ export default function MjopPage() {
           activeTab={tab}
           onChange={(id) => setTab(id as MjopTab)}
           className="w-full"
+          variant="underline"
         />
 
         {/* ── ACTIEF ── */}

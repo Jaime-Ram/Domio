@@ -43,6 +43,7 @@ export function PageTitleBar({ basePath = '/dashboard/landlord' }: PageTitleBarP
             startTransition(() => router.push(basePath + path))
           }}
           className="w-full"
+          variant="underline"
         />
       ) : !pageDef.noDivider ? (
         <div className="h-8 flex items-end">

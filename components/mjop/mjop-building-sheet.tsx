@@ -346,7 +346,7 @@ export function MjopBuildingSheet({
         className="max-w-3xl"
       >
         {/* Stats + tabs */}
-        <div className="px-6 pt-5 pb-0 border-b border-gray-200 dark:border-neutral-700">
+        <div className="px-6 pt-5 pb-4">
           {/* Stats row */}
           <div className="flex items-center gap-6 mb-4 flex-wrap">
           {building.bouwjaar && <Stat label="Bouwjaar" value={building.bouwjaar} />}

@@ -434,7 +434,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
       }
     >
       {/* Tab navigation */}
-      <div className="px-6 pt-4 shrink-0 border-b border-gray-100 dark:border-neutral-800">
+      <div className="px-6 pt-4 shrink-0">
         <TabNav
           tabs={TABS as unknown as { id: TabId; label: string }[]}
           activeTab={activeTab}

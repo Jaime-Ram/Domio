@@ -493,6 +493,7 @@ export default function FlowsPage() {
         activeTab={tab}
         onChange={(id) => setTab(id as FlowTab)}
         className="w-full"
+        variant="underline"
       />
 
       {tab === 'bibliotheek' && (

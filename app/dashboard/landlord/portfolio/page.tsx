@@ -435,6 +435,7 @@ export default function PortfolioPage() {
             ]}
             activeTab={activeSegment}
             onChange={(id) => { setActiveSegment(id as PortfolioSegment); setSelectedIds(new Set()) }}
+            variant="underline"
           />
         </div>
 

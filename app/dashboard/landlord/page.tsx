@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
 } from 'recharts'
 import { ArrowUpRight, X, Euro, Wrench, FileText, TrendingUp, AlertTriangle, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -23,6 +24,13 @@ const incomeHistory = [
   { month: 'Feb', income: 27900, costs: 4900 },
   { month: 'Mrt', income: 28400, costs: 5000 },
 ]
+
+const costBreakdown = [
+  { name: 'Onderhoud', value: monthlyFinancials.onderhoud, color: '#163300' },
+  { name: 'Beheer', value: monthlyFinancials.beheerkosten, color: '#5b8c3e' },
+  { name: 'VvE & verzekering', value: 1400, color: '#cbd5e1' },
+]
+const totalKosten = costBreakdown.reduce((s, c) => s + c.value, 0)
 
 
 function fmt(n: number) {
@@ -173,7 +181,7 @@ export default function EmployerDashboardPage() {
             <div className="min-w-0">
               <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
               <div className="flex items-baseline gap-2 mt-1.5">
-                <p className="text-[32px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">
+                <p className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">
                   {fmt(monthlyFinancials.huurinkomsten)}
                 </p>
                 <TrendBadge value={incomeTrendPct} />
@@ -266,6 +274,37 @@ export default function EmployerDashboardPage() {
 
       {/* ——— Rechts: paneel ——— */}
       <div className="flex flex-col gap-6">
+
+        {/* Uitgaven — donut */}
+        <div className="rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Uitgaven</p>
+            <span className="text-sm font-bold text-[#163300] dark:text-[#9FE870]">{fmt(totalKosten)}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="relative h-[96px] w-[96px] shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={costBreakdown} dataKey="value" nameKey="name" innerRadius={30} outerRadius={46} paddingAngle={2} stroke="none">
+                    {costBreakdown.map((c) => <Cell key={c.name} fill={c.color} />)}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="text-[10px] text-gray-400">kosten</span>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0 space-y-1.5">
+              {costBreakdown.map((c) => (
+                <div key={c.name} className="flex items-center gap-1.5 text-[11px]">
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ background: c.color }} />
+                  <span className="text-gray-500 dark:text-gray-400 truncate">{c.name}</span>
+                  <span className="ml-auto font-medium text-gray-700 dark:text-gray-300">{fmt(c.value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Compliance — accent */}
         {!dismissed.includes('compliance') && (

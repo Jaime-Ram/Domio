@@ -534,7 +534,7 @@ export function TicketDetailSheet({ ticketId, onClose, onTicketUpdate, isDemo, u
       ) : (
         <div className="flex flex-col h-full">
           {/* Status + Priority badges row */}
-          <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap border-b border-gray-100 dark:border-neutral-800">
+          <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap">
             <StatusBadge status={detail.status} />
             <PriorityBadge priority={detail.priority} />
             {detail.category && (
