@@ -31,6 +31,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { supabase } from '@/lib/supabase/client'
 import {
   ADD_DIALOG_BODY_SCROLL_CLASS,
   ADD_DIALOG_CLOSE_BUTTON_CLASS,
@@ -70,6 +71,7 @@ export interface PropertyForm {
   ean_electricity: string
   ean_gas: string
   portfolio_id: string
+  cost_allocation_key_id: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -85,6 +87,14 @@ const PROPERTY_TYPES = [
 ]
 
 const ENERGY_LABELS = ['A+++++', 'A++++', 'A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
+
+const METHOD_LABELS: Record<string, string> = {
+  equal: 'Gelijke verdeling',
+  surface_area: 'Naar oppervlakte',
+  custom: 'Aangepast',
+}
+
+type CostAllocationKey = { id: string; name: string; method: string }
 
 const ENERGY_COLORS: Record<string, string> = {
   'A+++++': 'bg-green-100 text-green-800',
@@ -116,6 +126,7 @@ const EMPTY_FORM: PropertyForm = {
   ean_electricity: '',
   ean_gas: '',
   portfolio_id: '',
+  cost_allocation_key_id: '',
 }
 
 // ─── PDOK Locatieserver ───────────────────────────────────────────────────────
@@ -181,7 +192,9 @@ interface NewPropertyDialogProps {
 }
 
 export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, defaultPortfolioId }: NewPropertyDialogProps) {
-  const [step, setStep] = useState<'search' | 'confirm'>('search')
+  const [step, setStep] = useState<'search' | 'confirm' | 'allocation'>('search')
+  const [keys, setKeys] = useState<CostAllocationKey[]>([])
+  const [keysLoading, setKeysLoading] = useState(true)
   const [postcode, setPostcode] = useState('')
   const [huisnummer, setHuisnummer] = useState('')
   const [searching, setSearching] = useState(false)
@@ -197,6 +210,24 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
   useEffect(() => {
     if (open) setForm((f) => ({ ...f, portfolio_id: defaultPortfolioId || '' }))
   }, [open, defaultPortfolioId])
+
+  // Laad de standaard verdeelsleutels (templates beschikbaar voor iedereen)
+  useEffect(() => {
+    if (!open) return
+    let active = true
+    ;(async () => {
+      setKeysLoading(true)
+      const { data } = await supabase
+        .from('cost_allocation_keys')
+        .select('id, name, method')
+        .eq('standard', true)
+        .order('name')
+      if (!active) return
+      setKeys((data as CostAllocationKey[] | null) ?? [])
+      setKeysLoading(false)
+    })()
+    return () => { active = false }
+  }, [open])
 
   const resetDialog = () => {
     setStep('search')
@@ -338,11 +369,16 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
         <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
           <div className="min-w-0 w-full">
             <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>
-              {step === 'search' ? 'Pand toevoegen' : 'Bevestig gegevens'}
+              {step === 'search' ? 'Pand toevoegen' : step === 'confirm' ? 'Bevestig gegevens' : 'Verdeelsleutel'}
             </DialogTitle>
-            {step !== 'search' && (
+            {step === 'confirm' && (
               <DialogDescription className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                 Controleer de gegevens. EAN, WOZ en energielabel worden automatisch ingevuld waar beschikbaar.
+              </DialogDescription>
+            )}
+            {step === 'allocation' && (
+              <DialogDescription className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                Kies hoe de servicekosten over dit pand worden verdeeld.
               </DialogDescription>
             )}
           </div>
@@ -350,25 +386,25 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
           {/* Stap-indicator: volle breedte, tekst eronder */}
           <div className="w-full mt-3 space-y-2">
             <div className="flex gap-2 sm:gap-3 w-full">
-              <div
-                className={cn(
-                  'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
-                  step === 'search'
-                    ? 'bg-[#163300] dark:bg-[#9FE870]'
-                    : 'bg-[#163300]/35 dark:bg-[#9FE870]/35'
-                )}
-              />
-              <div
-                className={cn(
-                  'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
-                  step === 'confirm'
-                    ? 'bg-[#163300] dark:bg-[#9FE870]'
-                    : 'bg-gray-200 dark:bg-neutral-700'
-                )}
-              />
+              {(() => {
+                const stepIndex = step === 'search' ? 0 : step === 'confirm' ? 1 : 2
+                return [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
+                      i === stepIndex
+                        ? 'bg-[#163300] dark:bg-[#9FE870]'
+                        : i < stepIndex
+                        ? 'bg-[#163300]/35 dark:bg-[#9FE870]/35'
+                        : 'bg-gray-200 dark:bg-neutral-700'
+                    )}
+                  />
+                ))
+              })()}
             </div>
             <p className="text-xs text-left text-gray-400 dark:text-gray-500">
-              Stap {step === 'search' ? '1' : '2'} van 2
+              Stap {step === 'search' ? '1' : step === 'confirm' ? '2' : '3'} van 3
             </p>
           </div>
         </DialogHeader>
@@ -696,13 +732,59 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
               </div>
             </>
           )}
+
+          {/* ── Stap 3: Verdeelsleutel ── */}
+          {step === 'allocation' && (
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-gray-600 dark:text-gray-400">Verdeelsleutel *</Label>
+              {keysLoading ? (
+                <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verdeelsleutels laden…
+                </div>
+              ) : keys.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                  Er zijn nog geen standaard verdeelsleutels beschikbaar.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {keys.map((k) => {
+                    const selected = form.cost_allocation_key_id === k.id
+                    return (
+                      <button
+                        key={k.id}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, cost_allocation_key_id: k.id }))}
+                        className={cn(
+                          'w-full text-left rounded-2xl border px-4 py-3 transition-colors',
+                          selected
+                            ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300]/5 dark:bg-[#9FE870]/10'
+                            : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{k.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {METHOD_LABELS[k.method] ?? k.method}
+                            </p>
+                          </div>
+                          {selected && <CheckCircle2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <footer className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
-          {step === 'confirm' ? (
+          {step !== 'search' ? (
             <button
               type="button"
-              onClick={() => setStep('search')}
+              onClick={() => setStep(step === 'allocation' ? 'confirm' : 'search')}
               className={ADD_DIALOG_CLOSE_BUTTON_CLASS}
               aria-label="Vorige stap"
             >
@@ -729,12 +811,22 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                 {searching ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Search className="h-4 w-4 shrink-0" />}
                 Zoeken
               </Button>
+            ) : step === 'confirm' ? (
+              <Button
+                type="button"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                onClick={() => setStep('allocation')}
+                disabled={!form.address && !selectedAdres}
+              >
+                Volgende
+                <ChevronRight className="h-4 w-4 shrink-0" />
+              </Button>
             ) : (
               <Button
                 type="button"
                 className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
                 onClick={handleSave}
-                disabled={saving || (!form.address && !selectedAdres)}
+                disabled={saving || (!form.address && !selectedAdres) || !form.cost_allocation_key_id}
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Building2 className="h-4 w-4 shrink-0" />}
                 {saving ? 'Aanmaken…' : 'Pand aanmaken'}

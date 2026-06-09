@@ -108,7 +108,7 @@ function buildTimeline(events: any[], messages: any[]): TimelineEvent[] {
     })
   }
   return items.sort((a, b) =>
-    new Date(a.timestamp as string).getTime() - new Date(b.timestamp as string).getTime()
+    new Date(b.timestamp as string).getTime() - new Date(a.timestamp as string).getTime()
   )
 }
 
@@ -215,35 +215,38 @@ function TenantTicketDetail({
           {/* Voortgang indicator */}
           <div>
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-3">Voortgang</p>
-            <div className="flex items-center gap-0">
+            <div className="flex items-center">
               {STATUS_STEPS.map((step, i) => {
                 const done = i <= currentStepIdx && ticket?.status !== 'geannuleerd'
                 const active = i === currentStepIdx && ticket?.status !== 'geannuleerd'
+                const isLast = i === STATUS_STEPS.length - 1
                 return (
-                  <div key={step} className="flex items-center flex-1">
-                    <div className={cn(
-                      'h-2 w-2 rounded-full shrink-0 transition-colors',
-                      done ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700',
-                      active && 'ring-2 ring-offset-1 ring-[#163300] dark:ring-[#9FE870]',
-                    )} />
-                    {i < STATUS_STEPS.length - 1 && (
+                  <div key={step} className="flex-1 flex flex-col items-center">
+                    <div className="flex items-center w-full">
                       <div className={cn(
                         'h-0.5 flex-1 transition-colors',
-                        i < currentStepIdx && ticket?.status !== 'geannuleerd'
-                          ? 'bg-[#163300] dark:bg-[#9FE870]'
-                          : 'bg-gray-200 dark:bg-neutral-700',
+                        i === 0 ? 'opacity-0' :
+                          done ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700',
                       )} />
-                    )}
+                      <div className={cn(
+                        'h-2 w-2 rounded-full shrink-0 transition-colors',
+                        done ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700',
+                        active && 'ring-2 ring-offset-1 ring-[#163300] dark:ring-[#9FE870]',
+                      )} />
+                      <div className={cn(
+                        'h-0.5 flex-1 transition-colors',
+                        isLast ? 'opacity-0' :
+                          i < currentStepIdx && ticket?.status !== 'geannuleerd'
+                            ? 'bg-[#163300] dark:bg-[#9FE870]'
+                            : 'bg-gray-200 dark:bg-neutral-700',
+                      )} />
+                    </div>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 text-center">
+                      {STATUS_LABEL[step]}
+                    </span>
                   </div>
                 )
               })}
-            </div>
-            <div className="flex justify-between mt-1.5">
-              {STATUS_STEPS.map((step) => (
-                <span key={step} className="text-[10px] text-gray-400 dark:text-gray-500 text-center flex-1">
-                  {STATUS_LABEL[step]}
-                </span>
-              ))}
             </div>
             {ticket?.status === 'geannuleerd' && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">

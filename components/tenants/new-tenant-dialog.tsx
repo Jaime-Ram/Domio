@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import {
-  CreateDialogShell,
-} from '@/components/ui/add-dialog-layout'
+import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+import { CreateDialogShell } from '@/components/ui/add-dialog-layout'
 import {
   Select,
   SelectContent,
@@ -11,36 +10,69 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Building2, FileText, X, ScrollText, Mail } from 'lucide-react'
-import { generateContractHTML } from '@/lib/pdf/generate-contract-pdf'
+import {
+  Building2,
+  Home,
+  Check,
+  ChevronDown,
+  Plus,
+  Trash2,
+  AlertCircle,
+  Search,
+  X,
+} from 'lucide-react'
 import { DialogDateField } from '@/components/ui/dialog-date-field'
 import { DialogField } from '@/components/ui/dialog-field'
 import { Input } from '@/components/ui/input'
-import { tenantQueries, propertyQueries } from '@/lib/supabase/queries'
+import { tenantQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
-import { mockProperties } from '@/lib/mock-data/vastgoed'
+import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
-function formatIBAN(raw: string): string {
-  const clean = raw.replace(/[^A-Z0-9]/gi, '').toUpperCase().slice(0, 18)
-  if (!clean) return ''
-  // NL IBAN: LL NN LLLL NNNN NNNN NN (18 chars) → group as 4-4-4-4-2
-  return [clean.slice(0, 4), clean.slice(4, 8), clean.slice(8, 12), clean.slice(12, 16), clean.slice(16, 18)]
-    .filter(Boolean)
-    .join(' ')
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+type PropertyOption = {
+  id: string
+  name: string
+  address: string
+  units: { id: string; unit_number: string; monthly_rent: number | null }[]
 }
 
-const EMPTY = {
-  full_name: '',
-  email: '',
-  phone: '',
-  monthlyRent: '',
-  deposit: '',
-  bankAccount: '',
+type ActiveLeaseInfo = {
+  id: string
+  start_date: string
+  end_date: string | null
+  monthly_rent: number
+  tenant_name: string | null
+}
+
+type ExistingTenantOption = {
+  id: string
+  full_name: string
+  email: string | null
+  phone: string | null
+}
+
+type TenantSlot = {
+  tempId: string
+  mode: 'new' | 'existing'
+  // new mode
+  full_name: string
+  email: string
+  phone: string
+  // existing mode
+  existingId: string
+  existingSearch: string
+}
+
+const CONTRACT_EMPTY = {
   startDate: '',
   endDate: '',
-  contractType: 'onbepaald',
+  contractType: 'onbepaald' as 'onbepaald' | 'bepaald',
+  monthlyRent: '',
+  servicekosten: '',
+  deposit: '',
   billingPeriod: 'maandelijks',
   billingDay: '1',
   indexation: 'cpi',
@@ -58,14 +90,6 @@ export type CreatedTenantPayload = {
   monthlyRent?: number
   startDate?: string | null
   leaseLinkFailed?: boolean
-  inviteSent?: boolean
-}
-
-type UnitOption = {
-  unitId: string
-  label: string
-  propertyName: string
-  monthlyRent: number
 }
 
 interface NewTenantDialogProps {
@@ -74,271 +98,217 @@ interface NewTenantDialogProps {
   onCreated: (tenant: CreatedTenantPayload) => void
 }
 
-function safeValue(v: string) {
-  if (!v || v.includes('NaN') || v.includes('undefined') || v.trim() === '') return 'Niet gedefinieerd'
-  return v
+function fmtDate(d: string) {
+  return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  const display = safeValue(value)
-  return (
-    <div className="flex items-start justify-between gap-4 py-2 border-b border-gray-100 dark:border-neutral-800 last:border-0">
-      <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{label}</span>
-      <span className={cn('text-xs font-medium text-right', display === 'Niet gedefinieerd' ? 'text-gray-400 dark:text-gray-500 italic' : 'text-gray-900 dark:text-white')}>
-        {display}
-      </span>
-    </div>
-  )
+function makeSlot(): TenantSlot {
+  return { tempId: `slot-${Date.now()}-${Math.random()}`, mode: 'new', full_name: '', email: '', phone: '', existingId: '', existingSearch: '' }
 }
 
-function OptInCard({
-  icon,
-  title,
-  description,
-  checked,
-  onChange,
-}: {
-  icon: React.ReactNode
-  title: string
-  description: string
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={cn(
-        'w-full flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all duration-150',
-        checked
-          ? 'border-[#163300] bg-[#163300]/[0.03] dark:border-[#9FE870] dark:bg-[#9FE870]/[0.06]'
-          : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600',
-      )}
-    >
-      <div className={cn(
-        'h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-colors',
-        checked
-          ? 'bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300]'
-          : 'bg-gray-100 dark:bg-neutral-800 text-gray-400 dark:text-gray-500',
-      )}>
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-white">{title}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{description}</p>
-      </div>
-      {/* Toggle pill */}
-      <div className={cn(
-        'relative h-6 w-10 rounded-full shrink-0 transition-colors duration-150',
-        checked ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700',
-      )}>
-        <div className={cn(
-          'absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-all duration-150',
-          checked ? 'left-5' : 'left-1',
-        )} />
-      </div>
-    </button>
-  )
-}
+// ── Main component ────────────────────────────────────────────────────────────
 
 export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogProps) {
   const { isDemo } = useDashboardUser()
   const [step, setStep] = useState(1)
-  const [form, setForm] = useState({ ...EMPTY })
-  const [unitId, setUnitId] = useState<string>('')
-  const [unitOptions, setUnitOptions] = useState<UnitOption[]>([])
-  const [loadingUnits, setLoadingUnits] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showPreview, setShowPreview] = useState(false)
 
-  // New opt-in choices
-  const [createContract, setCreateContract] = useState(true)
-  const [inviteTenant, setInviteTenant] = useState(true)
+  // ── Step 1: Property + Unit ──────────────────────────────────────────────────
+  const [properties, setProperties] = useState<PropertyOption[]>([])
+  const [loadingProps, setLoadingProps] = useState(true)
+  const [propertyId, setPropertyId] = useState('')
+  const [unitId, setUnitId] = useState('')
+  const [activeLease, setActiveLease] = useState<ActiveLeaseInfo | null>(null)
+  const [loadingLease, setLoadingLease] = useState(false)
+  const [deactivateExisting, setDeactivateExisting] = useState(false)
 
+  const [propPickerOpen, setPropPickerOpen] = useState(false)
+  const [unitPickerOpen, setUnitPickerOpen] = useState(false)
+  const [pickerPos, setPickerPos] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  // ── Step 2: Contract details ─────────────────────────────────────────────────
+  const [form, setForm] = useState({ ...CONTRACT_EMPTY })
+  const setField = (k: keyof typeof CONTRACT_EMPTY, v: string) =>
+    setForm((f) => ({ ...f, [k]: v }))
+
+  // ── Step 3: Tenant slots ──────────────────────────────────────────────────────
+  const [existingTenants, setExistingTenants] = useState<ExistingTenantOption[]>([])
+  const [loadingTenants, setLoadingTenants] = useState(false)
+  const [tenantSlots, setTenantSlots] = useState<TenantSlot[]>([makeSlot()])
+
+  // ── Load properties ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return
-    setForm({ ...EMPTY })
-    setUnitId('')
     setStep(1)
+    setPropertyId('')
+    setUnitId('')
+    setActiveLease(null)
+    setDeactivateExisting(false)
+    setForm({ ...CONTRACT_EMPTY })
+    setTenantSlots([makeSlot()])
     setError(null)
-    setCreateContract(true)
-    setInviteTenant(true)
 
-    if (isDemo) {
-      setUnitOptions(
-        mockProperties.map((p) => ({
-          unitId: `demo-unit-${p.id}`,
-          label: `${p.name} (${(p.address ?? '').split(',')[0] || p.name})`,
-          propertyName: p.name,
-          monthlyRent: p.monthlyRent ?? 0,
-        }))
-      )
-      return
-    }
+    if (isDemo) { setProperties([]); setLoadingProps(false); return }
 
-    setLoadingUnits(true)
-    getUser()
-      .then(({ user }) => {
-        if (!user) return
-        return propertyQueries.getByOwner(user.id)
-      })
-      .then((props) => {
-        const opts: UnitOption[] = []
-        for (const p of props ?? []) {
-          const units = ((p as unknown) as { units?: { id: string; unit_number: string; monthly_rent: number | null }[] }).units ?? []
-          for (const u of units) {
-            opts.push({
-              unitId: u.id,
-              label: `${(p as { name: string }).name}${u.unit_number ? ` — ${u.unit_number}` : ''}`,
-              propertyName: (p as { name: string }).name,
-              monthlyRent: Number(u.monthly_rent) || 0,
-            })
-          }
-        }
-        setUnitOptions(opts)
-      })
-      .catch(() => setUnitOptions([]))
-      .finally(() => setLoadingUnits(false))
+    setLoadingProps(true)
+    getUser().then(({ user }) => {
+      if (!user) { setLoadingProps(false); return }
+      return (supabase as any)
+        .from('properties')
+        .select('id, name, address, units(id, unit_number, monthly_rent)')
+        .eq('owner_id', user.id)
+        .order('name')
+        .then(({ data }: any) => {
+          setProperties((data ?? []).map((p: any) => ({
+            id: p.id, name: p.name, address: p.address,
+            units: (p.units ?? []).map((u: any) => ({ id: u.id, unit_number: u.unit_number, monthly_rent: u.monthly_rent })),
+          })))
+        })
+    }).catch(() => {}).finally(() => setLoadingProps(false))
   }, [open, isDemo])
 
+  // ── Load active lease when unit changes ──────────────────────────────────────
   useEffect(() => {
-    const unit = unitOptions.find((o) => o.unitId === unitId)
-    if (unit && !form.monthlyRent) {
-      setForm((f) => ({ ...f, monthlyRent: String(unit.monthlyRent || '') }))
-    }
-  }, [unitId, unitOptions])
+    setActiveLease(null)
+    setDeactivateExisting(false)
+    if (!unitId || isDemo) return
+    setLoadingLease(true)
+    ;(supabase as any)
+      .from('leases')
+      .select('id, start_date, end_date, monthly_rent, tenants(full_name)')
+      .eq('unit_id', unitId).eq('status', 'actief').maybeSingle()
+      .then(({ data }: any) => {
+        if (data) setActiveLease({ id: data.id, start_date: data.start_date, end_date: data.end_date ?? null, monthly_rent: data.monthly_rent, tenant_name: data.tenants?.full_name ?? null })
+      })
+      .catch(() => {}).finally(() => setLoadingLease(false))
+  }, [unitId, isDemo])
 
-  const selectedUnit = unitOptions.find((o) => o.unitId === unitId)
-  const setField = (key: keyof typeof EMPTY, val: string) =>
-    setForm((f) => ({ ...f, [key]: val }))
+  const selectedProperty = properties.find((p) => p.id === propertyId)
+  const selectedUnit = selectedProperty?.units.find((u) => u.id === unitId)
+  useEffect(() => {
+    if (selectedUnit?.monthly_rent && !form.monthlyRent)
+      setField('monthlyRent', String(selectedUnit.monthly_rent))
+  }, [unitId])
 
-  // Step navigation — step 3 (contract details) is skipped if createContract=false
-  const totalSteps = createContract ? 4 : 3
-  const displayStep = createContract ? step : (step === 4 ? 3 : step)
+  // ── Load existing tenants for step 3 ─────────────────────────────────────────
+  const loadTenants = useCallback(async () => {
+    if (isDemo) return
+    setLoadingTenants(true)
+    try {
+      const { user } = await getUser()
+      if (!user) return
+      const { data } = await (supabase as any)
+        .from('tenants').select('id, full_name, email, phone').eq('owner_id', user.id).order('full_name')
+      setExistingTenants(data ?? [])
+    } catch {} finally { setLoadingTenants(false) }
+  }, [isDemo])
 
-  const step1Valid = !!form.full_name.trim() && !!form.monthlyRent && !!unitId
-  const step3Valid = !!form.startDate // only relevant when createContract=true
+  // ── Slot helpers ──────────────────────────────────────────────────────────────
+  const updateSlot = (tempId: string, patch: Partial<TenantSlot>) =>
+    setTenantSlots((prev) => prev.map((s) => s.tempId === tempId ? { ...s, ...patch } : s))
 
+  const removeSlot = (tempId: string) =>
+    setTenantSlots((prev) => prev.filter((s) => s.tempId !== tempId))
+
+  // ── Validation ────────────────────────────────────────────────────────────────
+  const step1Valid = !!propertyId && !!unitId
+  const step2Valid = !!form.startDate && !!form.monthlyRent
+  const step3Valid = tenantSlots.some((s) =>
+    s.mode === 'new' ? !!s.full_name.trim() : !!s.existingId
+  )
+
+  // ── Navigation ────────────────────────────────────────────────────────────────
   const goNext = () => {
-    if (step === 1) {
-      if (!form.deposit && form.monthlyRent) setField('deposit', form.monthlyRent)
-      setStep(2)
-    } else if (step === 2) {
-      setStep(createContract ? 3 : 4)
-    } else if (step === 3) {
-      setStep(4)
-    }
+    if (step === 1) setStep(2)
+    else if (step === 2) { loadTenants(); setStep(3) }
   }
-
   const goBack = () => {
-    if (step === 4) setStep(createContract ? 3 : 2)
+    if (step === 2) setStep(1)
     else if (step === 3) setStep(2)
-    else if (step === 2) setStep(1)
   }
 
-  const primaryDisabled =
-    saving ||
-    (step === 1 && !step1Valid) ||
-    (step === 3 && !step3Valid)
+  const primaryDisabled = saving || (step === 1 && !step1Valid) || (step === 2 && !step2Valid) || (step === 3 && !step3Valid)
 
-  const stepTitles = ['Nieuwe huurder', 'Instellen', 'Contractdetails', 'Controleer & afronden']
-  const stepSubtitles = [
-    'Persoonsgegevens en contactinformatie van de huurder.',
-    'Kies wat je wilt aanmaken voor deze huurder.',
-    'Standaardwaarden zijn alvast ingevuld, pas aan waar nodig.',
-    'Controleer de samenvatting voordat je opslaat.',
-  ]
-
+  // ── Save ──────────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     setSaving(true)
     setError(null)
     try {
       if (isDemo) {
+        const firstNew = tenantSlots.find((s) => s.mode === 'new' && s.full_name.trim())
         onCreated({
           id: `demo-${Date.now()}`,
-          full_name: form.full_name.trim(),
-          email: form.email.trim() || null,
-          phone: form.phone.trim() || null,
-          propertyName: selectedUnit?.propertyName ?? '',
-          monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
+          full_name: firstNew?.full_name.trim() || 'Demo huurder',
+          email: firstNew?.email || null,
+          phone: firstNew?.phone || null,
+          propertyName: selectedProperty?.name ?? '',
+          monthlyRent: parseFloat(form.monthlyRent) || 0,
           startDate: form.startDate || null,
-          inviteSent: inviteTenant,
         })
-        onClose()
-        return
+        onClose(); return
       }
+
       const { user } = await getUser()
       if (!user) throw new Error('Niet ingelogd')
 
-      const created = await tenantQueries.create({
-        owner_id: user.id,
-        full_name: form.full_name.trim(),
-        email: form.email.trim() || null,
-        phone: form.phone.trim() || null,
-      })
+      // Resolve all tenant IDs in slot order
+      const allIds: string[] = []
+      let firstPayload: { id: string; full_name: string; email: string | null; phone: string | null } | null = null
 
-      if (unitId && selectedUnit) {
-        try {
-          const res = await fetch('/api/leases', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              unitId,
-              tenantId: created.id,
-              startDate: form.startDate || new Date().toISOString().slice(0, 10),
-              endDate: form.endDate || null,
-              monthlyRent: parseFloat(form.monthlyRent) || selectedUnit.monthlyRent,
-              deposit: form.deposit ? parseFloat(form.deposit) : null,
-              indexationMethod: form.indexation === 'geen' ? 'none' : form.indexation,
-              indexationPct: (form.indexation === 'cpi_plus' || form.indexation === 'fixed')
-                ? parseFloat(form.indexationPct) || null
-                : null,
-              indexMonth: form.indexation !== 'geen' ? parseInt(form.indexMonth) || 1 : null,
-            }),
+      for (const slot of tenantSlots) {
+        if (slot.mode === 'new' && slot.full_name.trim()) {
+          const t = await tenantQueries.create({
+            owner_id: user.id,
+            full_name: slot.full_name.trim(),
+            email: slot.email.trim() || null,
+            phone: slot.phone.trim() || null,
           })
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({}))
-            throw new Error(body.error || `HTTP ${res.status}`)
+          allIds.push(t.id)
+          if (!firstPayload) firstPayload = { id: t.id, full_name: t.full_name, email: t.email, phone: t.phone }
+        } else if (slot.mode === 'existing' && slot.existingId) {
+          allIds.push(slot.existingId)
+          if (!firstPayload) {
+            const ex = existingTenants.find((t) => t.id === slot.existingId)
+            if (ex) firstPayload = { id: ex.id, full_name: ex.full_name, email: ex.email, phone: ex.phone }
           }
-        } catch (leaseErr: any) {
-          console.error('[new-tenant] lease creation failed:', leaseErr?.message ?? leaseErr)
-          onCreated({
-            id: created.id,
-            full_name: created.full_name,
-            email: created.email,
-            phone: created.phone,
-            leaseLinkFailed: true,
-            propertyName: selectedUnit?.propertyName ?? '',
-            monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
-          })
-          onClose()
-          return
         }
       }
 
-      // Send platform invite if chosen — uses /api/invitations/send (tenant already created)
-      if (inviteTenant && created.email) {
-        try {
-          await fetch('/api/invitations/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tenantId: created.id }),
-          })
-        } catch (inviteErr) {
-          console.error('[new-tenant] invite failed (non-fatal):', inviteErr)
-        }
+      if (allIds.length === 0) throw new Error('Selecteer of maak minimaal één huurder aan')
+
+      const res = await fetch('/api/leases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unitId,
+          tenantId: allIds[0],
+          startDate: form.startDate,
+          endDate: form.endDate || null,
+          monthlyRent: parseFloat(form.monthlyRent),
+          deposit: form.deposit ? parseFloat(form.deposit) : null,
+          servicekosten: form.servicekosten ? parseFloat(form.servicekosten) : null,
+          indexationMethod: form.indexation === 'geen' ? 'none' : form.indexation,
+          indexationPct: (form.indexation === 'cpi_plus' || form.indexation === 'fixed') ? parseFloat(form.indexationPct) || null : null,
+          indexMonth: form.indexation !== 'geen' ? parseInt(form.indexMonth) || 1 : null,
+          deactivateLeaseId: deactivateExisting && activeLease ? activeLease.id : null,
+          additionalTenantIds: allIds.length > 1 ? allIds.slice(1) : null,
+        }),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || `HTTP ${res.status}`)
       }
 
       onCreated({
-        id: created.id,
-        full_name: created.full_name,
-        email: created.email,
-        phone: created.phone,
+        id: firstPayload!.id,
+        full_name: firstPayload!.full_name,
+        email: firstPayload!.email,
+        phone: firstPayload!.phone,
+        propertyName: selectedProperty?.name ?? '',
+        monthlyRent: parseFloat(form.monthlyRent) || 0,
         startDate: form.startDate || null,
-        propertyName: selectedUnit?.propertyName ?? '',
-        monthlyRent: parseFloat(form.monthlyRent) || selectedUnit?.monthlyRent || 0,
-        inviteSent: inviteTenant && !!created.email,
       })
       onClose()
     } catch (err) {
@@ -348,9 +318,12 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
     }
   }
 
-  const billingLabel = form.billingPeriod === 'maandelijks'
-    ? `Maandelijks, dag ${form.billingDay}`
-    : form.billingPeriod === 'kwartaal' ? 'Per kwartaal' : 'Jaarlijks'
+  const stepTitles = ['Pand & eenheid', 'Contractdetails', 'Huurders']
+  const stepSubtitles = [
+    'Selecteer het pand en de eenheid waarvoor je een contract aanmaakt.',
+    'Vul de contractvoorwaarden in.',
+    'Voeg de huurder(s) toe aan dit contract.',
+  ]
 
   return (
     <CreateDialogShell
@@ -358,140 +331,160 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
       onOpenChange={(v) => { if (!v) onClose() }}
       title={stepTitles[step - 1]}
       subtitle={stepSubtitles[step - 1]}
-      primaryLabel={step < 4 ? 'Verder' : 'Opslaan'}
-      onPrimary={step < 4 ? goNext : handleSave}
+      primaryLabel={step < 3 ? 'Verder' : 'Contract aanmaken'}
+      onPrimary={step < 3 ? goNext : handleSave}
       primaryDisabled={primaryDisabled}
       primaryLoading={saving}
-      step={displayStep}
-      totalSteps={totalSteps}
+      step={step}
+      totalSteps={3}
       onBack={step > 1 ? goBack : undefined}
       scrollBody
     >
-      {/* Step 1 — Persoonsgegevens */}
+
+      {/* ── Step 1: Pand + Eenheid ── */}
       {step === 1 && (
-        <div className="space-y-3">
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
-              {error}
+        <div className="space-y-4">
+          {loadingProps ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-2">Panden laden…</p>
+          ) : properties.length === 0 ? (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Voeg eerst een pand en eenheid toe via Portfolio.
             </p>
+          ) : (
+            <>
+              <DialogField label="Pand" required>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const r = e.currentTarget.getBoundingClientRect()
+                    setPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                    setPropPickerOpen((v) => !v); setUnitPickerOpen(false)
+                  }}
+                  className={cn(
+                    'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                    propertyId
+                      ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                      : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                  )}
+                >
+                  <Building2 className="h-4 w-4 shrink-0" />
+                  <span className="flex-1 text-left">{selectedProperty?.name ?? 'Pand kiezen'}</span>
+                  {propertyId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                </button>
+                {propPickerOpen && pickerPos && createPortal(
+                  <>
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPropPickerOpen(false)} />
+                    <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                      className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                    >
+                      {properties.map((p) => (
+                        <button key={p.id} type="button"
+                          onClick={() => { setPropertyId(p.id); setUnitId(''); setPropPickerOpen(false) }}
+                          className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                            propertyId === p.id ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                          )}
+                        >
+                          <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          <div className="flex-1 min-w-0">
+                            <p className="truncate">{p.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{p.address}</p>
+                          </div>
+                          {propertyId === p.id && <Check className="h-3.5 w-3.5 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>,
+                  document.body
+                )}
+              </DialogField>
+
+              <DialogField label="Eenheid" required>
+                <button
+                  type="button"
+                  disabled={!propertyId}
+                  onClick={(e) => {
+                    const r = e.currentTarget.getBoundingClientRect()
+                    setPickerPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                    setUnitPickerOpen((v) => !v); setPropPickerOpen(false)
+                  }}
+                  className={cn(
+                    'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
+                    unitId
+                      ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                      : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
+                  )}
+                >
+                  <Home className="h-4 w-4 shrink-0" />
+                  <span className="flex-1 text-left">{selectedUnit?.unit_number ?? 'Eenheid kiezen'}</span>
+                  {unitId ? <Check className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
+                </button>
+                {unitPickerOpen && pickerPos && propertyId && createPortal(
+                  <>
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setUnitPickerOpen(false)} />
+                    <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
+                      className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                    >
+                      {(selectedProperty?.units ?? []).length === 0 ? (
+                        <p className="px-4 py-3 text-sm text-gray-400">Geen eenheden gevonden</p>
+                      ) : (selectedProperty?.units ?? []).map((u) => (
+                        <button key={u.id} type="button"
+                          onClick={() => { setUnitId(u.id); setUnitPickerOpen(false) }}
+                          className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                            unitId === u.id ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                          )}
+                        >
+                          <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          <span className="flex-1">{u.unit_number}</span>
+                          {u.monthly_rent && <span className="text-xs text-gray-400">€{u.monthly_rent.toLocaleString('nl-NL')}/mnd</span>}
+                          {unitId === u.id && <Check className="h-3.5 w-3.5 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>,
+                  document.body
+                )}
+              </DialogField>
+
+              {loadingLease && <p className="text-xs text-gray-400 dark:text-gray-500 px-1">Bestaand contract ophalen…</p>}
+              {!loadingLease && activeLease && (
+                <div className="rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/10 p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Actief contract gevonden</p>
+                      <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+                        {activeLease.tenant_name && <span>{activeLease.tenant_name} · </span>}
+                        Gestart {fmtDate(activeLease.start_date)} · €{activeLease.monthly_rent.toLocaleString('nl-NL')}/mnd
+                      </p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => setDeactivateExisting((v) => !v)}
+                    className={cn('w-full flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm transition-all',
+                      deactivateExisting ? 'border-amber-500 dark:border-amber-600 bg-amber-100/60 dark:bg-amber-900/20' : 'border-amber-200 dark:border-amber-800/40 hover:border-amber-300 dark:hover:border-amber-700'
+                    )}
+                  >
+                    <div className={cn('relative h-5 w-9 rounded-full shrink-0 transition-colors', deactivateExisting ? 'bg-amber-500 dark:bg-amber-600' : 'bg-gray-200 dark:bg-neutral-700')}>
+                      <div className={cn('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all', deactivateExisting ? 'left-4' : 'left-0.5')} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-amber-800 dark:text-amber-300">Beëindig huidig contract</p>
+                      <p className="text-xs text-amber-700/70 dark:text-amber-400/70 mt-0.5">
+                        Het bestaande contract krijgt status "verlopen" zodra het nieuwe contract aangemaakt wordt.
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </>
           )}
-          <DialogField label="Naam huurder" required>
-            <Input
-              autoFocus
-              value={form.full_name}
-              onChange={(e) => setField('full_name', e.target.value)}
-              placeholder="Voor- en achternaam of bedrijfsnaam"
-              className="rounded-xl"
-              autoComplete="name"
-            />
-          </DialogField>
-          <div className="grid grid-cols-2 gap-3">
-            <DialogField label="Email" optional>
-              <Input type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} placeholder="naam@voorbeeld.nl" className="rounded-xl" autoComplete="email" />
-            </DialogField>
-            <DialogField label="Telefoonnummer" optional>
-              <Input type="tel" value={form.phone} onChange={(e) => setField('phone', e.target.value)} placeholder="+31 6 12345678" className="rounded-xl" autoComplete="tel" />
-            </DialogField>
-          </div>
-          <DialogField label="Object / eenheid" required>
-            {loadingUnits ? (
-              <p className="text-sm text-gray-500">Eenheden laden…</p>
-            ) : unitOptions.length === 0 ? (
-              <p className="text-sm text-amber-600 dark:text-amber-400">
-                Voeg eerst een pand en eenheid toe via Portfolio.
-              </p>
-            ) : (
-              <Select value={unitId || ''} onValueChange={(v) => setUnitId(v)}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Kies een eenheid" />
-                </SelectTrigger>
-                <SelectContent>
-                  {unitOptions.map((o) => (
-                    <SelectItem key={o.unitId} value={o.unitId}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </DialogField>
-          <DialogField label="Huurprijs per maand" required>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500">€</span>
-              <Input
-                type="number"
-                min="0"
-                value={form.monthlyRent}
-                onChange={(e) => setField('monthlyRent', e.target.value)}
-                placeholder="0"
-                className="rounded-xl pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-            </div>
-          </DialogField>
-          <DialogField label="Bankrekeningnummer huurder" optional>
-            <Input
-              value={form.bankAccount}
-              onChange={(e) => setField('bankAccount', formatIBAN(e.target.value))}
-              placeholder="NL00 XXXX 0000 0000 00"
-              className="rounded-xl"
-              maxLength={22}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </DialogField>
         </div>
       )}
 
-      {/* Step 2 — Opt-in keuzes */}
+      {/* ── Step 2: Contract details ── */}
       {step === 2 && (
         <div className="space-y-3">
-          <OptInCard
-            icon={<ScrollText className="h-5 w-5" />}
-            title="Contract aanmaken"
-            description="Genereer een huurovereenkomst op basis van de ingevoerde gegevens. Zet dit uit als het contract al bestaat."
-            checked={createContract}
-            onChange={setCreateContract}
-          />
-          <OptInCard
-            icon={<Mail className="h-5 w-5" />}
-            title="Huurder uitnodigen voor platform"
-            description="Stuur een uitnodigingsmail zodat de huurder toegang krijgt tot hun eigen portaal."
-            checked={inviteTenant}
-            onChange={(v) => {
-              // Can only invite if email is known
-              if (v && !form.email.trim()) return
-              setInviteTenant(v)
-            }}
-          />
-          {inviteTenant && !form.email.trim() && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 px-1">
-              Vul een e-mailadres in bij stap 1 om de huurder te kunnen uitnodigen.
-            </p>
-          )}
-          {!inviteTenant && !form.email.trim() && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 px-1">
-              Geen e-mailadres ingevuld — uitnodiging is uitgeschakeld.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Step 3 — Contractdetails (only when createContract=true) */}
-      {step === 3 && createContract && (
-        <div className="space-y-3">
-          <DialogField label="Borg">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500">€</span>
-              <Input
-                type="number"
-                min="0"
-                value={form.deposit}
-                onChange={(e) => setField('deposit', e.target.value)}
-                placeholder="0"
-                className="rounded-xl pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-            </div>
-          </DialogField>
-          <DialogField label="Contractvorm">
-            <Select value={form.contractType} onValueChange={(v) => setField('contractType', v)}>
+          <DialogField label="Contractvorm" required>
+            <Select value={form.contractType} onValueChange={(v) => setField('contractType', v as any)}>
               <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="onbepaald">Onbepaalde tijd</SelectItem>
@@ -499,14 +492,41 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               </SelectContent>
             </Select>
           </DialogField>
+
           <div className={cn('grid gap-3', form.contractType === 'bepaald' ? 'grid-cols-2' : 'grid-cols-1')}>
             <DialogDateField label="Startdatum" value={form.startDate} onChange={(v) => setField('startDate', v)} required />
             {form.contractType === 'bepaald' && (
               <DialogDateField label="Einddatum" value={form.endDate} onChange={(v) => setField('endDate', v)} min={form.startDate || undefined} />
             )}
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <DialogField label="Huurprijs per maand" required>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">€</span>
+                <Input type="number" min="0" value={form.monthlyRent} onChange={(e) => setField('monthlyRent', e.target.value)} placeholder="0"
+                  className="rounded-xl pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              </div>
+            </DialogField>
+            <DialogField label="Borg">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">€</span>
+                <Input type="number" min="0" value={form.deposit} onChange={(e) => setField('deposit', e.target.value)} placeholder="0"
+                  className="rounded-xl pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              </div>
+            </DialogField>
+          </div>
+
+          <DialogField label="Servicekosten voorschot per maand">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">€</span>
+              <Input type="number" min="0" value={form.servicekosten} onChange={(e) => setField('servicekosten', e.target.value)} placeholder="0"
+                className="rounded-xl pl-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+            </div>
+          </DialogField>
+
           <div className={cn('grid gap-3', form.billingPeriod === 'maandelijks' ? 'grid-cols-2' : 'grid-cols-1')}>
-            <DialogField label="Facturatie periode">
+            <DialogField label="Factuurperiode">
               <Select value={form.billingPeriod} onValueChange={(v) => setField('billingPeriod', v)}>
                 <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -519,205 +539,239 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
             {form.billingPeriod === 'maandelijks' && (
               <DialogField label="Facturatiedag">
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={28}
-                    value={form.billingDay}
-                    onChange={(e) => {
-                      const v = Math.min(28, Math.max(1, Number(e.target.value) || 1))
-                      setField('billingDay', String(v))
-                    }}
-                    className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">v/d maand</span>
+                  <Input type="number" min={1} max={28} value={form.billingDay}
+                    onChange={(e) => setField('billingDay', String(Math.min(28, Math.max(1, Number(e.target.value) || 1))))}
+                    className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                  <span className="text-xs text-gray-400 shrink-0">v/d maand</span>
                 </div>
               </DialogField>
             )}
           </div>
-          <div className="space-y-3">
-            <div className={cn('grid gap-3', form.indexation !== 'geen' ? 'grid-cols-2' : 'grid-cols-1')}>
-              <DialogField label="Jaarlijkse indexatie">
-                <Select value={form.indexation} onValueChange={(v) => setField('indexation', v)}>
+
+          <div className={cn('grid gap-3', form.indexation !== 'geen' ? 'grid-cols-2' : 'grid-cols-1')}>
+            <DialogField label="Jaarlijkse indexatie">
+              <Select value={form.indexation} onValueChange={(v) => setField('indexation', v)}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cpi">CPI – CBS-inflatie</SelectItem>
+                  <SelectItem value="cpi_plus">CPI + opslag %</SelectItem>
+                  <SelectItem value="fixed">Vast percentage</SelectItem>
+                  <SelectItem value="geen">Geen indexatie</SelectItem>
+                </SelectContent>
+              </Select>
+            </DialogField>
+            {form.indexation !== 'geen' && (
+              <DialogField label="Indexatiemaand">
+                <Select value={form.indexMonth} onValueChange={(v) => setField('indexMonth', v)}>
                   <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cpi">CPI – CBS-inflatie</SelectItem>
-                    <SelectItem value="cpi_plus">CPI + opslag %</SelectItem>
-                    <SelectItem value="fixed">Vast percentage</SelectItem>
-                    <SelectItem value="geen">Geen indexatie</SelectItem>
+                    {['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'].map((m, i) => (
+                      <SelectItem key={i + 1} value={String(i + 1)}>{m}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </DialogField>
-              {form.indexation !== 'geen' && (
-                <DialogField label="Indexatiemaand">
-                  <Select value={form.indexMonth} onValueChange={(v) => setField('indexMonth', v)}>
-                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'].map((m, i) => (
-                        <SelectItem key={i+1} value={String(i+1)}>{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </DialogField>
-              )}
-            </div>
-            {(form.indexation === 'cpi_plus' || form.indexation === 'fixed') && (
-              <DialogField label={form.indexation === 'cpi_plus' ? 'Opslag bovenop CPI (%)' : 'Vast percentage (%)'}>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min={0}
-                    max={20}
-                    placeholder="bijv. 1.5"
-                    value={form.indexationPct}
-                    onChange={(e) => setField('indexationPct', e.target.value)}
-                    className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <span className="text-xs text-gray-400 shrink-0">%</span>
-                </div>
-              </DialogField>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <DialogField label="Opzegtermijn huurder">
+          {(form.indexation === 'cpi_plus' || form.indexation === 'fixed') && (
+            <DialogField label={form.indexation === 'cpi_plus' ? 'Opslag bovenop CPI (%)' : 'Vast percentage (%)'}>
               <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  max={24}
-                  value={form.noticePeriodMonths}
-                  onChange={(e) => {
-                    const v = Math.min(24, Math.max(1, Number(e.target.value) || 1))
-                    setField('noticePeriodMonths', String(v))
-                  }}
-                  className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
-                  {Number(form.noticePeriodMonths) === 1 ? 'maand' : 'maanden'}
-                </span>
+                <Input type="number" step="0.1" min={0} max={20} placeholder="bijv. 1.5" value={form.indexationPct}
+                  onChange={(e) => setField('indexationPct', e.target.value)}
+                  className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                <span className="text-xs text-gray-400 shrink-0">%</span>
               </div>
             </DialogField>
-          </div>
+          )}
+
+          <DialogField label="Opzegtermijn huurder">
+            <div className="flex items-center gap-2">
+              <Input type="number" min={1} max={24} value={form.noticePeriodMonths}
+                onChange={(e) => setField('noticePeriodMonths', String(Math.min(24, Math.max(1, Number(e.target.value) || 1))))}
+                className="rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+              <span className="text-xs text-gray-400 shrink-0">{Number(form.noticePeriodMonths) === 1 ? 'maand' : 'maanden'}</span>
+            </div>
+          </DialogField>
         </div>
       )}
 
-      {/* Step 4 — Samenvatting */}
-      {step === 4 && (
-        <div className="space-y-4">
+      {/* ── Step 3: Huurders ── */}
+      {step === 3 && (
+        <div className="space-y-3">
+          {loadingTenants ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 py-2">Huurders laden…</p>
+          ) : (
+            <>
+              {tenantSlots.map((slot, idx) => (
+                <TenantSlotCard
+                  key={slot.tempId}
+                  slot={slot}
+                  index={idx}
+                  canRemove={tenantSlots.length > 1}
+                  existingTenants={existingTenants}
+                  usedExistingIds={new Set(tenantSlots.filter((s) => s.tempId !== slot.tempId && s.mode === 'existing').map((s) => s.existingId).filter(Boolean))}
+                  onChange={(patch) => updateSlot(slot.tempId, patch)}
+                  onRemove={() => removeSlot(slot.tempId)}
+                />
+              ))}
 
-          {/* Opt-in badges */}
-          <div className="flex flex-wrap gap-2">
-            <span className={cn(
-              'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full',
-              createContract
-                ? 'bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
-                : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
-            )}>
-              <ScrollText className="h-3 w-3" />
-              {createContract ? 'Contract wordt aangemaakt' : 'Geen contract'}
-            </span>
-            <span className={cn(
-              'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full',
-              inviteTenant && form.email.trim()
-                ? 'bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
-                : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
-            )}>
-              <Mail className="h-3 w-3" />
-              {inviteTenant && form.email.trim() ? 'Uitnodiging wordt verstuurd' : 'Geen uitnodiging'}
-            </span>
-          </div>
+              <button
+                type="button"
+                onClick={() => setTenantSlots((prev) => [...prev, makeSlot()])}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#163300]/30 dark:border-[#9FE870]/30 bg-[#163300]/5 dark:bg-[#9FE870]/8 text-[#163300] dark:text-[#9FE870] text-sm font-semibold px-4 py-1.5 hover:bg-[#163300]/10 dark:hover:bg-[#9FE870]/15 transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Nieuwe huurder
+              </button>
 
-          <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
-            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Huurder</p>
-            <SummaryRow label="Naam" value={form.full_name} />
-            <SummaryRow label="Email" value={form.email} />
-            <SummaryRow label="Telefoon" value={form.phone} />
-            <SummaryRow label="Bankrekeningnummer" value={form.bankAccount} />
-          </div>
-
-          <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
-            <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Object & huur</p>
-            <SummaryRow label="Object" value={selectedUnit?.label ?? ''} />
-            <SummaryRow label="Huurprijs" value={form.monthlyRent ? `€ ${parseFloat(form.monthlyRent).toLocaleString('nl-NL')} / mnd` : ''} />
-            {createContract && <SummaryRow label="Borg" value={form.deposit ? `€ ${parseFloat(form.deposit).toLocaleString('nl-NL')}` : ''} />}
-          </div>
-
-          {createContract && (
-            <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-2xl px-4 py-3">
-              <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500 mb-2">Contract</p>
-              <SummaryRow label="Contractvorm" value={form.contractType === 'onbepaald' ? 'Onbepaalde tijd' : 'Bepaalde tijd'} />
-              <SummaryRow label="Startdatum" value={form.startDate} />
-              {form.contractType === 'bepaald' && <SummaryRow label="Einddatum" value={form.endDate} />}
-              <SummaryRow label="Facturatie" value={billingLabel} />
-              <SummaryRow label="Indexatie" value={
-                form.indexation === 'cpi' ? 'CBS CPI' :
-                form.indexation === 'cpi_plus' ? `CBS CPI + ${form.indexationPct || '?'}%` :
-                form.indexation === 'fixed' ? `Vast ${form.indexationPct || '?'}%` :
-                'Geen'
-              } />
-              <SummaryRow label="Opzegtermijn" value={`${form.noticePeriodMonths} ${Number(form.noticePeriodMonths) === 1 ? 'maand' : 'maanden'}`} />
-            </div>
-          )}
-
-          {createContract && (
-            <button
-              type="button"
-              onClick={() => setShowPreview(true)}
-              className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              <FileText className="h-4 w-4 shrink-0" />
-              Contractvoorbeeld bekijken
-            </button>
-          )}
-
-          {showPreview && (
-            <div className="fixed inset-0 z-[60] flex flex-col bg-neutral-900/95 backdrop-blur-sm">
-              <div className="flex items-center justify-between px-4 py-3 bg-neutral-900 border-b border-neutral-800 shrink-0">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-white">Huurovereenkomst — {selectedUnit?.label ?? (form.full_name || 'concept')}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowPreview(false)}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-neutral-800 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-auto p-6 flex justify-center">
-                <div className="w-full max-w-3xl bg-white rounded shadow-2xl overflow-hidden">
-                  <iframe
-                    srcDoc={generateContractHTML({
-                      propertyAddress: selectedUnit?.label ?? 'Onbekend object',
-                      monthlyRent: parseFloat(form.monthlyRent) || 0,
-                      tenants: [{ name: form.full_name || 'Huurder', email: form.email || undefined, phone: form.phone || undefined }],
-                      startDate: form.startDate || undefined,
-                      endDate: form.endDate || undefined,
-                      deposit: form.deposit ? parseFloat(form.deposit) : undefined,
-                      bankAccount: form.bankAccount || undefined,
-                      billingDay: parseInt(form.billingDay) || 1,
-                      billingPeriod: form.billingPeriod,
-                      indexation: form.indexation,
-                      noticePeriodMonths: parseInt(form.noticePeriodMonths) || 1,
-                    })}
-                    className="w-full h-[calc(100vh-120px)] bg-white"
-                    title="Contract preview"
-                    sandbox="allow-same-origin"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
-              {error}
-            </p>
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 dark:bg-red-950/30 dark:text-red-400 px-3 py-2 rounded-xl">
+                  {error}
+                </p>
+              )}
+            </>
           )}
         </div>
       )}
     </CreateDialogShell>
+  )
+}
+
+// ── TenantSlotCard ────────────────────────────────────────────────────────────
+
+function TenantSlotCard({
+  slot,
+  index,
+  canRemove,
+  existingTenants,
+  usedExistingIds,
+  onChange,
+  onRemove,
+}: {
+  slot: TenantSlot
+  index: number
+  canRemove: boolean
+  existingTenants: ExistingTenantOption[]
+  usedExistingIds: Set<string>
+  onChange: (patch: Partial<TenantSlot>) => void
+  onRemove: () => void
+}) {
+  const [search, setSearch] = useState('')
+
+  const selectedTenant = slot.mode === 'existing' && slot.existingId
+    ? existingTenants.find((t) => t.id === slot.existingId) ?? null
+    : null
+
+  const filtered = existingTenants.filter((t) =>
+    !usedExistingIds.has(t.id) &&
+    (!search || t.full_name.toLowerCase().includes(search.toLowerCase()) || (t.email ?? '').toLowerCase().includes(search.toLowerCase()))
+  )
+
+  return (
+    <div className="rounded-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 pt-3 pb-2">
+        <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
+          Huurder {index + 1}
+        </span>
+        <div className="flex items-center gap-2">
+          {/* Mode toggle */}
+          <div className="inline-flex rounded-full border border-gray-200 dark:border-neutral-700 p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => onChange({ mode: 'new', existingId: '', existingSearch: '' })}
+              className={cn(
+                'rounded-full px-2.5 py-1 font-medium transition-colors',
+                slot.mode === 'new'
+                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              )}
+            >
+              Nieuw
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange({ mode: 'existing', full_name: '', email: '', phone: '' })}
+              className={cn(
+                'rounded-full px-2.5 py-1 font-medium transition-colors',
+                slot.mode === 'existing'
+                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              )}
+            >
+              Bestaand
+            </button>
+          </div>
+          {canRemove && (
+            <button type="button" onClick={onRemove} className="text-gray-300 dark:text-neutral-600 hover:text-red-500 dark:hover:text-red-400 transition-colors p-0.5">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="px-3 pb-3 space-y-2">
+        {slot.mode === 'new' ? (
+          <>
+            <Input
+              value={slot.full_name}
+              onChange={(e) => onChange({ full_name: e.target.value })}
+              placeholder="Naam *"
+              className="rounded-xl h-9 text-sm"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input type="email" value={slot.email} onChange={(e) => onChange({ email: e.target.value })} placeholder="E-mail" className="rounded-xl h-9 text-sm" />
+              <Input type="tel" value={slot.phone} onChange={(e) => onChange({ phone: e.target.value })} placeholder="Telefoon" className="rounded-xl h-9 text-sm" />
+            </div>
+          </>
+        ) : selectedTenant ? (
+          /* Existing tenant selected — show summary with clear button */
+          <div className="flex items-center gap-3 rounded-xl bg-[#163300]/5 dark:bg-[#9FE870]/8 px-3 py-2.5">
+            <Check className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{selectedTenant.full_name}</p>
+              {selectedTenant.email && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{selectedTenant.email}</p>}
+            </div>
+            <button type="button" onClick={() => onChange({ existingId: '' })} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          /* Existing tenant search */
+          existingTenants.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 py-1">Nog geen huurders in het systeem.</p>
+          ) : (
+            <div className="space-y-1">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Zoek huurder…"
+                  className="rounded-xl h-9 text-sm pl-8"
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-100 dark:border-neutral-800 divide-y divide-gray-100 dark:divide-neutral-800">
+                {filtered.length === 0 ? (
+                  <p className="px-3 py-2.5 text-sm text-gray-400 dark:text-gray-500">Geen resultaten</p>
+                ) : filtered.map((t) => (
+                  <button key={t.id} type="button"
+                    onClick={() => { onChange({ existingId: t.id }); setSearch('') }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 dark:text-white truncate">{t.full_name}</p>
+                      {t.email && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.email}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </div>
   )
 }

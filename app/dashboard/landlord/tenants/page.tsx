@@ -15,7 +15,6 @@ import {
   Mail,
   RotateCcw,
   Loader2,
-  Eye,
   Trash2,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
@@ -29,7 +28,6 @@ import {
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { TenantDetailSheet } from '@/components/tenants/tenant-detail-sheet'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants/new-tenant-dialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { DialogField } from '@/components/ui/dialog-field'
@@ -388,13 +386,12 @@ function TenantsPageContent() {
             />
 
             <DataTable>
-              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)_2rem]">
+              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)]">
                 <SortableHeader label="Huurder" sortKey="name" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Status" sortKey="status" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Eenheid" sortKey="unit" sort={tenantSort} onSort={toggleSort} />
                 <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Portaal</span>
-                <span />
               </DataTableHeader>
               <DataTableBody>
                 {sortedTenants.length === 0 ? (
@@ -402,7 +399,7 @@ function TenantsPageContent() {
                 ) : sortedTenants.map((tenant) => (
                   <DataTableRow
                     key={tenant.id}
-                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)_2rem]"
+                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
                     onClick={() => setSelectedTenantId(tenant.id)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -429,7 +426,7 @@ function TenantsPageContent() {
                           ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
                           : 'bg-[#A8200D] text-white'
                       )}>
-                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status}
+                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief Contract' : tenant.status}
                       </span>
                     </div>
                     <div className="min-w-0">
@@ -490,15 +487,6 @@ function TenantsPageContent() {
                           Uitnodigen
                         </button>
                       )}
-                    </div>
-                    <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
-                      <RowActionsMenu
-                        actions={[
-                          { label: 'Bekijken', icon: Eye, onClick: () => setSelectedTenantId(tenant.id) },
-                          { label: 'Portaaluitnodiging sturen', icon: Mail, onClick: () => sendInvite(tenant.id) },
-                          { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeleteTenant(tenant) },
-                        ]}
-                      />
                     </div>
                   </DataTableRow>
                 ))}

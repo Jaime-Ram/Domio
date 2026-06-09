@@ -928,6 +928,7 @@ export default function PortfolioPage() {
               ean_electricity: formData.ean_electricity?.trim() || null,
               ean_gas: formData.ean_gas?.trim() || null,
               portfolio_id: formData.portfolio_id || null,
+              cost_allocation_key_id: formData.cost_allocation_key_id,
             } as never)
 
             // Update local state immediately

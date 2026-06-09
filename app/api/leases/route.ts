@@ -7,7 +7,11 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { unitId, tenantId, startDate, endDate, monthlyRent, deposit, indexationMethod, indexationPct, indexMonth } = await req.json()
+  const {
+    unitId, tenantId, startDate, endDate, monthlyRent, deposit, servicekosten,
+    indexationMethod, indexationPct, indexMonth,
+    deactivateLeaseId, additionalTenantIds,
+  } = await req.json()
   if (!unitId || !tenantId || !monthlyRent) {
     return NextResponse.json({ error: 'unitId, tenantId en monthlyRent zijn verplicht' }, { status: 400 })
   }
@@ -51,6 +55,19 @@ export async function POST(req: NextRequest) {
     paymentProfileId = newProfile.id
   }
 
+  // Deactivate existing lease if requested
+  if (deactivateLeaseId) {
+    const { error: deactivateErr } = await (supabase as any)
+      .from('leases')
+      .update({ status: 'verlopen' })
+      .eq('id', deactivateLeaseId)
+      .eq('owner_id', user.id)
+    if (deactivateErr) {
+      console.error('[api/leases] bestaand contract deactiveren mislukt:', deactivateErr.message)
+      return NextResponse.json({ error: 'Bestaand contract deactiveren mislukt: ' + deactivateErr.message }, { status: 500 })
+    }
+  }
+
   // Lease en unit-update via gewone server client — RLS beschermt mee
   const { data: lease, error: leaseErr } = await (supabase as any)
     .from('leases')
@@ -63,6 +80,7 @@ export async function POST(req: NextRequest) {
       end_date: endDate || null,
       monthly_rent: monthlyRent,
       deposit: deposit || null,
+      servicekosten_voorschot: servicekosten || null,
       status: 'actief',
       notes: null,
       base_rent: monthlyRent,
@@ -79,6 +97,23 @@ export async function POST(req: NextRequest) {
   }
 
   await supabase.from('units').update({ status: 'verhuurd' } as never).eq('id', unitId)
+
+  // Insert lease_tenants for primary + any additional tenants
+  const allTenantIds: string[] = [tenantId, ...(additionalTenantIds ?? [])]
+  const { error: ltErr } = await (supabase as any)
+    .from('lease_tenants')
+    .insert(allTenantIds.map((tid: string, i: number) => ({
+      lease_id: lease.id,
+      tenant_id: tid,
+      is_primary: i === 0,
+    })))
+
+  if (ltErr) {
+    console.error('[api/leases] lease_tenants aanmaken mislukt:', ltErr.message, ltErr.code)
+    // Lease exists but tenant links failed — roll back the lease to avoid orphaned record
+    await adminAny.from('leases').delete().eq('id', lease.id)
+    return NextResponse.json({ error: 'Huurders koppelen aan contract mislukt: ' + ltErr.message }, { status: 500 })
+  }
 
   return NextResponse.json({ lease })
 }

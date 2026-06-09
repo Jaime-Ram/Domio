@@ -79,13 +79,26 @@ export async function POST(request: NextRequest) {
     const nameRaw = formDataGet(formData, 'name')
     const typeRaw = formDataGet(formData, 'type')
     const propertyRaw = formDataGet(formData, 'property_id')
+    const leaseRaw = formDataGet(formData, 'lease_id')
+    const unitRaw = formDataGet(formData, 'unit_id')
+    const ticketRaw = formDataGet(formData, 'ticket_id')
     const nameOverride = typeof nameRaw === 'string' ? nameRaw.trim() : undefined
     const typeParam = typeof typeRaw === 'string' ? typeRaw.trim() : undefined
     const propertyIdParam = typeof propertyRaw === 'string' ? propertyRaw : null
+    const leaseIdParam = typeof leaseRaw === 'string' && leaseRaw.length > 0 ? leaseRaw : null
+    const unitIdParam = typeof unitRaw === 'string' && unitRaw.length > 0 ? unitRaw : null
+    const ticketIdParam = typeof ticketRaw === 'string' && ticketRaw.length > 0 ? ticketRaw : null
     const docType = ['Contract', 'Keuring', 'Factuur', 'Verzekering', 'Overig'].includes(typeParam || '')
       ? typeParam
       : 'Overig'
     const propertyId = propertyIdParam && propertyIdParam.length > 0 ? propertyIdParam : null
+
+    // Derive scope from provided IDs
+    const scope = ticketIdParam ? 'ticket'
+      : leaseIdParam ? 'lease'
+      : unitIdParam ? 'unit'
+      : propertyId ? 'property'
+      : 'general'
 
     const displayName = nameOverride || file.name.replace(/\.[^.]+$/, '') || 'Document'
     const fileName = sanitizeFileName(file.name || `${displayName}.pdf`)
@@ -94,15 +107,18 @@ export async function POST(request: NextRequest) {
     const insertPayload: DocumentInsert = {
       owner_id: user.id,
       property_id: propertyId,
+      lease_id: leaseIdParam,
+      unit_id: unitIdParam,
       name: displayName,
       type: docType as 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig',
       file_name: fileName,
       mime_type: mimeType,
       source: 'upload',
+      scope,
+      ...(ticketIdParam ? { ticket_id: ticketIdParam } : {}),
     }
     const { data: insertData, error: insertError } = await supabase
       .from('documents')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generic infers never for documents table
       .insert(insertPayload as any)
       .select()
       .single()
