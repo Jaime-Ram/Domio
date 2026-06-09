@@ -12,7 +12,9 @@ import {
 import * as React from 'react'
 
 const font = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-const LOGO_URL = 'https://domiovastgoedbeheer.nl/images/DomioLogo.png'
+// Let op: www-variant gebruiken — de non-www URL geeft een 307-redirect en
+// mailclients (Apple Mail, Gmail) volgen geen redirects voor afbeeldingen.
+const LOGO_URL = 'https://www.domiovastgoedbeheer.nl/images/DomioLogo.png'
 
 interface EmailLayoutProps {
   preview: string
