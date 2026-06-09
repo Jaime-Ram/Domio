@@ -1,9 +1,15 @@
 import { supabase } from './client'
 
-/** Origin voor auth-redirects: productie-URL als gezet (NEXT_PUBLIC_APP_URL), anders huidige origin. */
+/**
+ * Origin voor auth-redirects. Op de client gebruiken we altijd de actuele
+ * origin (window.location.origin), zodat de PKCE-callback exact op hetzelfde
+ * domein/poort landt als waar de flow startte — anders raakt de code_verifier-
+ * cookie zoek (werkt lokaal op elke poort en productie op www/non-www).
+ * Alleen server-side (geen window) valt 'ie terug op NEXT_PUBLIC_APP_URL.
+ */
 function getAppOrigin(): string {
   if (typeof window !== 'undefined') {
-    return process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+    return window.location.origin
   }
   return process.env.NEXT_PUBLIC_APP_URL || ''
 }
