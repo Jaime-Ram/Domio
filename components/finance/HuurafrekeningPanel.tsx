@@ -504,52 +504,28 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
 
   return (
     <>
-    <Card className={dashboardCardClass()}>
-      <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <FileText className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-              Huurafrekeningen
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-              Periodieke afrekening van servicekosten per huurder
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3 sm:min-w-[180px] sm:max-w-[240px]">
-              <Search className="h-4 w-4 text-gray-400 shrink-0" />
-              <Input
-                placeholder="Zoek op pand, huurder..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 px-2 text-sm min-w-0 flex-1 bg-transparent py-0"
-              />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 shrink-0"
-              onClick={() => setViewMode(v => v === 'table' ? 'board' : 'table')}
-              aria-label={viewMode === 'table' ? 'Toon als bord' : 'Toon als lijst'}
-            >
-              {viewMode === 'table' ? <Columns3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <TableToolbar
+        title="Huurafrekeningen"
+        count={`${filteredSettlements.length} van ${settlements.length} afrekening${settlements.length === 1 ? '' : 'en'}`}
+        search={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Zoek op pand, huurder…"
+        filterContent={filterContent}
+        viewMode={viewMode === 'board' ? 'grid' : 'table'}
+        onViewModeChange={(v) => setViewMode(v === 'grid' ? 'board' : 'table')}
+        onAdd={openNew}
+        addLabel="Nieuwe afrekening"
+      />
 
-      <CardContent className={cn(
-        'p-0 px-0 pb-0',
-        !loading && viewMode === 'board' ? 'px-5 pb-5 pt-2' : DASHBOARD_TABLE_TOOLBAR_TO_TABLE_GAP_CLASS
-      )}>
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          </div>
-        ) : viewMode === 'board' ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {loading ? (
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+        </div>
+      ) : viewMode === 'board' ? (
+        <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+          <div className="h-full overflow-y-auto p-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {([
               { key: 'concept',   label: 'Concepten',  statuses: ['concept'] as SettlementStatus[] },
               { key: 'verzonden', label: 'Verzonden',   statuses: ['definitief', 'verzonden'] as SettlementStatus[] },
@@ -610,8 +586,11 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                 </div>
               )
             })}
+            </div>
           </div>
+        </div>
         ) : (
+          <div className="flex-1 min-h-0 overflow-y-auto">
           <DashboardTableBlock empty={filteredSettlements.length === 0}>
             <Table>
               <TableHeader>
@@ -692,9 +671,9 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
               </TableBody>
             </Table>
           </DashboardTableBlock>
+          </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
     <SettlementWizard
       key={`${wizardOpen}-${editId ?? 'new'}`}
       open={wizardOpen}

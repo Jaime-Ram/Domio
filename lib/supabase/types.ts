@@ -488,6 +488,9 @@ export interface Database {
           id: string
           owner_id: string
           property_id: string | null
+          unit_id: string | null
+          lease_id: string | null
+          ticket_id: string | null
           name: string
           type: 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig'
           file_name: string | null
@@ -496,6 +499,7 @@ export interface Database {
           storage_path: string | null
           source: 'upload' | 'generated' | null
           template_type: string | null
+          scope: 'general' | 'lease' | 'unit' | 'property' | 'ticket'
           created_at: string
           updated_at: string
         }
@@ -503,6 +507,9 @@ export interface Database {
           id?: string
           owner_id: string
           property_id?: string | null
+          unit_id?: string | null
+          lease_id?: string | null
+          ticket_id?: string | null
           name: string
           type?: 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig'
           file_name?: string | null
@@ -511,6 +518,7 @@ export interface Database {
           storage_path?: string | null
           source?: 'upload' | 'generated' | null
           template_type?: string | null
+          scope?: 'general' | 'lease' | 'unit' | 'property' | 'ticket'
           created_at?: string
           updated_at?: string
         }
@@ -518,6 +526,9 @@ export interface Database {
           id?: string
           owner_id?: string
           property_id?: string | null
+          unit_id?: string | null
+          lease_id?: string | null
+          ticket_id?: string | null
           name?: string
           type?: 'Contract' | 'Keuring' | 'Factuur' | 'Verzekering' | 'Overig'
           file_name?: string | null
@@ -526,6 +537,7 @@ export interface Database {
           storage_path?: string | null
           source?: 'upload' | 'generated' | null
           template_type?: string | null
+          scope?: 'general' | 'lease' | 'unit' | 'property' | 'ticket'
           created_at?: string
           updated_at?: string
         }

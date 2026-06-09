@@ -20,24 +20,46 @@ export async function POST(
 
   const db = supabase as any
 
-  // Verify tenant has access to this ticket via their lease
+  // Verify tenant has access to this ticket via their lease (supports lease_tenants join table)
   const { data: access } = await db
     .from('tickets')
-    .select(`
-      id, title, ticket_number, owner_id,
-      leases:lease_id(
-        tenants(profile_id, full_name)
-      )
-    `)
+    .select('id, title, ticket_number, owner_id, lease_id, created_by')
     .eq('id', ticketId)
     .single()
 
   if (!access) return NextResponse.json({ error: 'Ticket niet gevonden' }, { status: 404 })
 
-  const tenant = access.leases?.tenants
-  if (!tenant || tenant.profile_id !== user.id) {
+  // Check access: created_by this user, OR lease linked via lease_tenants
+  let hasAccess = access.created_by === user.id
+
+  if (!hasAccess && access.lease_id) {
+    const { data: tenantRow } = await db
+      .from('tenants')
+      .select('id')
+      .eq('profile_id', user.id)
+      .single()
+
+    if (tenantRow) {
+      const { data: lt } = await db
+        .from('lease_tenants')
+        .select('lease_id')
+        .eq('lease_id', access.lease_id)
+        .eq('tenant_id', tenantRow.id)
+        .maybeSingle()
+      hasAccess = !!lt
+    }
+  }
+
+  if (!hasAccess) {
     return NextResponse.json({ error: 'Geen toegang tot dit ticket' }, { status: 403 })
   }
+
+  // Resolve tenant full_name for the email
+  const { data: tenantRow } = await db
+    .from('tenants')
+    .select('full_name')
+    .eq('profile_id', user.id)
+    .maybeSingle()
 
   // Insert message (RLS: tenant_insert_public_messages policy vereist)
   const { data: message, error } = await db
@@ -73,7 +95,7 @@ export async function POST(
         subject: `Huurder heeft gereageerd op ticket: ${access.title}`,
         react: React.createElement(TicketReplyEmail, {
           recipientName: landlordProfile.full_name ?? 'Verhuurder',
-          senderName: tenantProfile?.full_name ?? tenant.full_name ?? 'Huurder',
+          senderName: tenantProfile?.full_name ?? tenantRow?.full_name ?? 'Huurder',
           ticketTitle: access.title,
           ticketNumber: access.ticket_number ?? null,
           messageContent: content.trim(),

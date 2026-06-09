@@ -41,7 +41,6 @@ import {
   TicketPlus,
   Loader2,
   Bell,
-  MessageSquare,
   FileUp,
   CalendarDays,
   FileX,
@@ -848,7 +847,6 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
                 slim
               />
               <ActionListRow icon={Bell} title="Betalingsherinnering sturen" subtitle="Registreert een herinnering in de activiteitenlog" onClick={handleBetalingsherinnering} slim />
-              <ActionListRow icon={MessageSquare} title="Bericht sturen" subtitle="Directe chat met huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
               <ActionListRow icon={FileUp} title="Document versturen" subtitle="Stuur een PDF of brief naar de huurder" slim right={<span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Binnenkort</span>} />
             </ActionListSection>
 

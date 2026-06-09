@@ -95,6 +95,28 @@ export function CreateDialogShell({
           {subtitle && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
           )}
+          {isMultiStep && step && totalSteps && (
+            <div className="w-full mt-3 space-y-2">
+              <div className="flex gap-2 sm:gap-3 w-full">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
+                      i === step - 1
+                        ? 'bg-[#163300] dark:bg-[#9FE870]'
+                        : i < step - 1
+                        ? 'bg-[#163300]/35 dark:bg-[#9FE870]/35'
+                        : 'bg-gray-200 dark:bg-neutral-700'
+                    )}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-left text-gray-400 dark:text-gray-500">
+                Stap {step} van {totalSteps}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Body */}

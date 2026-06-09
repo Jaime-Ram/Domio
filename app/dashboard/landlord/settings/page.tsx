@@ -4,15 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import {
   User, Shield, CreditCard, Settings,
-  CheckCircle2, Pencil, X, Check, Loader2, Mail, Building2,
-  Landmark, BookOpen, RefreshCw, ExternalLink,
+  CheckCircle2, Pencil, Check, Loader2, Mail, Building2,
+  Landmark, BookOpen,
   Globe, Bell, Trash2, AlertTriangle, ChevronRight,
   Download,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
 import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail, deleteAccount } from '@/lib/supabase/auth'
-import { supabase } from '@/lib/supabase/client'
 import { DeleteAccountDialog } from '@/components/dashboard/delete-account-dialog'
 import { ActionListRow, ActionListSection } from '@/components/ui/action-list'
 
@@ -171,19 +170,6 @@ export default function SettingsPage() {
   // Voorkeuren expand
   const [prefSection, setPrefSection] = useState<'taal' | 'notif' | null>(null)
 
-  // Koppelingen
-  interface BankConnection { iban: string | null; last_synced_at: string | null }
-  const [bankConnection, setBankConnection] = useState<BankConnection | null>(null)
-  const [bankLoading, setBankLoading] = useState(true)
-  const [bankSyncing, setBankSyncing] = useState(false)
-
-  // Bank picker
-  interface YapilyInstitution { id: string; name: string; logo: string | null }
-  const [showBankPicker, setShowBankPicker] = useState(false)
-  const [institutions, setInstitutions] = useState<YapilyInstitution[]>([])
-  const [institutionsLoading, setInstitutionsLoading] = useState(false)
-
-
   const loadTotpFactors = useCallback(async () => {
     if (isDemo) return
     const { data } = await listMfaFactors()
@@ -262,41 +248,6 @@ export default function SettingsPage() {
       setActiveTab(tab as SettingsTab)
     }
   }, [])
-
-  useEffect(() => {
-    if (isDemo) { setBankLoading(false); return }
-    supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'yapily').maybeSingle()
-      .then(({ data }) => { setBankConnection(data ?? null); setBankLoading(false) })
-  }, [isDemo])
-
-  async function handleBankSync() {
-    setBankSyncing(true)
-    try {
-      await fetch('/api/yapily/sync')
-      const { data } = await supabase.from('bank_connections').select('iban, last_synced_at').eq('provider', 'yapily').maybeSingle()
-      setBankConnection(data ?? null)
-    } finally {
-      setBankSyncing(false)
-    }
-  }
-
-  async function handleBankConnect() {
-    setShowBankPicker(true)
-    if (institutions.length > 0) return
-    setInstitutionsLoading(true)
-    try {
-      const res = await fetch('/api/yapily/institutions')
-      if (res.ok) {
-        const data = await res.json()
-        setInstitutions(data.institutions ?? [])
-      }
-    } finally {
-      setInstitutionsLoading(false)
-    }
-  }
-
-  const formatBankDate = (iso: string) =>
-    new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   // Account field handlers
   const cancelEditing = () => {
@@ -510,37 +461,32 @@ export default function SettingsPage() {
     return d.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
   })()
 
+  if (!accountDataReady) {
+    return <AccountHeaderSkeleton cardClass={sCard} />
+  }
+
   return (
     <>
-      {!accountDataReady ? (
-        <AccountHeaderSkeleton cardClass={sCard} />
-      ) : (
-        <div className={cn(sCard, 'overflow-hidden')}>
-          <div
-            className="h-28 sm:h-32 bg-[#163300] bg-cover bg-no-repeat"
-            style={{ backgroundImage: "url('/images/Achtergrond2.jpg')", backgroundPosition: '50% 26%' }}
-          />
-          <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
-            <div className="-mt-[4.5rem] shrink-0">
-              <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold">
-                {initialsLetters != null ? initialsLetters : <User className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden />}
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mt-2">
-              <div className="flex flex-col items-center sm:items-start gap-3">
-                <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870] text-center sm:text-left">
-                  {displayName}
-                </h1>
-                <div className="mt-3">
-                  <SettingsPillNav activeTab={activeTab} onTabChange={setActiveTab} />
-                </div>
-              </div>
+      {/* Header card */}
+      <div className={cn(sCard, 'overflow-hidden')}>
+        <div
+          className="h-28 sm:h-32 bg-[#163300] bg-cover bg-no-repeat"
+          style={{ backgroundImage: "url('/images/Achtergrond2.jpg')", backgroundPosition: '50% 26%' }}
+        />
+        <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
+          <div className="-mt-[4.5rem] shrink-0">
+            <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold">
+              {initialsLetters != null ? initialsLetters : <User className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden />}
             </div>
           </div>
+          <div className="mt-2 flex flex-col gap-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870]">{displayName}</h1>
+            <SettingsPillNav activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
         </div>
-      )}
+      </div>
 
-      {accountDataReady && activeTab === 'account' && (
+      {activeTab === 'account' && (
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
@@ -790,7 +736,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {accountDataReady && activeTab === 'beveiliging' && (
+      {activeTab === 'beveiliging' && (
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
@@ -970,7 +916,7 @@ export default function SettingsPage() {
       )}
 
       {/* Abonnement tab */}
-      {accountDataReady && activeTab === 'abonnement' && (
+      {activeTab === 'abonnement' && (
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
@@ -1035,36 +981,13 @@ export default function SettingsPage() {
 
           {/* Bankieren */}
           <ActionListSection title="Bankieren">
-            {bankLoading ? (
-              <div className="flex items-center gap-4 py-4">
-                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 animate-pulse shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3.5 w-32 rounded bg-gray-200 dark:bg-neutral-700 animate-pulse" />
-                  <div className="h-3 w-48 rounded bg-gray-100 dark:bg-neutral-800 animate-pulse" />
-                </div>
-              </div>
-            ) : bankConnection ? (
-              <ActionListRow
-                icon={Landmark}
-                title="Bankkoppeling"
-                subtitle={`${bankConnection.iban ? `IBAN: ${bankConnection.iban}` : 'Verbonden'}${bankConnection.last_synced_at ? ` · ${formatBankDate(bankConnection.last_synced_at)}` : ''}`}
-                right={
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="inline-flex items-center rounded-full bg-[#9FE870]/20 dark:bg-[#9FE870]/10 px-2.5 py-0.5 text-xs font-medium text-[#163300] dark:text-[#9FE870]">Verbonden</span>
-                    <button onClick={handleBankSync} disabled={bankSyncing} className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50">
-                      <RefreshCw className={cn('h-3.5 w-3.5', bankSyncing && 'animate-spin')} />{bankSyncing ? 'Sync...' : 'Sync'}
-                    </button>
-                  </div>
-                }
-              />
-            ) : (
-              <ActionListRow
-                icon={Landmark}
-                title="Bankkoppeling"
-                subtitle="Koppel je bankrekening via Yapily Open Banking"
-                onClick={handleBankConnect}
-              />
-            )}
+            <ActionListRow
+              icon={Landmark}
+              title="Bankkoppeling"
+              subtitle="Koppel je bankrekening via Yapily Open Banking"
+              right={<span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">Binnenkort</span>}
+              className="opacity-50"
+            />
           </ActionListSection>
 
           {/* Boekhouding & platformen */}
@@ -1089,46 +1012,6 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* ── Bank picker modal ── */}
-      {showBankPicker && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setShowBankPicker(false)}>
-          <div className="w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100 dark:border-neutral-800">
-              <p className="text-base font-semibold text-gray-900 dark:text-white">Kies je bank</p>
-              <button onClick={() => setShowBankPicker(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="max-h-80 overflow-y-auto py-2">
-              {institutionsLoading ? (
-                <div className="flex items-center justify-center py-10">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                </div>
-              ) : institutions.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">Geen banken beschikbaar</p>
-              ) : (
-                institutions.map(inst => (
-                  <a
-                    key={inst.id}
-                    href={`/api/yapily/link?institutionId=${inst.id}`}
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
-                  >
-                    {inst.logo ? (
-                      <img src={inst.logo} alt={inst.name} className="h-8 w-8 rounded-lg object-contain shrink-0" />
-                    ) : (
-                      <div className="h-8 w-8 rounded-lg bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                        <Landmark className="h-4 w-4 text-gray-400" />
-                      </div>
-                    )}
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{inst.name}</span>
-                    <ChevronRight className="h-4 w-4 text-gray-400 ml-auto shrink-0" />
-                  </a>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }

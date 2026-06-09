@@ -180,12 +180,14 @@ CREATE TABLE public.documents (
   template_type text,
   unit_id uuid,
   lease_id uuid,
-  scope text NOT NULL DEFAULT 'general'::text CHECK (scope = ANY (ARRAY['general'::text, 'lease'::text, 'unit'::text, 'property'::text])),
+  ticket_id uuid,
+  scope text NOT NULL DEFAULT 'general'::text CHECK (scope = ANY (ARRAY['general'::text, 'lease'::text, 'unit'::text, 'property'::text, 'ticket'::text])),
   CONSTRAINT documents_pkey PRIMARY KEY (id),
   CONSTRAINT documents_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
   CONSTRAINT documents_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
   CONSTRAINT documents_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
-  CONSTRAINT documents_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id)
+  CONSTRAINT documents_lease_id_fkey FOREIGN KEY (lease_id) REFERENCES public.leases(id),
+  CONSTRAINT documents_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES public.tickets(id)
 );
 CREATE TABLE public.bank_connections (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -276,15 +278,14 @@ CREATE TABLE public.payment_profile_events (
 CREATE TABLE public.cost_allocation_keys (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   owner_id uuid NOT NULL,
-  property_id uuid,
   name text NOT NULL,
   method text NOT NULL CHECK (method = ANY (ARRAY['equal'::text, 'surface_area'::text, 'custom'::text])),
   units jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(units) = 'array'::text),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  standard boolean DEFAULT false,
   CONSTRAINT cost_allocation_keys_pkey PRIMARY KEY (id),
-  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id),
-  CONSTRAINT cost_allocation_keys_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id)
+  CONSTRAINT cost_allocation_keys_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.legal_entities (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -374,11 +375,11 @@ CREATE TABLE public.payment_assignments (
   CONSTRAINT payment_assignments_pkey PRIMARY KEY (id),
   CONSTRAINT payment_assignments_cost_allocation_key_id_fkey FOREIGN KEY (cost_allocation_key_id) REFERENCES public.cost_allocation_keys(id),
   CONSTRAINT payment_assignments_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT payment_assignments_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES public.payments(id),
   CONSTRAINT payment_assignments_rent_expectation_id_fkey FOREIGN KEY (rent_expectation_id) REFERENCES public.rent_expectations(id),
   CONSTRAINT payment_assignments_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.profiles(id),
   CONSTRAINT payment_assignments_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
-  CONSTRAINT payment_assignments_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id)
+  CONSTRAINT payment_assignments_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id),
+  CONSTRAINT payment_assignments_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES public.payments(id)
 );
 CREATE TABLE public.lease_tenants (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -624,4 +625,33 @@ CREATE TABLE public.contacts (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT contacts_pkey PRIMARY KEY (id),
   CONSTRAINT contacts_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.flows (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  template_id text NOT NULL,
+  name text NOT NULL,
+  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'inactive'::text])),
+  category text,
+  trigger text,
+  trigger_conf jsonb NOT NULL DEFAULT '{}'::jsonb,
+  configured_steps jsonb NOT NULL DEFAULT '[]'::jsonb,
+  property_scope jsonb NOT NULL DEFAULT '{"type": "all", "propertyIds": []}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT flows_pkey PRIMARY KEY (id),
+  CONSTRAINT flows_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.contact_links (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL,
+  contact_id uuid NOT NULL,
+  property_id uuid,
+  portfolio_id uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT contact_links_pkey PRIMARY KEY (id),
+  CONSTRAINT contact_links_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT contact_links_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES public.contacts(id),
+  CONSTRAINT contact_links_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(id),
+  CONSTRAINT contact_links_portfolio_id_fkey FOREIGN KEY (portfolio_id) REFERENCES public.portfolios(id)
 );
