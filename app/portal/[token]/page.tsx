@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { verifyInvitationToken } from '@/lib/invitations'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { MapPin, CheckCircle2, ArrowRight } from 'lucide-react'
 import { AuthPageShell } from '@/components/auth/auth-page-shell'
 
@@ -22,8 +22,12 @@ export default async function PortalPage({ params }: PortalPageProps) {
     return <TokenExpiredView />
   }
 
-  const supabase = await createClient()
-  const db = supabase as any
+  // Admin-client: het token bewijst al dat je deze uitnodiging mag zien.
+  // Met de sessie-client zou een niet-ingelogde bezoeker (anon) door RLS
+  // niets kunnen lezen → onterechte 404.
+  const admin = createAdminClient()
+  if (!admin) return <TokenExpiredView />
+  const db = admin as any
 
   const [{ data: invitation }, { data: tenant }] = await Promise.all([
     db.from('tenant_invitations').select('id, status, expires_at').eq('id', payload.invitationId).single(),
