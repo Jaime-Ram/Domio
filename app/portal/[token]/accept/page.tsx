@@ -1,15 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { supabase } from '@/lib/supabase/client'
 
 export default function AcceptInvitationPage() {
+  return (
+    <Suspense fallback={<Shell><Loader2 className="w-6 h-6 animate-spin text-gray-300" /></Shell>}>
+      <AcceptInvitationInner />
+    </Suspense>
+  )
+}
+
+function AcceptInvitationInner() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const token = params.token as string
+  const inviteEmail = searchParams.get('e')
 
   const [checkingSession, setCheckingSession] = useState(true)
   const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null)
@@ -118,11 +128,18 @@ export default function AcceptInvitationPage() {
     <Shell>
       <div className="w-full max-w-sm">
         <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
-          Aanvraag accepteren
+          Log in of maak een account
         </h1>
-        <p className="text-sm text-gray-500 text-center leading-relaxed mb-8">
-          Kies een wachtwoord om je aanvraag te bevestigen. Heb je al een Domio-account met dit e-mailadres? Vul dan je bestaande wachtwoord in.
+        <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
+          Stel een wachtwoord in om je aanvraag te bevestigen. Heb je al een Domio-account met dit e-mailadres? Vul dan je bestaande wachtwoord in.
         </p>
+
+        {inviteEmail && (
+          <div className="bg-[#f4f4f4] rounded-2xl px-4 py-3 mb-4 text-center">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Je e-mailadres</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{inviteEmail}</p>
+          </div>
+        )}
 
         <form onSubmit={handlePasswordSubmit} className="space-y-3">
           <div className="relative">

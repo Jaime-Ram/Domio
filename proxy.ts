@@ -20,7 +20,18 @@ export async function proxy(request: NextRequest) {
     const target = '/dashboard/landlord' + pathname.slice('/dashboard/employer'.length) + search
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
-  if (pathname === '/portal' || pathname.startsWith('/portal/')) {
+  // LET OP: NIET de hele /portal/* afvangen — /portal/<token> en
+  // /portal/<token>/accept zijn de PUBLIEKE uitnodigings-acceptatieflow en
+  // moeten gewoon geserveerd worden (zonder login). Alleen de oude
+  // tenant-portal secties verhuizen we naar het nieuwe dashboard.
+  const LEGACY_PORTAL_SECTIONS = [
+    '/portal',
+    '/portal/financial',
+    '/portal/tickets',
+    '/portal/documents',
+    '/portal/settings',
+  ]
+  if (LEGACY_PORTAL_SECTIONS.includes(pathname)) {
     const target = '/dashboard/tenant' + pathname.slice('/portal'.length) + search
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
