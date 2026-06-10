@@ -32,8 +32,8 @@ import { NewTenantDialog, type CreatedTenantPayload } from '@/components/tenants
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { DialogField } from '@/components/ui/dialog-field'
 import { Input } from '@/components/ui/input'
-import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
-import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
+import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
 
 type TenantRow = {
   id: string
@@ -362,6 +362,110 @@ function TenantsPageContent() {
     </>
   )
 
+  const tenantColumns: DataTableColumn<any>[] = [
+    {
+      key: 'name', header: 'Huurder', sortable: true, width: 'minmax(0,2fr)',
+      render: (tenant) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+            <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
+            <a
+              href={`mailto:${tenant.email}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-block max-w-full text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5 hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+            >{tenant.email}</a>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'status', header: 'Status', sortable: true, width: 'minmax(0,1fr)',
+      render: (tenant) => (
+        <span className={cn(
+          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+          tenant.status === 'actief'
+            ? 'bg-[#2F5711] text-white'
+            : tenant.status === 'concept'
+            ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+            : tenant.status === 'geen contract'
+            ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
+            : 'bg-[#A8200D] text-white'
+        )}>
+          {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief Contract' : tenant.status}
+        </span>
+      ),
+    },
+    {
+      key: 'unit', header: 'Eenheid', sortable: true, width: 'minmax(0,1.5fr)',
+      render: (tenant) => (
+        tenant.unitNumber || tenant.propertyName ? (
+          <>
+            <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.unitNumber || '—'}</p>
+            {tenant.propertyName && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tenant.propertyName}</p>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-gray-400 dark:text-gray-600">—</p>
+        )
+      ),
+    },
+    {
+      key: 'rent', header: 'Huurprijs', sortable: true, width: 'minmax(0,1fr)',
+      render: (tenant) => (
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          {tenant.monthlyRent ? `€${tenant.monthlyRent.toLocaleString('nl-NL')}` : '—'}
+        </p>
+      ),
+    },
+    {
+      key: 'portaal', header: 'Portaal', width: 'minmax(0,1.4fr)',
+      render: (tenant) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          {tenant.profileId !== null ? (
+            <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#9FE870]">
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span className="text-xs font-medium">Actief</span>
+            </div>
+          ) : tenant.portalStatus === 'uitgenodigd' ? (
+            <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+              <Mail className="h-4 w-4 shrink-0" />
+              <span className="text-xs font-medium">Uitgenodigd</span>
+              <button
+                onClick={() => sendInvite(tenant.id)}
+                disabled={invitingIds.has(tenant.id)}
+                title="Opnieuw sturen"
+                className="ml-0.5 text-amber-400 hover:text-amber-600 dark:text-amber-500 dark:hover:text-amber-300 transition-colors disabled:opacity-50"
+              >
+                {invitingIds.has(tenant.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+          ) : tenant.email ? (
+            <button
+              onClick={() => sendInvite(tenant.id)}
+              disabled={invitingIds.has(tenant.id)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
+            >
+              {invitingIds.has(tenant.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+              Uitnodigen
+            </button>
+          ) : (
+            <button
+              onClick={() => openEmailDialog(tenant.id)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Uitnodigen
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ]
+
   return (
     <>
       {leaseLinkError && (
@@ -385,113 +489,15 @@ function TenantsPageContent() {
               addLabel="Nieuw contract"
             />
 
-            <DataTable>
-              <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)]">
-                <SortableHeader label="Huurder" sortKey="name" sort={tenantSort} onSort={toggleSort} />
-                <SortableHeader label="Status" sortKey="status" sort={tenantSort} onSort={toggleSort} />
-                <SortableHeader label="Eenheid" sortKey="unit" sort={tenantSort} onSort={toggleSort} />
-                <SortableHeader label="Huurprijs" sortKey="rent" sort={tenantSort} onSort={toggleSort} />
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Portaal</span>
-              </DataTableHeader>
-              <DataTableBody>
-                {sortedTenants.length === 0 ? (
-                  <DataTableEmpty>Geen huurders gevonden.</DataTableEmpty>
-                ) : sortedTenants.map((tenant) => (
-                  <DataTableRow
-                    key={tenant.id}
-                    cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.4fr)]"
-                    onClick={() => setSelectedTenantId(tenant.id)}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                        <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
-                        <a
-                          href={`mailto:${tenant.email}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-block max-w-full text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5 hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
-                        >{tenant.email}</a>
-                      </div>
-                    </div>
-                    <div>
-                      <span className={cn(
-                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                        tenant.status === 'actief'
-                          ? 'bg-[#2F5711] text-white'
-                          : tenant.status === 'concept'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                          : tenant.status === 'geen contract'
-                          ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
-                          : 'bg-[#A8200D] text-white'
-                      )}>
-                        {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief Contract' : tenant.status}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      {tenant.unitNumber || tenant.propertyName ? (
-                        <>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.unitNumber || '—'}</p>
-                          {tenant.propertyName && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tenant.propertyName}</p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-sm text-gray-400 dark:text-gray-600">—</p>
-                      )}
-                    </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {tenant.monthlyRent ? `€${tenant.monthlyRent.toLocaleString('nl-NL')}` : '—'}
-                    </p>
-                    <div onClick={(e) => e.stopPropagation()}>
-                      {tenant.profileId !== null ? (
-                        <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#9FE870]">
-                          <CheckCircle2 className="h-4 w-4 shrink-0" />
-                          <span className="text-xs font-medium">Actief</span>
-                        </div>
-                      ) : tenant.portalStatus === 'uitgenodigd' ? (
-                        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                          <Mail className="h-4 w-4 shrink-0" />
-                          <span className="text-xs font-medium">Uitgenodigd</span>
-                          <button
-                            onClick={() => sendInvite(tenant.id)}
-                            disabled={invitingIds.has(tenant.id)}
-                            title="Opnieuw sturen"
-                            className="ml-0.5 text-amber-400 hover:text-amber-600 dark:text-amber-500 dark:hover:text-amber-300 transition-colors disabled:opacity-50"
-                          >
-                            {invitingIds.has(tenant.id)
-                              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              : <RotateCcw className="h-3.5 w-3.5" />
-                            }
-                          </button>
-                        </div>
-                      ) : tenant.email ? (
-                        <button
-                          onClick={() => sendInvite(tenant.id)}
-                          disabled={invitingIds.has(tenant.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
-                        >
-                          {invitingIds.has(tenant.id)
-                            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            : <Mail className="h-3.5 w-3.5" />
-                          }
-                          Uitnodigen
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => openEmailDialog(tenant.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
-                        >
-                          <Mail className="h-3.5 w-3.5" />
-                          Uitnodigen
-                        </button>
-                      )}
-                    </div>
-                  </DataTableRow>
-                ))}
-              </DataTableBody>
-            </DataTable>
+            <DataTable
+              rows={sortedTenants}
+              columns={tenantColumns}
+              getRowId={(t) => t.id}
+              sort={tenantSort}
+              onSort={toggleSort}
+              onRowClick={(t) => setSelectedTenantId(t.id)}
+              empty="Geen huurders gevonden."
+            />
             </div>
 
       <Dialog open={!!emailDialogTenantId} onOpenChange={(open) => { if (!open) setEmailDialogTenantId(null) }}>
