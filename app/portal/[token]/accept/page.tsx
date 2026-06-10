@@ -1,27 +1,26 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { Eye, EyeOff, Loader2, CheckCircle2, MapPin } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { supabase } from '@/lib/supabase/client'
 
-export default function AcceptInvitationPage() {
-  return (
-    <Suspense fallback={<Shell><Loader2 className="w-6 h-6 animate-spin text-gray-300" /></Shell>}>
-      <AcceptInvitationInner />
-    </Suspense>
-  )
+interface Summary {
+  email: string
+  status: string
+  landlord: string
+  property: string | null
+  monthlyRent: number | null
 }
 
-function AcceptInvitationInner() {
+export default function AcceptInvitationPage() {
   const params = useParams()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const token = params.token as string
-  const inviteEmail = searchParams.get('e')
 
-  const [checkingSession, setCheckingSession] = useState(true)
+  const [summary, setSummary] = useState<Summary | null>(null)
+  const [loadingPage, setLoadingPage] = useState(true)
   const [loggedInEmail, setLoggedInEmail] = useState<string | null>(null)
 
   const [password, setPassword] = useState('')
@@ -29,15 +28,20 @@ function AcceptInvitationInner() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [resetSent, setResetSent] = useState(false)
   const [done, setDone] = useState(false)
 
-  // Bepaal of de bezoeker al is ingelogd
+  // Samenvatting + sessie ophalen
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setLoggedInEmail(data.user?.email ?? null)
-      setCheckingSession(false)
+    Promise.all([
+      fetch(`/api/invitations/summary?token=${encodeURIComponent(token)}`).then((r) => r.json()).catch(() => null),
+      supabase.auth.getUser().then(({ data }) => data.user?.email ?? null).catch(() => null),
+    ]).then(([sum, email]) => {
+      if (sum && !sum.error) setSummary(sum)
+      setLoggedInEmail(email)
+      setLoadingPage(false)
     })
-  }, [])
+  }, [token])
 
   async function accept(body: Record<string, unknown>) {
     setError(null)
@@ -59,12 +63,10 @@ function AcceptInvitationInner() {
     }
   }
 
-  // Ingelogd: accepteer in één klik (geen wachtwoord nodig)
   function handleOneClickAccept() {
     accept({})
   }
 
-  // Niet ingelogd: wachtwoord instellen / invullen
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -73,8 +75,22 @@ function AcceptInvitationInner() {
     accept({ password })
   }
 
+  async function handleForgotPassword() {
+    if (!summary?.email) return
+    setError(null)
+    const { error } = await supabase.auth.resetPasswordForEmail(summary.email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    })
+    if (error) { setError(error.message); return }
+    setResetSent(true)
+  }
+
   const inputCls = 'w-full bg-[#f4f4f4] rounded-2xl px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#163300]/15 transition-all'
   const ctaCls = 'flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors disabled:opacity-50'
+
+  if (loadingPage) {
+    return <Shell><Loader2 className="w-6 h-6 animate-spin text-gray-300" /></Shell>
+  }
 
   if (done) {
     return (
@@ -90,15 +106,26 @@ function AcceptInvitationInner() {
     )
   }
 
-  if (checkingSession) {
-    return (
-      <Shell>
-        <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
-      </Shell>
-    )
-  }
+  // Samenvattingskaart — op beide varianten getoond
+  const summaryCard = (
+    <>
+      {summary?.property && (
+        <div className="flex items-center gap-3 bg-[#f4f4f4] rounded-2xl px-4 py-3.5 mb-6 text-left">
+          <div className="w-8 h-8 rounded-xl bg-[#163300] flex items-center justify-center shrink-0">
+            <MapPin className="w-4 h-4 text-[#9FE870]" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">
+              Uitnodiging van {summary.landlord}
+            </p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{summary.property}</p>
+          </div>
+        </div>
+      )}
+    </>
+  )
 
-  // ── Ingelogd: één klik ──
+  // ── Al ingelogd: één klik ──
   if (loggedInEmail) {
     return (
       <Shell>
@@ -106,13 +133,13 @@ function AcceptInvitationInner() {
           <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
             Aanvraag accepteren
           </h1>
-          <p className="text-sm text-gray-500 text-center leading-relaxed mb-8">
-            Je bent ingelogd als <strong className="text-gray-700">{loggedInEmail}</strong>. Accepteer de aanvraag om toegang te krijgen tot je huurportaal.
+          <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
+            Je bent ingelogd als <strong className="text-gray-700">{loggedInEmail}</strong>.
           </p>
 
-          {error && (
-            <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-3">{error}</p>
-          )}
+          {summaryCard}
+
+          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-3">{error}</p>}
 
           <button onClick={handleOneClickAccept} disabled={loading} className={ctaCls}>
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -123,21 +150,23 @@ function AcceptInvitationInner() {
     )
   }
 
-  // ── Niet ingelogd: wachtwoord instellen of invullen ──
+  // ── Niet ingelogd: samenvatting + wachtwoord (inloggen óf account aanmaken) ──
   return (
     <Shell>
       <div className="w-full max-w-sm">
         <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
-          Log in of maak een account
+          Bevestig je aanvraag
         </h1>
         <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
-          Stel een wachtwoord in om je aanvraag te bevestigen. Heb je al een Domio-account met dit e-mailadres? Vul dan je bestaande wachtwoord in.
+          Kies een wachtwoord om je account te activeren. Heb je al een Domio-account? Vul je bestaande wachtwoord in.
         </p>
 
-        {inviteEmail && (
+        {summaryCard}
+
+        {summary?.email && (
           <div className="bg-[#f4f4f4] rounded-2xl px-4 py-3 mb-4 text-center">
             <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Je e-mailadres</p>
-            <p className="text-sm font-semibold text-gray-900 truncate">{inviteEmail}</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{summary.email}</p>
           </div>
         )}
 
@@ -171,9 +200,7 @@ function AcceptInvitationInner() {
             placeholder="Bevestig wachtwoord"
           />
 
-          {error && (
-            <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3">{error}</p>}
 
           <div className="pt-2">
             <button type="submit" disabled={loading} className={ctaCls}>
@@ -182,6 +209,16 @@ function AcceptInvitationInner() {
             </button>
           </div>
         </form>
+
+        <div className="text-center mt-4">
+          {resetSent ? (
+            <p className="text-xs text-[#15803D]">Reset-link verstuurd naar je e-mail.</p>
+          ) : (
+            <button onClick={handleForgotPassword} className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2">
+              Wachtwoord vergeten?
+            </button>
+          )}
+        </div>
 
         <p className="text-xs text-center text-gray-400 mt-6">
           Door verder te gaan ga je akkoord met ons{' '}

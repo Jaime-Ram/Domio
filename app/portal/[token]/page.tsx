@@ -87,7 +87,7 @@ export default async function PortalPage({ params }: PortalPageProps) {
 
         <div className="space-y-3">
           <Link
-            href={`/portal/${token}/accept${tenant.email ? `?e=${encodeURIComponent(tenant.email)}` : ''}`}
+            href={`/portal/${token}/accept`}
             className="flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors"
           >
             Aanvraag accepteren
