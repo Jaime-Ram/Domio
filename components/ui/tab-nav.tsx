@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 export type TabNavItem<T extends string = string> = {
@@ -15,7 +16,8 @@ interface TabNavProps<T extends string = string> {
   className?: string
   /**
    * 'pill'      — groen blok per actieve tab (uitschuif-menus).
-   * 'underline' — tekst-tabs met groene onderstreep (navigatie onder titels).
+   * 'underline' — tekst-tabs met meeschuivende groene onderstreep
+   *               (navigatie onder titels — zelfde stijl als Taken).
    */
   variant?: 'pill' | 'underline'
 }
@@ -27,29 +29,51 @@ export function TabNav<T extends string = string>({
   className,
   variant = 'pill',
 }: TabNavProps<T>) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const btnRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 })
+
+  useEffect(() => {
+    if (variant !== 'underline') return
+    const container = containerRef.current
+    const btn = btnRefs.current[activeTab]
+    if (!container || !btn) return
+    const c = container.getBoundingClientRect()
+    const b = btn.getBoundingClientRect()
+    setIndicator({ left: b.left - c.left, width: b.width })
+  }, [variant, activeTab, tabs])
+
   if (variant === 'underline') {
     return (
-      <div className={cn('flex items-center border-b border-gray-100 dark:border-neutral-800', className)}>
-        {tabs.map((tab) => {
+      <div
+        ref={containerRef}
+        className={cn(
+          'relative flex items-center overflow-x-auto border-b border-gray-200 dark:border-neutral-700 text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          className,
+        )}
+      >
+        {tabs.map((tab, index) => {
           const active = activeTab === tab.id
           return (
             <button
               key={tab.id}
+              ref={(el) => { btnRefs.current[tab.id] = el }}
               type="button"
               onClick={() => onChange(tab.id)}
               className={cn(
-                'mr-6 pb-2.5 -mb-px border-b-2 text-[13px] font-medium transition-colors whitespace-nowrap',
+                'shrink-0 pb-2 whitespace-nowrap font-semibold transition-colors duration-200',
+                index < tabs.length - 1 ? 'mr-6' : '',
                 active
-                  ? 'border-[#163300] text-[#163300] dark:border-[#9FE870] dark:text-[#9FE870]'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-neutral-200',
+                  ? 'text-[#15803D] dark:text-[#4ADE80]'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-neutral-200',
               )}
             >
               {tab.label}
               {tab.count !== undefined && (
                 <span className={cn(
-                  'ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full text-[10px] font-medium px-1',
+                  'ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full text-[11px] font-medium px-1',
                   active
-                    ? 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
+                    ? 'bg-[#15803D]/15 text-[#15803D] dark:bg-[#4ADE80]/20 dark:text-[#4ADE80]'
                     : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400',
                 )}>
                   {tab.count}
@@ -58,6 +82,10 @@ export function TabNav<T extends string = string>({
             </button>
           )
         })}
+        <div
+          className="absolute bottom-0 h-[2px] rounded-full bg-[#15803D] dark:bg-[#4ADE80] transition-all duration-200"
+          style={{ left: indicator.left, width: indicator.width }}
+        />
       </div>
     )
   }
