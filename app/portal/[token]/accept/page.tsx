@@ -141,7 +141,7 @@ function AcceptInvitationInner() {
         {summaryCard}
         {error && <Alert variant="destructive" className="mt-4"><AlertDescription>{error}</AlertDescription></Alert>}
         <Button onClick={handleSwitchAccount} disabled={loading} className={`${PRIMARY_BTN} mt-8`}>
-          {loading ? 'Bezig…' : `Uitloggen en doorgaan als ${summary!.email}`}
+          {loading ? 'Bezig…' : 'Uitloggen'}
         </Button>
       </motion.div>
     )
