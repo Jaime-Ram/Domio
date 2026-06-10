@@ -79,19 +79,6 @@ export async function POST(req: NextRequest) {
         )
       }
       userId = user.id
-
-      // Magic-link-gebruikers (of andere nieuwe accounts) hebben mogelijk nog
-      // geen huurder-profiel — maak het aan zodat de koppeling klopt.
-      const { data: prof } = await db.from('profiles').select('id').eq('id', userId).single()
-      if (!prof) {
-        const { data: t } = await db.from('tenants').select('full_name').eq('id', tenantId).single()
-        await admin.from('profiles').upsert({
-          id: userId,
-          email,
-          full_name: (t as any)?.full_name ?? '',
-          role: 'huurder',
-        } as any)
-      }
     } else {
       // ── Pad 2: wachtwoord meegegeven ──
       const { data: existingUsers } = await admin.auth.admin.listUsers()
@@ -117,17 +104,33 @@ export async function POST(req: NextRequest) {
         if (createError) throw createError
         userId = newUser.user.id
 
-        const { data: tenantData } = await db.from('tenants').select('full_name').eq('id', tenantId).single()
-        await admin.from('profiles').upsert({
-          id: userId,
-          email,
-          full_name: (tenantData as any)?.full_name ?? '',
-          role: 'huurder',
-        } as any)
-
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
         if (signInError) throw signInError
       }
+    }
+
+    // ── Profiel garanderen + rol forceren op 'huurder' ──
+    // De DB-default voor profiles.role is 'verhuurder'. Een uitgenodigd account
+    // is per definitie een huurder, dus we zetten de rol expliciet — behalve
+    // wanneer het account zelf al een verhuurder is die panden/huurders beheert
+    // (die mogen we niet degraderen).
+    const [{ data: prof }, { data: ownProps }, { data: ownTenants }] = await Promise.all([
+      db.from('profiles').select('id, role').eq('id', userId).single(),
+      db.from('properties').select('id').eq('owner_id', userId).limit(1),
+      db.from('tenants').select('id').eq('owner_id', userId).limit(1),
+    ])
+    const isLandlord = (ownProps?.length ?? 0) > 0 || (ownTenants?.length ?? 0) > 0
+
+    if (!prof) {
+      const { data: t } = await db.from('tenants').select('full_name').eq('id', tenantId).single()
+      await admin.from('profiles').upsert({
+        id: userId,
+        email,
+        full_name: (t as any)?.full_name ?? '',
+        role: 'huurder',
+      } as any)
+    } else if (!isLandlord && (prof as any).role !== 'huurder') {
+      await (admin as any).from('profiles').update({ role: 'huurder' }).eq('id', userId)
     }
 
     // Link profile_id to tenant record
