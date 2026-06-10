@@ -204,17 +204,20 @@ export default function TasksPage() {
     { key: 'afgerond', label: 'Afgerond', count: afgerondCount },
   ]
 
-  const tasksToolbar = (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <TabNav
-        tabs={FILTERS.map((f) => ({ id: f.key, label: f.label, count: f.count }))}
-        activeTab={filter}
-        onChange={(k) => setFilter(k as FilterKey)}
-        variant="underline"
-        className="w-full sm:w-auto"
-      />
+  // Tabbalk vol-breed onder de titel — zelfde plek/stijl als de andere pagina's
+  const tasksTabs = (
+    <TabNav
+      tabs={FILTERS.map((f) => ({ id: f.key, label: f.label, count: f.count }))}
+      activeTab={filter}
+      onChange={(k) => setFilter(k as FilterKey)}
+      variant="underline"
+      className="w-full"
+    />
+  )
 
-      <div className="flex items-center gap-1 shrink-0">
+  // Zoek/filter/actie-knoppen op een eigen rij boven de tabel
+  const tasksControls = (
+    <div className="flex items-center justify-end gap-1">
         {/* Search — icon, expands left */}
         <div className="flex flex-row-reverse items-center">
           <button
@@ -281,15 +284,18 @@ export default function TasksPage() {
           <Plus className="h-4 w-4 mr-2" />
           Nieuwe taak
         </Button>
-      </div>
     </div>
   )
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
 
-      {/* Tabs (open/afgerond/alle) + toolbar onder de titel, zoals bij Flows */}
-      {tasksToolbar}
+      {/* Tabbalk vol-breed onder de titel, zoals de andere pagina's */}
+      {tasksTabs}
+
+      <div className="flex flex-col gap-3">
+        {/* Zoek/filter/acties boven de tabel */}
+        {tasksControls}
 
       <div className="rounded-2xl overflow-hidden">
         {/* Column headers */}
@@ -447,6 +453,7 @@ export default function TasksPage() {
             })}
           </div>
         )}
+      </div>
       </div>
 
       {/* Create dialog */}
