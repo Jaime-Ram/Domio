@@ -34,14 +34,14 @@ export function getPageDef(rel: string, firstName: string): PageDef {
       { label: 'Inspecties', path: '/maintenance/inspecties' },
     ],
   }
-  if (rel.startsWith('/tenants')) return { title: 'Huurders' }
-  if (rel.startsWith('/contacts')) return { title: 'Contactboek' }
+  if (rel.startsWith('/tenants')) return { title: 'Huurders', tabs: [{ label: 'Alles', path: '/tenants' }] }
+  if (rel.startsWith('/contacts')) return { title: 'Contactboek', tabs: [{ label: 'Alles', path: '/contacts' }] }
   if (rel.startsWith('/portfolio')) return { title: 'Portefeuille', noDivider: true }
   if (rel.startsWith('/tasks')) return { title: 'Taken', noDivider: true }
-  if (rel.startsWith('/documents')) return { title: 'Documenten' }
+  if (rel.startsWith('/documents')) return { title: 'Documenten', tabs: [{ label: 'Alles', path: '/documents' }] }
   if (rel.startsWith('/flows')) return { title: 'Flows', noDivider: true }
   if (rel.startsWith('/mjop')) return { title: 'MJOP', noDivider: true }
-  if (rel.startsWith('/integrations')) return { title: 'Integraties' }
+  if (rel.startsWith('/integrations')) return { title: 'Integraties', tabs: [{ label: 'Alles', path: '/integrations' }] }
   if (rel.startsWith('/assist')) return { title: 'Domio Assist' }
   if (rel.startsWith('/app')) return { title: 'App' }
   if (rel.startsWith('/settings')) return { title: 'Instellingen' }
