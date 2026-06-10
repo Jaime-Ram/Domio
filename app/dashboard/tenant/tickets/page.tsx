@@ -407,7 +407,8 @@ export default function TenantTicketsPage() {
   }
 
   const handleSubmit = async () => {
-    if (!title.trim() || !context) return
+    if (!title.trim()) return
+    if (!context) { setError('Geen actief huurcontract gevonden. Vernieuw de pagina.'); return }
     setSubmitting(true)
     setError(null)
     try {

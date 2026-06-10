@@ -10,10 +10,11 @@ import { LocalPdfThumbnail } from '@/components/documents/local-pdf-thumbnail'
 import { mockDocuments } from '@/lib/mock-data/vastgoed'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { useDocumentPreview } from '@/providers/document-preview-provider'
-import { documentQueries } from '@/lib/supabase/queries'
+import { documentQueries, propertyQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
+import { supabase } from '@/lib/supabase/client'
 import { getUser } from '@/lib/supabase/auth'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
-import { Eye, Download, Trash2, Upload, X, Plus, CheckSquare } from 'lucide-react'
+import { Eye, Download, Trash2, Upload, X, Plus, CheckSquare, Link2, ChevronDown, Search, Check } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -72,6 +73,27 @@ export default function DocumentsPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   /** Documenten waar nu een bulk-download of -verwijdering op bezig is (per id spinner op de kaart). */
   const [bulkProcessingIds, setBulkProcessingIds] = useState<string[]>([])
+
+  type LinkType = 'property' | 'unit' | 'lease' | 'ticket'
+  type LinkOption = { id: string; label: string; sublabel?: string }
+
+  // Upload dialog link state
+  const [linkEnabled, setLinkEnabled] = useState(false)
+  const [linkType, setLinkType] = useState<LinkType>('property')
+  const [linkSearch, setLinkSearch] = useState('')
+  const [linkSelectedId, setLinkSelectedId] = useState<string | null>(null)
+  const [linkOptions, setLinkOptions] = useState<LinkOption[]>([])
+  const [linkOptionsLoading, setLinkOptionsLoading] = useState(false)
+
+  // Assign dialog (for existing documents)
+  const [assignDialogDoc, setAssignDialogDoc] = useState<{ id: string; name: string } | null>(null)
+  const [assignType, setAssignType] = useState<LinkType>('property')
+  const [assignSearch, setAssignSearch] = useState('')
+  const [assignSelectedId, setAssignSelectedId] = useState<string | null>(null)
+  const [assignOptions, setAssignOptions] = useState<LinkOption[]>([])
+  const [assignOptionsLoading, setAssignOptionsLoading] = useState(false)
+  const [assignSaving, setAssignSaving] = useState(false)
+  const [assignError, setAssignError] = useState<string | null>(null)
   const contentRef = useRef<HTMLDivElement | null>(null)
   const [bulkCenter, setBulkCenter] = useState<number | null>(null)
 
@@ -130,6 +152,132 @@ export default function DocumentsPage() {
     })
     return () => cancelAnimationFrame(id)
   }, [selectionMode, selectedIds.length])
+
+  useEffect(() => {
+    if (!linkEnabled || !linkType) return
+    setLinkOptionsLoading(true)
+    setLinkOptions([])
+    setLinkSearch('')
+    getUser().then(async ({ user }) => {
+      if (!user) { setLinkOptionsLoading(false); return }
+      try {
+        if (linkType === 'property') {
+          const props = await propertyQueries.getByOwner(user.id)
+          setLinkOptions(props.map(p => ({ id: p.id, label: (p as any).name || p.address || 'Pand', sublabel: p.address })))
+        } else if (linkType === 'unit') {
+          const props = await propertyQueries.getByOwner(user.id)
+          const propIds = props.map(p => p.id)
+          if (propIds.length > 0) {
+            const { data } = await supabase.from('units').select('id, unit_number, properties(name, address)').in('property_id', propIds)
+            setLinkOptions((data || []).map((u: any) => ({
+              id: u.id,
+              label: u.unit_number ? `Eenheid ${u.unit_number}` : 'Woning',
+              sublabel: u.properties?.address || u.properties?.name,
+            })))
+          }
+        } else if (linkType === 'lease') {
+          const leases = await leaseQueries.getByOwner(user.id)
+          setLinkOptions((leases || []).map((l: any) => ({
+            id: l.id,
+            label: [l.units?.unit_number && `Eenheid ${l.units.unit_number}`, l.tenants?.full_name].filter(Boolean).join(' — ') || 'Huurcontract',
+            sublabel: [l.units?.properties?.address, l.status].filter(Boolean).join(' · '),
+          })))
+        } else if (linkType === 'ticket') {
+          const tickets = await ticketQueries.getByOwner(user.id)
+          setLinkOptions((tickets || []).map((t: any) => ({
+            id: t.id,
+            label: `#${t.ticket_number} ${t.title || t.subject || ''}`.trim(),
+            sublabel: t.units?.properties?.name || (t.properties as any)?.name || '',
+          })))
+        }
+      } catch { /* ignore */ }
+      setLinkOptionsLoading(false)
+    })
+  }, [linkType, linkEnabled])
+
+  const filteredLinkOptions = useMemo(() => {
+    if (!linkSearch) return linkOptions
+    const q = linkSearch.toLowerCase()
+    return linkOptions.filter(o => o.label.toLowerCase().includes(q) || (o.sublabel || '').toLowerCase().includes(q))
+  }, [linkOptions, linkSearch])
+
+  const loadOptionsForType = async (type: LinkType, set: (opts: LinkOption[]) => void) => {
+    const { user } = await getUser()
+    if (!user) return
+    if (type === 'property') {
+      const props = await propertyQueries.getByOwner(user.id)
+      set(props.map(p => ({ id: p.id, label: (p as any).name || p.address || 'Pand', sublabel: p.address })))
+    } else if (type === 'unit') {
+      const props = await propertyQueries.getByOwner(user.id)
+      const propIds = props.map(p => p.id)
+      if (propIds.length > 0) {
+        const { data } = await supabase.from('units').select('id, unit_number, properties(name, address)').in('property_id', propIds)
+        set((data || []).map((u: any) => ({
+          id: u.id,
+          label: u.unit_number ? `Eenheid ${u.unit_number}` : 'Woning',
+          sublabel: u.properties?.address || u.properties?.name,
+        })))
+      }
+    } else if (type === 'lease') {
+      const leases = await leaseQueries.getByOwner(user.id)
+      set((leases || []).map((l: any) => ({
+        id: l.id,
+        label: [l.units?.unit_number && `Eenheid ${l.units.unit_number}`, l.tenants?.full_name].filter(Boolean).join(' — ') || 'Huurcontract',
+        sublabel: [l.units?.properties?.address, l.status].filter(Boolean).join(' · '),
+      })))
+    } else if (type === 'ticket') {
+      const tickets = await ticketQueries.getByOwner(user.id)
+      set((tickets || []).map((t: any) => ({
+        id: t.id,
+        label: `#${t.ticket_number} ${t.title || t.subject || ''}`.trim(),
+        sublabel: t.units?.properties?.name || (t.properties as any)?.name || '',
+      })))
+    }
+  }
+
+  useEffect(() => {
+    if (!assignDialogDoc) return
+    setAssignOptionsLoading(true)
+    setAssignOptions([])
+    setAssignSearch('')
+    loadOptionsForType(assignType, setAssignOptions)
+      .catch(() => {})
+      .finally(() => setAssignOptionsLoading(false))
+  }, [assignType, assignDialogDoc])
+
+  const filteredAssignOptions = useMemo(() => {
+    if (!assignSearch) return assignOptions
+    const q = assignSearch.toLowerCase()
+    return assignOptions.filter(o => o.label.toLowerCase().includes(q) || (o.sublabel || '').toLowerCase().includes(q))
+  }, [assignOptions, assignSearch])
+
+  const handleAssignSave = async () => {
+    if (!assignDialogDoc || !assignSelectedId) return
+    setAssignSaving(true)
+    setAssignError(null)
+    try {
+      const body: Record<string, string | null> = {
+        property_id: null, unit_id: null, lease_id: null, ticket_id: null,
+      }
+      body[`${assignType}_id`] = assignSelectedId
+      const res = await fetch(`/api/documents/${assignDialogDoc.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setAssignError(json.error || 'Opslaan mislukt')
+        return
+      }
+      setAssignDialogDoc(null)
+      refreshDocuments()
+    } catch {
+      setAssignError('Opslaan mislukt')
+    } finally {
+      setAssignSaving(false)
+    }
+  }
 
   const uniqueProperties = useMemo(() => {
     const names = documents.map((doc: any) => {
@@ -194,6 +342,9 @@ export default function DocumentsPage() {
       for (const file of files) {
         const formData = new FormData()
         formData.set('file', file)
+        if (linkEnabled && linkSelectedId && linkType) {
+          formData.set(`${linkType}_id`, linkSelectedId)
+        }
         const res = await fetch('/api/documents/upload', {
           method: 'POST',
           body: formData,
@@ -498,6 +649,11 @@ export default function DocumentsPage() {
                         setUploadError(null)
                         setDropActive(false)
                         setStagedUploadFiles([])
+                        setLinkEnabled(false)
+                        setLinkType('property')
+                        setLinkSearch('')
+                        setLinkSelectedId(null)
+                        setLinkOptions([])
                       }
                     }}
                   >
@@ -607,6 +763,106 @@ export default function DocumentsPage() {
                             of klik om te bladeren · PDF, Word, afbeeldingen, CSV, …
                           </p>
                         </button>
+                        {/* Link section */}
+                        <div className="border-t border-gray-100 dark:border-neutral-800 pt-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLinkEnabled((prev) => !prev)
+                            }}
+                            className="flex w-full items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors py-1"
+                          >
+                            <Link2 className="h-4 w-4 shrink-0" />
+                            <span className="flex-1 text-left">Koppel document aan…</span>
+                            {linkEnabled && linkSelectedId && (
+                              <span className="text-xs bg-[#9FE870]/20 text-[#163300] dark:text-[#9FE870] px-2 py-0.5 rounded-full font-medium">
+                                Gekoppeld
+                              </span>
+                            )}
+                            <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', linkEnabled && 'rotate-180')} />
+                          </button>
+
+                          {linkEnabled && (
+                            <div className="mt-3 space-y-3">
+                              {/* Type pills */}
+                              <div className="flex flex-wrap gap-1.5">
+                                {([
+                                  { key: 'property', label: 'Pand' },
+                                  { key: 'unit', label: 'Woning' },
+                                  { key: 'lease', label: 'Huurcontract' },
+                                  { key: 'ticket', label: 'Ticket' },
+                                ] as const).map(({ key, label }) => (
+                                  <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => { setLinkType(key); setLinkSelectedId(null) }}
+                                    className={cn(
+                                      'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                                      linkType === key
+                                        ? 'bg-[#163300] text-white border-[#163300] dark:bg-[#9FE870] dark:text-[#163300] dark:border-[#9FE870]'
+                                        : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
+                                    )}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Search */}
+                              <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                                <input
+                                  type="text"
+                                  value={linkSearch}
+                                  onChange={(e) => setLinkSearch(e.target.value)}
+                                  placeholder={`Zoek ${linkType === 'property' ? 'pand' : linkType === 'unit' ? 'woning' : linkType === 'lease' ? 'huurcontract' : 'ticket'}…`}
+                                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#163300]/20 dark:focus:ring-[#9FE870]/20"
+                                />
+                              </div>
+
+                              {/* Options list */}
+                              <div className="max-h-[160px] overflow-y-auto space-y-0.5 rounded-xl border border-gray-100 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30 p-1">
+                                {linkOptionsLoading ? (
+                                  <div className="py-4 text-center text-xs text-gray-400">Laden…</div>
+                                ) : filteredLinkOptions.length === 0 ? (
+                                  <div className="py-4 text-center text-xs text-gray-400">
+                                    {linkSearch ? 'Geen resultaten' : 'Geen items gevonden'}
+                                  </div>
+                                ) : filteredLinkOptions.map((opt) => (
+                                  <button
+                                    key={opt.id}
+                                    type="button"
+                                    onClick={() => setLinkSelectedId(linkSelectedId === opt.id ? null : opt.id)}
+                                    className={cn(
+                                      'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
+                                      linkSelectedId === opt.id
+                                        ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                                        : 'hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-gray-100'
+                                    )}
+                                  >
+                                    <span className="flex-1 min-w-0">
+                                      <span className="text-sm font-medium truncate block">{opt.label}</span>
+                                      {opt.sublabel && (
+                                        <span className={cn(
+                                          'text-xs truncate block',
+                                          linkSelectedId === opt.id
+                                            ? 'text-white/70 dark:text-[#163300]/70'
+                                            : 'text-gray-500 dark:text-gray-400'
+                                        )}>
+                                          {opt.sublabel}
+                                        </span>
+                                      )}
+                                    </span>
+                                    {linkSelectedId === opt.id && (
+                                      <Check className="h-4 w-4 shrink-0" />
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         {uploadError && (
                           <p className="text-sm text-red-600 dark:text-red-400" role="alert">
                             {uploadError}
@@ -645,6 +901,128 @@ export default function DocumentsPage() {
                             : stagedUploadFiles.length > 0
                               ? `Definitief uploaden (${stagedUploadFiles.length})`
                               : 'Bestanden kiezen'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Assign dialog */}
+                  <Dialog
+                    open={!!assignDialogDoc}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setAssignDialogDoc(null)
+                        setAssignType('property')
+                        setAssignSearch('')
+                        setAssignSelectedId(null)
+                        setAssignOptions([])
+                        setAssignError(null)
+                      }
+                    }}
+                  >
+                    <DialogContent className="sm:max-w-md border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+                      <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
+                        <DialogTitle className="text-[#163300] dark:text-[#9FE870] text-lg">
+                          Toewijzen
+                        </DialogTitle>
+                        <DialogDescription className="truncate">
+                          {assignDialogDoc?.name}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="px-6 pb-4 flex flex-col gap-3">
+                        {/* Type pills */}
+                        <div className="flex flex-wrap gap-1.5">
+                          {([
+                            { key: 'property', label: 'Pand' },
+                            { key: 'unit', label: 'Woning' },
+                            { key: 'lease', label: 'Huurcontract' },
+                            { key: 'ticket', label: 'Ticket' },
+                          ] as const).map(({ key, label }) => (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() => { setAssignType(key); setAssignSelectedId(null) }}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                                assignType === key
+                                  ? 'bg-[#163300] text-white border-[#163300] dark:bg-[#9FE870] dark:text-[#163300] dark:border-[#9FE870]'
+                                  : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
+                              )}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                          <input
+                            type="text"
+                            value={assignSearch}
+                            onChange={(e) => setAssignSearch(e.target.value)}
+                            placeholder={`Zoek ${assignType === 'property' ? 'pand' : assignType === 'unit' ? 'woning' : assignType === 'lease' ? 'huurcontract' : 'ticket'}…`}
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#163300]/20 dark:focus:ring-[#9FE870]/20"
+                          />
+                        </div>
+
+                        {/* Options list */}
+                        <div className="max-h-[200px] overflow-y-auto space-y-0.5 rounded-xl border border-gray-100 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30 p-1">
+                          {assignOptionsLoading ? (
+                            <div className="py-5 text-center text-xs text-gray-400">Laden…</div>
+                          ) : filteredAssignOptions.length === 0 ? (
+                            <div className="py-5 text-center text-xs text-gray-400">
+                              {assignSearch ? 'Geen resultaten' : 'Geen items gevonden'}
+                            </div>
+                          ) : filteredAssignOptions.map((opt) => (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setAssignSelectedId(assignSelectedId === opt.id ? null : opt.id)}
+                              className={cn(
+                                'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
+                                assignSelectedId === opt.id
+                                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                                  : 'hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-gray-100'
+                              )}
+                            >
+                              <span className="flex-1 min-w-0">
+                                <span className="text-sm font-medium truncate block">{opt.label}</span>
+                                {opt.sublabel && (
+                                  <span className={cn(
+                                    'text-xs truncate block',
+                                    assignSelectedId === opt.id ? 'text-white/70 dark:text-[#163300]/70' : 'text-gray-500 dark:text-gray-400'
+                                  )}>
+                                    {opt.sublabel}
+                                  </span>
+                                )}
+                              </span>
+                              {assignSelectedId === opt.id && <Check className="h-4 w-4 shrink-0" />}
+                            </button>
+                          ))}
+                        </div>
+
+                        {assignError && (
+                          <p className="text-sm text-red-600 dark:text-red-400" role="alert">{assignError}</p>
+                        )}
+                      </div>
+                      <DialogFooter className="px-6 pb-6 pt-0 flex-row justify-end gap-2 sm:gap-2 border-t border-gray-100 dark:border-neutral-800 pt-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-full"
+                          onClick={() => setAssignDialogDoc(null)}
+                          disabled={assignSaving}
+                        >
+                          Annuleren
+                        </Button>
+                        <Button
+                          type="button"
+                          className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] disabled:opacity-60"
+                          onClick={handleAssignSave}
+                          disabled={!assignSelectedId || assignSaving}
+                        >
+                          {assignSaving ? 'Opslaan…' : 'Opslaan'}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -724,6 +1102,7 @@ export default function DocumentsPage() {
                     onPreview={selectionMode ? undefined : () => handleView(doc)}
                     onDownload={selectionMode ? undefined : () => handleDownload(doc)}
                     onDelete={selectionMode ? undefined : () => handleDelete(doc)}
+                    onAssign={selectionMode || isDemo ? undefined : () => setAssignDialogDoc({ id: doc.id, name: toCardDoc(doc).name })}
                     skipPreviewFetch={isDemo}
                     selectionMode={selectionMode}
                     selected={selectedIds.includes(doc.id)}

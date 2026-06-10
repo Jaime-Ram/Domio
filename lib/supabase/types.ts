@@ -261,16 +261,17 @@ export interface Database {
           unit_id: string | null
           property_id: string | null
           lease_id: string | null
-          scope: 'pand' | 'persoon' | null
+          scope: 'lease' | 'unit' | 'property'
           title: string
           description: string | null
-          status: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
+          status: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
           priority: 'laag' | 'normaal' | 'hoog' | 'urgent'
           due_date: string | null
           category: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
-          source: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          source: 'landlord' | 'tenant' | 'upload' | 'generated' | null
           ticket_number: number | null
           assignee_id: string | null
+          created_by: string | null
           sla_deadline: string | null
           resolved_at: string | null
           created_at: string
@@ -282,15 +283,16 @@ export interface Database {
           unit_id?: string | null
           property_id?: string | null
           lease_id?: string | null
-          scope?: 'pand' | 'persoon' | null
+          scope?: 'lease' | 'unit' | 'property'
           title: string
           description?: string | null
-          status?: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
+          status?: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
           priority?: 'laag' | 'normaal' | 'hoog' | 'urgent'
           due_date?: string | null
           category?: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
-          source?: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          source?: 'landlord' | 'tenant' | 'upload' | 'generated' | null
           assignee_id?: string | null
+          created_by?: string | null
           sla_deadline?: string | null
           resolved_at?: string | null
           created_at?: string
@@ -302,15 +304,16 @@ export interface Database {
           unit_id?: string | null
           property_id?: string | null
           lease_id?: string | null
-          scope?: 'pand' | 'persoon' | null
+          scope?: 'lease' | 'unit' | 'property'
           title?: string
           description?: string | null
-          status?: 'open' | 'in_behandeling' | 'gepland' | 'afgerond' | 'geannuleerd'
+          status?: 'open' | 'in_behandeling' | 'afgerond' | 'geannuleerd'
           priority?: 'laag' | 'normaal' | 'hoog' | 'urgent'
           due_date?: string | null
           category?: 'onderhoud' | 'inspectie' | 'klacht' | 'compliance' | 'huurgebeurtenis' | null
-          source?: 'landlord' | 'tenant' | 'system' | 'flow' | null
+          source?: 'landlord' | 'tenant' | 'upload' | 'generated' | null
           assignee_id?: string | null
+          created_by?: string | null
           sla_deadline?: string | null
           resolved_at?: string | null
           created_at?: string

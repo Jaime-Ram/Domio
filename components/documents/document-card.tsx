@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Eye, MoreHorizontal, UserPlus, Building2, Tag, Building, Pencil, Trash2, Info, Download, Check, Loader2 } from 'lucide-react'
+import { Eye, MoreHorizontal, Link2, Trash2, Download, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -55,14 +55,8 @@ type DocumentCardProps = {
   onDownload?: (doc: DocumentCardDoc) => void
   /** Bij true wordt geen PDF-voortvertoning opgehaald (voorkomt 404 bij demo/mock documenten). */
   skipPreviewFetch?: boolean
-  /** Acties uit het driepuntenmenu (optioneel). */
-  onAddToPerson?: (doc: DocumentCardDoc) => void
-  onAddToProperty?: (doc: DocumentCardDoc) => void
-  onTag?: (doc: DocumentCardDoc) => void
-  onLegalEntity?: (doc: DocumentCardDoc) => void
-  onRename?: (doc: DocumentCardDoc) => void
+  onAssign?: (doc: DocumentCardDoc) => void
   onDelete?: (doc: DocumentCardDoc) => void
-  onMoreInfo?: (doc: DocumentCardDoc) => void
   /** Bulk-select modus: hele kaart selecteert/deselecteert in plaats van openen. */
   selectionMode?: boolean
   selected?: boolean
@@ -108,13 +102,8 @@ export function DocumentCard({
   onPreview,
   onDownload,
   skipPreviewFetch,
-  onAddToPerson,
-  onAddToProperty,
-  onTag,
-  onLegalEntity,
-  onRename,
+  onAssign,
   onDelete,
-  onMoreInfo,
   selectionMode = false,
   selected = false,
   onToggleSelect,
@@ -507,34 +496,15 @@ export function DocumentCard({
             sideOffset={6}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
-            <DropdownMenuItem onClick={() => onAddToPerson?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <UserPlus className="h-4 w-4" />
-              Toewijzen aan bewoner
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAddToProperty?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <Building2 className="h-4 w-4" />
-              Toewijzen aan pand
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onLegalEntity?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <Building className="h-4 w-4" />
-              Rechtspersoon
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onTag?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <Tag className="h-4 w-4" />
-              Tag
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onRename?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <Pencil className="h-4 w-4" />
-              Naam wijzigen
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onMoreInfo?.(doc)} className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white">
-              <Info className="h-4 w-4" />
-              Meer info
+            <DropdownMenuItem
+              onClick={() => onAssign?.(doc)}
+              className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+            >
+              <Link2 className="h-4 w-4" />
+              Toewijzen
             </DropdownMenuItem>
             <DropdownMenuItem
-              onSelect={() => {
-                setTimeout(() => onDownload?.(doc), 0)
-              }}
+              onSelect={() => { setTimeout(() => onDownload?.(doc), 0) }}
               className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
             >
               <Download className="h-4 w-4" />
@@ -542,9 +512,7 @@ export function DocumentCard({
             </DropdownMenuItem>
             <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" role="separator" />
             <DropdownMenuItem
-              onSelect={() => {
-                setTimeout(() => onDelete?.(doc), 0)
-              }}
+              onSelect={() => { setTimeout(() => onDelete?.(doc), 0) }}
               className="gap-2 text-red-600 dark:text-red-400 focus:bg-gray-100 focus:text-red-600 hover:bg-gray-100 hover:text-red-600 dark:focus:bg-neutral-700 dark:focus:text-red-400 dark:hover:bg-neutral-700 dark:hover:text-red-400"
             >
               <Trash2 className="h-4 w-4" />

@@ -524,11 +524,12 @@ export default function MaintenancePage() {
         const slaDeadline = new Date(Date.now() + (SLA_HOURS[newPriority] ?? 72) * 3600000).toISOString()
         const created = await ticketQueries.create({
           owner_id: user.id,
+          created_by: user.id,
           title,
           description: newDescription.trim() || null,
           status: 'open',
           priority: newPriority,
-          scope: newScope,
+          scope: newScope === 'persoon' ? 'lease' : 'property',
           unit_id: newScope === 'persoon' ? (newUnitId || null) : null,
           property_id: newScope === 'pand' ? newPropertyId : null,
           lease_id: newScope === 'persoon' ? (newLeaseId || null) : null,
