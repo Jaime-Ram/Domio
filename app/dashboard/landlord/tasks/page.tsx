@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { AlertCircle, ClockCheck, CheckDone01 } from '@untitledui/icons'
 import { cn } from '@/lib/utils'
+import { TabNav } from '@/components/ui/tab-nav'
 import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
 import { taskQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
@@ -126,9 +127,6 @@ export default function TasksPage() {
   const [search, setSearch]       = useState('')
   const [searchExpanded, setSearchExpanded] = useState(false)
   const taskSearchRef = useRef<HTMLInputElement>(null)
-  const tabsContainerRef = useRef<HTMLDivElement>(null)
-  const filterButtonRefs = useRef<Partial<Record<FilterKey, HTMLButtonElement | null>>>({})
-  const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [sheetOpen, setSheetOpen]   = useState(false)
   const [editing, setEditing]       = useState<any | null>(null)
@@ -206,54 +204,15 @@ export default function TasksPage() {
     { key: 'afgerond', label: 'Afgerond', count: afgerondCount },
   ]
 
-  // Onderstreep onder actieve filter — zelfde patroon als huurders (Huidig / Aankomend / Oud)
-  useEffect(() => {
-    const container = tabsContainerRef.current
-    const btn = filterButtonRefs.current[filter]
-    if (!container || !btn) return
-    const containerRect = container.getBoundingClientRect()
-    const btnRect = btn.getBoundingClientRect()
-    setTabIndicator({
-      left: btnRect.left - containerRect.left,
-      width: btnRect.width,
-    })
-  }, [filter, tasks.length, openTasks.length, afgerondCount])
-
   const tasksToolbar = (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div
-        ref={tabsContainerRef}
-        className="relative flex w-full sm:w-auto min-w-0 overflow-x-auto text-sm border-b border-gray-200 dark:border-neutral-700 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {FILTERS.map((f, index) => (
-          <button
-            key={f.key}
-            type="button"
-            ref={(el) => {
-              filterButtonRefs.current[f.key] = el
-            }}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              'shrink-0 flex-1 sm:flex-initial pb-2 text-left sm:text-center whitespace-nowrap transition-colors duration-200 font-semibold',
-              index < FILTERS.length - 1 ? 'mr-4 sm:mr-6' : '',
-              filter === f.key
-                ? 'text-[#15803D] dark:text-[#4ADE80]'
-                : 'text-gray-500 dark:text-gray-400'
-            )}
-          >
-            <span>{f.label}</span>
-            {f.count !== undefined && (
-              <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#15803D]/15 text-[11px] font-medium text-[#15803D] dark:bg-[#4ADE80]/20 dark:text-[#4ADE80] px-1">
-                {f.count}
-              </span>
-            )}
-          </button>
-        ))}
-        <div
-          className="absolute bottom-0 h-[2px] rounded-full bg-[#15803D] dark:bg-[#4ADE80] transition-all duration-200"
-          style={{ left: tabIndicator.left, width: tabIndicator.width }}
-        />
-      </div>
+      <TabNav
+        tabs={FILTERS.map((f) => ({ id: f.key, label: f.label, count: f.count }))}
+        activeTab={filter}
+        onChange={(k) => setFilter(k as FilterKey)}
+        variant="underline"
+        className="w-full sm:w-auto"
+      />
 
       <div className="flex items-center gap-1 shrink-0">
         {/* Search — icon, expands left */}
