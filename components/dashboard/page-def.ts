@@ -9,7 +9,7 @@ export function getGreeting(): string {
 }
 
 export function getPageDef(rel: string, firstName: string): PageDef {
-  if (rel === '' || rel === '/') return { title: `${getGreeting()}, ${firstName}` }
+  if (rel === '' || rel === '/') return { title: `${getGreeting()}, ${firstName}`, tabs: [{ label: 'Alles', path: '' }] }
   if (rel.startsWith('/financial')) return {
     title: 'Financieel',
     tabs: [
