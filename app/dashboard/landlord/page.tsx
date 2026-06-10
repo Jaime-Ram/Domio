@@ -147,7 +147,7 @@ export default function EmployerDashboardPage() {
   ]
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-start">
+    <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-stretch">
 
       {/* ——— Links: KPI-kaart ——— */}
       <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 flex flex-col lg:flex-row">
@@ -208,39 +208,41 @@ export default function EmployerDashboardPage() {
       </div>
 
       {/* ——— Rechts: Bezetting ——— */}
-      <div className="rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Bezetting</p>
-          <span className="text-sm font-bold text-[#163300] dark:text-[#9FE870]">{kpi.bezetting}%</span>
+      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 p-5 flex flex-col h-full">
+        <SectionLabel>Bezetting</SectionLabel>
+        <div className="flex items-baseline gap-2 mt-1.5">
+          <p className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">{kpi.bezetting}%</p>
+          <span className="text-xs text-gray-400 dark:text-gray-500">{bezet} / {kpi.eenheden} eenheden</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative h-[96px] w-[96px] shrink-0">
+
+        {/* Grote donut — vult de hoogte */}
+        <div className="flex-1 flex items-center justify-center min-h-[150px] py-4">
+          <div className="relative h-[160px] w-[160px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={bezettingData} dataKey="value" nameKey="name" innerRadius={30} outerRadius={46} paddingAngle={2} stroke="none">
+                <Pie data={bezettingData} dataKey="value" nameKey="name" innerRadius={56} outerRadius={78} paddingAngle={2} stroke="none">
                   {bezettingData.map((c) => <Cell key={c.name} fill={c.color} />)}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="text-sm font-bold text-[#163300] dark:text-[#9FE870]">{kpi.bezetting}%</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-[28px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">{kpi.bezetting}%</span>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">bezet</span>
             </div>
           </div>
-          <div className="flex-1 min-w-0 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-[11px]">
-              <span className="h-2 w-2 rounded-full shrink-0 bg-[#163300]" />
-              <span className="text-gray-500 dark:text-gray-400 truncate">Bezet</span>
-              <span className="ml-auto font-medium text-gray-700 dark:text-gray-300">{bezet}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px]">
-              <span className="h-2 w-2 rounded-full shrink-0 bg-gray-300 dark:bg-neutral-600" />
-              <span className="text-gray-500 dark:text-gray-400 truncate">Leeg</span>
-              <span className="ml-auto font-medium text-gray-700 dark:text-gray-300">{leeg}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] pt-1 border-t border-gray-200 dark:border-neutral-700 mt-1">
-              <span className="text-gray-500 dark:text-gray-400 truncate">Eenheden</span>
-              <span className="ml-auto font-medium text-gray-700 dark:text-gray-300">{kpi.eenheden}</span>
-            </div>
+        </div>
+
+        {/* Legenda onderaan */}
+        <div className="space-y-2 pt-3 border-t border-gray-100 dark:border-neutral-700">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#163300] dark:bg-[#9FE870]" />
+            <span className="text-gray-500 dark:text-gray-400">Bezet</span>
+            <span className="ml-auto font-semibold text-gray-700 dark:text-gray-200">{bezet}</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-gray-200 dark:bg-neutral-600" />
+            <span className="text-gray-500 dark:text-gray-400">Leeg</span>
+            <span className="ml-auto font-semibold text-gray-700 dark:text-gray-200">{leeg}</span>
           </div>
         </div>
       </div>
