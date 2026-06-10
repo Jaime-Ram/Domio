@@ -95,7 +95,7 @@ export function ContentHeader({
 
         {/* Page title */}
         {pageDef.title && (
-          <h1 className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none truncate">
+          <h1 className="self-end pb-2 text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none truncate">
             {pageDef.title}
           </h1>
         )}
