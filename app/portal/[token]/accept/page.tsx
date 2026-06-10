@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { MapPin, CheckCircle2 } from 'lucide-react'
+import { MapPin, CheckCircle2, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -47,6 +47,7 @@ function AcceptInvitationInner() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [resetSent, setResetSent] = useState(false)
+  const [magicSent, setMagicSent] = useState(false)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
@@ -108,6 +109,26 @@ function AcceptInvitationInner() {
     setResetSent(true)
   }
 
+  // Inloggen zonder wachtwoord: stuur een magic link die na inloggen
+  // terugkeert naar deze accept-pagina, zodat de uitnodiging alsnog
+  // geaccepteerd wordt.
+  async function handleMagicLink() {
+    if (!summary?.email) return
+    setError(null)
+    setLoading(true)
+    const next = encodeURIComponent(`/portal/${token}/accept`)
+    const { error } = await supabase.auth.signInWithOtp({
+      email: summary.email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${next}`,
+        shouldCreateUser: true,
+      },
+    })
+    setLoading(false)
+    if (error) { setError(error.message); return }
+    setMagicSent(true)
+  }
+
   if (done) return <AuthLoadingScreen />
 
   if (loadingPage) {
@@ -160,6 +181,21 @@ function AcceptInvitationInner() {
         <Button onClick={handleOneClickAccept} disabled={loading} className={`${PRIMARY_BTN} mt-8`}>
           {loading ? 'Bezig…' : 'Aanvraag accepteren'}
         </Button>
+      </motion.div>
+    )
+  }
+
+  // ── Magic link verstuurd ──
+  if (magicSent) {
+    return (
+      <motion.div {...slideIn}>
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#9FE870]/20">
+          <Mail className="h-7 w-7 text-[#15803D]" />
+        </div>
+        <h1 className="text-4xl font-bold text-[#163300]">Check je e-mail</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          We hebben een inloglink gestuurd naar <strong className="text-gray-800">{summary?.email}</strong>. Klik op de knop in die e-mail — je aanvraag staat dan klaar.
+        </p>
       </motion.div>
     )
   }
@@ -221,6 +257,21 @@ function AcceptInvitationInner() {
         <Button type="submit" disabled={loading} className={PRIMARY_BTN}>
           {loading ? 'Bezig…' : 'Aanvraag accepteren'}
         </Button>
+
+        <div className="relative pt-2">
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200" /></div>
+          <div className="relative flex justify-center"><span className="bg-white dark:bg-gray-900 px-3 text-sm text-gray-500">of</span></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleMagicLink}
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-2 h-12 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 disabled:opacity-50"
+        >
+          <Mail className="h-5 w-5 text-gray-700" />
+          Inloggen via e-mail
+        </button>
       </form>
 
       <p className="mt-6 text-center text-xs text-gray-400">

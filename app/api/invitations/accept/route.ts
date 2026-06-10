@@ -46,12 +46,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Check invitation is still pending
-    const { data: invitation } = await db
+    const { data: invitation, error: invitationErr } = await db
       .from('tenant_invitations')
       .select('id, status, email')
       .eq('id', invitationDbId)
       .single()
 
+    // PGRST116 = geen rij gevonden; elke andere fout (bv. permission denied)
+    // is een serverfout en mag niet als "niet gevonden" worden verstopt.
+    if (invitationErr && invitationErr.code !== 'PGRST116') {
+      console.error('[invitations/accept] DB-fout bij ophalen uitnodiging', invitationErr)
+      return NextResponse.json({ error: 'Kon de uitnodiging niet ophalen. Probeer het later opnieuw.' }, { status: 500 })
+    }
     if (!invitation) return NextResponse.json({ error: 'Uitnodiging niet gevonden.' }, { status: 404 })
     if (invitation.status !== 'pending') {
       return NextResponse.json({ error: 'Deze uitnodiging is al gebruikt of geannuleerd.' }, { status: 400 })
@@ -73,6 +79,19 @@ export async function POST(req: NextRequest) {
         )
       }
       userId = user.id
+
+      // Magic-link-gebruikers (of andere nieuwe accounts) hebben mogelijk nog
+      // geen huurder-profiel — maak het aan zodat de koppeling klopt.
+      const { data: prof } = await db.from('profiles').select('id').eq('id', userId).single()
+      if (!prof) {
+        const { data: t } = await db.from('tenants').select('full_name').eq('id', tenantId).single()
+        await admin.from('profiles').upsert({
+          id: userId,
+          email,
+          full_name: (t as any)?.full_name ?? '',
+          role: 'huurder',
+        } as any)
+      }
     } else {
       // ── Pad 2: wachtwoord meegegeven ──
       const { data: existingUsers } = await admin.auth.admin.listUsers()
