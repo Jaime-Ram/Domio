@@ -167,7 +167,7 @@ function AcceptInvitationInner() {
   // ── Niet ingelogd: inloggen óf account aanmaken ──
   return (
     <motion.div {...slideIn}>
-      <h1 className="text-4xl font-bold text-[#163300]">Bevestig je aanvraag</h1>
+      <h1 className="text-4xl font-bold text-[#163300]">Activeer je account</h1>
       <p className="mt-2 text-sm text-gray-600">
         Kies een wachtwoord om je account te activeren. Heb je al een Domio-account? Vul je bestaande wachtwoord in.
       </p>
