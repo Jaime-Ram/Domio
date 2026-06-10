@@ -63,19 +63,13 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const isDashboard = pathname.startsWith('/dashboard')
-  const isDemo = request.cookies.get('domio_demo')?.value === '1'
 
-  // Demo volledig gescheiden: bij domio_demo cookie mag men niet naar /dashboard (eigen account)
-  if (isDashboard && isDemo) {
-    return NextResponse.redirect(new URL('/demo/app', request.url))
-  }
-
-  if (isDashboard && !user && !isDemo) {
+  if (isDashboard && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
   // Role-based routing for authenticated dashboard users.
-  if (isDashboard && user && !isDemo) {
+  if (isDashboard && user) {
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     if (aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) {
       return NextResponse.redirect(new URL('/login', request.url))
