@@ -2,8 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Eye, EyeOff, Loader2, CheckCircle2, MapPin } from 'lucide-react'
-import { Logo } from '@/components/Logo'
+import { motion } from 'motion/react'
+import { MapPin, CheckCircle2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AuthPageShell } from '@/components/auth/auth-page-shell'
+import { AuthLoadingScreen } from '@/components/auth/auth-loading-screen'
 import { supabase } from '@/lib/supabase/client'
 
 interface Summary {
@@ -14,7 +19,21 @@ interface Summary {
   monthlyRent: number | null
 }
 
+const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
+const slideIn = { initial: { opacity: 0, x: 32 }, animate: { opacity: 1, x: 0 }, transition }
+
+const INPUT_CLS = 'h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]'
+const PRIMARY_BTN = 'w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm'
+
 export default function AcceptInvitationPage() {
+  return (
+    <AuthPageShell>
+      <AcceptInvitationInner />
+    </AuthPageShell>
+  )
+}
+
+function AcceptInvitationInner() {
   const params = useParams()
   const router = useRouter()
   const token = params.token as string
@@ -25,13 +44,11 @@ export default function AcceptInvitationPage() {
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [resetSent, setResetSent] = useState(false)
   const [done, setDone] = useState(false)
 
-  // Samenvatting + sessie ophalen
   useEffect(() => {
     Promise.all([
       fetch(`/api/invitations/summary?token=${encodeURIComponent(token)}`).then((r) => r.json()).catch(() => null),
@@ -55,10 +72,9 @@ export default function AcceptInvitationPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Onbekende fout')
       setDone(true)
-      setTimeout(() => router.push('/dashboard/tenant'), 1800)
+      setTimeout(() => router.push('/dashboard/tenant'), 1500)
     } catch (err: any) {
       setError(err.message)
-    } finally {
       setLoading(false)
     }
   }
@@ -92,45 +108,24 @@ export default function AcceptInvitationPage() {
     setResetSent(true)
   }
 
-  const inputCls = 'w-full bg-[#f4f4f4] rounded-2xl px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#163300]/15 transition-all'
-  const ctaCls = 'flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-4 rounded-full hover:bg-[#8AD45F] transition-colors disabled:opacity-50'
+  if (done) return <AuthLoadingScreen />
 
   if (loadingPage) {
-    return <Shell><Loader2 className="w-6 h-6 animate-spin text-gray-300" /></Shell>
+    return <div className="h-12" />
   }
 
-  if (done) {
-    return (
-      <Shell>
-        <div className="w-full max-w-sm text-center">
-          <div className="w-14 h-14 rounded-full bg-[#9FE870]/20 flex items-center justify-center mx-auto mb-5">
-            <CheckCircle2 className="w-7 h-7 text-[#15803D]" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Aanvraag geaccepteerd!</h1>
-          <p className="text-sm text-gray-400">Je wordt doorgestuurd naar je portaal…</p>
-        </div>
-      </Shell>
-    )
-  }
-
-  // Samenvattingskaart — op beide varianten getoond
-  const summaryCard = (
-    <>
-      {summary?.property && (
-        <div className="flex items-center gap-3 bg-[#f4f4f4] rounded-2xl px-4 py-3.5 mb-6 text-left">
-          <div className="w-8 h-8 rounded-xl bg-[#163300] flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4 text-[#9FE870]" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">
-              Uitnodiging van {summary.landlord}
-            </p>
-            <p className="text-sm font-semibold text-gray-900 truncate">{summary.property}</p>
-          </div>
-        </div>
-      )}
-    </>
-  )
+  // Samenvattingskaart — op elke variant getoond
+  const summaryCard = summary?.property ? (
+    <div className="mt-8 flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#163300]">
+        <MapPin className="h-5 w-5 text-[#9FE870]" />
+      </div>
+      <div className="min-w-0">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Uitnodiging van {summary.landlord}</div>
+        <div className="truncate text-sm font-semibold text-gray-900">{summary.property}</div>
+      </div>
+    </div>
+  ) : null
 
   const emailMismatch =
     !!loggedInEmail && !!summary?.email && loggedInEmail.toLowerCase() !== summary.email.toLowerCase()
@@ -138,139 +133,100 @@ export default function AcceptInvitationPage() {
   // ── Ingelogd met een ánder account dan de uitnodiging ──
   if (emailMismatch) {
     return (
-      <Shell>
-        <div className="w-full max-w-sm">
-          <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
-            Verkeerd account
-          </h1>
-          <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
-            Deze uitnodiging is gericht aan <strong className="text-gray-700">{summary!.email}</strong>, maar je bent ingelogd als <strong className="text-gray-700">{loggedInEmail}</strong>.
-          </p>
-
-          {summaryCard}
-
-          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-3">{error}</p>}
-
-          <button onClick={handleSwitchAccount} disabled={loading} className={ctaCls}>
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            Uitloggen en doorgaan als {summary!.email}
-          </button>
-        </div>
-      </Shell>
+      <motion.div {...slideIn}>
+        <h1 className="text-4xl font-bold text-[#163300]">Verkeerd account</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Deze uitnodiging is gericht aan <strong className="text-gray-800">{summary!.email}</strong>, maar je bent ingelogd als <strong className="text-gray-800">{loggedInEmail}</strong>.
+        </p>
+        {summaryCard}
+        {error && <Alert variant="destructive" className="mt-4"><AlertDescription>{error}</AlertDescription></Alert>}
+        <Button onClick={handleSwitchAccount} disabled={loading} className={`${PRIMARY_BTN} mt-8`}>
+          {loading ? 'Bezig…' : `Uitloggen en doorgaan als ${summary!.email}`}
+        </Button>
+      </motion.div>
     )
   }
 
   // ── Al ingelogd met het juiste account: één klik ──
   if (loggedInEmail) {
     return (
-      <Shell>
-        <div className="w-full max-w-sm">
-          <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
-            Aanvraag accepteren
-          </h1>
-          <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
-            Je bent ingelogd als <strong className="text-gray-700">{loggedInEmail}</strong>.
-          </p>
-
-          {summaryCard}
-
-          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-3">{error}</p>}
-
-          <button onClick={handleOneClickAccept} disabled={loading} className={ctaCls}>
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            Aanvraag accepteren
-          </button>
-        </div>
-      </Shell>
+      <motion.div {...slideIn}>
+        <h1 className="text-4xl font-bold text-[#163300]">Aanvraag accepteren</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Je bent ingelogd als <strong className="text-gray-800">{loggedInEmail}</strong>.
+        </p>
+        {summaryCard}
+        {error && <Alert variant="destructive" className="mt-4"><AlertDescription>{error}</AlertDescription></Alert>}
+        <Button onClick={handleOneClickAccept} disabled={loading} className={`${PRIMARY_BTN} mt-8`}>
+          {loading ? 'Bezig…' : 'Aanvraag accepteren'}
+        </Button>
+      </motion.div>
     )
   }
 
-  // ── Niet ingelogd: samenvatting + wachtwoord (inloggen óf account aanmaken) ──
+  // ── Niet ingelogd: inloggen óf account aanmaken ──
   return (
-    <Shell>
-      <div className="w-full max-w-sm">
-        <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
-          Bevestig je aanvraag
-        </h1>
-        <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
-          Kies een wachtwoord om je account te activeren. Heb je al een Domio-account? Vul je bestaande wachtwoord in.
-        </p>
+    <motion.div {...slideIn}>
+      <h1 className="text-4xl font-bold text-[#163300]">Bevestig je aanvraag</h1>
+      <p className="mt-2 text-sm text-gray-600">
+        Kies een wachtwoord om je account te activeren. Heb je al een Domio-account? Vul je bestaande wachtwoord in.
+      </p>
 
-        {summaryCard}
+      {summaryCard}
 
+      {error && <Alert variant="destructive" className="mt-4"><AlertDescription>{error}</AlertDescription></Alert>}
+
+      <form onSubmit={handlePasswordSubmit} className="mt-8 space-y-6">
         {summary?.email && (
-          <div className="bg-[#f4f4f4] rounded-2xl px-4 py-3 mb-4 text-center">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Je e-mailadres</p>
-            <p className="text-sm font-semibold text-gray-900 truncate">{summary.email}</p>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">E{'‑'}mailadres</label>
+            <Input value={summary.email} disabled className={`${INPUT_CLS} bg-gray-50 text-gray-500`} />
           </div>
         )}
-
-        <form onSubmit={handlePasswordSubmit} className="space-y-3">
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              className={inputCls + ' pr-11'}
-              placeholder="Wachtwoord (min. 8 tekens)"
-              autoFocus
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">Wachtwoord</label>
+            {resetSent ? (
+              <span className="text-sm text-[#15803D]">Reset-link verstuurd</span>
+            ) : (
+              <button type="button" onClick={handleForgotPassword} className="text-sm text-[#163300] underline underline-offset-2 hover:no-underline">
+                Vergeten?
+              </button>
+            )}
           </div>
-
-          <input
-            type={showPassword ? 'text' : 'password'}
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={INPUT_CLS}
+            required
+            minLength={8}
+            autoFocus
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="confirm" className="text-sm font-medium text-gray-700">Bevestig wachtwoord</label>
+          <Input
+            id="confirm"
+            type="password"
+            placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            className={INPUT_CLS}
             required
-            className={inputCls}
-            placeholder="Bevestig wachtwoord"
           />
-
-          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3">{error}</p>}
-
-          <div className="pt-2">
-            <button type="submit" disabled={loading} className={ctaCls}>
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Aanvraag accepteren
-            </button>
-          </div>
-        </form>
-
-        <div className="text-center mt-4">
-          {resetSent ? (
-            <p className="text-xs text-[#15803D]">Reset-link verstuurd naar je e-mail.</p>
-          ) : (
-            <button onClick={handleForgotPassword} className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2">
-              Wachtwoord vergeten?
-            </button>
-          )}
         </div>
+        <Button type="submit" disabled={loading} className={PRIMARY_BTN}>
+          {loading ? 'Bezig…' : 'Aanvraag accepteren'}
+        </Button>
+      </form>
 
-        <p className="text-xs text-center text-gray-400 mt-6">
-          Door verder te gaan ga je akkoord met ons{' '}
-          <a href="https://domiovastgoedbeheer.nl/privacy" className="underline underline-offset-2">
-            privacybeleid
-          </a>.
-        </p>
-      </div>
-    </Shell>
-  )
-}
-
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen bg-white flex flex-col items-center px-4 pt-12 pb-16">
-      <div className="mb-10"><Logo width={120} height={32} href="#" /></div>
-      {children}
-    </div>
+      <p className="mt-6 text-center text-xs text-gray-400">
+        Door verder te gaan ga je akkoord met ons{' '}
+        <a href="https://domiovastgoedbeheer.nl/privacy" className="underline underline-offset-2">privacybeleid</a>.
+      </p>
+    </motion.div>
   )
 }
