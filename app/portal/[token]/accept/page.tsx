@@ -75,6 +75,13 @@ export default function AcceptInvitationPage() {
     accept({ password })
   }
 
+  async function handleSwitchAccount() {
+    setLoading(true)
+    await supabase.auth.signOut()
+    setLoggedInEmail(null)
+    setLoading(false)
+  }
+
   async function handleForgotPassword() {
     if (!summary?.email) return
     setError(null)
@@ -125,7 +132,35 @@ export default function AcceptInvitationPage() {
     </>
   )
 
-  // ── Al ingelogd: één klik ──
+  const emailMismatch =
+    !!loggedInEmail && !!summary?.email && loggedInEmail.toLowerCase() !== summary.email.toLowerCase()
+
+  // ── Ingelogd met een ánder account dan de uitnodiging ──
+  if (emailMismatch) {
+    return (
+      <Shell>
+        <div className="w-full max-w-sm">
+          <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight text-center leading-tight mb-3">
+            Verkeerd account
+          </h1>
+          <p className="text-sm text-gray-500 text-center leading-relaxed mb-6">
+            Deze uitnodiging is gericht aan <strong className="text-gray-700">{summary!.email}</strong>, maar je bent ingelogd als <strong className="text-gray-700">{loggedInEmail}</strong>.
+          </p>
+
+          {summaryCard}
+
+          {error && <p className="text-sm text-red-500 bg-red-50 rounded-2xl px-4 py-3 mb-3">{error}</p>}
+
+          <button onClick={handleSwitchAccount} disabled={loading} className={ctaCls}>
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            Uitloggen en doorgaan als {summary!.email}
+          </button>
+        </div>
+      </Shell>
+    )
+  }
+
+  // ── Al ingelogd met het juiste account: één klik ──
   if (loggedInEmail) {
     return (
       <Shell>
