@@ -167,6 +167,24 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedIbanTenantId, setSelectedIbanTenantId] = useState<string | null>(null)
   const [savingIban, setSavingIban] = useState(false)
 
+  // Delete state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deletingPayment, setDeletingPayment] = useState(false)
+
+  async function handleDeletePayment() {
+    if (!selectedTx || !user?.id) return
+    setDeletingPayment(true)
+    try {
+      await (supabase as any).from('payments').delete().eq('id', selectedTx.id).eq('owner_id', user.id)
+      setShowDeleteConfirm(false)
+      setRightMode('empty')
+      setSelectedTxId(null)
+      onRefresh()
+    } finally {
+      setDeletingPayment(false)
+    }
+  }
+
   // Manual payment state
   const [showManualPayForm, setShowManualPayForm] = useState(false)
   const [payStep, setPayStep] = useState<1 | 2 | 3 | 4>(1)
@@ -655,7 +673,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     {/* Omschrijving */}
                     <div>
                       <div className="flex items-center gap-2 min-w-0">
-                        <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
                         {tx.is_manual_transaction && (
                           <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                             Handmatig
@@ -694,7 +712,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             ? <Home className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                             : <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                           }
-                          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {tx.assignment.unit_id
                               ? (tx.assignment.unit_name ?? tx.assignment.property_name)
                               : tx.assignment.property_name
@@ -707,14 +725,14 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     </div>
 
                     {/* Datum */}
-                    <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       {formatDate(tx.value_date)}
                     </div>
 
                     {/* Bedrag */}
                     <div className="text-right">
                       <span className={cn(
-                        'font-semibold whitespace-nowrap',
+                        'text-sm font-semibold whitespace-nowrap',
                         tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                       )}>
                         {formatEur(tx.amount)}
@@ -736,40 +754,44 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
         <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
           <button
             type="button"
-            onClick={() => { setRightMode('empty'); setSelectedTxId(null) }}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="inline-flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
           >
-            Sluiten
+            <Trash2 className="h-3.5 w-3.5" />
+            Verwijderen
           </button>
 
-          {selectedTx?.assignment && !showAssignForm ? (
-            <button
-              type="button"
-              onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:opacity-80 transition-opacity"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Toewijzing wijzigen
-            </button>
-          ) : showAssignForm ? (() => {
-            const canSave = !!selectedCategory && assignLevel !== null && (
-              assignLevel === 'geen' ||
-              (!!selectedCategoryProperty && (
-                assignLevel === 'pand' ? !!selectedAllocationKey : !!selectedUnit
-              ))
-            )
-            return (
+          <div className="flex items-center gap-4">
+
+            {selectedTx?.assignment && !showAssignForm ? (
               <button
                 type="button"
-                onClick={handleAssign}
-                disabled={submitting || !canSave}
-                className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:opacity-80 transition-opacity"
               >
-                {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                Opslaan
+                <Pencil className="h-3.5 w-3.5" />
+                Toewijzing wijzigen
               </button>
-            )
-          })() : null}
+            ) : showAssignForm ? (() => {
+              const canSave = !!selectedCategory && assignLevel !== null && (
+                assignLevel === 'geen' ||
+                (!!selectedCategoryProperty && (
+                  assignLevel === 'pand' ? !!selectedAllocationKey : !!selectedUnit
+                ))
+              )
+              return (
+                <button
+                  type="button"
+                  onClick={handleAssign}
+                  disabled={submitting || !canSave}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                >
+                  {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  Opslaan
+                </button>
+              )
+            })() : null}
+          </div>
         </div>
       }
     >
@@ -1366,6 +1388,36 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
         </>
       )}
     </DetailShell>
+
+    {/* ─── Delete confirmation dialog ─── */}
+    <Dialog open={showDeleteConfirm} onOpenChange={(v) => { if (!v) setShowDeleteConfirm(false) }}>
+      <DialogContent className={addDialogContentClassName('max-w-sm')} closeButtonClassName={ADD_DIALOG_CLOSE_BUTTON_CLASS}>
+        <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
+          <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Betaling verwijderen</DialogTitle>
+        </DialogHeader>
+        <div className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+          Weet je zeker dat je deze betaling wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
+        </div>
+        <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(false)}
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            Annuleren
+          </button>
+          <button
+            type="button"
+            onClick={handleDeletePayment}
+            disabled={deletingPayment}
+            className="inline-flex items-center gap-2 rounded-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+          >
+            {deletingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Verwijderen
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     {/* ─── Manual payment dialog ─── */}
     <Dialog open={showManualPayForm} onOpenChange={(v) => { if (!v) setShowManualPayForm(false) }}>

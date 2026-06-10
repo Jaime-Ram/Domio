@@ -894,7 +894,17 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
         {/* ── Documenten ────────────────────────────────────────────────── */}
         {activeTab === 'documenten' && (
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-5">Documenten</p>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500">Documenten</p>
+              <button
+                type="button"
+                onClick={() => { router.push(`${basePath}/documents`); onClose() }}
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+              >
+                Alle documenten
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
             {propertyDocuments.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="h-12 w-12 rounded-2xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
