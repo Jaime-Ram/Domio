@@ -19,19 +19,12 @@ export function getPageDef(rel: string, firstName: string): PageDef {
       { label: 'Huurafrekeningen', path: '/financial/huurafrekening' },
     ],
   }
-  if (rel.startsWith('/compliance')) return {
-    title: 'Compliance',
-    tabs: [
-      { label: 'WWS Overzicht', path: '/compliance' },
-      { label: 'Puntentelling', path: '/compliance/puntentelling' },
-      { label: 'Alerts', path: '/compliance/alerts' },
-    ],
-  }
+  if (rel.startsWith('/compliance')) return { title: 'Compliance' }
   if (rel.startsWith('/maintenance')) return {
     title: 'Onderhoud',
     tabs: [
       { label: 'Tickets', path: '/maintenance' },
-      { label: 'Inspecties', path: '/maintenance/inspecties' },
+      { label: 'MJOP', path: '/mjop' },
     ],
   }
   if (rel.startsWith('/tenants')) return { title: 'Huurders', tabs: [{ label: 'Alles', path: '/tenants' }] }
@@ -40,7 +33,13 @@ export function getPageDef(rel: string, firstName: string): PageDef {
   if (rel.startsWith('/tasks')) return { title: 'Taken', noDivider: true }
   if (rel.startsWith('/documents')) return { title: 'Documenten', tabs: [{ label: 'Alles', path: '/documents' }] }
   if (rel.startsWith('/flows')) return { title: 'Flows', noDivider: true }
-  if (rel.startsWith('/mjop')) return { title: 'MJOP', noDivider: true }
+  if (rel.startsWith('/mjop')) return {
+    title: 'Onderhoud',
+    tabs: [
+      { label: 'Tickets', path: '/maintenance' },
+      { label: 'MJOP', path: '/mjop' },
+    ],
+  }
   if (rel.startsWith('/integrations')) return { title: 'Integraties', tabs: [{ label: 'Alles', path: '/integrations' }] }
   if (rel.startsWith('/assist')) return { title: 'Domio Assist' }
   if (rel.startsWith('/app')) return { title: 'App' }

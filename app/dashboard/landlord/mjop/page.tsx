@@ -12,7 +12,6 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { TabNav } from '@/components/ui/tab-nav'
 import { GrayBlock } from '@/components/ui/gray-block'
 import { GeometricShapes } from '@/components/decorative/geometric-shapes'
 import { CreateDialogShell } from '@/components/ui/add-dialog-layout'
@@ -35,7 +34,6 @@ interface MjopBuilding {
   herbouwwaarde: number | null
 }
 
-type MjopTab = 'actief' | 'planning' | 'panden'
 
 export default function MjopPage() {
   const { user } = useDashboardUser()
@@ -44,7 +42,6 @@ export default function MjopPage() {
   const { data: buildings = [], isLoading: buildingsLoading } = useMjopBuildings(user?.id)
   const loading = propsLoading || buildingsLoading
 
-  const [tab, setTab] = useState<MjopTab>('actief')
 
   // Building detail sheet
   const searchParams = useSearchParams()
@@ -85,7 +82,6 @@ export default function MjopPage() {
       const created = await mjopQueries.createBuilding(payload)
       queryClient.setQueryData(QK.mjopBuildings(user!.id), (old: MjopBuilding[] = []) => [created, ...old])
       setDialogOpen(false)
-      setTab('actief')
     } catch (err) {
       console.error(err)
     } finally {
@@ -99,104 +95,6 @@ export default function MjopPage() {
   return (
     <>
       <div className="flex flex-col gap-8">
-        <TabNav
-          tabs={[
-            { id: 'actief', label: 'Actief', count: buildings.length > 0 ? buildings.length : undefined },
-            { id: 'planning', label: 'Planning' },
-            { id: 'panden', label: 'Panden' },
-          ]}
-          activeTab={tab}
-          onChange={(id) => setTab(id as MjopTab)}
-          className="w-full"
-          variant="underline"
-        />
-
-        {/* ── ACTIEF ── */}
-        {tab === 'actief' && (
-          loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {[1, 2, 3].map(n => (
-                <div key={n} className="h-36 rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 animate-pulse" />
-              ))}
-            </div>
-          ) : buildings.length === 0 ? (
-            <GrayBlock className="px-8 py-8">
-              <div className="flex flex-col gap-3 max-w-xl">
-                <h2 className="text-[26px] font-bold text-gray-900 dark:text-white leading-tight">
-                  Nog geen MJOP gestart
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Initialiseer een pand om een meerjarenonderhoudsplan op te bouwen met conditiemeting, elementen en planning.
-                </p>
-                <div className="mt-1">
-                  <button
-                    type="button"
-                    onClick={() => setTab('panden')}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
-                  >
-                    Naar panden
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </GrayBlock>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {buildings.map(building => (
-                <BuildingCard
-                  key={building.id}
-                  building={building}
-                  onOpen={() => setOpenBuildingId(building.id)}
-                />
-              ))}
-            </div>
-          )
-        )}
-
-        {/* ── PLANNING ── */}
-        {tab === 'planning' && (
-          <div className="flex flex-col gap-6">
-            <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
-              <GeometricShapes variant="diagonal-stripes" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.15} layers={2} />
-              <div className="relative z-10 flex flex-col gap-3 max-w-xl">
-                <h2 className="text-[26px] font-bold text-white leading-tight">
-                  Meerjarenbegroting
-                </h2>
-                <p className="text-sm text-white/80 leading-relaxed">
-                  Zodra je panden elementen en inspecties hebben, verschijnt hier de geplande onderhoudsbegroting over de komende 10 jaar, per pand en voor je hele portefeuille.
-                </p>
-                <div className="mt-1 flex items-center gap-3">
-                  <Button
-                    disabled
-                    className="rounded-full bg-[#9FE870] text-[#163300] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#9FE870]/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <CalendarRange className="h-4 w-4" />
-                    Begroting opbouwen
-                  </Button>
-                  <span className="text-xs text-white/50">Binnenkort beschikbaar</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Tijdlijn scaffold */}
-            <GrayBlock className="p-5 overflow-x-auto">
-              <p className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-4">
-                Tijdlijn onderhoud
-              </p>
-              <div className="flex gap-2 min-w-max">
-                {Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                  <div key={year} className="flex flex-col items-center gap-2 w-16">
-                    <div className="h-32 w-full rounded-xl border border-dashed border-gray-200 dark:border-neutral-600 bg-white/50 dark:bg-neutral-700/30" />
-                    <span className="text-[11px] font-medium text-gray-400 dark:text-neutral-500">{year}</span>
-                  </div>
-                ))}
-              </div>
-            </GrayBlock>
-          </div>
-        )}
-
-        {/* ── PANDEN ── */}
-        {tab === 'panden' && (
           <div className="flex flex-col gap-10">
             {/* Intro / coming soon block */}
             <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
@@ -258,7 +156,6 @@ export default function MjopPage() {
               )}
             </section>
           </div>
-        )}
       </div>
 
       {/* Dialog: MJOP initialiseren */}

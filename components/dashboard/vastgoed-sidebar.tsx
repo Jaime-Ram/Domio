@@ -72,7 +72,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   useEffect(() => {
     const menuItemsWithChildren = [
       { id: 'financieel-accordion', paths: [`${basePath}/financial`] },
-      { id: 'compliance-accordion', paths: [`${basePath}/compliance`] },
       { id: 'onderhoud-accordion', paths: [`${basePath}/maintenance`, `${basePath}/mjop`] },
     ]
     const toOpen = menuItemsWithChildren
@@ -113,21 +112,12 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
             { label: 'Huurafrekeningen', href: `${basePath}/financial/huurafrekening`, icon: Receipt },
           ],
         },
-        {
-          label: 'Compliance',
-          icon: ShieldCheck,
-          children: [
-            { label: 'WWS Overzicht', href: `${basePath}/compliance`, icon: BarChart3 },
-            { label: 'Puntentelling', href: `${basePath}/compliance/puntentelling`, icon: Calculator },
-            { label: 'Alerts', href: `${basePath}/compliance/alerts`, icon: AlertTriangle },
-          ],
-        },
+        { label: 'Compliance', href: `${basePath}/compliance`, icon: ShieldCheck },
         {
           label: 'Onderhoud',
           icon: Wrench,
           children: [
             { label: 'Tickets', href: `${basePath}/maintenance`, icon: Ticket },
-            { label: 'Inspecties', href: `${basePath}/maintenance/inspecties`, icon: ClipboardCheck },
             { label: 'MJOP', href: `${basePath}/mjop`, icon: CalendarRange },
           ],
         },
