@@ -65,24 +65,24 @@ export function ActionListRow({
         onClick={onClick}
         className={cn(
           'w-full flex items-center transition-colors text-left',
-          slim ? 'gap-3 py-2.5' : 'gap-4 py-4',
+          slim ? 'gap-3 py-2.5' : 'gap-4 py-2.5',
           danger ? ACTION_LIST_ROW_HOVER_DANGER : ACTION_LIST_ROW_HOVER,
         )}
       >
         <div className={cn(
           'rounded-full flex items-center justify-center shrink-0',
-          slim ? 'h-8 w-8' : 'h-10 w-10',
+          slim ? 'h-8 w-8' : 'h-9 w-9',
           danger ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-100 dark:bg-neutral-800'
         )}>
           <Icon className={cn(
-            slim ? 'h-3.5 w-3.5' : 'h-5 w-5',
+            slim ? 'h-3.5 w-3.5' : 'h-4 w-4',
             danger ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
           )} />
         </div>
         <div className="flex-1 min-w-0">
           <p className={cn(
             'font-medium truncate',
-            slim ? 'text-sm' : 'text-sm font-semibold',
+            slim ? 'text-sm' : 'text-[12.5px] font-semibold',
             danger ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
           )}>
             {title}
@@ -90,7 +90,7 @@ export function ActionListRow({
           {subtitle && (
             <p className={cn(
               'text-gray-500 dark:text-gray-400 truncate',
-              slim ? 'text-xs' : 'text-sm'
+              slim ? 'text-xs' : 'text-[12.5px]'
             )}>
               {subtitle}
             </p>
