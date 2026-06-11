@@ -15,11 +15,10 @@ import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { contactQueries } from '@/lib/supabase/queries'
 import { useContacts, useProperties, usePortfolios, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
-import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
-import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
+import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
 import { DropdownMenuLabel, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu'
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 type Category = 'alle' | 'loodgieter' | 'aannemer' | 'elektricien' | 'schilder' | 'schoonmaak' | 'overig'
 
@@ -253,6 +252,45 @@ export default function ContactsPage() {
     } catch (e) { console.error(e) }
   }
 
+  const contactColumns: DataTableColumn<any>[] = [
+    {
+      key: 'name', header: 'Naam', sortable: true, width: 'minmax(0,2fr)',
+      render: (c) => (
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+            <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
+            {c.company && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'category', header: 'Categorie', sortable: true, width: 'minmax(0,1fr)',
+      render: (c) => (
+        <Badge className={cn('text-xs font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
+          {CATEGORIES.find((cat) => cat.value === c.category)?.label ?? c.category}
+        </Badge>
+      ),
+    },
+    {
+      key: 'phone', header: 'Telefoon', width: 'minmax(0,1.2fr)',
+      render: (c) => c.phone ? (
+        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.phone}</a>
+      ) : <span className="text-sm text-gray-400 dark:text-gray-600">—</span>,
+    },
+    {
+      key: 'email', header: 'E-mail', width: 'minmax(0,1.6fr)',
+      render: (c) => c.email ? (
+        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.email}</a>
+      ) : <span className="text-sm text-gray-400 dark:text-gray-600">—</span>,
+    },
+  ]
+
   return (
     <>
       <div className="flex flex-col gap-8">
@@ -334,71 +372,19 @@ export default function ContactsPage() {
           ))}
         </div>
       ) : (
-        <DataTable>
-          <DataTableHeader cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.6fr)_2rem]">
-            <SortableHeader label="Naam" sortKey="name" sort={sort} onSort={toggleSort} />
-            <SortableHeader label="Categorie" sortKey="category" sort={sort} onSort={toggleSort} />
-            <DataTableHeadCell>Telefoon</DataTableHeadCell>
-            <DataTableHeadCell>E-mail</DataTableHeadCell>
-            <span />
-          </DataTableHeader>
-          <DataTableBody>
-            {sortedFiltered.map((c) => (
-              <DataTableRow
-                key={c.id}
-                cols="grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.6fr)_2rem]"
-                onClick={() => openDetail(c)}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                    <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
-                    {c.company && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <Badge className={cn('text-xs font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
-                    {CATEGORIES.find((cat) => cat.value === c.category)?.label ?? c.category}
-                  </Badge>
-                </div>
-                <div className="min-w-0">
-                  {c.phone ? (
-                    <a
-                      href={`tel:${c.phone}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
-                    >{c.phone}</a>
-                  ) : (
-                    <span className="text-sm text-gray-400 dark:text-gray-600">—</span>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  {c.email ? (
-                    <a
-                      href={`mailto:${c.email}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
-                    >{c.email}</a>
-                  ) : (
-                    <span className="text-sm text-gray-400 dark:text-gray-600">—</span>
-                  )}
-                </div>
-                <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
-                  <RowActionsMenu
-                    actions={[
-                      { label: 'Bewerken', icon: Pencil, onClick: async () => { await openDetail(c); setEditMode(true) } },
-                      { label: 'Verwijderen', icon: Trash2, danger: true, onClick: async () => { await openDetail(c); setDeleteConfirm(true) } },
-                    ]}
-                  />
-                </div>
-              </DataTableRow>
-            ))}
-          </DataTableBody>
-        </DataTable>
+        <DataTable
+          rows={sortedFiltered}
+          columns={contactColumns}
+          getRowId={(c) => c.id}
+          sort={sort}
+          onSort={toggleSort}
+          onRowClick={(c) => openDetail(c)}
+          rowActions={(c) => [
+            { label: 'Bewerken', icon: Pencil, onClick: async () => { await openDetail(c); setEditMode(true) } },
+            { label: 'Verwijderen', icon: Trash2, danger: true, onClick: async () => { await openDetail(c); setDeleteConfirm(true) } },
+          ]}
+          empty="Geen contacten gevonden."
+        />
       )}
 
       {/* ── TOEVOEGEN — CreateDialogShell (popup) ── */}
