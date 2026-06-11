@@ -19,7 +19,7 @@ export function getPageDef(rel: string, firstName: string): PageDef {
       { label: 'Huurafrekeningen', path: '/financial/huurafrekening' },
     ],
   }
-  if (rel.startsWith('/compliance')) return { title: 'Compliance' }
+  if (rel.startsWith('/compliance')) return { title: 'Compliance', tabs: [{ label: 'Alles', path: '/compliance' }] }
   if (rel.startsWith('/maintenance')) return {
     title: 'Onderhoud',
     tabs: [

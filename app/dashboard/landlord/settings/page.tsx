@@ -10,6 +10,7 @@ import {
   Download,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TabNav } from '@/components/ui/tab-nav'
 import { getProfile, updateProfile, type NotificationPrefs, getDefaultNotificationPrefs } from '@/lib/supabase/profile'
 import { resetPassword, enrollMfa, challengeMfa, verifyMfa, verifyMfaCode, unenrollMfa, listMfaFactors, updateEmail, deleteAccount } from '@/lib/supabase/auth'
 import { DeleteAccountDialog } from '@/components/dashboard/delete-account-dialog'
@@ -481,7 +482,18 @@ export default function SettingsPage() {
           </div>
           <div className="mt-2 flex flex-col gap-4">
             <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870]">{displayName}</h1>
-            <SettingsPillNav activeTab={activeTab} onTabChange={setActiveTab} />
+            <TabNav
+              variant="underline"
+              className="w-full"
+              tabs={[
+                { id: 'account', label: 'Account' },
+                { id: 'beveiliging', label: 'Beveiliging' },
+                { id: 'abonnement', label: 'Abonnement' },
+                { id: 'koppelingen', label: 'Koppelingen' },
+              ]}
+              activeTab={activeTab}
+              onChange={(id) => setActiveTab(id as SettingsTab)}
+            />
           </div>
         </div>
       </div>
