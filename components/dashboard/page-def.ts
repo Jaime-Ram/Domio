@@ -40,9 +40,9 @@ export function getPageDef(rel: string, firstName: string): PageDef {
       { label: 'MJOP', path: '/mjop' },
     ],
   }
-  if (rel.startsWith('/integrations')) return { title: 'Integraties', tabs: [{ label: 'Alles', path: '/integrations' }] }
-  if (rel.startsWith('/assist')) return { title: 'Domio Assist', tabs: [{ label: 'Domio Assist', path: '/assist' }] }
-  if (rel.startsWith('/app')) return { title: 'App', tabs: [{ label: 'App', path: '/app' }] }
+  if (rel.startsWith('/integrations')) return { title: 'Integraties' }
+  if (rel.startsWith('/assist')) return { title: 'Domio Assist' }
+  if (rel.startsWith('/app')) return { title: 'App' }
   if (rel.startsWith('/settings')) return { title: 'Instellingen', noDivider: true }
   if (rel.startsWith('/upgrade')) return { title: 'Abonnement' }
   if (rel.startsWith('/hulp')) return { title: 'Hulp' }
