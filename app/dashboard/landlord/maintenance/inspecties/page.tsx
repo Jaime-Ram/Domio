@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
-import { DataTable, DataTableHeader, DataTableBody, DataTableRow, DataTableHeadCell, DataTableEmpty } from '@/components/ui/data-table'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
+import { BuildingAvatar } from '@/components/ui/entity-avatar'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -165,37 +166,24 @@ export default function InspectiesPage() {
         addLabel="Nieuwe inspectie"
       />
 
-      <DataTable>
-        <DataTableHeader cols="grid-cols-[1fr_auto_auto_auto_auto_auto]">
-          <DataTableHeadCell>Adres</DataTableHeadCell>
-          <DataTableHeadCell>Type</DataTableHeadCell>
-          <DataTableHeadCell>Status</DataTableHeadCell>
-          <DataTableHeadCell>Datum</DataTableHeadCell>
-          <DataTableHeadCell>Inspecteur</DataTableHeadCell>
-          <DataTableHeadCell>Notities</DataTableHeadCell>
-        </DataTableHeader>
-        <DataTableBody>
-          {filtered.length === 0 ? (
-            <DataTableEmpty>Geen inspecties gevonden.</DataTableEmpty>
-          ) : filtered.map((insp) => (
-            <DataTableRow key={insp.id} cols="grid-cols-[1fr_auto_auto_auto_auto_auto]">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                  <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                </div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{insp.address}</p>
-              </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{TYPE_LABELS[insp.type]}</p>
-              <div>{getStatusBadge(insp.status)}</div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                {format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}
-              </p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{insp.inspector}</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 max-w-[200px] truncate">{insp.notes ?? '—'}</p>
-            </DataTableRow>
-          ))}
-        </DataTableBody>
-      </DataTable>
+      <DataTable
+        rows={filtered}
+        columns={[
+          { key: 'address', header: 'Adres', width: 'minmax(0,1.6fr)', render: (insp) => (
+            <div className="flex items-center gap-3 min-w-0">
+              <BuildingAvatar />
+              <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate">{insp.address}</p>
+            </div>
+          ) },
+          { key: 'type', header: 'Type', width: 'auto', render: (insp) => <p className="text-[12.5px] text-gray-700 dark:text-gray-300 whitespace-nowrap">{(TYPE_LABELS as any)[insp.type]}</p> },
+          { key: 'status', header: 'Status', width: 'auto', render: (insp) => getStatusBadge(insp.status) },
+          { key: 'date', header: 'Datum', width: 'auto', render: (insp) => <p className="text-[12.5px] text-gray-700 dark:text-gray-300 whitespace-nowrap">{format(new Date(insp.date), 'd MMM yyyy', { locale: nl })}</p> },
+          { key: 'inspector', header: 'Inspecteur', width: 'auto', render: (insp) => <p className="text-[12.5px] text-gray-700 dark:text-gray-300 whitespace-nowrap">{insp.inspector}</p> },
+          { key: 'notes', header: 'Notities', width: 'minmax(0,1fr)', render: (insp) => <p className="text-[12.5px] text-gray-400 dark:text-gray-500 truncate">{insp.notes ?? '—'}</p> },
+        ] as DataTableColumn<any>[]}
+        getRowId={(i) => i.id}
+        empty="Geen inspecties gevonden."
+      />
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent
