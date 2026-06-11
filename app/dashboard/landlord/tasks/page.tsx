@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { TabNav } from '@/components/ui/tab-nav'
 import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
+import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { taskQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -217,74 +218,33 @@ export default function TasksPage() {
 
   // Zoek/filter/actie-knoppen op een eigen rij boven de tabel
   const tasksControls = (
-    <div className="flex items-center justify-end gap-1">
-        {/* Search — icon, expands left */}
-        <div className="flex flex-row-reverse items-center">
-          <button
-            type="button"
-            onClick={() => { setSearchExpanded(true); setTimeout(() => taskSearchRef.current?.focus(), 0) }}
-            className={cn(
-              'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
-              search && 'text-[#163300] dark:text-[#9FE870]',
-            )}
-          >
-            <Search className="h-4 w-4" />
-          </button>
-          <div className={cn(
-            'overflow-hidden transition-all duration-200 ease-out',
-            searchExpanded ? 'max-w-[160px] opacity-100 mr-1' : 'max-w-0 opacity-0 pointer-events-none',
-          )}>
-            <input
-              ref={taskSearchRef}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onBlur={() => { if (!search) setSearchExpanded(false) }}
-              onKeyDown={e => { if (e.key === 'Escape') { setSearch(''); setSearchExpanded(false) } }}
-              placeholder="Zoeken…"
-              className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
-            />
+    <TableToolbar
+      search={search}
+      onSearchChange={setSearch}
+      searchPlaceholder="Zoek taken…"
+      filterContent={
+        <>
+          <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+            Categorie
+          </DropdownMenuLabel>
+          <div className="space-y-1">
+            {(Object.entries(CATEGORY_CONFIG) as [string, { label: string }][]).map(([key, { label }]) => (
+              <DropdownMenuCheckboxItem
+                key={key}
+                checked={categoryFilter[key] !== false}
+                onCheckedChange={(v) => setCategoryFilter((f) => ({ ...f, [key]: Boolean(v) }))}
+                onSelect={(e) => e.preventDefault()}
+                className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
+              >
+                {label}
+              </DropdownMenuCheckboxItem>
+            ))}
           </div>
-        </div>
-        {/* Filter — icon only */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              suppressHydrationWarning
-              className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
-            >
-              <Filter className="h-4 w-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={8} className={cn(DASHBOARD_FILTER_MENU_CONTENT_CLASS, 'max-h-[min(70vh,480px)] overflow-y-auto')}>
-            <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-              Categorie
-            </DropdownMenuLabel>
-            <div className="space-y-1">
-              {(Object.entries(CATEGORY_CONFIG) as [string, { label: string }][]).map(([key, { label }]) => (
-                <DropdownMenuCheckboxItem
-                  key={key}
-                  checked={categoryFilter[key] !== false}
-                  onCheckedChange={(v) => setCategoryFilter((f) => ({ ...f, [key]: Boolean(v) }))}
-                  onSelect={(e) => e.preventDefault()}
-                  className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
-                >
-                  {label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {/* Add button */}
-        <Button
-          type="button"
-          onClick={openNew}
-          className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium ml-1"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nieuwe taak
-        </Button>
-    </div>
+        </>
+      }
+      onAdd={openNew}
+      addLabel="Nieuwe taak"
+    />
   )
 
   const taskColumns: DataTableColumn<any>[] = [

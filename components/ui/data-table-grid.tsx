@@ -66,6 +66,8 @@ interface DataTableProps<T> {
   empty?: React.ReactNode
   loading?: boolean
   loadingRows?: number
+  /** Vul-modus: tabel vult de hoogte, header blijft staan, rijen scrollen. */
+  fill?: boolean
   className?: string
 }
 
@@ -86,6 +88,7 @@ export function DataTable<T>({
   empty = 'Geen resultaten.',
   loading,
   loadingRows = 5,
+  fill,
   className,
 }: DataTableProps<T>) {
   const tracks = [
@@ -94,10 +97,8 @@ export function DataTable<T>({
   ].join(' ')
   const gridStyle: React.CSSProperties = { gridTemplateColumns: tracks }
 
-  return (
-    <div className={cn('rounded-2xl', className)}>
-      {/* Header */}
-      <div className="grid items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800" style={gridStyle}>
+  const headerEl = (
+      <div className={cn('relative grid items-center gap-4 px-3 pt-2.5 pb-2 after:pointer-events-none after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-gray-100 dark:after:bg-neutral-800', fill && 'bg-white dark:bg-neutral-900')} style={gridStyle}>
         {columns.map((c) =>
           c.sortable && onSort ? (
             <SortableHeader
@@ -112,7 +113,7 @@ export function DataTable<T>({
             <span
               key={c.key}
               className={cn(
-                'text-xs font-medium text-gray-500 dark:text-gray-400',
+                'text-sm font-medium text-gray-400 dark:text-gray-500',
                 c.align === 'right' && 'justify-self-end text-right',
                 c.align === 'center' && 'justify-self-center text-center',
                 c.headerClassName,
@@ -124,12 +125,13 @@ export function DataTable<T>({
         )}
         {rowActions && <span />}
       </div>
+  )
 
-      {/* Body */}
-      <div className="divide-y divide-gray-100 dark:divide-neutral-800">
+  const bodyEl = (
+      <div>
         {loading ? (
           Array.from({ length: loadingRows }).map((_, i) => (
-            <div key={i} className="grid items-center gap-4 mx-1 px-3 py-3" style={gridStyle}>
+            <div key={i} className="grid items-center gap-4 px-3 py-2.5" style={gridStyle}>
               {columns.map((c) => (
                 <div key={c.key} className="h-4 rounded bg-gray-100 dark:bg-neutral-800 animate-pulse" style={{ width: `${55 + ((i * 13 + c.key.length * 7) % 35)}%` }} />
               ))}
@@ -146,7 +148,8 @@ export function DataTable<T>({
                 key={getRowId(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={cn(
-                  'grid items-center gap-4 mx-1 px-3 py-3 rounded-xl transition-colors',
+                  'relative grid items-center gap-4 px-3 py-2.5 transition-colors',
+                  'after:pointer-events-none after:absolute after:inset-x-3 after:bottom-0 after:h-px after:bg-gray-100 dark:after:bg-neutral-800 last:after:hidden',
                   onRowClick && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/40',
                 )}
                 style={gridStyle}
@@ -173,6 +176,21 @@ export function DataTable<T>({
           })
         )}
       </div>
+  )
+
+  if (fill) {
+    return (
+      <div className={cn('flex h-full min-h-0 flex-col rounded-2xl border border-gray-100 dark:border-neutral-800 overflow-hidden', className)}>
+        <div className="shrink-0">{headerEl}</div>
+        <div className="flex-1 min-h-0 overflow-y-auto">{bodyEl}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn('rounded-2xl border border-gray-100 dark:border-neutral-800 overflow-hidden', className)}>
+      {headerEl}
+      {bodyEl}
     </div>
   )
 }

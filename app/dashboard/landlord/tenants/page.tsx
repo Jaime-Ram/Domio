@@ -17,6 +17,8 @@ import {
   Loader2,
   Trash2,
   Eye,
+  Building2,
+  Euro,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import { cn } from '@/lib/utils'
@@ -35,6 +37,7 @@ import { DialogField } from '@/components/ui/dialog-field'
 import { Input } from '@/components/ui/input'
 import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
+import { PersonAvatar } from '@/components/ui/entity-avatar'
 
 type TenantRow = {
   id: string
@@ -67,6 +70,7 @@ function TenantsPageContent() {
 
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
   const [search, setSearch] = useState('')
   const [balanceFilter, setBalanceFilter] = useState({
     opPeil: true,
@@ -368,15 +372,13 @@ function TenantsPageContent() {
       key: 'name', header: 'Huurder', sortable: true, width: 'minmax(0,2fr)',
       render: (tenant) => (
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-            <Users className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-          </div>
+          <PersonAvatar />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
+            <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
             <a
               href={`mailto:${tenant.email}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-block max-w-full text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5 hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+              className="inline-block max-w-full text-[12.5px] text-gray-500 dark:text-gray-400 truncate leading-tight hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
             >{tenant.email}</a>
           </div>
         </div>
@@ -386,7 +388,7 @@ function TenantsPageContent() {
       key: 'status', header: 'Status', sortable: true, width: 'minmax(0,1fr)',
       render: (tenant) => (
         <span className={cn(
-          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+          'inline-flex items-center rounded-full px-2.5 py-0.5 text-[12.5px] font-medium',
           tenant.status === 'actief'
             ? 'bg-[#2F5711] text-white'
             : tenant.status === 'concept'
@@ -400,24 +402,20 @@ function TenantsPageContent() {
       ),
     },
     {
-      key: 'unit', header: 'Eenheid', sortable: true, width: 'minmax(0,1.5fr)',
-      render: (tenant) => (
-        tenant.unitNumber || tenant.propertyName ? (
-          <>
-            <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{tenant.unitNumber || '—'}</p>
-            {tenant.propertyName && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{tenant.propertyName}</p>
-            )}
-          </>
-        ) : (
-          <p className="text-sm text-gray-400 dark:text-gray-600">—</p>
-        )
-      ),
+      key: 'unit', header: 'Adres', sortable: true, width: 'minmax(0,1.5fr)',
+      render: (tenant) => {
+        const label = tenant.propertyName
+          ? `${tenant.propertyName}${tenant.unitNumber ? ` (${tenant.unitNumber})` : ''}`
+          : (tenant.unitNumber || '')
+        return label
+          ? <p className="text-[12.5px] text-gray-700 dark:text-gray-300 truncate">{label}</p>
+          : <p className="text-[12.5px] text-gray-400 dark:text-gray-600">—</p>
+      },
     },
     {
       key: 'rent', header: 'Huurprijs', sortable: true, width: 'minmax(0,1fr)',
       render: (tenant) => (
-        <p className="text-sm font-medium text-gray-900 dark:text-white">
+        <p className="text-[12.5px] font-medium text-gray-900 dark:text-white">
           {tenant.monthlyRent ? `€${tenant.monthlyRent.toLocaleString('nl-NL')}` : '—'}
         </p>
       ),
@@ -429,12 +427,12 @@ function TenantsPageContent() {
           {tenant.profileId !== null ? (
             <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#9FE870]">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span className="text-xs font-medium">Actief</span>
+              <span className="text-[12.5px] font-medium">Actief</span>
             </div>
           ) : tenant.portalStatus === 'uitgenodigd' ? (
             <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
               <Mail className="h-4 w-4 shrink-0" />
-              <span className="text-xs font-medium">Uitgenodigd</span>
+              <span className="text-[12.5px] font-medium">Uitgenodigd</span>
               <button
                 onClick={() => sendInvite(tenant.id)}
                 disabled={invitingIds.has(tenant.id)}
@@ -448,7 +446,7 @@ function TenantsPageContent() {
             <button
               onClick={() => sendInvite(tenant.id)}
               disabled={invitingIds.has(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
             >
               {invitingIds.has(tenant.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
               Uitnodigen
@@ -456,7 +454,7 @@ function TenantsPageContent() {
           ) : (
             <button
               onClick={() => openEmailDialog(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
             >
               <Mail className="h-3.5 w-3.5" />
               Uitnodigen
@@ -478,7 +476,7 @@ function TenantsPageContent() {
           </button>
         </div>
       )}
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-1 min-h-0 flex-col gap-8">
             <TableToolbar
               title="Huurders"
               count={`${filteredTenants.length} van ${tenants.length} huurder${tenants.length === 1 ? '' : 's'}`}
@@ -486,23 +484,77 @@ function TenantsPageContent() {
               onSearchChange={setSearch}
               searchPlaceholder="Zoek huurder, e-mail, object…"
               filterContent={filterContent}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
               onAdd={() => setNewTenantOpen(true)}
               addLabel="Nieuw contract"
             />
 
-            <DataTable
-              rows={sortedTenants}
-              columns={tenantColumns}
-              getRowId={(t) => t.id}
-              sort={tenantSort}
-              onSort={toggleSort}
-              onRowClick={(t) => setSelectedTenantId(t.id)}
-              rowActions={(t) => [
-                { label: 'Bekijken', icon: Eye, onClick: () => setSelectedTenantId(t.id) },
-                { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeleteTenant(t) },
-              ]}
-              empty="Geen huurders gevonden."
-            />
+            {viewMode === 'grid' ? (
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {sortedTenants.length === 0 ? (
+                  <p className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen huurders gevonden.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-1">
+                    {sortedTenants.map((tenant) => (
+                      <button
+                        key={tenant.id}
+                        type="button"
+                        onClick={() => setSelectedTenantId(tenant.id)}
+                        className="group rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <PersonAvatar size="lg" />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-gray-900 dark:text-white truncate">{tenant.name}</p>
+                            {tenant.email && <p className="text-xs text-gray-500 truncate">{tenant.email}</p>}
+                          </div>
+                          <span className={cn(
+                            'shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+                            tenant.status === 'actief' ? 'bg-[#2F5711] text-white'
+                              : tenant.status === 'concept' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                              : tenant.status === 'geen contract' ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
+                              : 'bg-[#A8200D] text-white',
+                          )}>
+                            {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief' : tenant.status}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          {(tenant.unitNumber || tenant.propertyName) && (
+                            <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
+                              <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              <span className="truncate">{[tenant.unitNumber, tenant.propertyName].filter(Boolean).join(' · ')}</span>
+                            </p>
+                          )}
+                          {tenant.monthlyRent ? (
+                            <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
+                              <Euro className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              <span>€{tenant.monthlyRent.toLocaleString('nl-NL')} / maand</span>
+                            </p>
+                          ) : null}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <DataTable
+                rows={sortedTenants}
+                columns={tenantColumns}
+                getRowId={(t) => t.id}
+                sort={tenantSort}
+                onSort={toggleSort}
+                onRowClick={(t) => setSelectedTenantId(t.id)}
+                rowActions={(t) => [
+                  { label: 'Bekijken', icon: Eye, onClick: () => setSelectedTenantId(t.id) },
+                  { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeleteTenant(t) },
+                ]}
+                empty="Geen huurders gevonden."
+                fill
+                className="flex-1 min-h-0"
+              />
+            )}
             </div>
 
       <Dialog open={!!emailDialogTenantId} onOpenChange={(open) => { if (!open) setEmailDialogTenantId(null) }}>

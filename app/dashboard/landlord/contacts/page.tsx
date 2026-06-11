@@ -16,6 +16,7 @@ import { contactQueries } from '@/lib/supabase/queries'
 import { useContacts, useProperties, usePortfolios, useQueryClient, QK } from '@/lib/hooks/use-dashboard-queries'
 import { TableToolbar } from '@/components/dashboard/table-toolbar'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
+import { PersonAvatar } from '@/components/ui/entity-avatar'
 import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
 import { DropdownMenuLabel, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu'
 import { DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS } from '@/app/dashboard/landlord/dashboard-ui'
@@ -257,9 +258,7 @@ export default function ContactsPage() {
       key: 'name', header: 'Naam', sortable: true, width: 'minmax(0,2fr)',
       render: (c) => (
         <div className="flex items-center gap-3 min-w-0">
-          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-            <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-          </div>
+          <PersonAvatar />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
             {c.company && (
@@ -448,9 +447,7 @@ export default function ContactsPage() {
         title={detailContact?.name ?? ''}
         subtitle={detailContact ? (CATEGORIES.find(c => c.value === detailContact.category)?.label ?? detailContact.category) : undefined}
         headerLeft={
-          <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-            <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-          </div>
+          <PersonAvatar />
         }
         footer={
           deleteConfirm ? (

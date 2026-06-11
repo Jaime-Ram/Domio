@@ -53,7 +53,7 @@ export function TableToolbar({
   const hasLeft = title || count !== undefined
 
   return (
-    <div className={cn('flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between', className)}>
+    <div className={cn('flex flex-col gap-3 sm:flex-row sm:items-end', hasLeft ? 'sm:justify-between' : 'sm:justify-end', className)}>
       {hasLeft && (
         <div>
           {title && (
