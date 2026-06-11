@@ -129,7 +129,7 @@ export function DataTable<T>({
       <div className="divide-y divide-gray-100 dark:divide-neutral-800">
         {loading ? (
           Array.from({ length: loadingRows }).map((_, i) => (
-            <div key={i} className="grid items-center gap-4 mx-1 px-3 py-3.5" style={gridStyle}>
+            <div key={i} className="grid items-center gap-4 mx-1 px-3 py-3" style={gridStyle}>
               {columns.map((c) => (
                 <div key={c.key} className="h-4 rounded bg-gray-100 dark:bg-neutral-800 animate-pulse" style={{ width: `${55 + ((i * 13 + c.key.length * 7) % 35)}%` }} />
               ))}
@@ -146,7 +146,7 @@ export function DataTable<T>({
                 key={getRowId(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={cn(
-                  'grid items-center gap-4 mx-1 px-3 py-3.5 rounded-xl transition-colors',
+                  'grid items-center gap-4 mx-1 px-3 py-3 rounded-xl transition-colors',
                   onRowClick && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/40',
                 )}
                 style={gridStyle}
