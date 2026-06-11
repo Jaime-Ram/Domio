@@ -9,7 +9,8 @@ import {
 import { AlertCircle, ClockCheck, CheckDone01 } from '@untitledui/icons'
 import { cn } from '@/lib/utils'
 import { TabNav } from '@/components/ui/tab-nav'
-import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
 import { taskQueries } from '@/lib/supabase/queries'
 import { getUser } from '@/lib/supabase/auth'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
@@ -27,7 +28,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { MetricCard } from '@/components/finance/MetricCard'
 import { AddTaskTile } from '@/components/tasks/add-task-tile'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import {
   DASHBOARD_FILTER_MENU_CONTENT_CLASS,
   DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS,
@@ -287,6 +287,74 @@ export default function TasksPage() {
     </div>
   )
 
+  const taskColumns: DataTableColumn<any>[] = [
+    {
+      key: 'done', header: '', width: '2rem', className: 'flex justify-center',
+      render: (task) => {
+        const done = task.status === 'afgerond'
+        return (
+          <button
+            type="button"
+            onClick={() => toggleDone(task)}
+            aria-label={done ? 'Taak heropenen' : 'Taak afronden'}
+            className={cn(
+              'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
+              done ? 'border-gray-400 bg-gray-400 dark:border-neutral-500 dark:bg-neutral-500' : 'border-gray-300 dark:border-neutral-600 hover:border-gray-500 dark:hover:border-neutral-400',
+            )}
+          >
+            {done && <Check className="h-2.5 w-2.5 text-white" />}
+          </button>
+        )
+      },
+    },
+    {
+      key: 'title', header: 'Taak', sortable: true,
+      render: (task) => {
+        const done = task.status === 'afgerond'
+        const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
+        const rec = RECURRING_LABEL[task.recurring] ?? ''
+        return (
+          <div className="min-w-0">
+            <span className={cn('text-sm font-semibold truncate block', done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white')}>{task.title}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
+              {cat.label}
+              {rec && (<><span>·</span><span className="inline-flex items-center gap-1"><RefreshCw className="h-3 w-3 shrink-0" />{rec}</span></>)}
+            </span>
+          </div>
+        )
+      },
+    },
+    {
+      key: 'property', header: 'Pand', sortable: true,
+      render: (task) => task.properties ? (
+        <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">{task.properties.name}</span>
+      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+    },
+    {
+      key: 'due_date', header: 'Einddatum', sortable: true,
+      render: (task) => {
+        const done = task.status === 'afgerond'
+        const days = task.due_date ? daysUntil(task.due_date) : null
+        const isOverdue = days !== null && days < 0 && !done
+        return task.due_date ? (
+          <span className={cn('text-sm', isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : done ? 'text-gray-400 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400')}>{fmtDate(task.due_date)}</span>
+        ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
+      },
+    },
+    {
+      key: 'priority', header: 'Prioriteit', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
+      render: (task) => task.priority && task.priority !== 'normaal' ? (
+        <span className="text-sm text-gray-500 dark:text-gray-400">{(PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal).label}</span>
+      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+    },
+    {
+      key: 'notification_date', header: 'Herinnering', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
+      render: (task) => task.notification_date ? (
+        <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(task.notification_date)}</span>
+      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+    },
+  ]
+
   return (
     <div className="flex flex-col gap-6">
 
@@ -297,163 +365,30 @@ export default function TasksPage() {
         {/* Zoek/filter/acties boven de tabel */}
         {tasksControls}
 
-      <div className="rounded-2xl overflow-hidden">
-        {/* Column headers */}
-        <div className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_1fr_2.5rem] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-          <span />
-          <SortableHeader label="Taak" sortKey="title" sort={taskSort} onSort={toggleSort} />
-          <SortableHeader label="Pand" sortKey="property" sort={taskSort} onSort={toggleSort} />
-          <SortableHeader label="Einddatum" sortKey="due_date" sort={taskSort} onSort={toggleSort} />
-          <SortableHeader label="Prioriteit" sortKey="priority" sort={taskSort} onSort={toggleSort} className="hidden md:inline-flex" />
-          <SortableHeader label="Herinnering" sortKey="notification_date" sort={taskSort} onSort={toggleSort} className="hidden md:inline-flex" />
-          <span />
-        </div>
-
-        {loading ? (
-          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="mx-1 px-3 py-3.5">
-                <div className="h-4 w-full max-w-xl animate-pulse rounded bg-gray-200 dark:bg-neutral-700" />
-              </div>
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="py-16 text-center px-4">
+      <DataTable
+        rows={filtered}
+        columns={taskColumns}
+        getRowId={(t) => t.id}
+        sort={taskSort}
+        onSort={toggleSort}
+        loading={loading}
+        rowActions={(task) => [
+          { label: 'Bewerken', icon: Pencil, onClick: () => openEdit(task) },
+          { label: task.status === 'afgerond' ? 'Heropenen' : 'Markeer als afgerond', icon: Check, onClick: () => toggleDone(task) },
+        ]}
+        empty={
+          <div className="px-4">
             <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}
-            </p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}</p>
             {!search && filter === 'alle' && (
-              <button
-                type="button"
-                onClick={openNew}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors"
-              >
+              <button type="button" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors">
                 <Plus className="h-3.5 w-3.5" />
                 Eerste taak aanmaken
               </button>
             )}
           </div>
-        ) : (
-          <div className="divide-y divide-gray-100 dark:divide-neutral-800">
-            {filtered.map((task) => {
-              const done = task.status === 'afgerond'
-              const days = task.due_date ? daysUntil(task.due_date) : null
-              const isOverdue = days !== null && days < 0 && !done
-              const cat = CATEGORY_CONFIG[task.category] ?? CATEGORY_CONFIG.overig
-              const prio = PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal
-              const rec = RECURRING_LABEL[task.recurring] ?? ''
-
-              return (
-                <div
-                  key={task.id}
-                  className="grid grid-cols-[2rem_1fr_1fr_1fr_1fr_1fr_2.5rem] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
-                >
-                  {/* Done toggle */}
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => toggleDone(task)}
-                      aria-label={done ? 'Taak heropenen' : 'Taak afronden'}
-                      className={cn(
-                        'shrink-0 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors',
-                        done
-                          ? 'border-gray-400 bg-gray-400 dark:border-neutral-500 dark:bg-neutral-500'
-                          : 'border-gray-300 dark:border-neutral-600 hover:border-gray-500 dark:hover:border-neutral-400'
-                      )}
-                    >
-                      {done && <Check className="h-2.5 w-2.5 text-white" />}
-                    </button>
-                  </div>
-
-                  {/* Title + category */}
-                  <div className="min-w-0">
-                    <span className={cn(
-                      'text-sm font-semibold truncate block',
-                      done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white'
-                    )}>
-                      {task.title}
-                    </span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
-                      {cat.label}
-                      {rec && (
-                        <>
-                          <span>·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <RefreshCw className="h-3 w-3 shrink-0" />
-                            {rec}
-                          </span>
-                        </>
-                      )}
-                    </span>
-                  </div>
-
-                  {/* Pand */}
-                  <div className="min-w-0">
-                    {task.properties ? (
-                      <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">
-                        {task.properties.name}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
-                    )}
-                  </div>
-
-                  {/* Einddatum */}
-                  <div className="min-w-0">
-                    {task.due_date ? (
-                      <span className={cn(
-                        'text-sm',
-                        isOverdue
-                          ? 'text-red-500 dark:text-red-400 font-medium'
-                          : done
-                            ? 'text-gray-400 dark:text-gray-600'
-                            : 'text-gray-500 dark:text-gray-400'
-                      )}>
-                        {fmtDate(task.due_date)}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
-                    )}
-                  </div>
-
-                  {/* Prioriteit */}
-                  <div className="hidden md:block min-w-0">
-                    {task.priority && task.priority !== 'normaal' ? (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {prio.label}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
-                    )}
-                  </div>
-
-                  {/* Herinnering */}
-                  <div className="hidden md:block min-w-0">
-                    {task.notification_date ? (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {fmtDate(task.notification_date)}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
-                    )}
-                  </div>
-
-                  {/* Acties */}
-                  <div className="justify-self-end" onClick={(e) => e.stopPropagation()}>
-                    <RowActionsMenu
-                      actions={[
-                        { label: 'Bewerken', icon: Pencil, onClick: () => openEdit(task) },
-                        { label: task.status === 'afgerond' ? 'Heropenen' : 'Markeer als afgerond', icon: Check, onClick: () => toggleDone(task) },
-                      ]}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
+        }
+      />
       </div>
 
       {/* Create dialog */}
