@@ -13,7 +13,8 @@ import { useDocumentPreview } from '@/providers/document-preview-provider'
 import { documentQueries, propertyQueries, leaseQueries, ticketQueries } from '@/lib/supabase/queries'
 import { supabase } from '@/lib/supabase/client'
 import { getUser } from '@/lib/supabase/auth'
-import { useSortable, applySortedRows, SortableHeader } from '@/components/ui/sortable-table'
+import { useSortable, applySortedRows } from '@/components/ui/sortable-table'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
 import { Eye, Download, Trash2, Upload, X, Plus, CheckSquare, Link2, ChevronDown, Search, Check } from 'lucide-react'
 import {
   Dialog,
@@ -1030,67 +1031,36 @@ export default function DocumentsPage() {
           </>
         )}
         {viewMode === 'table' ? (
-            <div className="rounded-2xl overflow-hidden mt-8">
-              {/* Column headers */}
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] items-center gap-4 mx-1 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
-                <SortableHeader label="Naam" sortKey="name" sort={docSort} onSort={toggleSort} />
-                <SortableHeader label="Type" sortKey="type" sort={docSort} onSort={toggleSort} />
-                <SortableHeader label="Datum" sortKey="date" sort={docSort} onSort={toggleSort} />
-                <SortableHeader label="Pand" sortKey="property" sort={docSort} onSort={toggleSort} />
-                <span />
-              </div>
-              {/* Rows */}
-              <div className="divide-y divide-gray-100 dark:divide-neutral-800">
-                {sortedDocuments.map((doc) => {
-                  const cardDoc = toCardDoc(doc)
-                  const prop = doc.property ?? doc.properties
-                  const address = prop?.address ?? null
-                  const created = doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'
-                  return (
-                    <div
-                      key={doc.id}
-                      className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] items-center gap-4 mx-1 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors rounded-xl"
-                    >
+            <div className="mt-8">
+              <DataTable
+                rows={sortedDocuments}
+                getRowId={(d) => d.id}
+                sort={docSort}
+                onSort={toggleSort}
+                onRowClick={(doc) => handleView(doc)}
+                columns={[
+                  { key: 'name', header: 'Naam', sortable: true, width: 'minmax(0,2fr)', render: (doc) => {
+                    const cardDoc = toCardDoc(doc)
+                    return (
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                          <DocumentTypeGlyph
-                            name={cardDoc.name}
-                            file_name={cardDoc.file_name}
-                            mime_type={cardDoc.mime_type}
-                            className="h-4 w-4 text-gray-600 dark:text-gray-300"
-                          />
+                          <DocumentTypeGlyph name={cardDoc.name} file_name={cardDoc.file_name} mime_type={cardDoc.mime_type} className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white truncate">{cardDoc.name}</span>
+                        <span className="text-[12.5px] font-medium text-gray-900 dark:text-white truncate">{cardDoc.name}</span>
                       </div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400 truncate">{cardDoc.type}</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{created}</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400 truncate">{address || '—'}</span>
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full text-[#163300] dark:text-[#9FE870]"
-                          onClick={() => handleView(doc)}
-                          aria-label="Bekijken"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full"
-                          onClick={() => handleDownload(doc)}
-                          aria-label="Download"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  } },
+                  { key: 'type', header: 'Type', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-gray-600 dark:text-gray-400 truncate">{toCardDoc(doc).type}</span> },
+                  { key: 'date', header: 'Datum', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-gray-600 dark:text-gray-400">{doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'}</span> },
+                  { key: 'property', header: 'Pand', sortable: true, width: 'minmax(0,1.5fr)', render: (doc) => { const prop = doc.property ?? doc.properties; return <span className="text-[12.5px] text-gray-600 dark:text-gray-400 truncate">{prop?.address ?? '—'}</span> } },
+                ] as DataTableColumn<any>[]}
+                rowActions={(doc) => [
+                  { label: 'Downloaden', icon: Download, onClick: () => handleDownload(doc) },
+                  ...(isDemo ? [] : [{ label: 'Toewijzen aan pand', icon: Link2, onClick: () => setAssignDialogDoc({ id: doc.id, name: toCardDoc(doc).name }) }]),
+                  { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => handleDelete(doc) },
+                ]}
+                empty="Geen documenten."
+              />
             </div>
           ) : (
             <>
