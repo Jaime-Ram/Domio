@@ -210,6 +210,13 @@ export default function SettingsPage() {
   useEffect(() => { loadProfile() }, [loadProfile])
   useEffect(() => { loadTotpFactors() }, [loadTotpFactors])
 
+  // Veiligheid: zodra de gebruikerscontext klaar is, tonen we de pagina hoe dan
+  // ook (anders blijft de hele pagina op de skeleton hangen als getProfile traag
+  // is of faalt). De formuliervelden vullen zich zodra het profiel binnen is.
+  useEffect(() => {
+    if (!userCtxLoading) setAccountDataReady(true)
+  }, [userCtxLoading])
+
   useEffect(() => {
     if (!isDemo) return
     if (dashProfile) {
@@ -461,10 +468,6 @@ export default function SettingsPage() {
     if (Number.isNaN(d.getTime())) return null
     return d.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
   })()
-
-  if (!accountDataReady) {
-    return <AccountHeaderSkeleton cardClass={sCard} />
-  }
 
   return (
     <>
