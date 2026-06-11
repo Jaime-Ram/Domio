@@ -260,9 +260,9 @@ export default function ContactsPage() {
         <div className="flex items-center gap-3 min-w-0">
           <PersonAvatar />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
+            <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
             {c.company && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
+              <p className="text-[12.5px] text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
             )}
           </div>
         </div>
@@ -271,7 +271,7 @@ export default function ContactsPage() {
     {
       key: 'category', header: 'Categorie', sortable: true, width: 'minmax(0,1fr)',
       render: (c) => (
-        <Badge className={cn('text-xs font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
+        <Badge className={cn('text-[12.5px] font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
           {CATEGORIES.find((cat) => cat.value === c.category)?.label ?? c.category}
         </Badge>
       ),
@@ -279,14 +279,14 @@ export default function ContactsPage() {
     {
       key: 'phone', header: 'Telefoon', width: 'minmax(0,1.2fr)',
       render: (c) => c.phone ? (
-        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.phone}</a>
-      ) : <span className="text-sm text-gray-400 dark:text-gray-600">—</span>,
+        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.phone}</a>
+      ) : <span className="text-[12.5px] text-gray-400 dark:text-gray-600">—</span>,
     },
     {
       key: 'email', header: 'E-mail', width: 'minmax(0,1.6fr)',
       render: (c) => c.email ? (
-        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-sm text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.email}</a>
-      ) : <span className="text-sm text-gray-400 dark:text-gray-600">—</span>,
+        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.email}</a>
+      ) : <span className="text-[12.5px] text-gray-400 dark:text-gray-600">—</span>,
     },
   ]
 

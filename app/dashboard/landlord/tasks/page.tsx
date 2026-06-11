@@ -275,8 +275,8 @@ export default function TasksPage() {
         const rec = RECURRING_LABEL[task.recurring] ?? ''
         return (
           <div className="min-w-0">
-            <span className={cn('text-sm font-semibold truncate block', done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white')}>{task.title}</span>
-            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
+            <span className={cn('text-[12.5px] font-semibold truncate block', done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white')}>{task.title}</span>
+            <span className="text-[12.5px] text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
               {cat.label}
               {rec && (<><span>·</span><span className="inline-flex items-center gap-1"><RefreshCw className="h-3 w-3 shrink-0" />{rec}</span></>)}
             </span>
@@ -287,8 +287,8 @@ export default function TasksPage() {
     {
       key: 'property', header: 'Pand', sortable: true,
       render: (task) => task.properties ? (
-        <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">{task.properties.name}</span>
-      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+        <span className="text-[12.5px] text-gray-500 dark:text-gray-400 truncate block">{task.properties.name}</span>
+      ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
     {
       key: 'due_date', header: 'Einddatum', sortable: true,
@@ -297,21 +297,21 @@ export default function TasksPage() {
         const days = task.due_date ? daysUntil(task.due_date) : null
         const isOverdue = days !== null && days < 0 && !done
         return task.due_date ? (
-          <span className={cn('text-sm', isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : done ? 'text-gray-400 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400')}>{fmtDate(task.due_date)}</span>
-        ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>
+          <span className={cn('text-[12.5px]', isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : done ? 'text-gray-400 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400')}>{fmtDate(task.due_date)}</span>
+        ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>
       },
     },
     {
       key: 'priority', header: 'Prioriteit', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
       render: (task) => task.priority && task.priority !== 'normaal' ? (
-        <span className="text-sm text-gray-500 dark:text-gray-400">{(PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal).label}</span>
-      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+        <span className="text-[12.5px] text-gray-500 dark:text-gray-400">{(PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal).label}</span>
+      ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
     {
       key: 'notification_date', header: 'Herinnering', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
       render: (task) => task.notification_date ? (
-        <span className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(task.notification_date)}</span>
-      ) : <span className="text-sm text-gray-300 dark:text-neutral-600">—</span>,
+        <span className="text-[12.5px] text-gray-500 dark:text-gray-400">{fmtDate(task.notification_date)}</span>
+      ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
   ]
 
