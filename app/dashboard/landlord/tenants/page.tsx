@@ -16,6 +16,7 @@ import {
   RotateCcw,
   Loader2,
   Trash2,
+  Eye,
 } from 'lucide-react'
 import { mockTenants } from '@/lib/mock-data/vastgoed'
 import { cn } from '@/lib/utils'
@@ -496,6 +497,10 @@ function TenantsPageContent() {
               sort={tenantSort}
               onSort={toggleSort}
               onRowClick={(t) => setSelectedTenantId(t.id)}
+              rowActions={(t) => [
+                { label: 'Bekijken', icon: Eye, onClick: () => setSelectedTenantId(t.id) },
+                { label: 'Verwijderen', icon: Trash2, danger: true, onClick: () => setDeleteTenant(t) },
+              ]}
               empty="Geen huurders gevonden."
             />
             </div>
