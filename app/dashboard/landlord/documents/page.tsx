@@ -623,22 +623,6 @@ export default function DocumentsPage() {
           onAdd={!isDemo ? handleUploadClick : undefined}
           addLabel={uploading ? 'Bezig…' : 'Document uploaden'}
           addDisabled={uploading}
-          extra={
-            <button
-              type="button"
-              onClick={toggleSelectionMode}
-              disabled={bulkBusy}
-              title={selectionMode ? 'Annuleer selectie' : 'Selecteer documenten'}
-              className={cn(
-                'h-8 w-8 flex items-center justify-center rounded-full transition-colors',
-                selectionMode
-                  ? 'text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800',
-              )}
-            >
-              {selectionMode ? <X className="h-4 w-4" /> : <CheckSquare className="h-4 w-4" />}
-            </button>
-          }
         />
         {!isDemo && (
           <>
