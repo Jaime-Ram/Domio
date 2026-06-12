@@ -5,6 +5,7 @@ import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDashboardUser } from '@/providers/dashboard-user-provider'
 import { propertyQueries } from '@/lib/supabase/queries'
+import { supabase } from '@/lib/supabase/client'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table-grid'
 import { BuildingAvatar } from '@/components/ui/entity-avatar'
 import { DetailShell } from '@/components/ui/detail-shell'
@@ -35,6 +36,7 @@ export default function CompliancePage() {
   const [loading, setLoading] = useState(true)
   const [checks, setChecks] = useState<CheckMap>({})
   const [openId, setOpenId] = useState<string | null>(null)
+  const [useTable, setUseTable] = useState(false)
 
   // Panden laden
   useEffect(() => {
@@ -45,26 +47,43 @@ export default function CompliancePage() {
       .finally(() => setLoading(false))
   }, [user?.id])
 
-  // Check-state uit localStorage
+  // Check-state laden: eerst de tabel, anders terugval op localStorage
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) setChecks(JSON.parse(raw))
-    } catch { /* leeg */ }
-  }, [])
-
-  const persist = (next: CheckMap) => {
-    setChecks(next)
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch { /* negeer */ }
-  }
+    if (!user?.id) return
+    const sb = supabase as any
+    sb.from('compliance_checks').select('property_id, item_key').eq('owner_id', user.id)
+      .then(({ data, error }: any) => {
+        if (error) {
+          try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) setChecks(JSON.parse(raw)) } catch { /* leeg */ }
+          return
+        }
+        setUseTable(true)
+        const map: CheckMap = {}
+        for (const row of (data ?? [])) (map[row.property_id] ??= []).push(row.item_key)
+        setChecks(map)
+      })
+  }, [user?.id])
 
   const checkedSet = (propertyId: string) => new Set(checks[propertyId] ?? [])
 
   const toggleItem = (propertyId: string, itemKey: string) => {
     const set = checkedSet(propertyId)
-    if (set.has(itemKey)) set.delete(itemKey)
-    else set.add(itemKey)
-    persist({ ...checks, [propertyId]: [...set] })
+    const willCheck = !set.has(itemKey)
+    if (willCheck) set.add(itemKey)
+    else set.delete(itemKey)
+    const next = { ...checks, [propertyId]: [...set] }
+    setChecks(next)
+
+    if (useTable && user?.id) {
+      const sb = supabase as any
+      if (willCheck) {
+        sb.from('compliance_checks').upsert({ owner_id: user.id, property_id: propertyId, item_key: itemKey }).then(() => {})
+      } else {
+        sb.from('compliance_checks').delete().eq('property_id', propertyId).eq('item_key', itemKey).then(() => {})
+      }
+    } else {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch { /* negeer */ }
+    }
   }
 
   // Overzicht-cijfers
