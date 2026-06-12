@@ -471,20 +471,6 @@ export default function SettingsPage() {
 
   return (
     <>
-      {/* Navtabs — standaard positie onder de titel */}
-      <TabNav
-        variant="underline"
-        className="w-full"
-        tabs={[
-          { id: 'account', label: 'Account' },
-          { id: 'beveiliging', label: 'Beveiliging' },
-          { id: 'abonnement', label: 'Abonnement' },
-          { id: 'koppelingen', label: 'Koppelingen' },
-        ]}
-        activeTab={activeTab}
-        onChange={(id) => setActiveTab(id as SettingsTab)}
-      />
-
       {/* Header card */}
       <div className={cn(sCard, 'overflow-hidden')}>
         <div
@@ -497,7 +483,21 @@ export default function SettingsPage() {
               {initialsLetters != null ? initialsLetters : <User className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden />}
             </div>
           </div>
-          <h1 className="mt-2 text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870]">{displayName}</h1>
+          <div className="mt-2 flex flex-col gap-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870]">{displayName}</h1>
+            <TabNav
+              variant="underline"
+              className="w-full"
+              tabs={[
+                { id: 'account', label: 'Account' },
+                { id: 'beveiliging', label: 'Beveiliging' },
+                { id: 'abonnement', label: 'Abonnement' },
+                { id: 'koppelingen', label: 'Koppelingen' },
+              ]}
+              activeTab={activeTab}
+              onChange={(id) => setActiveTab(id as SettingsTab)}
+            />
+          </div>
         </div>
       </div>
 
