@@ -471,44 +471,39 @@ export default function SettingsPage() {
 
   return (
     <>
-      {/* Header card */}
-      <div className={cn(sCard, 'overflow-hidden')}>
-        <div
-          className="h-28 sm:h-32 bg-[#163300] bg-cover bg-no-repeat"
-          style={{ backgroundImage: "url('/images/Achtergrond2.jpg')", backgroundPosition: '50% 26%' }}
-        />
-        <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
-          <div className="-mt-[4.5rem] shrink-0">
-            <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold">
-              {initialsLetters != null ? initialsLetters : <User className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden />}
-            </div>
-          </div>
-          <div className="mt-2 flex flex-col gap-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#163300] dark:text-[#9FE870]">{displayName}</h1>
-            <div className="flex items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm overflow-x-auto">
-              {([
-                ['account', 'Account'],
-                ['beveiliging', 'Beveiliging'],
-                ['abonnement', 'Abonnement'],
-                ['koppelingen', 'Koppelingen'],
-              ] as [SettingsTab, string][]).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActiveTab(id)}
-                  className={cn(
-                    'shrink-0 pb-2 -mb-px font-semibold whitespace-nowrap transition-colors border-b-2',
-                    activeTab === id
-                      ? 'text-[#15803D] dark:text-[#4ADE80] border-[#15803D] dark:border-[#4ADE80]'
-                      : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-neutral-200',
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Profielregel */}
+      <div className="flex items-center gap-3">
+        <div className="h-12 w-12 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-base font-semibold shrink-0">
+          {initialsLetters != null ? initialsLetters : <User className="h-6 w-6 text-gray-400 dark:text-gray-500" aria-hidden />}
         </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-[#163300] dark:text-[#9FE870] truncate">{displayName}</h1>
+          {displayEmail && <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>}
+        </div>
+      </div>
+
+      {/* Navtabs */}
+      <div className="flex items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm overflow-x-auto">
+        {([
+          ['account', 'Account'],
+          ['beveiliging', 'Beveiliging'],
+          ['abonnement', 'Abonnement'],
+          ['koppelingen', 'Koppelingen'],
+        ] as [SettingsTab, string][]).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setActiveTab(id)}
+            className={cn(
+              'shrink-0 pb-2.5 -mb-px font-semibold whitespace-nowrap transition-colors border-b-2',
+              activeTab === id
+                ? 'text-[#15803D] dark:text-[#4ADE80] border-[#15803D] dark:border-[#4ADE80]'
+                : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-neutral-200',
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {activeTab === 'account' && (
