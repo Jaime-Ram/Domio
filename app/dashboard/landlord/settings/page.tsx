@@ -471,29 +471,19 @@ export default function SettingsPage() {
 
   return (
     <>
-      {/* Navtabs — bovenaan, zoals Flows */}
-      <div className="flex flex-wrap items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm">
-        {([
-          ['account', 'Account'],
-          ['beveiliging', 'Beveiliging'],
-          ['abonnement', 'Abonnement'],
-          ['koppelingen', 'Koppelingen'],
-        ] as [SettingsTab, string][]).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setActiveTab(id)}
-            className={cn(
-              'shrink-0 pb-2.5 -mb-px font-semibold whitespace-nowrap transition-colors border-b-2',
-              activeTab === id
-                ? 'text-[#15803D] dark:text-[#4ADE80] border-[#15803D] dark:border-[#4ADE80]'
-                : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-neutral-200',
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* Navtabs — gedeelde TabNav, zelfde UI/UX als de andere pagina's */}
+      <TabNav
+        variant="underline"
+        className="w-full"
+        tabs={[
+          { id: 'account', label: 'Account' },
+          { id: 'beveiliging', label: 'Beveiliging' },
+          { id: 'abonnement', label: 'Abonnement' },
+          { id: 'koppelingen', label: 'Koppelingen' },
+        ]}
+        activeTab={activeTab}
+        onChange={(id) => setActiveTab(id as SettingsTab)}
+      />
 
       {/* Profielblok — altijd zichtbaar, zelfde stijl als de andere content-blokken */}
       <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-5 flex items-center gap-4">
