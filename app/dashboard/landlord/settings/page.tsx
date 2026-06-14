@@ -418,15 +418,22 @@ export default function SettingsPage() {
           }}
           aria-hidden
         />
-        <div className="relative z-10 flex items-center gap-5">
-          <div className="h-16 w-16 rounded-full bg-[#9FE870]/15 ring-2 ring-[#9FE870]/30 flex items-center justify-center text-[#9FE870] text-xl font-bold shrink-0">
-            {initialsLetters != null ? initialsLetters : <User className="h-8 w-8" aria-hidden />}
+        <div className="relative z-10 flex flex-col gap-3 max-w-xl">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-full bg-[#9FE870]/15 ring-2 ring-[#9FE870]/30 flex items-center justify-center text-[#9FE870] text-lg font-bold shrink-0">
+              {initialsLetters != null ? initialsLetters : <User className="h-7 w-7" aria-hidden />}
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-[26px] font-bold text-white leading-tight truncate">{displayName}</h1>
+              {displayEmail && <p className="text-sm text-white/70 truncate">{displayEmail}</p>}
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-[26px] font-bold text-white leading-tight truncate">{displayName}</h1>
-            {displayEmail && <p className="text-sm text-white/70 truncate mt-0.5">{displayEmail}</p>}
-            {memberSinceLabel && <p className="text-xs text-white/50 mt-1">Lid sinds {memberSinceLabel}</p>}
-          </div>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Beheer hier je persoonlijke gegevens, beveiliging, abonnement en koppelingen met externe systemen.
+          </p>
+          {memberSinceLabel && (
+            <span className="text-xs text-white/50">Lid sinds {memberSinceLabel}</span>
+          )}
         </div>
       </div>
 
