@@ -389,7 +389,7 @@ export default function SettingsPage() {
   })()
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       {/* Navtabs — gedeelde TabNav (in een wrapper, anders klapt 'ie samen in de min-h-0 flex-kolom) */}
       <div>
         <TabNav
@@ -956,6 +956,6 @@ export default function SettingsPage() {
         </div>
       )}
 
-    </>
+    </div>
   )
 }
