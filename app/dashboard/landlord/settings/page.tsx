@@ -471,19 +471,21 @@ export default function SettingsPage() {
 
   return (
     <>
-      {/* Navtabs — gedeelde TabNav, zelfde UI/UX als de andere pagina's */}
-      <TabNav
-        variant="underline"
-        className="w-full"
-        tabs={[
-          { id: 'account', label: 'Account' },
-          { id: 'beveiliging', label: 'Beveiliging' },
-          { id: 'abonnement', label: 'Abonnement' },
-          { id: 'koppelingen', label: 'Koppelingen' },
-        ]}
-        activeTab={activeTab}
-        onChange={(id) => setActiveTab(id as SettingsTab)}
-      />
+      {/* Navtabs — gedeelde TabNav (in een wrapper, anders klapt 'ie samen in de min-h-0 flex-kolom) */}
+      <div>
+        <TabNav
+          variant="underline"
+          className="w-full"
+          tabs={[
+            { id: 'account', label: 'Account' },
+            { id: 'beveiliging', label: 'Beveiliging' },
+            { id: 'abonnement', label: 'Abonnement' },
+            { id: 'koppelingen', label: 'Koppelingen' },
+          ]}
+          activeTab={activeTab}
+          onChange={(id) => setActiveTab(id as SettingsTab)}
+        />
+      </div>
 
       {/* Profielblok — altijd zichtbaar, zelfde stijl als de andere content-blokken */}
       <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-5 flex items-center gap-4">
