@@ -406,15 +406,27 @@ export default function SettingsPage() {
         />
       </div>
 
-      {/* Profielblok — altijd zichtbaar, zelfde stijl als de andere content-blokken */}
-      <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-5 flex items-center gap-4">
-        <div className="h-16 w-16 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold shrink-0">
-          {initialsLetters != null ? initialsLetters : <User className="h-8 w-8 text-gray-400 dark:text-gray-500" aria-hidden />}
-        </div>
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold text-[#163300] dark:text-[#9FE870] truncate">{displayName}</h1>
-          {displayEmail && <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>}
-          {memberSinceLabel && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Lid sinds {memberSinceLabel}</p>}
+      {/* Account-blok — zelfde formaat/stijl als het Flows "maak je eigen flow"-blok */}
+      <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
+        {/* Vastgoed-plaatje rechts, vervaagd */}
+        <div
+          className="absolute inset-y-0 right-0 w-2/5 bg-cover bg-center opacity-25"
+          style={{
+            backgroundImage: "url('/images/AchtergrondX.jpg')",
+            maskImage: 'linear-gradient(to right, transparent, black 65%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 65%)',
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10 flex items-center gap-5">
+          <div className="h-16 w-16 rounded-full bg-[#9FE870]/15 ring-2 ring-[#9FE870]/30 flex items-center justify-center text-[#9FE870] text-xl font-bold shrink-0">
+            {initialsLetters != null ? initialsLetters : <User className="h-8 w-8" aria-hidden />}
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-[26px] font-bold text-white leading-tight truncate">{displayName}</h1>
+            {displayEmail && <p className="text-sm text-white/70 truncate mt-0.5">{displayEmail}</p>}
+            {memberSinceLabel && <p className="text-xs text-white/50 mt-1">Lid sinds {memberSinceLabel}</p>}
+          </div>
         </div>
       </div>
 
