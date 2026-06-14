@@ -471,18 +471,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      {/* Profielregel */}
-      <div className="flex items-center gap-3">
-        <div className="h-12 w-12 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-base font-semibold shrink-0">
-          {initialsLetters != null ? initialsLetters : <User className="h-6 w-6 text-gray-400 dark:text-gray-500" aria-hidden />}
-        </div>
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold text-[#163300] dark:text-[#9FE870] truncate">{displayName}</h1>
-          {displayEmail && <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>}
-        </div>
-      </div>
-
-      {/* Navtabs */}
+      {/* Navtabs — bovenaan, zoals Flows */}
       <div className="flex items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm overflow-x-auto">
         {([
           ['account', 'Account'],
@@ -504,6 +493,18 @@ export default function SettingsPage() {
             {label}
           </button>
         ))}
+      </div>
+
+      {/* Profielblok — altijd zichtbaar */}
+      <div className={cn(sCard, 'p-5 flex items-center gap-4')}>
+        <div className="h-16 w-16 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold shrink-0">
+          {initialsLetters != null ? initialsLetters : <User className="h-8 w-8 text-gray-400 dark:text-gray-500" aria-hidden />}
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-[#163300] dark:text-[#9FE870] truncate">{displayName}</h1>
+          {displayEmail && <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>}
+          {memberSinceLabel && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Lid sinds {memberSinceLabel}</p>}
+        </div>
       </div>
 
       {activeTab === 'account' && (
