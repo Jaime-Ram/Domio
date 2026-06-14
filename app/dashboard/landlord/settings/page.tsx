@@ -472,7 +472,7 @@ export default function SettingsPage() {
   return (
     <>
       {/* Navtabs — bovenaan, zoals Flows */}
-      <div className="flex items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm overflow-x-auto">
+      <div className="flex flex-wrap items-center gap-6 border-b border-gray-200 dark:border-neutral-700 text-sm">
         {([
           ['account', 'Account'],
           ['beveiliging', 'Beveiliging'],
@@ -495,8 +495,8 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {/* Profielblok — altijd zichtbaar */}
-      <div className={cn(sCard, 'p-5 flex items-center gap-4')}>
+      {/* Profielblok — altijd zichtbaar, zelfde stijl als de andere content-blokken */}
+      <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-5 flex items-center gap-4">
         <div className="h-16 w-16 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#163300] dark:text-[#9FE870] text-xl font-semibold shrink-0">
           {initialsLetters != null ? initialsLetters : <User className="h-8 w-8 text-gray-400 dark:text-gray-500" aria-hidden />}
         </div>
