@@ -20,72 +20,6 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 type SettingsTab = 'account' | 'beveiliging' | 'abonnement' | 'koppelingen'
 
 
-function AccountHeaderSkeleton({ cardClass }: { cardClass: string }) {
-  return (
-    <div
-      className={cn(cardClass, 'overflow-hidden')}
-      aria-busy="true"
-      aria-live="polite"
-      aria-label="Accountgegevens laden"
-    >
-      <div className="h-28 sm:h-32 bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-      <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
-        <div className="-mt-[4.5rem] shrink-0">
-          <div className="h-20 w-20 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-        </div>
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="space-y-3 w-full max-w-md">
-            <div className="h-8 w-52 rounded-lg bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-            <div className="h-4 w-72 max-w-full rounded-md bg-neutral-200 dark:bg-neutral-600/80 animate-pulse" />
-            <div className="h-4 w-56 max-w-full rounded-md bg-neutral-200 dark:bg-neutral-600/80 animate-pulse" />
-          </div>
-          <div className="flex flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
-            <div className="h-4 w-56 rounded-md bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-            <div className="h-4 w-40 rounded-md bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-            <div className="h-4 w-48 rounded-md bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-          </div>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-9 w-[7.5rem] rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SettingsPillNav({ activeTab, onTabChange }: { activeTab: SettingsTab; onTabChange: (t: SettingsTab) => void }) {
-  const tabs: { key: SettingsTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { key: 'account', label: 'Account', icon: User },
-    { key: 'beveiliging', label: 'Beveiliging', icon: Shield },
-    { key: 'abonnement', label: 'Abonnement', icon: CreditCard },
-    { key: 'koppelingen', label: 'Koppelingen', icon: Settings },
-  ]
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {tabs.map(({ key, label, icon: Icon }) => {
-        const active = key === activeTab
-        return (
-          <button
-            key={key}
-            onClick={() => onTabChange(key)}
-            className={cn(
-              'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
-              active
-                ? 'bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90'
-                : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
-            )}
-          >
-            <Icon className="size-4 shrink-0 text-current" />
-            <span className="truncate">{label}</span>
-          </button>
-        )
-      })}
-    </div>
-  )
-}
 
 type AccountFormData = {
   name: string
@@ -120,7 +54,6 @@ export default function SettingsPage() {
     company_city: '',
   })
   const [originalForm, setOriginalForm] = useState<AccountFormData | null>(null)
-  const [accountDataReady, setAccountDataReady] = useState(false)
   const [mfaMethod, setMfaMethod] = useState<'none' | 'totp'>('none')
   const [mfaMethodStatus, setMfaMethodStatus] = useState<SaveStatus>('idle')
   const [pwResetStatus, setPwResetStatus] = useState<SaveStatus>('idle')
@@ -179,7 +112,7 @@ export default function SettingsPage() {
 
   const loadProfile = useCallback(async () => {
     if (isDemo) return
-    if (!user?.id) { setAccountDataReady(true); return }
+    if (!user?.id) return
     try {
       const p = await getProfile(user.id)
       if (p) {
@@ -202,20 +135,13 @@ export default function SettingsPage() {
         setLanguage(p.language ?? 'nl')
         setNotifPrefs(p.notification_prefs ?? getDefaultNotificationPrefs())
       }
-    } finally {
-      setAccountDataReady(true)
+    } catch {
+      /* profiel laden mislukt — velden blijven leeg */
     }
   }, [user?.id, isDemo])
 
   useEffect(() => { loadProfile() }, [loadProfile])
   useEffect(() => { loadTotpFactors() }, [loadTotpFactors])
-
-  // Veiligheid: zodra de gebruikerscontext klaar is, tonen we de pagina hoe dan
-  // ook (anders blijft de hele pagina op de skeleton hangen als getProfile traag
-  // is of faalt). De formuliervelden vullen zich zodra het profiel binnen is.
-  useEffect(() => {
-    if (!userCtxLoading) setAccountDataReady(true)
-  }, [userCtxLoading])
 
   useEffect(() => {
     if (!isDemo) return
@@ -237,15 +163,8 @@ export default function SettingsPage() {
       setOriginalForm(formData)
       setLanguage(dashProfile.language ?? 'nl')
       setNotifPrefs(dashProfile.notification_prefs ?? getDefaultNotificationPrefs())
-      setAccountDataReady(true)
-    } else if (!userCtxLoading) {
-      setAccountDataReady(true)
     }
   }, [isDemo, dashProfile, userCtxLoading])
-
-  useEffect(() => {
-    if (!userCtxLoading && !user && !isDemo) setAccountDataReady(true)
-  }, [userCtxLoading, user, isDemo])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
