@@ -65,7 +65,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex-1 flex justify-center md:justify-start md:flex-none md:flex-shrink-0">
-            <Logo width={100} height={28} />
+            <Logo width={68} height={19} />
           </div>
           <nav className="hidden md:flex items-center gap-6 flex-1 justify-start pl-8">
             <div
@@ -213,7 +213,7 @@ function MarketingLayoutInner({ children }: MarketingLayoutProps) {
                 </button>
               </div>
               <div className="dropdown-item-in flex md:min-h-[200px]">
-                <Link href="/demo" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                <Link href="/registreren" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
                   <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-32 h-32" color="#9FE870" opacity={0.18} layers={2} />
                   <div className="relative z-10 flex flex-col items-start gap-3">
                     <h3 className="text-2xl font-semibold tracking-tight leading-snug text-white">Overstappen binnen een uur</h3>

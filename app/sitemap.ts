@@ -28,7 +28,6 @@ const STATIC_PATHS: { path: string; changeFrequency: MetadataRoute.Sitemap[0]['c
   { path: '/login', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/forgot-password', changeFrequency: 'yearly', priority: 0.3 },
   { path: '/hulp', changeFrequency: 'monthly', priority: 0.6 },
-  { path: '/demo', changeFrequency: 'monthly', priority: 0.65 },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -412,7 +412,7 @@ export default function Home() {
                   </button>
                 </div>
                 <div className="dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '150ms' }}>
-                  <Link href="/demo" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                  <Link href="/registreren" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
                     <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-32 h-32" color="#9FE870" opacity={0.18} layers={2} />
                     <div className="relative z-10 flex flex-col items-start gap-3">
                       <h3 className="text-2xl font-semibold tracking-tight leading-snug text-white">Overstappen binnen een uur</h3>
@@ -779,7 +779,7 @@ export default function Home() {
                     <Link href="/registreren">Registreren</Link>
                   </Button>
                   <Link
-                    href="/demo"
+                    href="/registreren"
                     className="inline-flex items-center justify-center gap-2 rounded-full border border-white px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
                   >
                     <span className="md:hidden">Demo</span>

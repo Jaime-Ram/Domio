@@ -11,12 +11,12 @@ import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
 import { FileText, Wrench, Euro, UserPlus, ArrowUpRight, Plus, Minus } from 'lucide-react'
 
 const MINDER_BELANGRIJKE_FUNCTIES = [
-  { title: 'Rapportages', description: 'Genereer overzichten en exporteer data voor je boekhouding of belastingaangifte.', demoHref: '/demo' },
-  { title: 'Communicatie', description: 'Berichten en notities met huurders, alles gekoppeld aan objecten en tickets.', demoHref: '/demo' },
-  { title: 'Accountinstellingen', description: 'Configureer je account, notificaties en koppelingen met externe systemen.', demoHref: '/demo' },
-  { title: 'Bankimport', description: 'Importeer bankafschriften voor automatische verwerking van betalingen.', demoHref: '/demo' },
-  { title: 'Boekhoudintegratie', description: 'Koppel Domio aan Exact, Moneybird of andere boekhoudsoftware.', demoHref: '/demo' },
-  { title: 'Inspectieplanning', description: 'Plan en log periodieke inspecties per object met foto\'s en rapporten.', demoHref: '/demo' },
+  { title: 'Rapportages', description: 'Genereer overzichten en exporteer data voor je boekhouding of belastingaangifte.', demoHref: '/registreren' },
+  { title: 'Communicatie', description: 'Berichten en notities met huurders, alles gekoppeld aan objecten en tickets.', demoHref: '/registreren' },
+  { title: 'Accountinstellingen', description: 'Configureer je account, notificaties en koppelingen met externe systemen.', demoHref: '/registreren' },
+  { title: 'Bankimport', description: 'Importeer bankafschriften voor automatische verwerking van betalingen.', demoHref: '/registreren' },
+  { title: 'Boekhoudintegratie', description: 'Koppel Domio aan Exact, Moneybird of andere boekhoudsoftware.', demoHref: '/registreren' },
+  { title: 'Inspectieplanning', description: 'Plan en log periodieke inspecties per object met foto\'s en rapporten.', demoHref: '/registreren' },
 ]
 
 const ACTIVITIES = [
@@ -78,7 +78,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Maandelijkse inkomsten inzichtelijk"
               description="Volg je huurinkomsten in realtime. Bekijk trends per week en maand, en exporteer rapporten voor je boekhouding."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<InkomstenWidget />}
               visualLeft={true}
             />
@@ -87,7 +87,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Portefeuille en objecten beheren"
               description="Overzicht van al je panden en unitss. Beheer huurders, contracten en documenten per object. Altijd up-to-date."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<PortefeuilleWidget />}
               visualLeft={false}
             />
@@ -96,11 +96,11 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Recente activiteit op één plek"
               description="Zie direct wat er speelt: nieuwe huurders, onderhoudsmeldingen, betalingen en contractwijzigingen. Nooit meer iets missen."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={
                 <TransactionListWidget
                   title="Recente activiteit"
-                  seeAllHref="/demo"
+                  seeAllHref="/registreren"
                   seeAllLabel="Alles"
                   items={ACTIVITIES.map((item, i) => ({
                     icon: activityIcon(item.type),
@@ -118,7 +118,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Compliance en WWS-scoring"
               description="Houd je energieprestatie bij met automatische WWS-berekening en puntentelling. Blijf compliant met actuele regelgeving."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<ComplianceWidget />}
               visualLeft={false}
             />
@@ -127,7 +127,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Facturatie en betalingen"
               description="Stuur facturen, volg betalingen en koppel je bank voor automatische import. Volledig overzicht van je financiën."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<FeatureImagePlaceholder label="Financieel overzicht" />}
               visualLeft={true}
             />
@@ -136,7 +136,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Onderhoud en inspecties"
               description="Beheer meldingen, plan inspecties en wijs onderhoud toe aan leveranciers. Alles geregeld vanuit één dashboard."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<FeatureImagePlaceholder label="Onderhoud & tickets" />}
               visualLeft={false}
             />
@@ -145,7 +145,7 @@ export default function FunctiesPage() {
             <FunctieFeatureBlock
               title="Drive en documenten"
               description="Centrale opslag voor contracten, rapporten en overige documenten. Zoekbaar en gekoppeld aan objecten en huurders."
-              demoHref="/demo"
+              demoHref="/registreren"
               visual={<FeatureImagePlaceholder label="Documenten & Drive" />}
               visualLeft={true}
             />
