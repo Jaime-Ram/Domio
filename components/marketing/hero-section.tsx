@@ -119,27 +119,8 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
           </motion.div>
         </div>
 
-        {/* Partners */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex items-center gap-10 flex-wrap pb-12"
-        >
-          <span className="text-white/60 text-base font-normal shrink-0">Onze partners:</span>
-          <div className="flex items-center gap-10 flex-wrap">
-            {PARTNER_LOGOS.map((n) => (
-              <Image
-                key={n}
-                src={`/logos/partners-${n}.svg`}
-                alt={`Partner ${n}`}
-                width={130}
-                height={22}
-                className="brightness-0 invert object-contain"
-              />
-            ))}
-          </div>
-        </motion.div>
+        {/* Partners — tijdelijk verborgen (placeholder-logo's) tot we echte partners hebben */}
+        <div className="pb-12" />
 
       </div>
 
