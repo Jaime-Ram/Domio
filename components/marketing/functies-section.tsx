@@ -8,6 +8,7 @@ import {
   Wrench,
   Euro,
   UserPlus,
+  Check,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TransactionListWidget } from '@/components/ui/transaction-list-widget'
@@ -32,6 +33,25 @@ const ONDERHOUD = [
   { title: 'Lekkage badkamer', prop: 'Kerkstraat 12', prio: 'Urgent', dot: 'bg-red-500' },
   { title: 'CV-ketel storing', prop: 'Keizersgracht 100', prio: 'Hoog', dot: 'bg-orange-400' },
   { title: 'Schilderwerk kozijn', prop: 'Jordaan 8', prio: 'Normaal', dot: 'bg-gray-300 dark:bg-neutral-600' },
+]
+
+const HUURDERS = [
+  { name: 'Jan Jansen', unit: 'Kerkstraat 12, app 4B', initials: 'JJ' },
+  { name: 'Maria de Vries', unit: 'Keizersgracht 100, 2A', initials: 'MV' },
+  { name: 'Ahmed El Idrissi', unit: 'Jordaan 8', initials: 'AE' },
+]
+
+const COMPLIANCE_CATS = [
+  { label: 'Goed verhuurderschap', pct: 100 },
+  { label: 'Huurprijs & punten', pct: 75 },
+  { label: 'Veiligheid & onderhoud', pct: 60 },
+  { label: 'Financieel & admin', pct: 80 },
+]
+
+const TAKEN = [
+  { title: 'CV-ketel inspectie inplannen', date: '12 jun', done: false },
+  { title: 'Huurindexatie doorvoeren', date: '15 jun', done: false },
+  { title: 'Servicekosten afrekenen', date: '8 jun', done: true },
 ]
 
 function activityIcon(type: string) {
@@ -159,6 +179,72 @@ export function FunctiesSection() {
                       <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.prop}</p>
                     </div>
                     <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 shrink-0">{t.prio}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Huurders & bezetting */}
+          <div className="w-full">
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 shadow-soft-lg border border-gray-200/60 dark:border-neutral-700 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Huurders</h3>
+                <span className="text-xs font-medium text-[#15803D]">92% bezet</span>
+              </div>
+              <div className="space-y-2.5">
+                {HUURDERS.map((h) => (
+                  <div key={h.name} className={cn('rounded-2xl px-3.5 py-2.5 flex items-center gap-3', INNER_BLOCK_CLASS)}>
+                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center text-white text-xs font-semibold shrink-0">{h.initials}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{h.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{h.unit}</p>
+                    </div>
+                    <span className="h-2 w-2 rounded-full bg-[#2F5711] shrink-0" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Compliance */}
+          <div className="w-full">
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 shadow-soft-lg border border-gray-200/60 dark:border-neutral-700 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Compliance</h3>
+                <span className="text-sm font-bold text-[#15803D]">78%</span>
+              </div>
+              <div className="space-y-3">
+                {COMPLIANCE_CATS.map((c) => (
+                  <div key={c.label}>
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                      <span className="truncate">{c.label}</span>
+                      <span className="font-medium shrink-0 ml-2">{c.pct}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#15803D]" style={{ width: `${c.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 6. Taken */}
+          <div className="w-full">
+            <div className="rounded-2xl bg-white dark:bg-neutral-900 shadow-soft-lg border border-gray-200/60 dark:border-neutral-700 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Taken</h3>
+                <span className="text-xs font-medium text-gray-400 dark:text-gray-500">deze week</span>
+              </div>
+              <div className="space-y-3">
+                {TAKEN.map((t) => (
+                  <div key={t.title} className="flex items-center gap-3">
+                    <span className={cn('h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0', t.done ? 'bg-[#15803D] border-[#15803D]' : 'border-gray-300 dark:border-neutral-600')}>
+                      {t.done && <Check className="h-2.5 w-2.5 text-white" />}
+                    </span>
+                    <p className={cn('text-sm flex-1 min-w-0 truncate', t.done ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white')}>{t.title}</p>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{t.date}</span>
                   </div>
                 ))}
               </div>
