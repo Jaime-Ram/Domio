@@ -28,6 +28,12 @@ const ACTIVITIES = [
   { type: 'contract', label: 'Huurcontract verlengd', sub: 'Maria de Vries - Appartement 2A', time: '1 dag geleden', amount: '€1.180' },
 ]
 
+const ONDERHOUD = [
+  { title: 'Lekkage badkamer', prop: 'Kerkstraat 12', prio: 'Urgent', dot: 'bg-red-500' },
+  { title: 'CV-ketel storing', prop: 'Keizersgracht 100', prio: 'Hoog', dot: 'bg-orange-400' },
+  { title: 'Schilderwerk kozijn', prop: 'Jordaan 8', prio: 'Normaal', dot: 'bg-gray-300 dark:bg-neutral-600' },
+]
+
 function activityIcon(type: string) {
   const iconClass = 'h-4 w-4'
   switch (type) {
@@ -132,35 +138,30 @@ export function FunctiesSection() {
             />
           </div>
 
-          {/* 3. Maandoverzicht */}
+          {/* 3. Onderhoud & tickets */}
           <div className="w-full">
             <div className="rounded-2xl bg-white dark:bg-neutral-900 shadow-soft-lg border border-gray-200/60 dark:border-neutral-700 p-5">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
-                Maandoverzicht
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className={cn('rounded-2xl p-4 flex flex-col', INNER_BLOCK_CLASS)}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center">
-                      <Euro className="h-3.5 w-3.5 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Inkomsten</span>
-                  </div>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">€24.500</p>
-                </div>
-                <div className={cn('rounded-2xl p-4 flex flex-col', INNER_BLOCK_CLASS)}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center">
-                      <ArrowUpRight className="h-3.5 w-3.5 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Uitgaven</span>
-                  </div>
-                  <p className="text-xl font-bold text-gray-900 dark:text-white">€3.200</p>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                  Onderhoud
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-orange-500">
+                  <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                  3 open
+                </span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-                +5.2% vs vorige maand
-              </p>
+              <div className="space-y-2.5">
+                {ONDERHOUD.map((t) => (
+                  <div key={t.title} className={cn('rounded-2xl px-3.5 py-3 flex items-center gap-3', INNER_BLOCK_CLASS)}>
+                    <span className={cn('h-2.5 w-2.5 rounded-full shrink-0', t.dot)} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{t.title}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{t.prop}</p>
+                    </div>
+                    <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 shrink-0">{t.prio}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
