@@ -2,10 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { translateAuthError } from '@/lib/auth-errors'
 
+/**
+ * Open-redirect bescherming: accepteer alleen interne paden.
+ * Weigert absolute URLs (https://evil.com) en protocol-relatieve (//evil.com),
+ * anders kan ?next= gebruikt worden om na login naar een phishing-site te sturen.
+ */
+function safeNext(raw: string | null): string | null {
+  if (!raw) return null
+  if (!raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return null
+  return raw
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next')
+  const next = safeNext(requestUrl.searchParams.get('next'))
 
   if (code) {
     const supabase = await createClient()

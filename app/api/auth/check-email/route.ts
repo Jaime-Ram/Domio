@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { readJson, zEmail } from '@/lib/api/validation'
 
 const emailLower = (e: string) => e?.trim().toLowerCase() ?? ''
+
+const checkEmailSchema = z.object({ email: zEmail })
 
 /**
  * POST /api/auth/check-email
@@ -11,11 +15,12 @@ const emailLower = (e: string) => e?.trim().toLowerCase() ?? ''
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
-    if (!email || !email.includes('@')) {
+    // Ongeldige/te grote body → behandel als "bestaat niet" (geen enumeratie-signaal).
+    const parsed = await readJson(request, checkEmailSchema)
+    if (!parsed.ok) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
+    const email = parsed.data.email
 
     const supabase = createAdminClient()
     if (!supabase) {

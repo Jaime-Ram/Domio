@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { lookupEanVoorAdres } from '@/lib/supabase/ean-lookup-server'
 import { parseHuisnummerInput } from '@/lib/supabase/parse-huisnummer'
 import { normalizePostcode } from '@/lib/supabase/address-normalize'
+import { readJson } from '@/lib/api/validation'
+
+// Publieke route → strikt valideren. NL-postcode (1234 AB) en een redelijk
+// huisnummer-veld (cijfers, letters, spatie, streepje).
+const eanLookupSchema = z.object({
+  postcode: z.string().trim().min(4).max(8).regex(/^\d{4}\s?[A-Za-z]{2}$/, 'Ongeldige postcode'),
+  huisnummer: z
+    .union([z.string(), z.number()])
+    .transform((v) => String(v).trim())
+    .pipe(z.string().min(1).max(12).regex(/^[0-9A-Za-z\s-]+$/, 'Ongeldig huisnummer')),
+})
 
 /**
  * Adresverrijking voor pand aanmaken:
@@ -37,12 +49,9 @@ function cityFromPdok(doc: Record<string, unknown>): string {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json()
-  const { postcode, huisnummer } = body as { postcode?: string; huisnummer?: string }
-
-  if (!postcode || huisnummer == null || String(huisnummer).trim() === '') {
-    return NextResponse.json({ error: 'Postcode en huisnummer zijn verplicht' }, { status: 400 })
-  }
+  const parsed = await readJson(request, eanLookupSchema)
+  if (!parsed.ok) return parsed.response
+  const { postcode, huisnummer } = parsed.data
 
   const pc = normalizePostcode(postcode)
   const parsedHn = parseHuisnummerInput(String(huisnummer))

@@ -6,6 +6,13 @@ export async function GET(request: NextRequest) {
   const pandId = request.nextUrl.searchParams.get('pandId')
   if (!pandId) return NextResponse.json({ error: 'pandId required' }, { status: 400 })
 
+  // Path-injectie voorkomen: een BAG-pandIdentificatie is altijd numeriek (16 cijfers).
+  // Zonder deze check kan een aanvaller het URL-pad manipuleren en met jouw API-key
+  // willekeurige Kadaster-endpoints aanroepen.
+  if (!/^\d{1,20}$/.test(pandId)) {
+    return NextResponse.json({ error: 'Ongeldig pandId' }, { status: 400 })
+  }
+
   const apiKey = process.env.BAG_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'BAG_API_KEY not configured' }, { status: 503 })
@@ -13,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/panden/${pandId}`,
+      `https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/panden/${encodeURIComponent(pandId)}`,
       {
         headers: {
           'X-Api-Key': apiKey,

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { checkRateLimit, RL_AUTH, RL_DEFAULT } from '@/lib/rate-limit'
 
 const LANDLORD_BASE = '/dashboard/landlord'
 const SUBSCRIPTION_EXEMPT = [
@@ -8,12 +9,43 @@ const SUBSCRIPTION_EXEMPT = [
   `${LANDLORD_BASE}/settings`,
 ]
 
+// Auth-acties die brute-force/spam-gevoelig zijn: 5 pogingen per 15 min.
+// Read-only status-routes (check-connection, 2fa/required) vallen hier bewust
+// NIET onder, anders breken normale page-loads.
+const STRICT_AUTH_PREFIXES = [
+  '/api/auth/check-email',
+  '/api/auth/2fa/email/send',
+  '/api/auth/2fa/email/verify',
+  '/api/auth/delete-account',
+  '/api/invitations/accept',
+  '/api/invitations/send',
+]
+
 function isSubscriptionExempt(pathname: string): boolean {
   return SUBSCRIPTION_EXEMPT.some(p => pathname === p || pathname.startsWith(p + '/'))
 }
 
+/**
+ * Rate limiting voor alle /api-routes. Webhooks, crons en externe OAuth-
+ * callbacks worden overgeslagen: die zijn al beveiligd via signature/secret en
+ * worden extern automatisch herhaald (rate-limiten zou ze breken).
+ */
+function rateLimitApi(request: NextRequest, pathname: string): NextResponse | null {
+  if (pathname.endsWith('/webhook') || pathname.endsWith('/callback') || pathname.startsWith('/api/cron')) {
+    return null
+  }
+  const isStrictAuth = STRICT_AUTH_PREFIXES.some((p) => pathname.startsWith(p))
+  const preset = isStrictAuth ? RL_AUTH : RL_DEFAULT
+  return checkRateLimit(request, { name: `api:${pathname}`, ...preset })
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+
+  // API-routes: alleen rate limiting, daarna doorlaten (auth doen ze zelf).
+  if (pathname.startsWith('/api')) {
+    return rateLimitApi(request, pathname) ?? NextResponse.next()
+  }
 
   // Legacy path redirects: keep old links working.
   if (pathname === '/dashboard/employer' || pathname.startsWith('/dashboard/employer/')) {
@@ -124,6 +156,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/api/:path*',
     '/dashboard/:path*',
     '/portal/:path*',
     '/login',
