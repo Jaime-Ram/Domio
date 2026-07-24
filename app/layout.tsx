@@ -1,17 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import Script from "next/script";
 import { RouteProvider } from "@/providers/route-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-  preload: true,
-  adjustFontFallback: true,
-});
 
 export const metadata: Metadata = {
   title: "Domio",
@@ -40,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang="nl" className="scroll-smooth" suppressHydrationWarning>
       <head>
         {/* Theme color for browser chrome */}
         <meta name="theme-color" content="#f4f4f4" />

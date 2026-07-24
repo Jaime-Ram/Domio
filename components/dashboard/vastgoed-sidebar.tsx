@@ -129,7 +129,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       label: 'Meer',
       items: [
         { label: 'Integraties', href: `${basePath}/integrations`, icon: Plug, comingSoon: true },
-        { label: 'Domio Assist', href: `${basePath}/assist`, icon: Sparkles, comingSoon: true },
+        { label: 'Domio Agentic', href: `${basePath}/assist`, icon: Sparkles, comingSoon: true },
         { label: 'App', href: `${basePath}/app`, icon: Smartphone, comingSoon: true },
         { label: 'Accountinstellingen', href: `${basePath}/settings`, icon: Settings },
       ],
@@ -160,7 +160,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const itemClass = (active: boolean) => cn(
     "flex items-center w-full py-[5px] px-3 text-[14px] rounded-md transition-colors duration-150 focus:outline-none text-left",
     active
-      ? "bg-gray-200 text-[#163300] font-medium dark:bg-neutral-700 dark:text-[#9FE870]"
+      ? "bg-[#9FE870]/40 text-[#163300] font-medium dark:bg-[#9FE870]/20 dark:text-[#9FE870]"
       : "text-gray-700 hover:bg-gray-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
   )
 

@@ -165,13 +165,26 @@ function RegistrerenContent() {
             </button>
           )}
           {!emailExists && !success && (
-            <h1 className="text-4xl font-bold text-[#163300]">
-              {step === 1
-                ? "Maak je Domio\u2011account"
-                : step === 2
-                  ? 'Wat voor account wil je aanmaken?'
-                  : 'Vul je gegevens in'}
-            </h1>
+            <>
+              <h1 className="text-4xl font-medium text-[#163300]">
+                {step === 1
+                  ? 'Maak je account'
+                  : step === 2
+                    ? 'Wat voor account wil je aanmaken?'
+                    : 'Vul je gegevens in'}
+              </h1>
+              {step === 1 && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Al een account?{' '}
+                  <Link
+                    href="/login"
+                    className="font-medium text-[#163300] underline underline-offset-2 hover:no-underline"
+                  >
+                    Inloggen
+                  </Link>
+                </p>
+              )}
+            </>
           )}
           {error && (
             <Alert variant="destructive" className="mt-4">
@@ -238,24 +251,22 @@ function RegistrerenContent() {
                 exit={{ opacity: 0, x: -32 }}
                 transition={transition}
               >
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  Vul eerst je e{'\u2011'}mailadres in
-                </label>
-                <Input
+              <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#163300]">
+                <span className="block text-[12px] text-gray-500">E-mailadres</span>
+                <input
                   id="email"
                   type="email"
                   placeholder="naam@voorbeeld.nl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+                  className="mt-0.5 w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
                   required
                 />
-              </div>
+              </label>
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+                className="w-full h-14 rounded-lg bg-[#9FE870] text-[#163300] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
               >
                 {loading ? 'Bezig...' : 'Volgende'}
               </Button>
@@ -273,7 +284,7 @@ function RegistrerenContent() {
                   type="button"
                   variant="default"
                   size="lg"
-                  className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="h-12 rounded-lg border-gray-300 bg-white hover:bg-gray-50"
                   onClick={() => handleSocialRegistration('google')}
                   disabled={loading}
                   aria-label="Registreren met Google"
@@ -289,7 +300,7 @@ function RegistrerenContent() {
                   type="button"
                   variant="default"
                   size="lg"
-                  className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                  className="h-12 rounded-lg border-gray-300 bg-white hover:bg-gray-50"
                   onClick={() => handleSocialRegistration('apple')}
                   disabled={loading}
                   aria-label="Registreren met Apple"
@@ -366,7 +377,7 @@ function RegistrerenContent() {
                   placeholder="Je volledige naam"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
+                  className="h-14 text-[15px] px-4 rounded-lg border-gray-200 bg-white focus-visible:border-brand-primary"
                   required
                 />
               </div>
@@ -379,7 +390,7 @@ function RegistrerenContent() {
                   placeholder="+31 6 12345678"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
+                  className="h-14 text-[15px] px-4 rounded-lg border-gray-200 bg-white focus-visible:border-brand-primary"
                 />
               </div>
 
@@ -391,7 +402,7 @@ function RegistrerenContent() {
                   placeholder="Minimaal 6 tekens"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 text-base rounded-block border-gray-300 focus-visible:ring-brand-primary focus-visible:border-brand-primary"
+                  className="h-14 text-[15px] px-4 rounded-lg border-gray-200 bg-white focus-visible:border-brand-primary"
                   required
                 />
               </div>
@@ -399,7 +410,7 @@ function RegistrerenContent() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-full bg-brand-accent text-brand-primary hover:bg-brand-accent/90 font-semibold text-base border-0"
+                className="w-full h-14 rounded-lg bg-brand-accent text-brand-primary hover:bg-brand-accent/90 font-medium text-[15px] border-0 shadow-none"
               >
                 {loading ? 'Bezig...' : 'Registreren'}
               </Button>

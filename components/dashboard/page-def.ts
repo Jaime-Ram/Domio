@@ -41,7 +41,7 @@ export function getPageDef(rel: string, firstName: string): PageDef {
     ],
   }
   if (rel.startsWith('/integrations')) return { title: 'Integraties' }
-  if (rel.startsWith('/assist')) return { title: 'Domio Assist' }
+  if (rel.startsWith('/assist')) return { title: 'Domio Agentic' }
   if (rel.startsWith('/app')) return { title: 'App' }
   if (rel.startsWith('/settings')) return { title: 'Instellingen', noDivider: true }
   if (rel.startsWith('/upgrade')) return { title: 'Abonnement' }

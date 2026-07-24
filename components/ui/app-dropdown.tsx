@@ -37,9 +37,10 @@ export function AppDropdownItem({ className, ...props }: AppDropdownItemProps) {
   return (
     <DropdownMenuItem
       className={cn(
-        'flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200',
-        'cursor-pointer transition-colors hover:bg-[#f4f4f4] dark:hover:bg-neutral-700',
-        'focus:bg-[#f4f4f4] dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white',
+        // Zelfde maat/stijl als de sidebar-nav-items (zie feedback_dropdown_nav_stijl).
+        'flex items-center gap-2.5 px-3 py-[5px] rounded-md text-[14px] font-medium text-gray-700 dark:text-gray-200',
+        'cursor-pointer transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700',
+        'focus:bg-gray-200 dark:focus:bg-neutral-700 focus:text-gray-900 dark:focus:text-white',
         className,
       )}
       {...props}
@@ -68,9 +69,9 @@ export function AppDropdownCheckboxItem({ className, ...props }: AppDropdownChec
   return (
     <DropdownMenuCheckboxItem
       className={cn(
-        'flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm text-gray-700 dark:text-gray-200',
-        'cursor-pointer transition-colors hover:bg-[#f4f4f4] dark:hover:bg-neutral-700',
-        'focus:bg-[#f4f4f4] dark:focus:bg-neutral-700',
+        'flex items-center justify-between gap-2 px-3 py-[5px] rounded-md text-[14px] text-gray-700 dark:text-gray-200',
+        'cursor-pointer transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700',
+        'focus:bg-gray-200 dark:focus:bg-neutral-700',
         className,
       )}
       {...props}

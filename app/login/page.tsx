@@ -247,7 +247,7 @@ function LoginContent() {
             <ArrowLeft className="h-4 w-4" />
             Terug
           </button>
-          <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+          <h1 className="text-4xl font-medium text-[#163300]">Verificatie</h1>
           <p className="mt-2 text-sm text-gray-600">
             Voer de 6-cijferige code uit je authenticator-app in.
           </p>
@@ -265,7 +265,7 @@ function LoginContent() {
               maxLength={6}
               value={totpCode}
               onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
               autoFocus
             />
             <Button
@@ -286,7 +286,7 @@ function LoginContent() {
             <ArrowLeft className="h-4 w-4" />
             Terug
           </button>
-          <h1 className="text-4xl font-bold text-[#163300]">Verificatie</h1>
+          <h1 className="text-4xl font-medium text-[#163300]">Verificatie</h1>
           <p className="mt-2 text-sm text-gray-600">
             We hebben een 6-cijferige code naar je e-mailadres gestuurd. Voer die hieronder in.
           </p>
@@ -304,7 +304,7 @@ function LoginContent() {
               maxLength={6}
               value={emailCode}
               onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
               autoFocus
             />
             <Button
@@ -328,7 +328,7 @@ function LoginContent() {
         </motion.div>
       ) : (
         <motion.div key="login" {...slideIn}>
-          <h1 className="text-4xl font-bold text-[#163300]">
+          <h1 className="text-4xl font-medium text-[#163300]">
             Welkom terug!
           </h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -343,41 +343,39 @@ function LoginContent() {
             </Alert>
           )}
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                E{'\u2011'}mailadres
-              </label>
-              <Input
+            <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#163300]">
+              <span className="block text-[12px] text-gray-500">E-mailadres</span>
+              <input
                 id="email"
                 type="email"
                 placeholder="naam@voorbeeld.nl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+                className="mt-0.5 w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                  Wachtwoord
-                </label>
+            </label>
+            <div>
+              <div className="mb-1.5 flex justify-end">
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-[#163300] underline underline-offset-2 hover:no-underline"
+                  className="text-[13px] text-[#163300] underline underline-offset-2 hover:no-underline"
                 >
-                  Vergeten?
+                  Wachtwoord vergeten?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
-                required
-              />
+              <label htmlFor="password" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#163300]">
+                <span className="block text-[12px] text-gray-500">Wachtwoord</span>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Je wachtwoord"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-0.5 w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
+                  required
+                />
+              </label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
@@ -395,7 +393,7 @@ function LoginContent() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+              className="w-full h-14 rounded-lg bg-[#9FE870] text-[#163300] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
             >
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>
@@ -412,7 +410,7 @@ function LoginContent() {
                 type="button"
                 variant="default"
                 size="lg"
-                className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                className="h-12 rounded-lg border-gray-300 bg-white hover:bg-gray-50"
                 onClick={handleSocialLogin}
                 disabled={loading}
                 aria-label="Inloggen met Google"
@@ -428,7 +426,7 @@ function LoginContent() {
                 type="button"
                 variant="default"
                 size="lg"
-                className="h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50"
+                className="h-12 rounded-lg border-gray-300 bg-white hover:bg-gray-50"
                 onClick={async () => {
                   setLoading(true); setError(null)
                   try { const { error: e } = await signInWithApple(); if (e) throw e } catch (err: unknown) { setError(translateAuthError(err instanceof Error ? err.message : 'Inloggen met Apple mislukt')); setLoading(false) }
@@ -446,7 +444,7 @@ function LoginContent() {
                 type="button"
                 variant="default"
                 size="lg"
-                className="w-full h-12 rounded-xl border-gray-300 bg-white hover:bg-gray-50 flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-lg border-gray-300 bg-white hover:bg-gray-50 flex items-center justify-center gap-2"
                 onClick={handlePasskeyLogin}
                 disabled={loading}
                 aria-label="Inloggen met passkey"
@@ -464,7 +462,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <AuthPageShell>
+    <AuthPageShell variant="split">
       <Suspense fallback={null}>
         <LoginContent />
       </Suspense>

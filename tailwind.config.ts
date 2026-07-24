@@ -17,6 +17,18 @@ const config: Config = {
     extend: {
       /* Domio brand + Interactive tokens */
       colors: {
+        /* Domio landing (v2), vaste tokens, los van shadcn theming */
+        forest: '#161f13',
+        'forest-2': '#0f160c',
+        lime: '#94f477',
+        'lime-2': '#7ee85c',
+        ink: '#1a1c18',
+        grey: '#55554e',
+        'grey-2': '#97978f',
+        panel: '#f4f4f1',
+        'panel-2': '#ebebe7',
+        line: '#e3e3de',
+        paper: '#ffffff',
         brand: {
           primary: 'var(--color-primary-500)',
           'primary-hover': 'var(--color-primary-400)',

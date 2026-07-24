@@ -34,6 +34,36 @@ label:has(input:not(:disabled)),
   }
 }
 
+/* Switzer, merkfont (Ramp-achtige grotesk), zelf gehost */
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Codec Pro Font Face */
 @font-face {
   font-family: 'Codec Pro';
@@ -162,12 +192,12 @@ label:has(input:not(:disabled)),
 @layer base {
   :root {
     /* Font family */
-    --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    --font-display: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-body: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-display: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-mono: ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     
     /* Font family (backward compatibility) */
-    --font-sans: var(--font-inter, "Inter"), ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
   
   .dark-mode {
@@ -364,22 +394,22 @@ label:has(input:not(:disabled)),
     overflow-x: hidden;
     }
   
-  /* Apply Codec Pro to all headings */
+  /* Koppen in het nieuwe merkfont (Switzer), lichtere weights, minder vet dan Codec Pro */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Codec Pro', -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    font-weight: 700;
-  }
-  
-  h1 {
-    font-weight: 800;
-  }
-  
-  h2 {
-    font-weight: 700;
-  }
-  
-  h3, h4, h5, h6 {
+    font-family: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 600;
+  }
+
+  h2 {
+    font-weight: 600;
+  }
+
+  h3, h4, h5, h6 {
+    font-weight: 500;
   }
   
 }
@@ -399,3 +429,21 @@ label:has(input:not(:disabled)),
   }
 }
 
+
+/* ===== Domio landing (v2) utilities ===== */
+.display {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.dotgrid {
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+@keyframes domio-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: domio-marquee 40s linear infinite;
+}

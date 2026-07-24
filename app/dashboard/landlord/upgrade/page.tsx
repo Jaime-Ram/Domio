@@ -31,7 +31,7 @@ const PLANS = [
       'Onbeperkt panden',
       'Alles uit Starter',
       'Prioriteit support',
-      'Domio Assist (AI)',
+      'Domio Agentic (AI)',
       'Geavanceerde rapportages',
       'API toegang',
       'Dedicated onboarding',

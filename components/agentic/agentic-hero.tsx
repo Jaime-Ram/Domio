@@ -1,76 +1,40 @@
-'use client'
-
-import { useRef, useState } from 'react'
 import Link from 'next/link'
-import { Pause, Play } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 /**
- * Hero voor Domio Agentic: groot blok met achtergrondvideo, titel + CTA's
- * linksonder en een play/pause-knop rechtsonder (zelfde stijl als de hoofd-hero).
+ * Ramp-achtige hero: rustige witte achtergrond, grote strakke bijna-zwarte
+ * kop, ingetogen subtekst, twee crispe knoppen. Geen gradient, geen ruis.
+ * De product-shot staat er los onder (in page.tsx) op een zacht getint paneel.
  */
 export function AgenticHero() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [playing, setPlaying] = useState(true)
-
-  const toggle = () => {
-    const v = videoRef.current
-    if (!v) return
-    if (v.paused) {
-      void v.play()
-      setPlaying(true)
-    } else {
-      v.pause()
-      setPlaying(false)
-    }
-  }
-
   return (
-    <section className="px-2.5 pt-16 sm:px-3 lg:px-4">
-      <div className="relative mx-auto h-[86vh] min-h-[560px] w-full max-w-[1500px] overflow-hidden rounded-lg bg-gray-900 shadow-xl">
-        <video
-          ref={videoRef}
-          src="/videos/hero-bg.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* Verloop voor leesbaarheid linksonder */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
-
-        {/* Titel + CTA's linksonder */}
-        <div className="absolute bottom-0 left-0 max-w-2xl p-8 sm:p-10 lg:p-14">
-          <h1 className="text-[2.6rem] font-[550] leading-[1.05] tracking-tight text-white sm:text-[3.4rem] md:text-[4.1rem]">
-            Onderhoud dat<br />
-            zichzelf regelt.
-          </h1>
-          <p className="mt-5 text-lg font-medium text-white/80">Wij brengen agentic AI naar de vastgoedwereld.</p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link
-              href="/registreren"
-              className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#163300] shadow-sm transition-colors hover:bg-white/90"
-            >
-              Start direct
-            </Link>
-            <Link
-              href="#hoe-het-werkt"
-              className="rounded-xl border border-white/70 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              Hoe het werkt
-            </Link>
-          </div>
+    <section className="mx-auto max-w-7xl px-6 pb-14 pt-16 md:px-8 md:pb-20 md:pt-24">
+      <div className="max-w-3xl">
+        <p className="text-[14px] font-semibold uppercase tracking-[0.14em] text-[#15803D]">
+          Agentic vastgoedbeheer
+        </p>
+        <h1 className="mt-5 text-[2.75rem] font-semibold leading-[1.02] tracking-tight text-[#163300] sm:text-6xl md:text-[4.25rem]">
+          Onderhoud dat<br />zichzelf regelt
+        </h1>
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#163300]/60 md:text-xl">
+          Een team van agents handelt je vastgoedonderhoud af, van melding tot factuur. Volledig
+          zelfstandig, terwijl jij de regie houdt.
+        </p>
+        <div className="mt-9 flex flex-wrap items-center gap-3">
+          <Link
+            href="/registreren"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#163300] px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#163300]/90"
+          >
+            Start direct
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 rounded-lg border border-[#163300]/15 bg-white px-6 py-3 text-[15px] font-semibold text-[#163300] transition-colors hover:border-[#163300]/30"
+          >
+            Boek een demo
+          </Link>
         </div>
-
-        {/* Play / pause rechtsonder */}
-        <button
-          type="button"
-          onClick={toggle}
-          className="absolute bottom-5 right-5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-          aria-label={playing ? 'Video pauzeren' : 'Video afspelen'}
-        >
-          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-        </button>
       </div>
     </section>
   )

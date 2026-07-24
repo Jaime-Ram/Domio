@@ -18,7 +18,7 @@ export default function AssistPage() {
         <div className="text-center mb-6">
           <h1 className="text-2xl md:text-3xl text-[#163300] dark:text-[#9FE870] leading-tight tracking-tight flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0">
             <span className="font-bold">Domio</span>
-            <span className="font-normal">Assist</span>
+            <span className="font-normal">Agentic</span>
           </h1>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1.5">
             Binnenkort beschikbaar
@@ -53,7 +53,7 @@ export default function AssistPage() {
           </div>
 
           <p className="text-center text-[10px] text-gray-300 dark:text-neutral-600 mt-2 max-w-3xl">
-            Domio Assist kan fouten maken. Controleer belangrijke informatie altijd zelf.
+            Domio Agentic kan fouten maken. Controleer belangrijke informatie altijd zelf.
           </p>
         </div>
 
