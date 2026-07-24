@@ -76,8 +76,8 @@ export default function SystemsSection() {
           oplossen.
         </p>
 
-        {/* chaotic collage */}
-        <div className="relative mx-auto mt-12 h-[560px] max-w-5xl">
+        {/* chaotic collage (verborgen op mobiel: werkt daar niet lekker) */}
+        <div className="relative mx-auto mt-12 hidden h-[560px] max-w-5xl lg:block">
           {/* dotted connective lines */}
           <div className="absolute inset-0 dotgrid opacity-40" />
 

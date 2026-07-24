@@ -57,10 +57,10 @@ export default function SocialProof() {
           </a>
         </div>
 
-        {/* logo-tegels + uitgelicht blok (2x2) rechtsboven */}
-        <div className="mt-10 grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-8">
-          {/* uitgelicht, 2x2, rechtsboven, met achtergrondfoto + roterende stat */}
-          <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl text-paper lg:col-start-7 lg:row-start-1">
+        {/* logo-tegels + uitgelicht blok (mobiel: banner boven; desktop: 2x2 rechtsboven) */}
+        <div className="mt-10 grid grid-cols-3 gap-2.5 lg:grid-cols-8">
+          {/* uitgelicht, met achtergrondfoto + roterende stat */}
+          <div className="relative col-span-3 aspect-[16/10] overflow-hidden rounded-2xl text-paper lg:col-span-2 lg:row-span-2 lg:aspect-auto lg:col-start-7 lg:row-start-1">
             <Image
               src="/images/Achtergrond3.jpg"
               alt=""
@@ -110,10 +110,12 @@ export default function SocialProof() {
             </div>
           </div>
 
-          {logos.map((name) => (
+          {logos.map((name, i) => (
             <div
               key={name}
-              className="flex aspect-square items-center justify-center rounded-xl bg-paper text-center ring-1 ring-line transition-colors hover:bg-panel"
+              className={`aspect-square items-center justify-center rounded-xl bg-paper text-center ring-1 ring-line transition-colors hover:bg-panel ${
+                i >= 6 ? "hidden lg:flex" : "flex"
+              }`}
             >
               <span className="px-1.5 text-[12px] font-medium text-grey-2">{name}</span>
             </div>
