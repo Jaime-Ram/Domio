@@ -5,25 +5,25 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 
 const logos = [
-  "Vesteda",
-  "Bouwinvest",
-  "MVGM",
-  "Pararius",
-  "Rotsvast",
-  "Interhouse",
-  "123Wonen",
-  "Nederwoon",
-  "Rebo Groep",
-  "Woonstad",
-  "Van der Linden",
-  "Woonbron",
+  "Havenstad Beheer",
+  "Norderhuis",
+  "Kade 12",
+  "Brightpand",
+  "Vesterhof",
+  "De Wolk Vastgoed",
+  "Nova Panden",
+  "Stedeling",
+  "Groenwaard",
+  "Meridiaan",
+  "Pandhuis",
+  "Loft & Co",
 ];
 
 const stats = [
-  { big: "3 dagen", small: "sneller opgelost", company: "Vastgoedbeheer West" },
-  { big: "30%", small: "goedkoper onderhoud", company: "MVGM" },
-  { big: "75%", small: "minder handwerk", company: "Rotsvast" },
-  { big: "2x", small: "zoveel panden beheerd", company: "Bouwinvest" },
+  { big: "3 dagen", small: "sneller opgelost", company: "Havenstad Beheer" },
+  { big: "30%", small: "goedkoper onderhoud", company: "Norderhuis" },
+  { big: "75%", small: "minder handwerk", company: "Kade 12 Vastgoed" },
+  { big: "2x", small: "zoveel panden beheerd", company: "Brightpand" },
 ];
 
 export default function SocialProof() {

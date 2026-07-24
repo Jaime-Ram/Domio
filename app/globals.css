@@ -447,3 +447,18 @@ label:has(input:not(:disabled)),
 .animate-marquee {
   animation: domio-marquee 40s linear infinite;
 }
+
+/* Heel subtiel flowend gloed-vlekje achter de hero */
+@keyframes hero-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(4%, 3%, 0) scale(1.08); }
+}
+@keyframes hero-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-5%, -3%, 0) scale(1.1); }
+}
+.hero-blob-a { animation: hero-drift-a 22s ease-in-out infinite; }
+.hero-blob-b { animation: hero-drift-b 28s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob-a, .hero-blob-b { animation: none; }
+}

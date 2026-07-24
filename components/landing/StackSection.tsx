@@ -29,7 +29,7 @@ export default function StackSection() {
             <figcaption className="mt-4">
               <div className="text-[14px] font-medium text-ink">Mark de Vries</div>
               <div className="text-[14px] text-grey">
-                Directeur, Vastgoedbeheer West
+                Directeur, Havenstad Beheer
               </div>
               <a
                 href="#"

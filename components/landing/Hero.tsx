@@ -36,6 +36,18 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-paper">
+      {/* heel subtiel flowend gloed op de achtergrond */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="hero-blob-a absolute -left-[6%] top-[4%] h-[52vh] w-[52vh] rounded-full opacity-[0.16] blur-3xl"
+          style={{ background: "radial-gradient(circle, #94f477 0%, transparent 68%)" }}
+        />
+        <div
+          className="hero-blob-b absolute right-[0%] top-[20%] h-[58vh] w-[58vh] rounded-full opacity-[0.13] blur-3xl"
+          style={{ background: "radial-gradient(circle, #2f6a1e 0%, transparent 68%)" }}
+        />
+      </div>
+
       {/* dotted side grids */}
       <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
