@@ -351,12 +351,12 @@ export function TransactionsInbox({
 
   const getSortIcon = (column: SortColumn) => {
     if (sort.column !== column || !sort.direction) {
-      return <ChevronsUpDown className="h-3 w-3 text-gray-400" />
+      return <ChevronsUpDown className="h-3 w-3 text-[#97978f]" />
     }
     if (sort.direction === 'asc') {
-      return <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
+      return <ChevronUp className="h-3 w-3 text-[#161f13] dark:text-[#94f477]" />
     }
-    return <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
+    return <ChevronDown className="h-3 w-3 text-[#161f13] dark:text-[#94f477]" />
   }
 
   const sortedTransactions = [...searchFiltered]
@@ -386,7 +386,7 @@ export function TransactionsInbox({
           {/* Segment tabs with sliding underline */}
           <div
             ref={tabsContainerRef}
-            className="relative flex flex-wrap items-end gap-x-6 gap-y-1 w-full sm:w-auto text-sm border-b border-gray-200 dark:border-neutral-700"
+            className="relative flex flex-wrap items-end gap-x-6 gap-y-1 w-full sm:w-auto text-sm border-b border-[#e3e3de] dark:border-neutral-700"
           >
             {tabs.map((tab) => (
               <button
@@ -397,26 +397,26 @@ export function TransactionsInbox({
                 className={cn(
                   'inline-flex items-center justify-center gap-0 pb-2 shrink-0 whitespace-nowrap transition-colors duration-200 font-semibold',
                   filter === tab.key
-                    ? 'text-[#163300] dark:text-[#9FE870]'
-                    : 'text-gray-500 dark:text-gray-400'
+                    ? 'text-[#161f13] dark:text-[#94f477]'
+                    : 'text-[#97978f] dark:text-[#97978f]'
                 )}
               >
                 <span>{tab.label}</span>
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/25 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/25 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]">
                   {tab.count}
                 </span>
               </button>
             ))}
             <div
-              className="absolute bottom-0 h-[2px] rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all duration-200"
+              className="absolute bottom-0 h-[2px] rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all duration-200"
               style={{ left: indicator.left, width: indicator.width }}
             />
           </div>
 
           {/* Betaling toevoegen + zoeken */}
           <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 w-full sm:w-auto justify-end min-w-0">
-            <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[260px] flex h-9 items-center rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
-              <Search className="h-4 w-4 text-gray-400 shrink-0" aria-hidden />
+            <div className="relative flex-1 sm:flex-initial sm:min-w-[140px] sm:max-w-[260px] flex h-9 items-center rounded-full border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 pl-3 pr-3">
+              <Search className="h-4 w-4 text-[#97978f] shrink-0" aria-hidden />
               <Input
                 placeholder="Zoek op bedrag, huurder, pand, status..."
                 value={searchQuery}
@@ -432,7 +432,7 @@ export function TransactionsInbox({
               }}
               disabled={isDemo || !user?.id}
               title={isDemo ? 'Niet beschikbaar in demo' : !user?.id ? 'Niet ingelogd' : undefined}
-              className="shrink-0 h-9 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] font-medium px-4"
+              className="shrink-0 h-9 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] font-medium px-4"
             >
               <Plus className="h-4 w-4 mr-2" />
               Betaling toevoegen
@@ -486,30 +486,30 @@ export function TransactionsInbox({
             </TableHeader>
             <TableBody>
               {sortedTransactions.map((tx) => (
-                <TableRow key={tx.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800">
-                  <DashboardTableCell className="whitespace-nowrap text-gray-900 dark:text-white">
+                <TableRow key={tx.id} className="hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
+                  <DashboardTableCell className="whitespace-nowrap text-[#1a1c18] dark:text-white">
                     {formatDate(tx.value_date)}
                   </DashboardTableCell>
                   <DashboardTableCell>
                     <div className="flex items-center gap-1 text-sm">
-                      <Euro className="h-4 w-4 text-gray-400" />
-                      <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                      <Euro className="h-4 w-4 text-[#97978f]" />
+                      <span className="font-medium text-[#1a1c18] dark:text-white whitespace-nowrap">
                         {formatAmount(tx.amount)}
                       </span>
                     </div>
                   </DashboardTableCell>
                   <DashboardTableCell className="max-w-[160px]">
-                    <span className="text-sm text-gray-900 dark:text-white truncate block">
+                    <span className="text-sm text-[#1a1c18] dark:text-white truncate block">
                       {tx.counterparty_name || '—'}
                     </span>
                   </DashboardTableCell>
                   <DashboardTableCell className="hidden lg:table-cell">
-                    <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
+                    <span className="text-sm font-mono text-[#97978f] dark:text-[#97978f]">
                       {tx.counterparty_iban || '—'}
                     </span>
                   </DashboardTableCell>
                   <DashboardTableCell className="hidden md:table-cell max-w-[200px]">
-                    <span className="text-sm text-gray-500 dark:text-gray-400 truncate block">
+                    <span className="text-sm text-[#97978f] dark:text-[#97978f] truncate block">
                       {tx.description || '—'}
                     </span>
                   </DashboardTableCell>
@@ -544,7 +544,7 @@ export function TransactionsInbox({
                         size="sm"
                         variant="ghost"
                         onClick={() => setDrawerTx(tx)}
-                        className="rounded-full text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                        className="rounded-full text-xs font-medium text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200"
                       >
                         Wijzigen
                       </Button>
@@ -589,9 +589,9 @@ export function TransactionsInbox({
           if (!open) resetAddForm()
         }}
       >
-        <DialogContent className="border border-gray-200 dark:border-neutral-700 sm:max-w-md">
+        <DialogContent className="border border-[#e3e3de] dark:border-neutral-700 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#163300] dark:text-[#9FE870]">Betaling toevoegen</DialogTitle>
+            <DialogTitle className="text-[#161f13] dark:text-[#94f477]">Betaling toevoegen</DialogTitle>
             <DialogDescription>
               Handmatige inkomende betaling registreren. Daarna kun je hem koppelen aan een pand of huurder.
             </DialogDescription>
@@ -663,7 +663,7 @@ export function TransactionsInbox({
             </Button>
             <Button
               type="button"
-              className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
+              className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
               onClick={handleAddPayment}
               disabled={addSubmitting}
             >

@@ -29,7 +29,7 @@ export function TrialBanner() {
     <div className={`flex items-center gap-3 px-4 py-2.5 text-sm ${
       isUrgent
         ? 'bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300'
-        : 'bg-[#f0fae6] dark:bg-[#163300]/40 border-b border-[#9FE870]/30 text-[#163300] dark:text-[#9FE870]'
+        : 'bg-[#f0fae6] dark:bg-[#161f13]/40 border-b border-[#94f477]/30 text-[#161f13] dark:text-[#94f477]'
     }`}>
       <Sparkles className="h-3.5 w-3.5 shrink-0" />
       <span className="flex-1">

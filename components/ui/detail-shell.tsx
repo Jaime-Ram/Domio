@@ -51,7 +51,7 @@ export function DetailShell({
           <div className="px-6 pt-6 pb-5 border-b border-gray-100 dark:border-neutral-800 pr-14 shrink-0 flex items-center gap-3">
             {headerLeft}
             <div className="min-w-0 flex-1">
-              <DialogPrimitive.Title className="text-xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight truncate">
+              <DialogPrimitive.Title className="text-xl font-bold text-[#161f13] dark:text-[#94f477] leading-tight truncate">
                 {title}
               </DialogPrimitive.Title>
               {subtitle && (
@@ -89,7 +89,7 @@ export function DetailShell({
             </button>
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-sm font-semibold px-5 py-2 transition-colors"
+              className="inline-flex items-center justify-center rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] text-sm font-semibold px-5 py-2 transition-colors"
             >
               Opslaan
             </button>

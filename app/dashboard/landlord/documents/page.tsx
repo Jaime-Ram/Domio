@@ -580,7 +580,7 @@ export default function DocumentsPage() {
           searchPlaceholder="Zoek document, type, adres…"
           filterContent={mounted ? (
             <>
-              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                 Type
               </DropdownMenuLabel>
               <div className="space-y-1">
@@ -598,7 +598,7 @@ export default function DocumentsPage() {
               </div>
               {uniqueProperties.length > 0 && (
                 <>
-                  <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                     Object
                   </DropdownMenuLabel>
                   <div className="space-y-1">
@@ -642,9 +642,9 @@ export default function DocumentsPage() {
                       }
                     }}
                   >
-                    <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 overflow-hidden [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+                    <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 overflow-hidden [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
                       <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-                        <DialogTitle className="text-[#163300] dark:text-[#9FE870] text-lg">
+                        <DialogTitle className="text-[#161f13] dark:text-[#94f477] text-lg">
                           Documenten uploaden
                         </DialogTitle>
                         <DialogDescription>
@@ -654,7 +654,7 @@ export default function DocumentsPage() {
                       <div className="px-6 pb-2 flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto">
                         {stagedUploadFiles.length > 0 && (
                           <div className="space-y-3">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            <p className="text-sm font-medium text-[#1a1c18] dark:text-white">
                               Te uploaden ({stagedUploadFiles.length})
                             </p>
                             <ul className="space-y-3">
@@ -664,9 +664,9 @@ export default function DocumentsPage() {
                                 return (
                                   <li
                                     key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
-                                    className="flex gap-3 rounded-xl border border-gray-200 dark:border-neutral-600 bg-gray-50/80 dark:bg-neutral-800/80 p-3 pr-2"
+                                    className="flex gap-3 rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-[#f4f4f1]/80 dark:bg-neutral-800/80 p-3 pr-2"
                                   >
-                                    <div className="w-[100px] h-[72px] shrink-0 rounded-lg overflow-hidden bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 flex items-center justify-center">
+                                    <div className="w-[100px] h-[72px] shrink-0 rounded-lg overflow-hidden bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 flex items-center justify-center">
                                       {kind === 'image' && imageUrl ? (
                                         // eslint-disable-next-line @next/next/no-img-element -- lokale blob-preview vóór upload
                                         <img src={imageUrl} alt="" className="max-w-full max-h-full object-contain" />
@@ -677,17 +677,17 @@ export default function DocumentsPage() {
                                           name={file.name}
                                           file_name={file.name}
                                           mime_type={file.type || undefined}
-                                          className="h-10 w-10 text-gray-400 dark:text-neutral-500"
+                                          className="h-10 w-10 text-[#97978f] dark:text-neutral-500"
                                         />
                                       )}
                                     </div>
                                     <div className="min-w-0 flex-1 py-0.5">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={file.name}>
+                                      <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate" title={file.name}>
                                         {file.name}
                                       </p>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatFileSize(file.size)}</p>
+                                      <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">{formatFileSize(file.size)}</p>
                                       {kind === 'other' && (
-                                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                                        <p className="text-[11px] text-[#97978f] dark:text-[#97978f] mt-1">
                                           Voorbeeld niet beschikbaar; bestand wordt wel geüpload.
                                         </p>
                                       )}
@@ -696,7 +696,7 @@ export default function DocumentsPage() {
                                       type="button"
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 shrink-0 rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                      className="h-8 w-8 shrink-0 rounded-full text-[#97978f] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                                       onClick={() => removeStagedFile(index)}
                                       disabled={uploading}
                                       aria-label={`${file.name} uit lijst halen`}
@@ -725,11 +725,11 @@ export default function DocumentsPage() {
                           onDrop={handleDrop}
                           disabled={uploading}
                           className={cn(
-                            'w-full rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+                            'w-full rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-2',
                             stagedUploadFiles.length > 0 ? 'py-5' : 'py-10',
                             dropActive
-                              ? 'border-[#163300] bg-[#9FE870]/20 dark:bg-[#9FE870]/10'
-                              : 'border-gray-200 dark:border-neutral-600 bg-gray-50/90 dark:bg-neutral-800/80 hover:border-[#163300]/50 hover:bg-gray-100/80 dark:hover:bg-neutral-800',
+                              ? 'border-[#161f13] bg-[#94f477]/20 dark:bg-[#94f477]/10'
+                              : 'border-[#e3e3de] dark:border-neutral-600 bg-[#f4f4f1]/90 dark:bg-neutral-800/80 hover:border-[#161f13]/50 hover:bg-[#f4f4f1]/80 dark:hover:bg-neutral-800',
                             uploading && 'pointer-events-none opacity-70'
                           )}
                         >
@@ -737,30 +737,30 @@ export default function DocumentsPage() {
                             className={cn(
                               'mx-auto h-8 w-8 mb-2',
                               stagedUploadFiles.length > 0 ? 'mb-1.5' : 'mb-3 h-10 w-10',
-                              dropActive ? 'text-[#163300] dark:text-[#9FE870]' : 'text-gray-400 dark:text-gray-500'
+                              dropActive ? 'text-[#161f13] dark:text-[#94f477]' : 'text-[#97978f] dark:text-[#97978f]'
                             )}
                             aria-hidden
                           />
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">
                             {stagedUploadFiles.length > 0 ? 'Meer bestanden toevoegen' : 'Sleep bestanden hierheen'}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-1">
                             of klik om te bladeren · PDF, Word, afbeeldingen, CSV, …
                           </p>
                         </button>
                         {/* Link section */}
-                        <div className="border-t border-gray-100 dark:border-neutral-800 pt-3">
+                        <div className="border-t border-[#e3e3de] dark:border-neutral-800 pt-3">
                           <button
                             type="button"
                             onClick={() => {
                               setLinkEnabled((prev) => !prev)
                             }}
-                            className="flex w-full items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors py-1"
+                            className="flex w-full items-center gap-2 text-sm text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors py-1"
                           >
                             <Link2 className="h-4 w-4 shrink-0" />
                             <span className="flex-1 text-left">Koppel document aan…</span>
                             {linkEnabled && linkSelectedId && (
-                              <span className="text-xs bg-[#9FE870]/20 text-[#163300] dark:text-[#9FE870] px-2 py-0.5 rounded-full font-medium">
+                              <span className="text-xs bg-[#94f477]/20 text-[#161f13] dark:text-[#94f477] px-2 py-0.5 rounded-full font-medium">
                                 Gekoppeld
                               </span>
                             )}
@@ -784,8 +784,8 @@ export default function DocumentsPage() {
                                     className={cn(
                                       'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                                       linkType === key
-                                        ? 'bg-[#163300] text-white border-[#163300] dark:bg-[#9FE870] dark:text-[#163300] dark:border-[#9FE870]'
-                                        : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
+                                        ? 'bg-[#161f13] text-white border-[#161f13] dark:bg-[#94f477] dark:text-[#161f13] dark:border-[#94f477]'
+                                        : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-[#97978f] border-[#e3e3de] dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
                                     )}
                                   >
                                     {label}
@@ -795,22 +795,22 @@ export default function DocumentsPage() {
 
                               {/* Search */}
                               <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#97978f] pointer-events-none" />
                                 <input
                                   type="text"
                                   value={linkSearch}
                                   onChange={(e) => setLinkSearch(e.target.value)}
                                   placeholder={`Zoek ${linkType === 'property' ? 'pand' : linkType === 'unit' ? 'woning' : linkType === 'lease' ? 'huurcontract' : 'ticket'}…`}
-                                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#163300]/20 dark:focus:ring-[#9FE870]/20"
+                                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#161f13]/20 dark:focus:ring-[#94f477]/20"
                                 />
                               </div>
 
                               {/* Options list */}
-                              <div className="max-h-[160px] overflow-y-auto space-y-0.5 rounded-xl border border-gray-100 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30 p-1">
+                              <div className="max-h-[160px] overflow-y-auto space-y-0.5 rounded-xl border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1]/50 dark:bg-neutral-800/30 p-1">
                                 {linkOptionsLoading ? (
-                                  <div className="py-4 text-center text-xs text-gray-400">Laden…</div>
+                                  <div className="py-4 text-center text-xs text-[#97978f]">Laden…</div>
                                 ) : filteredLinkOptions.length === 0 ? (
-                                  <div className="py-4 text-center text-xs text-gray-400">
+                                  <div className="py-4 text-center text-xs text-[#97978f]">
                                     {linkSearch ? 'Geen resultaten' : 'Geen items gevonden'}
                                   </div>
                                 ) : filteredLinkOptions.map((opt) => (
@@ -821,8 +821,8 @@ export default function DocumentsPage() {
                                     className={cn(
                                       'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
                                       linkSelectedId === opt.id
-                                        ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
-                                        : 'hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-gray-100'
+                                        ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                        : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 text-[#1a1c18] dark:text-gray-100'
                                     )}
                                   >
                                     <span className="flex-1 min-w-0">
@@ -831,8 +831,8 @@ export default function DocumentsPage() {
                                         <span className={cn(
                                           'text-xs truncate block',
                                           linkSelectedId === opt.id
-                                            ? 'text-white/70 dark:text-[#163300]/70'
-                                            : 'text-gray-500 dark:text-gray-400'
+                                            ? 'text-white/70 dark:text-[#161f13]/70'
+                                            : 'text-[#97978f] dark:text-[#97978f]'
                                         )}>
                                           {opt.sublabel}
                                         </span>
@@ -854,7 +854,7 @@ export default function DocumentsPage() {
                           </p>
                         )}
                       </div>
-                      <DialogFooter className="px-6 pb-6 pt-3 flex-row flex-wrap justify-end gap-2 sm:gap-2 border-t border-gray-100 dark:border-neutral-800 shrink-0">
+                      <DialogFooter className="px-6 pb-6 pt-3 flex-row flex-wrap justify-end gap-2 sm:gap-2 border-t border-[#e3e3de] dark:border-neutral-800 shrink-0">
                         <Button
                           type="button"
                           variant="outline"
@@ -877,7 +877,7 @@ export default function DocumentsPage() {
                         )}
                         <Button
                           type="button"
-                          className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] disabled:opacity-60"
+                          className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] disabled:opacity-60"
                           onClick={stagedUploadFiles.length > 0 ? handleConfirmUpload : () => fileInputRef.current?.click()}
                           disabled={uploading}
                         >
@@ -905,9 +905,9 @@ export default function DocumentsPage() {
                       }
                     }}
                   >
-                    <DialogContent className="sm:max-w-md border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+                    <DialogContent className="sm:max-w-md border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
                       <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-                        <DialogTitle className="text-[#163300] dark:text-[#9FE870] text-lg">
+                        <DialogTitle className="text-[#161f13] dark:text-[#94f477] text-lg">
                           Toewijzen
                         </DialogTitle>
                         <DialogDescription className="truncate">
@@ -930,8 +930,8 @@ export default function DocumentsPage() {
                               className={cn(
                                 'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                                 assignType === key
-                                  ? 'bg-[#163300] text-white border-[#163300] dark:bg-[#9FE870] dark:text-[#163300] dark:border-[#9FE870]'
-                                  : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
+                                  ? 'bg-[#161f13] text-white border-[#161f13] dark:bg-[#94f477] dark:text-[#161f13] dark:border-[#94f477]'
+                                  : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-[#97978f] border-[#e3e3de] dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
                               )}
                             >
                               {label}
@@ -941,22 +941,22 @@ export default function DocumentsPage() {
 
                         {/* Search */}
                         <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#97978f] pointer-events-none" />
                           <input
                             type="text"
                             value={assignSearch}
                             onChange={(e) => setAssignSearch(e.target.value)}
                             placeholder={`Zoek ${assignType === 'property' ? 'pand' : assignType === 'unit' ? 'woning' : assignType === 'lease' ? 'huurcontract' : 'ticket'}…`}
-                            className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#163300]/20 dark:focus:ring-[#9FE870]/20"
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#161f13]/20 dark:focus:ring-[#94f477]/20"
                           />
                         </div>
 
                         {/* Options list */}
-                        <div className="max-h-[200px] overflow-y-auto space-y-0.5 rounded-xl border border-gray-100 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30 p-1">
+                        <div className="max-h-[200px] overflow-y-auto space-y-0.5 rounded-xl border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1]/50 dark:bg-neutral-800/30 p-1">
                           {assignOptionsLoading ? (
-                            <div className="py-5 text-center text-xs text-gray-400">Laden…</div>
+                            <div className="py-5 text-center text-xs text-[#97978f]">Laden…</div>
                           ) : filteredAssignOptions.length === 0 ? (
-                            <div className="py-5 text-center text-xs text-gray-400">
+                            <div className="py-5 text-center text-xs text-[#97978f]">
                               {assignSearch ? 'Geen resultaten' : 'Geen items gevonden'}
                             </div>
                           ) : filteredAssignOptions.map((opt) => (
@@ -967,8 +967,8 @@ export default function DocumentsPage() {
                               className={cn(
                                 'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
                                 assignSelectedId === opt.id
-                                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
-                                  : 'hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-gray-100'
+                                  ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                  : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 text-[#1a1c18] dark:text-gray-100'
                               )}
                             >
                               <span className="flex-1 min-w-0">
@@ -976,7 +976,7 @@ export default function DocumentsPage() {
                                 {opt.sublabel && (
                                   <span className={cn(
                                     'text-xs truncate block',
-                                    assignSelectedId === opt.id ? 'text-white/70 dark:text-[#163300]/70' : 'text-gray-500 dark:text-gray-400'
+                                    assignSelectedId === opt.id ? 'text-white/70 dark:text-[#161f13]/70' : 'text-[#97978f] dark:text-[#97978f]'
                                   )}>
                                     {opt.sublabel}
                                   </span>
@@ -991,7 +991,7 @@ export default function DocumentsPage() {
                           <p className="text-sm text-red-600 dark:text-red-400" role="alert">{assignError}</p>
                         )}
                       </div>
-                      <DialogFooter className="px-6 pb-6 pt-0 flex-row justify-end gap-2 sm:gap-2 border-t border-gray-100 dark:border-neutral-800 pt-3">
+                      <DialogFooter className="px-6 pb-6 pt-0 flex-row justify-end gap-2 sm:gap-2 border-t border-[#e3e3de] dark:border-neutral-800 pt-3">
                         <Button
                           type="button"
                           variant="outline"
@@ -1003,7 +1003,7 @@ export default function DocumentsPage() {
                         </Button>
                         <Button
                           type="button"
-                          className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] disabled:opacity-60"
+                          className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] disabled:opacity-60"
                           onClick={handleAssignSave}
                           disabled={!assignSelectedId || assignSaving}
                         >
@@ -1027,16 +1027,16 @@ export default function DocumentsPage() {
                     const cardDoc = toCardDoc(doc)
                     return (
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                          <DocumentTypeGlyph name={cardDoc.name} file_name={cardDoc.file_name} mime_type={cardDoc.mime_type} className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                        <div className="h-9 w-9 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                          <DocumentTypeGlyph name={cardDoc.name} file_name={cardDoc.file_name} mime_type={cardDoc.mime_type} className="h-4 w-4 text-[#55554e] dark:text-gray-300" />
                         </div>
-                        <span className="text-[12.5px] font-medium text-gray-900 dark:text-white truncate">{cardDoc.name}</span>
+                        <span className="text-[12.5px] font-medium text-[#1a1c18] dark:text-white truncate">{cardDoc.name}</span>
                       </div>
                     )
                   } },
-                  { key: 'type', header: 'Type', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-gray-600 dark:text-gray-400 truncate">{toCardDoc(doc).type}</span> },
-                  { key: 'date', header: 'Datum', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-gray-600 dark:text-gray-400">{doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'}</span> },
-                  { key: 'property', header: 'Pand', sortable: true, width: 'minmax(0,1.5fr)', render: (doc) => { const prop = doc.property ?? doc.properties; return <span className="text-[12.5px] text-gray-600 dark:text-gray-400 truncate">{prop?.address ?? '—'}</span> } },
+                  { key: 'type', header: 'Type', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-[#55554e] dark:text-[#97978f] truncate">{toCardDoc(doc).type}</span> },
+                  { key: 'date', header: 'Datum', sortable: true, width: 'minmax(0,1fr)', render: (doc) => <span className="text-[12.5px] text-[#55554e] dark:text-[#97978f]">{doc.created_at ? format(new Date(doc.created_at), 'd MMM yyyy', { locale: nl }) : '—'}</span> },
+                  { key: 'property', header: 'Pand', sortable: true, width: 'minmax(0,1.5fr)', render: (doc) => { const prop = doc.property ?? doc.properties; return <span className="text-[12.5px] text-[#55554e] dark:text-[#97978f] truncate">{prop?.address ?? '—'}</span> } },
                 ] as DataTableColumn<any>[]}
                 rowActions={(doc) => [
                   { label: 'Downloaden', icon: Download, onClick: () => handleDownload(doc) },
@@ -1070,15 +1070,15 @@ export default function DocumentsPage() {
                   className="fixed bottom-6 z-30 pointer-events-none"
                   style={{ left: bulkCenter, transform: 'translateX(-50%)' }}
                 >
-                  <div className="pointer-events-auto inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white dark:bg-neutral-700 shadow-sm border border-gray-200/80 dark:border-neutral-600">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 tabular-nums">
+                  <div className="pointer-events-auto inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white dark:bg-neutral-700 shadow-sm border border-[#e3e3de]/80 dark:border-neutral-600">
+                    <span className="text-sm font-medium text-[#55554e] dark:text-gray-200 tabular-nums">
                       {selectedIds.length} geselecteerd
                     </span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
+                      className="h-8 w-8 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
                       aria-label="Download geselecteerde documenten"
                       disabled={selectedIds.length === 0 || bulkBusy}
                       onClick={handleBulkDownloadSelected}
@@ -1089,7 +1089,7 @@ export default function DocumentsPage() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
+                      className="h-8 w-8 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
                       aria-label="Geselecteerde verwijderen"
                       disabled={selectedIds.length === 0 || bulkBusy}
                       onClick={handleBulkDeleteSelected}

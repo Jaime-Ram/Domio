@@ -553,7 +553,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const filterContent = (
     <>
-      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Type
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -567,7 +567,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#2F5711' }} />
             <span>Inkomsten</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.inkomsten}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{counts.inkomsten}</span>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={typeFilter.kosten}
@@ -579,10 +579,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#A8200D' }} />
             <span>Kosten</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.kosten}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{counts.kosten}</span>
         </DropdownMenuCheckboxItem>
       </div>
-      <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Koppeling
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -593,7 +593,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
         >
           <span>Gekoppeld</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.gekoppeld}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{counts.gekoppeld}</span>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={matchFilter.nietGekoppeld}
@@ -602,12 +602,12 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
         >
           <span>Niet gekoppeld</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{counts.nietGekoppeld}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{counts.nietGekoppeld}</span>
         </DropdownMenuCheckboxItem>
       </div>
       {uniqueProperties.length > 0 && (
         <>
-          <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+          <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
             Pand
           </DropdownMenuLabel>
           <div className="space-y-1">
@@ -620,7 +620,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
               >
                 <span className="truncate max-w-[160px]">{prop}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-[#97978f] dark:text-[#97978f]">
                   {transactions.filter((t) => t.assignment?.property_name === prop).length}
                 </span>
               </DropdownMenuCheckboxItem>
@@ -667,21 +667,21 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     cols={COLS}
                     onClick={() => handleSelectTx(tx)}
                     className={cn(
-                      isSelected && 'bg-gray-50 dark:bg-neutral-800/40'
+                      isSelected && 'bg-[#f4f4f1] dark:bg-neutral-800/40'
                     )}
                   >
                     {/* Omschrijving */}
                     <div>
                       <div className="flex items-center gap-2 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
+                        <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{tx.description || tx.counterparty_name || '—'}</p>
                         {tx.is_manual_transaction && (
-                          <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                          <span className="shrink-0 inline-flex items-center rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-[#97978f] dark:text-[#97978f]">
                             Handmatig
                           </span>
                         )}
                       </div>
                       {tx.counterparty_name && (
-                        <p className="text-xs text-gray-400 truncate mt-0.5">{tx.counterparty_name}</p>
+                        <p className="text-xs text-[#97978f] truncate mt-0.5">{tx.counterparty_name}</p>
                       )}
                     </div>
 
@@ -696,7 +696,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         const cat = tx.assignment!.category
                         const Icon = cat ? getCategoryIcon(cat) : null
                         return (
-                          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300">
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap bg-[#f4f4f1] dark:bg-neutral-800 text-[#55554e] dark:text-gray-300">
                             {Icon && <Icon className="h-3 w-3 shrink-0" />}
                             {cat ? getCategoryLabel(cat) : '—'}
                           </span>
@@ -709,10 +709,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                       {tx.assignment?.property_name ? (
                         <div className="flex items-center gap-1.5">
                           {tx.assignment.unit_id
-                            ? <Home className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                            : <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                            ? <Home className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
+                            : <Building2 className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
                           }
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">
                             {tx.assignment.unit_id
                               ? (tx.assignment.unit_name ?? tx.assignment.property_name)
                               : tx.assignment.property_name
@@ -725,7 +725,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     </div>
 
                     {/* Datum */}
-                    <div className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    <div className="text-sm text-[#97978f] dark:text-[#97978f] whitespace-nowrap">
                       {formatDate(tx.value_date)}
                     </div>
 
@@ -767,7 +767,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               <button
                 type="button"
                 onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:opacity-80 transition-opacity"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#161f13] dark:text-[#94f477] hover:opacity-80 transition-opacity"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Toewijzing wijzigen
@@ -784,7 +784,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                   type="button"
                   onClick={handleAssign}
                   disabled={submitting || !canSave}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
                 >
                   {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   Opslaan
@@ -803,8 +803,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               const Icon = getCategoryIcon(selectedCategory)
               return (
                 <div className="flex justify-center mb-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-neutral-800">
-                    <Icon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#f4f4f1] dark:bg-neutral-800">
+                    <Icon className="h-5 w-5 text-[#97978f] dark:text-[#97978f]" />
                   </div>
                 </div>
               )
@@ -814,7 +814,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
             )}>
               {formatEur(selectedTx.amount)}
             </p>
-            <p className="text-sm text-gray-400 mt-1.5">{formatDate(selectedTx.value_date)}</p>
+            <p className="text-sm text-[#97978f] mt-1.5">{formatDate(selectedTx.value_date)}</p>
 
             {/* Category pill — shown in read mode only */}
             {!showAssignForm && <div className="relative inline-flex justify-center mt-3">
@@ -829,15 +829,15 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               <button
                 type="button"
                 onClick={() => setShowCategoryDropdown(v => !v)}
-                className="relative z-20 inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 px-3.5 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors"
+                className="relative z-20 inline-flex items-center gap-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 hover:bg-[#ebebe7] dark:hover:bg-neutral-700 px-3.5 py-1.5 text-sm font-medium text-[#55554e] dark:text-gray-200 transition-colors"
               >
                 {selectedCategory && (() => { const Icon = getCategoryIcon(selectedCategory); return <Icon className="h-3.5 w-3.5 shrink-0" /> })()}
                 <span>{selectedCategory ? getCategoryLabel(selectedCategory) : 'Categorie kiezen'}</span>
-                <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                <ChevronDown className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
               </button>
 
               {showCategoryDropdown && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-20 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 min-w-[220px]">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-20 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 min-w-[220px]">
                   {txCategories.map(cat => {
                     const Icon = getCategoryIcon(cat.id)
                     const isSelected = selectedCategory === cat.id
@@ -854,14 +854,14 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                 if (e.key === 'Enter') { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }
                                 if (e.key === 'Escape') setCatEditId(null)
                               }}
-                              className="flex-1 min-w-0 h-7 rounded-md border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                              className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                             />
                             <button type="button" onClick={async () => { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }}
-                              className="h-7 px-2 rounded-md bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0">
+                              className="h-7 px-2 rounded-md bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0">
                               Ok
                             </button>
                             <button type="button" onClick={() => setCatEditId(null)}
-                              className="h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                              className="h-7 w-7 flex items-center justify-center rounded-md text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                               <XIcon className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -879,22 +879,22 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               className={cn(
                                 'flex-1 flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
                                 isSelected
-                                  ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold'
-                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                  ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold'
+                                  : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
-                              <Icon className="h-4 w-4 shrink-0 text-gray-400" />
+                              <Icon className="h-4 w-4 shrink-0 text-[#97978f]" />
                               <span className="flex-1">{cat.label}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#163300] dark:text-[#9FE870]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#161f13] dark:text-[#94f477]" />}
                             </button>
                             <button type="button"
                               onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
-                              className="opacity-0 group-hover:opacity-100 mr-1 h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-opacity">
+                              className="opacity-0 group-hover:opacity-100 mr-1 h-6 w-6 flex items-center justify-center rounded text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-opacity">
                               <Pencil className="h-3 w-3" />
                             </button>
                             <button type="button"
                               onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (selectedCategory === cat.id) setSelectedCategory(null) }}
-                              className="opacity-0 group-hover:opacity-100 mr-2 h-6 w-6 flex items-center justify-center rounded text-gray-400 hover:text-red-500 transition-opacity">
+                              className="opacity-0 group-hover:opacity-100 mr-2 h-6 w-6 flex items-center justify-center rounded text-[#97978f] hover:text-red-500 transition-opacity">
                               <Trash2 className="h-3 w-3" />
                             </button>
                           </>
@@ -904,7 +904,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                   })}
 
                   {/* Add new category */}
-                  <div className="border-t border-gray-100 dark:border-neutral-800 mt-1 pt-1">
+                  <div className="border-t border-[#e3e3de] dark:border-neutral-800 mt-1 pt-1">
                     {catAddOpen ? (
                       <div className="flex items-center gap-1.5 px-2 py-1">
                         <input
@@ -916,22 +916,22 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                             if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                           }}
-                          className="flex-1 min-w-0 h-7 rounded-md border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                          className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                         />
                         <button type="button"
                           disabled={!catAddLabel.trim()}
                           onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                          className="h-7 px-2 rounded-md bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                          className="h-7 px-2 rounded-md bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
                           Ok
                         </button>
                         <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
-                          className="h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                          className="h-7 w-7 flex items-center justify-center rounded-md text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                           <XIcon className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     ) : (
                       <button type="button" onClick={() => setCatAddOpen(true)}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#97978f] dark:text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
                         <Plus className="h-3.5 w-3.5" />
                         Nieuwe categorie
                       </button>
@@ -943,25 +943,25 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           </div>
 
           {/* ── Transaction detail rows ── */}
-          <div className="border-t border-gray-100 dark:border-neutral-800">
+          <div className="border-t border-[#e3e3de] dark:border-neutral-800">
 
             {selectedTx.counterparty_name && (
-              <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
-                <span className="text-sm text-gray-400 shrink-0">Afzender</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6 truncate">{selectedTx.counterparty_name}</span>
+              <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#e3e3de] dark:border-neutral-800">
+                <span className="text-sm text-[#97978f] shrink-0">Afzender</span>
+                <span className="text-sm font-medium text-[#1a1c18] dark:text-white text-right ml-6 truncate">{selectedTx.counterparty_name}</span>
               </div>
             )}
 
             {selectedTx.counterparty_iban && (
-              <div className="border-b border-gray-100 dark:border-neutral-800">
+              <div className="border-b border-[#e3e3de] dark:border-neutral-800">
                 <div className="flex items-start justify-between px-6 py-3.5">
-                  <span className="text-sm text-gray-400 shrink-0">IBAN</span>
+                  <span className="text-sm text-[#97978f] shrink-0">IBAN</span>
                   <div className="text-right ml-6 min-w-0">
-                    <p className="text-sm font-mono text-gray-900 dark:text-white">{selectedTx.counterparty_iban}</p>
+                    <p className="text-sm font-mono text-[#1a1c18] dark:text-white">{selectedTx.counterparty_iban}</p>
                     {ibanStatus === 'loading' && (
                       <div className="flex items-center justify-end gap-1 mt-1">
-                        <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
-                        <span className="text-xs text-gray-400">Controleren…</span>
+                        <Loader2 className="h-3 w-3 animate-spin text-[#97978f]" />
+                        <span className="text-xs text-[#97978f]">Controleren…</span>
                       </div>
                     )}
                     {ibanStatus === 'matched' && ibanMatchedTenant && (
@@ -978,7 +978,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         </span>
                         {!showIbanAssignForm && (
                           <button type="button" onClick={() => setShowIbanAssignForm(true)}
-                            className="text-xs font-medium text-[#163300] dark:text-[#9FE870] underline underline-offset-2"
+                            className="text-xs font-medium text-[#161f13] dark:text-[#94f477] underline underline-offset-2"
                           >
                             Koppelen
                           </button>
@@ -990,7 +990,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 {showIbanAssignForm && ibanStatus === 'unmatched' && (
                   <div className="px-6 pb-4 space-y-2">
                     {allActiveTenants.length === 0 ? (
-                      <p className="text-xs text-gray-400 py-2 text-center">Geen actieve huurders gevonden</p>
+                      <p className="text-xs text-[#97978f] py-2 text-center">Geen actieve huurders gevonden</p>
                     ) : (
                       <div className="space-y-1">
                         {allActiveTenants.map(tenant => (
@@ -998,14 +998,14 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             onClick={() => setSelectedIbanTenantId(tenant.id === selectedIbanTenantId ? null : tenant.id)}
                             className={cn('w-full flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors',
                               selectedIbanTenantId === tenant.id
-                                ? 'border-[#163300] bg-[#163300]/5 dark:border-[#9FE870] dark:bg-[#9FE870]/10'
-                                : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
+                                ? 'border-[#161f13] bg-[#161f13]/5 dark:border-[#94f477] dark:bg-[#94f477]/10'
+                                : 'border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
-                            <User className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                            <User className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
                             <span className="font-medium flex-1 truncate">{tenant.name}</span>
-                            <span className="text-xs text-gray-400 shrink-0">{tenant.propertyName}</span>
-                            {selectedIbanTenantId === tenant.id && <Check className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870] shrink-0" />}
+                            <span className="text-xs text-[#97978f] shrink-0">{tenant.propertyName}</span>
+                            {selectedIbanTenantId === tenant.id && <Check className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477] shrink-0" />}
                           </button>
                         ))}
                       </div>
@@ -1013,13 +1013,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     <div className="flex justify-end gap-2 pt-1">
                       <button type="button"
                         onClick={() => { setShowIbanAssignForm(false); setSelectedIbanTenantId(null) }}
-                        className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        className="text-xs text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
                       >
                         Annuleren
                       </button>
                       <button type="button" onClick={handleSaveIban}
                         disabled={!selectedIbanTenantId || savingIban}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-40"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-40"
                       >
                         {savingIban && <Loader2 className="h-3 w-3 animate-spin" />}
                         Opslaan
@@ -1031,16 +1031,16 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
             )}
 
             {selectedTx.description && (
-              <div className="flex items-start justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
-                <span className="text-sm text-gray-400 shrink-0">Omschrijving</span>
-                <span className="text-sm text-gray-900 dark:text-white text-right ml-6">{selectedTx.description}</span>
+              <div className="flex items-start justify-between px-6 py-3.5 border-b border-[#e3e3de] dark:border-neutral-800">
+                <span className="text-sm text-[#97978f] shrink-0">Omschrijving</span>
+                <span className="text-sm text-[#1a1c18] dark:text-white text-right ml-6">{selectedTx.description}</span>
               </div>
             )}
           </div>
 
           {/* ── Assignment section ── */}
           <div>
-            <p className="px-6 pt-5 pb-2 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            <p className="px-6 pt-5 pb-2 text-[11px] font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wider">
               Toewijzing
             </p>
 
@@ -1050,31 +1050,31 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 const a = selectedTx.assignment!
                 const CatIcon = a.category ? getCategoryIcon(a.category) : null
                 return (
-                  <div className="border-t border-gray-100 dark:border-neutral-800">
-                    <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
-                      <span className="text-sm text-gray-400 shrink-0">Categorie</span>
+                  <div className="border-t border-[#e3e3de] dark:border-neutral-800">
+                    <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#e3e3de] dark:border-neutral-800">
+                      <span className="text-sm text-[#97978f] shrink-0">Categorie</span>
                       <div className="flex items-center gap-2 ml-6">
-                        {CatIcon && <CatIcon className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0" />}
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {CatIcon && <CatIcon className="h-4 w-4 text-[#97978f] dark:text-[#97978f] shrink-0" />}
+                        <span className="text-sm font-medium text-[#1a1c18] dark:text-white">
                           {a.category ? getCategoryLabel(a.category) : '—'}
                         </span>
                       </div>
                     </div>
                     {a.property_name && (
-                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
-                        <span className="text-sm text-gray-400 shrink-0">Pand</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6">{a.property_name}</span>
+                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#e3e3de] dark:border-neutral-800">
+                        <span className="text-sm text-[#97978f] shrink-0">Pand</span>
+                        <span className="text-sm font-medium text-[#1a1c18] dark:text-white text-right ml-6">{a.property_name}</span>
                       </div>
                     )}
                     {a.tenant_name && (
-                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 dark:border-neutral-800">
-                        <span className="text-sm text-gray-400 shrink-0">Huurder</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white text-right ml-6">{a.tenant_name}</span>
+                      <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#e3e3de] dark:border-neutral-800">
+                        <span className="text-sm text-[#97978f] shrink-0">Huurder</span>
+                        <span className="text-sm font-medium text-[#1a1c18] dark:text-white text-right ml-6">{a.tenant_name}</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between px-6 py-3.5">
-                      <span className="text-sm text-gray-400 shrink-0">Gekoppeld via</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 text-right ml-6">
+                      <span className="text-sm text-[#97978f] shrink-0">Gekoppeld via</span>
+                      <span className="text-sm text-[#97978f] dark:text-[#97978f] text-right ml-6">
                         {a.is_manual ? 'Handmatig' : `${a.confidence_score ?? 0}% — ${METHOD_LABELS[a.match_method] ?? a.match_method}`}
                       </span>
                     </div>
@@ -1090,23 +1090,23 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     <button
                       type="button"
                       onClick={() => setAssignStep(s => (s - 1) as 1 | 2 | 3)}
-                      className="h-6 w-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
+                      className="h-6 w-6 flex items-center justify-center rounded-full text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 hover:text-[#55554e] dark:hover:text-gray-200 transition-colors shrink-0"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
                   )}
                   <div className="flex items-center gap-1">
                     {([1, 2, 3] as const).map(s => (
-                      <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', assignStep === s ? 'w-6' : 'w-2 opacity-30')} />
+                      <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', assignStep === s ? 'w-6' : 'w-2 opacity-30')} />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-400">Stap {assignStep} van 3</span>
+                  <span className="text-xs text-[#97978f]">Stap {assignStep} van 3</span>
                 </div>
 
                 {/* ── Step 1: Category ── */}
                 {assignStep === 1 && (
                   <>
-                    <p className="text-xs text-gray-400">Wat voor betaling is dit?</p>
+                    <p className="text-xs text-[#97978f]">Wat voor betaling is dit?</p>
                     <div className="grid grid-cols-5 gap-2">
                       {txCategories.map(cat => {
                         const Icon = getCategoryIcon(cat.id)
@@ -1121,8 +1121,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               }}
                               className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
                                 isSel
-                                  ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                                  : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                                  ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                  : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                               )}
                             >
                               <Icon className="h-4 w-4" />
@@ -1131,13 +1131,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             <div className="absolute -top-2 -right-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                               <button type="button"
                                 onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
-                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200"
                               >
                                 <Pencil className="h-3 w-3" />
                               </button>
                               <button type="button"
                                 onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (selectedCategory === cat.id) setSelectedCategory(null) }}
-                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                                className="h-5 w-5 flex items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow text-[#97978f] hover:text-red-500 dark:hover:text-red-400"
                               >
                                 <XIcon className="h-3 w-3" />
                               </button>
@@ -1152,13 +1152,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
                               if (e.key === 'Escape') setCatEditId(null)
                             }}
-                            className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                           />
                           <button type="button" disabled={!catEditLabel.trim()}
                             onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
-                            className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                            className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
                           <button type="button" onClick={() => setCatEditId(null)}
-                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                             <XIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
@@ -1175,22 +1175,22 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                               if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                             }}
-                            className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                           />
                           <button type="button"
                             disabled={!catAddLabel.trim()}
                             onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                            className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                            className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
                             Ok
                           </button>
                           <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
-                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                            className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                             <XIcon className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       ) : (
                         <button type="button" onClick={() => setCatAddOpen(true)}
-                          className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-gray-200 dark:border-neutral-700 px-1 py-3 text-gray-400 dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                          className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-[#e3e3de] dark:border-neutral-700 px-1 py-3 text-[#97978f] dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-[#97978f] dark:hover:text-[#97978f] transition-colors">
                           <Plus className="h-4 w-4" />
                           <span className="font-medium text-[11px] leading-tight text-center">Toevoegen</span>
                         </button>
@@ -1202,7 +1202,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 {/* ── Step 2: Pand or Eenheid ── */}
                 {assignStep === 2 && (
                   <>
-                    <p className="text-xs text-gray-400">Koppelen aan een pand of eenheid?</p>
+                    <p className="text-xs text-[#97978f]">Koppelen aan een pand of eenheid?</p>
                     <div className="grid grid-cols-2 gap-2">
                       {([
                         { key: 'pand', label: 'Pand', Icon: Building2, sub: 'Met verdeelsleutel' },
@@ -1220,13 +1220,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                           className={cn(
                             'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
                             assignLevel === key
-                              ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                              : 'border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
+                              ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                              : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
                           )}
                         >
                           <Icon className="h-4 w-4 mb-0.5" />
                           <span className="text-sm font-medium">{label}</span>
-                          <span className="text-[11px] text-gray-400 dark:text-gray-500">{sub}</span>
+                          <span className="text-[11px] text-[#97978f] dark:text-[#97978f]">{sub}</span>
                         </button>
                       ))}
                     </div>
@@ -1242,8 +1242,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                       className={cn(
                         'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
                         assignLevel === 'geen'
-                          ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                          : 'border-gray-200 dark:border-neutral-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-neutral-600 hover:text-gray-600 dark:hover:text-gray-300'
+                          ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                          : 'border-[#e3e3de] dark:border-neutral-700 text-[#97978f] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 hover:text-[#55554e] dark:hover:text-gray-300'
                       )}
                     >
                       Niet koppelen
@@ -1254,7 +1254,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 {/* ── Step 3: Property + unit/verdeelsleutel ── */}
                 {assignStep === 3 && (
                   <>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-[#97978f]">
                       {assignLevel === 'pand' ? 'Kies een pand en verdeelsleutel' : assignLevel === 'eenheid' ? 'Kies een pand en eenheid' : 'Alleen categorie wordt opgeslagen'}
                     </p>
 
@@ -1267,8 +1267,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                           className={cn(
                             'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                             selectedCategoryProperty
-                              ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                              : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                              ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                              : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                           )}
                         >
                           <Building2 className="h-4 w-4 shrink-0" />
@@ -1277,7 +1277,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                           {!selectedCategoryProperty && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
                         </button>
                         {propPickerOpen && (
-                          <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                          <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
                             {properties.map(p => {
                               const isSel = selectedCategoryProperty === p.id
                               return (
@@ -1285,10 +1285,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                   onClick={() => { setSelectedCategoryProperty(p.id); setSelectedUnit(null); setPropPickerOpen(false) }}
                                   className={cn(
                                     'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
-                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                                   <span className="flex-1">{p.name}</span>
                                   {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                                 </button>
@@ -1307,8 +1307,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             className={cn(
                               'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                               selectedUnit
-                                ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                                ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
                             <Home className="h-4 w-4 shrink-0" />
@@ -1317,9 +1317,9 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             {!selectedUnit && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
                           </button>
                           {unitPickerOpen && (
-                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
                               {unitsForSelectedProperty.length === 0 ? (
-                                <p className="px-4 py-3 text-sm text-gray-400">Geen eenheden gevonden</p>
+                                <p className="px-4 py-3 text-sm text-[#97978f]">Geen eenheden gevonden</p>
                               ) : unitsForSelectedProperty.map(u => {
                                 const isSel = selectedUnit === u.id
                                 return (
@@ -1327,10 +1327,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                     onClick={() => { setSelectedUnit(isSel ? null : u.id); setUnitPickerOpen(false) }}
                                     className={cn(
                                       'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                      isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                      isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                     )}
                                   >
-                                    <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                    <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                                     <span className="flex-1">{u.unit_number}</span>
                                     {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                                   </button>
@@ -1350,8 +1350,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             className={cn(
                               'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                               selectedAllocationKey
-                                ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                                : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                                ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
                             <span className="flex-1 text-left">{assignAllocKeys.find(k => k.id === selectedAllocationKey)?.name ?? (assignAllocKeys.length === 0 ? 'Geen verdeelsleutels beschikbaar' : 'Verdeelsleutel kiezen')}</span>
@@ -1359,7 +1359,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             {!selectedAllocationKey && assignAllocKeys.length > 0 && <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />}
                           </button>
                           {allocKeyPickerOpen && assignAllocKeys.length > 0 && (
-                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
+                            <div className="absolute top-full left-0 mt-1 z-20 w-full bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto">
                               {assignAllocKeys.map(k => {
                                 const isSel = selectedAllocationKey === k.id
                                 return (
@@ -1367,7 +1367,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                     onClick={() => { setSelectedAllocationKey(isSel ? null : k.id); setAllocKeyPickerOpen(false) }}
                                     className={cn(
                                       'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                      isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                      isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                     )}
                                   >
                                     <span className="flex-1">{k.name}</span>
@@ -1395,14 +1395,14 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
         <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
           <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Betaling verwijderen</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+        <div className="px-6 py-4 text-sm text-[#55554e] dark:text-gray-300">
           Weet je zeker dat je deze betaling wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
         </div>
         <div className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(false)}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
           >
             Annuleren
           </button>
@@ -1434,17 +1434,17 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               <button
                 type="button"
                 onClick={() => setPayStep(s => (s - 1) as 1 | 2 | 3 | 4)}
-                className="h-6 w-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-600 dark:hover:text-gray-200 transition-colors shrink-0"
+                className="h-6 w-6 flex items-center justify-center rounded-full text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 hover:text-[#55554e] dark:hover:text-gray-200 transition-colors shrink-0"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
             )}
             <div className="flex items-center gap-1">
               {([1, 2, 3, 4] as const).map(s => (
-                <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', payStep === s ? 'w-6' : 'w-2 opacity-30')} />
+                <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', payStep === s ? 'w-6' : 'w-2 opacity-30')} />
               ))}
             </div>
-            <span className="text-xs text-gray-400">Stap {payStep} van 4</span>
+            <span className="text-xs text-[#97978f]">Stap {payStep} van 4</span>
           </div>
         </DialogHeader>
 
@@ -1453,16 +1453,16 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           {/* ── Step 1: Payment details ── */}
           {payStep === 1 && (
             <div className="space-y-3">
-              <div className="flex rounded-2xl overflow-hidden border border-gray-200 dark:border-neutral-700 p-0.5 gap-0.5 bg-gray-50 dark:bg-neutral-800">
+              <div className="flex rounded-2xl overflow-hidden border border-[#e3e3de] dark:border-neutral-700 p-0.5 gap-0.5 bg-[#f4f4f1] dark:bg-neutral-800">
                 <button type="button" onClick={() => setPayDirection('inkomsten')}
                   className={cn('flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
-                    payDirection === 'inkomsten' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    payDirection === 'inkomsten' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200'
                   )}>
                   Inkomsten
                 </button>
                 <button type="button" onClick={() => setPayDirection('uitgaven')}
                   className={cn('flex-1 py-1.5 text-sm font-medium rounded-xl transition-colors',
-                    payDirection === 'uitgaven' ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    payDirection === 'uitgaven' ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200'
                   )}>
                   Uitgaven
                 </button>
@@ -1487,7 +1487,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           {/* ── Step 2: Category tiles ── */}
           {payStep === 2 && (
             <div className="space-y-3">
-              <p className="text-xs text-gray-400">Wat voor betaling is dit?</p>
+              <p className="text-xs text-[#97978f]">Wat voor betaling is dit?</p>
               <div className="grid grid-cols-5 gap-2">
                 {txCategories.map(cat => {
                   const Icon = getCategoryIcon(cat.id)
@@ -1498,8 +1498,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         onClick={() => { setPayCategory(cat.id); setPayStep(3) }}
                         className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
                           isSel
-                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                         )}
                       >
                         <Icon className="h-4 w-4" />
@@ -1508,13 +1508,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                       <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <button type="button"
                           onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
-                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200"
                         >
                           <Pencil className="h-2.5 w-2.5" />
                         </button>
                         <button type="button"
                           onClick={e => { e.stopPropagation(); deleteCategory(cat.id); if (payCategory === cat.id) setPayCategory(null) }}
-                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                          className="h-4 w-4 flex items-center justify-center rounded bg-white/90 dark:bg-neutral-900/90 text-[#97978f] hover:text-red-500 dark:hover:text-red-400"
                         >
                           <XIcon className="h-2.5 w-2.5" />
                         </button>
@@ -1529,13 +1529,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
                         if (e.key === 'Escape') setCatEditId(null)
                       }}
-                      className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                     />
                     <button type="button" disabled={!catEditLabel.trim()}
                       onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
-                      className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                      className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
                     <button type="button" onClick={() => setCatEditId(null)}
-                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                       <XIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -1552,22 +1552,22 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                         if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                       }}
-                      className="flex-1 h-8 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#163300] dark:focus:ring-[#9FE870]"
+                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
                     />
                     <button type="button"
                       disabled={!catAddLabel.trim()}
                       onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                      className="h-8 px-3 rounded-lg bg-[#9FE870] text-[#163300] text-xs font-semibold shrink-0 disabled:opacity-40">
+                      className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
                       Ok
                     </button>
                     <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
-                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
+                      className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                       <XIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 ) : (
                   <button type="button" onClick={() => setCatAddOpen(true)}
-                    className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-gray-200 dark:border-neutral-700 px-1 py-3 text-gray-400 dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                    className="flex flex-col items-center gap-1.5 rounded-lg border border-dashed border-[#e3e3de] dark:border-neutral-700 px-1 py-3 text-[#97978f] dark:text-neutral-600 hover:border-gray-300 dark:hover:border-neutral-500 hover:text-[#97978f] dark:hover:text-[#97978f] transition-colors">
                     <Plus className="h-4 w-4" />
                     <span className="font-medium text-[11px] leading-tight text-center">Toevoegen</span>
                   </button>
@@ -1579,7 +1579,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           {/* ── Step 3: Pand or Eenheid ── */}
           {payStep === 3 && (
             <div className="space-y-3">
-              <p className="text-xs text-gray-400">Koppelen aan een pand of eenheid?</p>
+              <p className="text-xs text-[#97978f]">Koppelen aan een pand of eenheid?</p>
               <div className="grid grid-cols-2 gap-2">
                 {([
                   { key: 'pand', label: 'Pand', Icon: Building2, sub: 'Met verdeelsleutel' },
@@ -1590,13 +1590,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
                       payLevel === key
-                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                        : 'border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
+                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
                     <Icon className="h-4 w-4 mb-0.5" />
                     <span className="text-sm font-medium">{label}</span>
-                    <span className="text-[11px] text-gray-400 dark:text-gray-500">{sub}</span>
+                    <span className="text-[11px] text-[#97978f] dark:text-[#97978f]">{sub}</span>
                   </button>
                 ))}
               </div>
@@ -1606,8 +1606,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 className={cn(
                   'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
                   payLevel === 'geen'
-                    ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                    : 'border-gray-200 dark:border-neutral-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-neutral-600 hover:text-gray-600 dark:hover:text-gray-300'
+                    ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                    : 'border-[#e3e3de] dark:border-neutral-700 text-[#97978f] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 hover:text-[#55554e] dark:hover:text-gray-300'
                 )}
               >
                 Niet koppelen
@@ -1618,7 +1618,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           {/* ── Step 4: Property + unit/verdeelsleutel ── */}
           {payStep === 4 && (
             <div className="space-y-3">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[#97978f]">
                 {payLevel === 'pand' ? 'Kies een pand en verdeelsleutel' : payLevel === 'eenheid' ? 'Kies een pand en eenheid' : 'Alleen categorie wordt opgeslagen'}
               </p>
               {payLevel !== 'geen' && <>
@@ -1632,8 +1632,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 className={cn(
                   'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                   payPropertyId
-                    ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                    : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                    ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                    : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                 )}
               >
                 <Building2 className="h-4 w-4 shrink-0" />
@@ -1644,7 +1644,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 <>
                   <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayPropOpen(false)} />
                   <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
-                    className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                    className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
                   >
                     {properties.map(p => {
                       const isSel = payPropertyId === p.id
@@ -1652,10 +1652,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         <button key={p.id} type="button"
                           onClick={() => { setPayPropertyId(p.id); setPayUnitId(null); setPayAllocationKeyId(null); setPayPropOpen(false) }}
                           className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                            isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                            isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                           )}
                         >
-                          <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                           <span className="flex-1">{p.name}</span>
                           {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                         </button>
@@ -1678,8 +1678,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                       payUnitId
-                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
                     <Home className="h-4 w-4 shrink-0" />
@@ -1690,20 +1690,20 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     <>
                       <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayUnitOpen(false)} />
                       <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
-                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
                       >
                         {unitsForPayProperty.length === 0 ? (
-                          <p className="px-4 py-3 text-sm text-gray-400">Geen eenheden gevonden</p>
+                          <p className="px-4 py-3 text-sm text-[#97978f]">Geen eenheden gevonden</p>
                         ) : unitsForPayProperty.map(u => {
                           const isSel = payUnitId === u.id
                           return (
                             <button key={u.id} type="button"
                               onClick={() => { setPayUnitId(isSel ? null : u.id); setPayUnitOpen(false) }}
                               className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
-                              <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                              <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                               <span className="flex-1">{u.unit_number}</span>
                               {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                             </button>
@@ -1728,8 +1728,8 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                       payAllocationKeyId
-                        ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                        : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
                     <span className="flex-1 text-left">{allocationKeys.find(k => k.id === payAllocationKeyId)?.name ?? (allocationKeys.length === 0 ? 'Geen verdeelsleutels beschikbaar' : 'Verdeelsleutel kiezen')}</span>
@@ -1739,7 +1739,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     <>
                       <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPayAllocOpen(false)} />
                       <div style={{ position: 'fixed', top: payPickerPos.top, left: payPickerPos.left, width: payPickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
-                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                        className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
                       >
                         {allocationKeys.map(k => {
                           const isSel = payAllocationKeyId === k.id
@@ -1747,7 +1747,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             <button key={k.id} type="button"
                               onClick={() => { setPayAllocationKeyId(isSel ? null : k.id); setPayAllocOpen(false) }}
                               className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
                               <span className="flex-1">{k.name}</span>
@@ -1776,7 +1776,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
           <button
             type="button"
             onClick={() => setShowManualPayForm(false)}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
           >
             Annuleren
           </button>
@@ -1786,7 +1786,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               type="button"
               disabled={!payDate || !payAmount.trim()}
               onClick={() => setPayStep(2)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
             >
               Volgende →
             </button>
@@ -1802,7 +1802,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 type="button"
                 onClick={handleSaveManualPayment}
                 disabled={savingPayment || !payCanSave}
-                className="inline-flex items-center gap-2 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Opslaan

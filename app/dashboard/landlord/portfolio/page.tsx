@@ -447,7 +447,7 @@ export default function PortfolioPage() {
           onSearchChange={setSearch}
           filterContent={activeSegment === 'objecten' ? (
             <>
-              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Type</DropdownMenuLabel>
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">Type</DropdownMenuLabel>
               <div className="space-y-1">
                 {['appartement', 'huis', 'overig'].map((t) => (
                   <DropdownMenuCheckboxItem
@@ -481,19 +481,19 @@ export default function PortfolioPage() {
             if (loading) return (
               <div className="space-y-3 p-4">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-20 bg-gray-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
+                  <div key={i} className="h-20 bg-[#f4f4f1] dark:bg-neutral-800 rounded-2xl animate-pulse" />
                 ))}
               </div>
             )
             if (portfolios.length === 0 && unassigned.length === 0) return (
               <div className="py-20 text-center">
                 <Briefcase className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nog geen portefeuilles</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Maak een portefeuille aan om panden te groeperen</p>
+                <p className="text-sm font-medium text-[#97978f] dark:text-[#97978f]">Nog geen portefeuilles</p>
+                <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-1">Maak een portefeuille aan om panden te groeperen</p>
                 <button
                   type="button"
                   onClick={() => setNewPortfolioOpen(true)}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-sm font-semibold px-4 py-2 transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] text-sm font-semibold px-4 py-2 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   Eerste portefeuille aanmaken
@@ -521,35 +521,35 @@ export default function PortfolioPage() {
                           <div>
                             <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(isExpanded ? null : '__unassigned')}>
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center">
-                                  <Home className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center">
+                                  <Home className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                                 </div>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-gray-900 dark:text-white text-sm">Algemene panden</span>
-                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">Standaard</span>
+                                    <span className="font-semibold text-[#1a1c18] dark:text-white text-sm">Algemene panden</span>
+                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">Standaard</span>
                                   </div>
                                 </div>
                               </div>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">{unassigned.length}</p>
+                              <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{unassigned.length}</p>
                               {unassignedIncome > 0
-                                ? <p className="text-sm font-semibold text-[#163300] dark:text-[#9FE870]">€{unassignedIncome.toLocaleString('nl-NL')}</p>
+                                ? <p className="text-sm font-semibold text-[#161f13] dark:text-[#94f477]">€{unassignedIncome.toLocaleString('nl-NL')}</p>
                                 : <span />
                               }
                               {unassigned.length > 0 ? (
                                 <div className="flex items-center gap-2">
-                                  <div className="w-14 h-1.5 rounded-full bg-gray-100 dark:bg-neutral-700 overflow-hidden">
-                                    <div className="h-full rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all" style={{ width: `${unassignedOcc}%` }} />
+                                  <div className="w-14 h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-700 overflow-hidden">
+                                    <div className="h-full rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all" style={{ width: `${unassignedOcc}%` }} />
                                   </div>
-                                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{unassignedOcc}%</p>
+                                  <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{unassignedOcc}%</p>
                                 </div>
                               ) : <span />}
-                              <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 justify-self-end', isExpanded && 'rotate-180')} />
+                              <ChevronDown className={cn('h-4 w-4 text-[#97978f] shrink-0 transition-transform duration-200 justify-self-end', isExpanded && 'rotate-180')} />
                             </DataTableRow>
                             {isExpanded && (
-                              <div className="bg-gray-50/60 dark:bg-neutral-900/40">
+                              <div className="bg-[#f4f4f1]/60 dark:bg-neutral-900/40">
                                 {unassigned.length === 0 ? (
-                                  <div className="px-12 py-5 text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2">
+                                  <div className="px-12 py-5 text-sm text-[#97978f] dark:text-[#97978f] flex items-center gap-2">
                                     <Building2 className="h-4 w-4" />
                                     Geen panden — wijs panden toe of maak er een aan
                                   </div>
@@ -557,21 +557,21 @@ export default function PortfolioPage() {
                                   <div
                                     key={prop.id}
                                     className={cn(
-                                      'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
-                                      idx < unassigned.length - 1 && 'border-b border-gray-100 dark:border-neutral-800'
+                                      'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-[#f4f4f1]/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
+                                      idx < unassigned.length - 1 && 'border-b border-[#e3e3de] dark:border-neutral-800'
                                     )}
                                     onClick={() => setSelectedPropertyId(prop.id)}
                                   >
                                     <div className="flex-shrink-0 w-4 flex flex-col items-center">
-                                      <div className="h-4 border-l-2 border-gray-200 dark:border-neutral-700 mb-0.5" />
-                                      <div className="h-0 w-2 border-b-2 border-gray-200 dark:border-neutral-700" />
+                                      <div className="h-4 border-l-2 border-[#e3e3de] dark:border-neutral-700 mb-0.5" />
+                                      <div className="h-0 w-2 border-b-2 border-[#e3e3de] dark:border-neutral-700" />
                                     </div>
                                     <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                      <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                      <Building2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{prop.name}</p>
-                                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                                      <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{prop.name}</p>
+                                      <p className="text-xs text-[#97978f] flex items-center gap-1">
                                         <MapPin className="h-3 w-3" />{prop.address}
                                       </p>
                                     </div>
@@ -593,33 +593,33 @@ export default function PortfolioPage() {
                           <div key={pf.id}>
                             <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(isExpanded ? null : pf.id)}>
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center">
-                                  <Briefcase className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center">
+                                  <Briefcase className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                                 </div>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-semibold text-gray-900 dark:text-white text-sm">{pf.name}</span>
-                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400">
+                                    <span className="font-semibold text-[#1a1c18] dark:text-white text-sm">{pf.name}</span>
+                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 text-[#97978f] dark:text-[#97978f]">
                                       {pf.entityType ?? 'Portefeuille'}
                                     </span>
                                   </div>
                                   {(pf.owner || pf.kvk) && (
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                    <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">
                                       {[pf.owner, pf.kvk ? `KvK ${pf.kvk}` : null].filter(Boolean).join(' · ')}
                                     </p>
                                   )}
                                 </div>
                               </div>
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">{pf.properties.length}</p>
-                              <p className="text-sm font-semibold text-[#163300] dark:text-[#9FE870]">€{income.toLocaleString('nl-NL')}</p>
+                              <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{pf.properties.length}</p>
+                              <p className="text-sm font-semibold text-[#161f13] dark:text-[#94f477]">€{income.toLocaleString('nl-NL')}</p>
                               <div className="flex items-center gap-2">
-                                <div className="w-14 h-1.5 rounded-full bg-gray-100 dark:bg-neutral-700 overflow-hidden">
-                                  <div className="h-full rounded-full bg-[#163300] dark:bg-[#9FE870] transition-all" style={{ width: `${occ}%` }} />
+                                <div className="w-14 h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-700 overflow-hidden">
+                                  <div className="h-full rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all" style={{ width: `${occ}%` }} />
                                 </div>
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white">{occ}%</p>
+                                <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{occ}%</p>
                               </div>
                               <div className="flex items-center gap-1 justify-self-end">
-                                <ChevronDown className={cn('h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200', isExpanded && 'rotate-180')} />
+                                <ChevronDown className={cn('h-4 w-4 text-[#97978f] shrink-0 transition-transform duration-200', isExpanded && 'rotate-180')} />
                                 <RowActionsMenu
                                   actions={[
                                     { label: isExpanded ? 'Inklappen' : 'Uitklappen', icon: ChevronDown, onClick: () => setExpandedPortfolioId(isExpanded ? null : pf.id) },
@@ -631,9 +631,9 @@ export default function PortfolioPage() {
                             </DataTableRow>
 
                             {isExpanded && (
-                              <div className="bg-gray-50/60 dark:bg-neutral-900/40">
+                              <div className="bg-[#f4f4f1]/60 dark:bg-neutral-900/40">
                                 {pf.properties.length === 0 ? (
-                                  <div className="px-12 py-5 text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2">
+                                  <div className="px-12 py-5 text-sm text-[#97978f] dark:text-[#97978f] flex items-center gap-2">
                                     <Building2 className="h-4 w-4" />
                                     Geen panden in deze portefeuille
                                   </div>
@@ -644,33 +644,33 @@ export default function PortfolioPage() {
                                     <div
                                       key={prop.id}
                                       className={cn(
-                                        'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-gray-100/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
-                                        !isLast && 'border-b border-gray-100 dark:border-neutral-800'
+                                        'flex items-center gap-3 pl-12 pr-5 py-3 hover:bg-[#f4f4f1]/60 dark:hover:bg-neutral-800/40 transition-colors cursor-pointer',
+                                        !isLast && 'border-b border-[#e3e3de] dark:border-neutral-800'
                                       )}
                                       onClick={() => setSelectedPropertyId(prop.id)}
                                     >
                                       <div className="flex-shrink-0 w-4 flex flex-col items-center">
-                                        <div className="h-4 border-l-2 border-gray-200 dark:border-neutral-700 mb-0.5" />
-                                        <div className="h-0 w-2 border-b-2 border-gray-200 dark:border-neutral-700" />
+                                        <div className="h-4 border-l-2 border-[#e3e3de] dark:border-neutral-700 mb-0.5" />
+                                        <div className="h-0 w-2 border-b-2 border-[#e3e3de] dark:border-neutral-700" />
                                       </div>
                                       <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                        <Building2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                                        <Building2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                                       </div>
                                       <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{prop.name}</p>
-                                        <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                                        <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{prop.name}</p>
+                                        <p className="text-xs text-[#97978f] dark:text-[#97978f] flex items-center gap-1">
                                           <MapPin className="h-3 w-3" />{prop.address}
                                         </p>
                                       </div>
                                       <div className="hidden sm:flex items-center gap-5 shrink-0 text-right">
                                         <div>
-                                          <p className="text-[11px] text-gray-400">Eenheden</p>
-                                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{prop.units.length}</p>
+                                          <p className="text-[11px] text-[#97978f]">Eenheden</p>
+                                          <p className="text-xs font-medium text-[#55554e] dark:text-gray-300">{prop.units.length}</p>
                                         </div>
                                         <div>
-                                          <p className="text-[11px] text-gray-400">Huur</p>
-                                          <p className="text-xs font-medium text-[#163300] dark:text-[#9FE870]">
-                                            {propIncome > 0 ? `€${propIncome.toLocaleString('nl-NL')}` : <span className="text-gray-400">Leeg</span>}
+                                          <p className="text-[11px] text-[#97978f]">Huur</p>
+                                          <p className="text-xs font-medium text-[#161f13] dark:text-[#94f477]">
+                                            {propIncome > 0 ? `€${propIncome.toLocaleString('nl-NL')}` : <span className="text-[#97978f]">Leeg</span>}
                                           </p>
                                         </div>
                                       </div>
@@ -678,12 +678,12 @@ export default function PortfolioPage() {
                                     </div>
                                   )
                                 })}
-                                <div className="px-12 py-3 border-t border-gray-100 dark:border-neutral-800 flex items-center gap-4 flex-wrap">
+                                <div className="px-12 py-3 border-t border-[#e3e3de] dark:border-neutral-800 flex items-center gap-4 flex-wrap">
                                   {unassigned.length > 0 && (
                                     <button
                                       type="button"
                                       onClick={() => { setAssignPickerPortfolioId(pf.id); setAssignPickerOpen(true) }}
-                                      className="text-xs text-[#163300] dark:text-[#9FE870] font-medium hover:underline flex items-center gap-1"
+                                      className="text-xs text-[#161f13] dark:text-[#94f477] font-medium hover:underline flex items-center gap-1"
                                     >
                                       <Layers className="h-3.5 w-3.5" />
                                       Bestaand pand indelen
@@ -692,7 +692,7 @@ export default function PortfolioPage() {
                                   <button
                                     type="button"
                                     onClick={() => { setNewPropertyPortfolioId(pf.id); setNewPropertyOpen(true) }}
-                                    className="text-xs text-[#163300] dark:text-[#9FE870] font-medium hover:underline flex items-center gap-1"
+                                    className="text-xs text-[#161f13] dark:text-[#94f477] font-medium hover:underline flex items-center gap-1"
                                   >
                                     <Plus className="h-3.5 w-3.5" />
                                     Nieuw pand aanmaken
@@ -717,14 +717,14 @@ export default function PortfolioPage() {
           {activeSegment === 'objecten' && (
             loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                {[0, 1, 2].map((i) => <div key={i} className="h-40 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />)}
+                {[0, 1, 2].map((i) => <div key={i} className="h-40 bg-[#ebebe7] dark:bg-neutral-700 rounded-lg animate-pulse" />)}
               </div>
             ) : (
               <DataTable>
                 <DataTableHeader cols="grid-cols-[1.5rem_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
+                    className="h-4 w-4 rounded accent-[#161f13] dark:accent-[#94f477] cursor-pointer"
                     checked={sortedProperties.length > 0 && sortedProperties.every((p) => selectedIds.has(p.id))}
                     onChange={(e) => setSelectedIds(e.target.checked ? new Set(sortedProperties.map((p) => p.id)) : new Set())}
                   />
@@ -749,7 +749,7 @@ export default function PortfolioPage() {
                       >
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded accent-[#163300] dark:accent-[#9FE870] cursor-pointer"
+                          className="h-4 w-4 rounded accent-[#161f13] dark:accent-[#94f477] cursor-pointer"
                           checked={selectedIds.has(prop.id)}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) =>
@@ -762,41 +762,41 @@ export default function PortfolioPage() {
                           }
                         />
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="h-9 w-9 rounded-xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                            <Building2 className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                          <div className="h-9 w-9 rounded-xl bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                            <Building2 className="h-4 w-4 text-[#55554e] dark:text-gray-300" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{prop.name}</p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 truncate">
+                            <p className="text-sm font-semibold text-[#1a1c18] dark:text-white truncate">{prop.name}</p>
+                            <p className="text-xs text-[#97978f] dark:text-[#97978f] flex items-center gap-1 truncate">
                               <MapPin className="h-3 w-3 shrink-0" />{prop.address}
                             </p>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 capitalize truncate">{prop.type}</p>
+                        <p className="text-sm text-[#55554e] dark:text-gray-300 capitalize truncate">{prop.type}</p>
                         <div>
                           {prop.portfolioName ? (
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">
                               {prop.portfolioName}
                             </span>
                           ) : (
-                            <span className="text-xs text-gray-400">—</span>
+                            <span className="text-xs text-[#97978f]">—</span>
                           )}
                         </div>
                         <div>
                           <span className={cn(
                             'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                            status === 'verhuurd' && 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]',
-                            status === 'leegstand' && 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
+                            status === 'verhuurd' && 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]',
+                            status === 'leegstand' && 'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-800 dark:text-[#97978f]',
                             status === 'achterstand' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
                             status === 'gemengd' && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
                           )}>
                             {status}
                           </span>
                         </div>
-                        <p className="text-sm font-medium text-[#163300] dark:text-[#9FE870]">
-                          {income > 0 ? `€${income.toLocaleString('nl-NL')}` : <span className="text-gray-400">—</span>}
+                        <p className="text-sm font-medium text-[#161f13] dark:text-[#94f477]">
+                          {income > 0 ? `€${income.toLocaleString('nl-NL')}` : <span className="text-[#97978f]">—</span>}
                         </p>
-                        <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                        <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] justify-self-end" />
                       </DataTableRow>
                     )
                   })}
@@ -812,8 +812,8 @@ export default function PortfolioPage() {
             sortedLegalEntities.length === 0 ? (
               <div className="py-20 text-center">
                 <Landmark className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nog geen rechtspersonen</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Rechtspersonen worden beheerd via Instellingen</p>
+                <p className="text-sm font-medium text-[#97978f] dark:text-[#97978f]">Nog geen rechtspersonen</p>
+                <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-1">Rechtspersonen worden beheerd via Instellingen</p>
               </div>
             ) : (
               <DataTable>
@@ -828,17 +828,17 @@ export default function PortfolioPage() {
                   {sortedLegalEntities.map((entity) => (
                     <DataTableRow key={entity.id} cols="grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-9 w-9 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                          <Landmark className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                        <div className="h-9 w-9 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                          <Landmark className="h-4 w-4 text-[#55554e] dark:text-gray-300" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{entity.name}</p>
+                          <p className="text-sm font-semibold text-[#1a1c18] dark:text-white truncate">{entity.name}</p>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 truncate">{entity.entityType}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-mono tabular-nums">{entity.kvk ?? '—'}</p>
-                      <p className="text-sm text-gray-900 dark:text-white tabular-nums">{entity.propertyCount}</p>
-                      <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 justify-self-end" />
+                      <p className="text-sm text-[#55554e] dark:text-gray-300 truncate">{entity.entityType}</p>
+                      <p className="text-sm text-[#97978f] dark:text-[#97978f] font-mono tabular-nums">{entity.kvk ?? '—'}</p>
+                      <p className="text-sm text-[#1a1c18] dark:text-white tabular-nums">{entity.propertyCount}</p>
+                      <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] justify-self-end" />
                     </DataTableRow>
                   ))}
                 </DataTableBody>
@@ -851,13 +851,13 @@ export default function PortfolioPage() {
       {/* ── Floating bulk-assign bar (Invoerpunt 2) ───────────────────────────── */}
       {selectedIds.size > 0 && (
         <div className="fixed bottom-6 inset-x-0 flex justify-center z-40 pointer-events-none">
-          <div className="pointer-events-auto bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 max-w-lg w-full mx-4">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-200 shrink-0">
+          <div className="pointer-events-auto bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 max-w-lg w-full mx-4">
+            <span className="text-sm font-medium text-[#55554e] dark:text-gray-200 shrink-0">
               {selectedIds.size} geselecteerd
             </span>
             <div className="flex-1 min-w-0">
               <Select value={bulkTargetPfId} onValueChange={setBulkTargetPfId}>
-                <SelectTrigger className="h-9 rounded-xl text-sm border-gray-200 dark:border-neutral-700">
+                <SelectTrigger className="h-9 rounded-xl text-sm border-[#e3e3de] dark:border-neutral-700">
                   <SelectValue placeholder="Kies portefeuille…" />
                 </SelectTrigger>
                 <SelectContent>
@@ -871,14 +871,14 @@ export default function PortfolioPage() {
               type="button"
               onClick={handleBulkAssign}
               disabled={!bulkTargetPfId || bulkAssigning}
-              className="text-sm font-semibold bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-3 py-1.5 disabled:opacity-40 shrink-0 transition-colors"
+              className="text-sm font-semibold bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-3 py-1.5 disabled:opacity-40 shrink-0 transition-colors"
             >
               {bulkAssigning ? 'Bezig…' : 'Indelen'}
             </button>
             <button
               type="button"
               onClick={() => { setSelectedIds(new Set()); setBulkTargetPfId('') }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+              className="text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-300 shrink-0 p-1 rounded-full hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -1009,7 +1009,7 @@ export default function PortfolioPage() {
           </DialogHeader>
           <DialogFooter>
             <button type="button" onClick={() => setDeletePortfolio(null)}
-              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-3 py-2">
+              className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-3 py-2">
               Annuleren
             </button>
             <button type="button" onClick={handleDeletePortfolio} disabled={deletingPortfolio}

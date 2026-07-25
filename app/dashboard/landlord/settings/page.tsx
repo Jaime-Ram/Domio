@@ -367,7 +367,7 @@ export default function SettingsPage() {
     }, 1000)
   }
 
-  const sCard = 'rounded-card border-[0.5px] border-gray-200 dark:border-neutral-700 shadow-none bg-white dark:bg-neutral-900'
+  const sCard = 'rounded-card border-[0.5px] border-[#e3e3de] dark:border-neutral-700 shadow-none bg-white dark:bg-neutral-900'
 
   const rawName = accountForm.name?.trim() || dashProfile?.full_name?.trim() || ''
   const displayEmail = accountForm.email?.trim() || dashProfile?.email?.trim() || user?.email?.trim() || ''
@@ -407,7 +407,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account-blok — zelfde formaat/stijl als het Flows "maak je eigen flow"-blok */}
-      <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
+      <div className="rounded-2xl bg-[#161f13] px-8 py-8 relative overflow-hidden">
         {/* Vastgoed-plaatje rechts, vervaagd */}
         <div
           className="absolute inset-y-0 right-0 w-2/5 bg-cover bg-center opacity-25"
@@ -420,7 +420,7 @@ export default function SettingsPage() {
         />
         <div className="relative z-10 flex flex-col gap-3 max-w-xl">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-[#9FE870]/15 ring-2 ring-[#9FE870]/30 flex items-center justify-center text-[#9FE870] text-lg font-bold shrink-0">
+            <div className="h-14 w-14 rounded-full bg-[#94f477]/15 ring-2 ring-[#94f477]/30 flex items-center justify-center text-[#94f477] text-lg font-bold shrink-0">
               {initialsLetters != null ? initialsLetters : <User className="h-7 w-7" aria-hidden />}
             </div>
             <div className="min-w-0">
@@ -441,8 +441,8 @@ export default function SettingsPage() {
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Account</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Beheer je persoonlijke gegevens, inlogmethode en bedrijfsinfo.</p>
+            <h2 className="text-2xl font-bold text-[#1a1c18] dark:text-white">Account</h2>
+            <p className="mt-1 text-sm text-[#97978f] dark:text-[#97978f]">Beheer je persoonlijke gegevens, inlogmethode en bedrijfsinfo.</p>
           </div>
 
           {/* Gegevens */}
@@ -457,24 +457,24 @@ export default function SettingsPage() {
               {accSection === 'personal' && (
                 <div className="pb-4 space-y-3">
                   {isDemo ? (
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    <p className="text-sm text-[#97978f] dark:text-[#97978f]">Beschikbaar in de echte omgeving.</p>
                   ) : (
                     <>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Naam</label>
-                        <input type="text" value={accountForm.name} onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Naam</label>
+                        <input type="text" value={accountForm.name} onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Telefoonnummer</label>
-                        <input type="tel" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Telefoonnummer</label>
+                        <input type="tel" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                       </div>
                       {fieldError && editingField !== 'login' && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
                       <div className="flex gap-2">
-                        <button onClick={handleSavePersonal} disabled={savingField === 'personal'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                        <button onClick={handleSavePersonal} disabled={savingField === 'personal'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
                           {savingField === 'personal' && <Loader2 className="h-4 w-4 animate-spin" />}
                           <span>Opslaan</span>
                         </button>
-                        <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
+                        <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
                       </div>
                     </>
                   )}
@@ -492,28 +492,28 @@ export default function SettingsPage() {
               {accSection === 'login' && (
                 <div className="pb-4 space-y-3">
                   {isDemo ? (
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    <p className="text-sm text-[#97978f] dark:text-[#97978f]">Beschikbaar in de echte omgeving.</p>
                   ) : emailChangeStatus === 'sent' ? (
-                    <div className="rounded-xl border border-[#9FE870]/40 bg-[#9FE870]/10 px-4 py-3 space-y-1">
+                    <div className="rounded-xl border border-[#94f477]/40 bg-[#94f477]/10 px-4 py-3 space-y-1">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
-                        <p className="text-sm font-medium text-[#163300] dark:text-[#9FE870]">Bevestigingsmail verstuurd</p>
+                        <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                        <p className="text-sm font-medium text-[#161f13] dark:text-[#94f477]">Bevestigingsmail verstuurd</p>
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Klik op de link in de e-mail naar <span className="font-medium">{newEmail}</span> om de wijziging te bevestigen.</p>
+                      <p className="text-xs text-[#55554e] dark:text-[#97978f]">Klik op de link in de e-mail naar <span className="font-medium">{newEmail}</span> om de wijziging te bevestigen.</p>
                     </div>
                   ) : (
                     <>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Huidig e-mailadres</label>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">{user?.email || '—'}</p>
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Huidig e-mailadres</label>
+                        <p className="text-sm text-[#55554e] dark:text-gray-300">{user?.email || '—'}</p>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Nieuw e-mailadres</label>
-                        <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nieuw@voorbeeld.nl" className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Nieuw e-mailadres</label>
+                        <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nieuw@voorbeeld.nl" className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                       </div>
                       {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
-                      <p className="text-xs text-gray-500 dark:text-gray-400">We sturen een bevestigingslink naar het nieuwe adres.</p>
-                      <button onClick={handleSendEmailVerification} disabled={savingField === 'login' || !newEmail.trim()} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                      <p className="text-xs text-[#97978f] dark:text-[#97978f]">We sturen een bevestigingslink naar het nieuwe adres.</p>
+                      <button onClick={handleSendEmailVerification} disabled={savingField === 'login' || !newEmail.trim()} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
                         {savingField === 'login' && <Loader2 className="h-4 w-4 animate-spin" />}
                         <span>Bevestigingsmail versturen</span>
                       </button>
@@ -533,54 +533,54 @@ export default function SettingsPage() {
               {accSection === 'company' && (
                 <div className="pb-4 space-y-3">
                   {isDemo ? (
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    <p className="text-sm text-[#97978f] dark:text-[#97978f]">Beschikbaar in de echte omgeving.</p>
                   ) : (
                     <>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Bedrijfsnaam</label>
-                        <input type="text" value={accountForm.company_name} onChange={(e) => setAccountForm({ ...accountForm, company_name: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Bedrijfsnaam</label>
+                        <input type="text" value={accountForm.company_name} onChange={(e) => setAccountForm({ ...accountForm, company_name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">KvK-nummer</label>
-                          <input type="text" value={accountForm.kvk_number} onChange={(e) => setAccountForm({ ...accountForm, kvk_number: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">KvK-nummer</label>
+                          <input type="text" value={accountForm.kvk_number} onChange={(e) => setAccountForm({ ...accountForm, kvk_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">BTW-nummer</label>
-                          <input type="text" value={accountForm.btw_number} onChange={(e) => setAccountForm({ ...accountForm, btw_number: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">BTW-nummer</label>
+                          <input type="text" value={accountForm.btw_number} onChange={(e) => setAccountForm({ ...accountForm, btw_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Zakelijk e-mailadres</label>
-                          <input type="email" value={accountForm.company_email} onChange={(e) => setAccountForm({ ...accountForm, company_email: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Zakelijk e-mailadres</label>
+                          <input type="email" value={accountForm.company_email} onChange={(e) => setAccountForm({ ...accountForm, company_email: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Zakelijk telefoonnummer</label>
-                          <input type="tel" value={accountForm.company_phone} onChange={(e) => setAccountForm({ ...accountForm, company_phone: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Zakelijk telefoonnummer</label>
+                          <input type="tel" value={accountForm.company_phone} onChange={(e) => setAccountForm({ ...accountForm, company_phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Adres</label>
-                        <input type="text" value={accountForm.company_address} onChange={(e) => setAccountForm({ ...accountForm, company_address: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                        <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Adres</label>
+                        <input type="text" value={accountForm.company_address} onChange={(e) => setAccountForm({ ...accountForm, company_address: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Postcode</label>
-                          <input type="text" value={accountForm.company_postal_code} onChange={(e) => setAccountForm({ ...accountForm, company_postal_code: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Postcode</label>
+                          <input type="text" value={accountForm.company_postal_code} onChange={(e) => setAccountForm({ ...accountForm, company_postal_code: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400">Plaats</label>
-                          <input type="text" value={accountForm.company_city} onChange={(e) => setAccountForm({ ...accountForm, company_city: e.target.value })} className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                          <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Plaats</label>
+                          <input type="text" value={accountForm.company_city} onChange={(e) => setAccountForm({ ...accountForm, company_city: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                         </div>
                       </div>
                       {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
                       <div className="flex gap-2">
-                        <button onClick={handleSaveCompany} disabled={savingField === 'company'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">
+                        <button onClick={handleSaveCompany} disabled={savingField === 'company'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
                           {savingField === 'company' && <Loader2 className="h-4 w-4 animate-spin" />}
                           <span>Opslaan</span>
                         </button>
-                        <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
+                        <button onClick={() => { if (originalForm) setAccountForm(originalForm); setFieldError('') }} className="px-4 py-2 text-sm font-medium text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 rounded-lg transition-colors">Herstellen</button>
                       </div>
                     </>
                   )}
@@ -601,12 +601,12 @@ export default function SettingsPage() {
               {prefSection === 'taal' && (
                 <div className="pb-4 flex gap-2 flex-wrap items-center">
                   {(['nl', 'en'] as const).map((lang) => (
-                    <button key={lang} onClick={async () => { setLanguage(lang); await handleSavePrefs(lang) }} className={cn('px-4 py-1.5 rounded-full text-sm font-medium border transition-colors', language === lang ? 'bg-[#9FE870] text-[#163300] border-[#9FE870]' : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-neutral-700 hover:border-gray-300')}>
+                    <button key={lang} onClick={async () => { setLanguage(lang); await handleSavePrefs(lang) }} className={cn('px-4 py-1.5 rounded-full text-sm font-medium border transition-colors', language === lang ? 'bg-[#94f477] text-[#161f13] border-[#94f477]' : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-gray-300 border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300')}>
                       {lang === 'nl' ? '🇳🇱 Nederlands' : '🇬🇧 English'}
                     </button>
                   ))}
-                  {prefsSaving && <span className="flex items-center gap-1 text-xs text-gray-400"><Loader2 className="h-3 w-3 animate-spin" />Opslaan…</span>}
-                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#163300] dark:text-[#9FE870]"><Check className="h-3 w-3" />Opgeslagen</span>}
+                  {prefsSaving && <span className="flex items-center gap-1 text-xs text-[#97978f]"><Loader2 className="h-3 w-3 animate-spin" />Opslaan…</span>}
+                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#161f13] dark:text-[#94f477]"><Check className="h-3 w-3" />Opgeslagen</span>}
                 </div>
               )}
             </ActionListRow>
@@ -628,12 +628,12 @@ export default function SettingsPage() {
                     { key: 'maintenance_request' as const, label: 'Onderhoudsverzoek', sub: '' },
                     { key: 'document_expiring' as const, label: 'Document verloopt binnenkort', sub: '' },
                   ].map(({ key, label, sub }) => (
-                    <label key={key} className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-neutral-800 last:border-0 cursor-pointer">
+                    <label key={key} className="flex items-center justify-between py-2.5 border-b border-[#e3e3de] dark:border-neutral-800 last:border-0 cursor-pointer">
                       <div>
-                        <p className="text-sm text-gray-800 dark:text-gray-200">{label}</p>
-                        {sub && <p className="text-xs text-gray-400 dark:text-gray-500">{sub}</p>}
+                        <p className="text-sm text-[#1a1c18] dark:text-gray-200">{label}</p>
+                        {sub && <p className="text-xs text-[#97978f] dark:text-[#97978f]">{sub}</p>}
                       </div>
-                      <input type="checkbox" checked={notifPrefs[key]} onChange={async (e) => { const next = { ...notifPrefs, [key]: e.target.checked }; setNotifPrefs(next); await handleSavePrefs(undefined, next) }} className="h-4 w-4 rounded accent-[#163300]" />
+                      <input type="checkbox" checked={notifPrefs[key]} onChange={async (e) => { const next = { ...notifPrefs, [key]: e.target.checked }; setNotifPrefs(next); await handleSavePrefs(undefined, next) }} className="h-4 w-4 rounded accent-[#161f13]" />
                     </label>
                   ))}
                 </div>
@@ -678,8 +678,8 @@ export default function SettingsPage() {
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Demo-omgeving</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Wijzigingen worden niet opgeslagen.</p>
+                <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">Demo-omgeving</p>
+                <p className="text-sm text-[#97978f] dark:text-[#97978f]">Wijzigingen worden niet opgeslagen.</p>
               </div>
             </div>
           )}
@@ -691,8 +691,8 @@ export default function SettingsPage() {
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Beveiliging</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Beheer hoe je inlogt en hoe je account wordt beschermd.</p>
+            <h2 className="text-2xl font-bold text-[#1a1c18] dark:text-white">Beveiliging</h2>
+            <p className="mt-1 text-sm text-[#97978f] dark:text-[#97978f]">Beheer hoe je inlogt en hoe je account wordt beschermd.</p>
           </div>
 
           {/* Inlogbeveiliging */}
@@ -707,17 +707,17 @@ export default function SettingsPage() {
             >
               {bevSection === 'wachtwoord' && (
                 <div className="pb-4 space-y-3">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    We sturen een resetlink naar <span className="font-medium text-gray-700 dark:text-gray-300">{displayEmail || 'je e-mailadres'}</span>.
+                  <p className="text-sm text-[#97978f] dark:text-[#97978f]">
+                    We sturen een resetlink naar <span className="font-medium text-[#55554e] dark:text-gray-300">{displayEmail || 'je e-mailadres'}</span>.
                   </p>
                   {!isDemo ? (
-                    <button onClick={handleSendPasswordReset} disabled={pwResetCooldown > 0} className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors', pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#163300] hover:bg-[#163300]/90')}>
+                    <button onClick={handleSendPasswordReset} disabled={pwResetCooldown > 0} className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors', pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#161f13] hover:bg-[#161f13]/90')}>
                       {pwResetStatus === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}
                       {pwResetStatus === 'saved' && <CheckCircle2 className="h-4 w-4" />}
                       <span>{pwResetStatus === 'error' ? (pwResetError || 'Fout bij versturen') : pwResetCooldown > 0 ? `Verstuurd — opnieuw in ${pwResetCooldown}s` : 'Resetlink versturen'}</span>
                     </button>
                   ) : (
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Beschikbaar in de echte omgeving.</p>
+                    <p className="text-sm text-[#97978f] dark:text-[#97978f]">Beschikbaar in de echte omgeving.</p>
                   )}
                 </div>
               )}
@@ -731,50 +731,50 @@ export default function SettingsPage() {
               right={
                 <div className="flex items-center gap-2 shrink-0">
                   {mfaMethod === 'totp' && (
-                    <span className="inline-flex items-center rounded-full bg-[#9FE870]/20 dark:bg-[#9FE870]/10 px-2.5 py-0.5 text-xs font-medium text-[#163300] dark:text-[#9FE870]">Aan</span>
+                    <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477]">Aan</span>
                   )}
-                  <ChevronRight className={cn('h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform', bevSection === '2fa' && 'rotate-90')} />
+                  <ChevronRight className={cn('h-4 w-4 text-[#97978f] dark:text-[#97978f] transition-transform', bevSection === '2fa' && 'rotate-90')} />
                 </div>
               }
             >
               {bevSection === '2fa' && (
                   <div className="pb-4 space-y-0">
                     {isDemo ? (
-                      <p className="text-sm text-gray-400 dark:text-gray-500 px-3 pb-2">Schakel 2FA in via je account in de echte omgeving.</p>
+                      <p className="text-sm text-[#97978f] dark:text-[#97978f] px-3 pb-2">Schakel 2FA in via je account in de echte omgeving.</p>
                     ) : (
                       <>
                         {/* Geen verificatie */}
-                        <button type="button" onClick={() => handleSelectMethod('none')} disabled={mfaMethod === 'none' || mfaMethodStatus === 'saving'} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left disabled:cursor-default">
-                          <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                            <svg className="h-5 w-5 text-gray-600 dark:text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                        <button type="button" onClick={() => handleSelectMethod('none')} disabled={mfaMethod === 'none' || mfaMethodStatus === 'saving'} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/40 transition-colors text-left disabled:cursor-default">
+                          <div className="h-10 w-10 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                            <svg className="h-5 w-5 text-[#55554e] dark:text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">Geen verificatie</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Alleen e-mailadres en wachtwoord</p>
-                            <p className="text-xs font-semibold text-[#163300] dark:text-[#9FE870] mt-0.5">Minder veilig</p>
+                            <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">Geen verificatie</p>
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f]">Alleen e-mailadres en wachtwoord</p>
+                            <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Minder veilig</p>
                           </div>
                           {mfaMethod === 'none' ? (
-                            <CheckCircle2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870] shrink-0" />
+                            <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
                           ) : (
-                            <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
+                            <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] shrink-0" />
                           )}
                         </button>
 
                         {/* Authenticator-app */}
                         <div>
-                          <button type="button" onClick={() => { if (!totpEnrolling && mfaMethod !== 'totp') handleSelectMethod('totp') }} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors text-left">
-                            <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                              <Shield className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                          <button type="button" onClick={() => { if (!totpEnrolling && mfaMethod !== 'totp') handleSelectMethod('totp') }} className="w-full flex items-center gap-4 py-4 px-3 rounded-xl hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/40 transition-colors text-left">
+                            <div className="h-10 w-10 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                              <Shield className="h-5 w-5 text-[#55554e] dark:text-gray-300" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">Authenticator-app</p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">Google Authenticator, 1Password of vergelijkbaar</p>
-                              <p className="text-xs font-semibold text-[#163300] dark:text-[#9FE870] mt-0.5">Zeer veilig</p>
+                              <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">Authenticator-app</p>
+                              <p className="text-sm text-[#97978f] dark:text-[#97978f]">Google Authenticator, 1Password of vergelijkbaar</p>
+                              <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Zeer veilig</p>
                             </div>
                             {mfaMethod === 'totp' ? (
-                              <CheckCircle2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870] shrink-0" />
+                              <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
                             ) : (
-                              <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
+                              <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] shrink-0" />
                             )}
                           </button>
                           {(mfaMethod === 'totp' || totpEnrolling) && (
@@ -783,21 +783,21 @@ export default function SettingsPage() {
                                 <div className="space-y-2">
                                   {totpFactors.map((f) => (
                                     <div key={f.id}>
-                                      <div className="flex items-center justify-between rounded-lg bg-white/60 dark:bg-neutral-800/60 border border-gray-100 dark:border-neutral-700 px-3 py-2">
+                                      <div className="flex items-center justify-between rounded-lg bg-white/60 dark:bg-neutral-800/60 border border-[#e3e3de] dark:border-neutral-700 px-3 py-2">
                                         <div className="flex items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />
-                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{f.friendly_name?.split(' ')?.[0] || 'Authenticator'}</span>
+                                          <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                                          <span className="text-sm font-medium text-[#1a1c18] dark:text-white">{f.friendly_name?.split(' ')?.[0] || 'Authenticator'}</span>
                                         </div>
                                         {unenrollFactorId === f.id ? (
-                                          <button onClick={() => { setUnenrollFactorId(''); setUnenrollCode(''); setUnenrollError('') }} className="text-xs text-gray-500 hover:underline">Annuleren</button>
+                                          <button onClick={() => { setUnenrollFactorId(''); setUnenrollCode(''); setUnenrollError('') }} className="text-xs text-[#97978f] hover:underline">Annuleren</button>
                                         ) : (
                                           <button onClick={() => { setUnenrollFactorId(f.id); setUnenrollCode(''); setUnenrollError('') }} className="text-xs text-red-600 dark:text-red-400 hover:underline">Verwijderen</button>
                                         )}
                                       </div>
                                       {unenrollFactorId === f.id && (
                                         <div className="mt-2 rounded-xl border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 px-3 py-3 space-y-2">
-                                          <p className="text-xs text-gray-600 dark:text-gray-400">Voer een code in om te bevestigen.</p>
-                                          <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={unenrollCode} onChange={(e) => setUnenrollCode(e.target.value.replace(/\D/g, ''))} className="w-32 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-red-300" />
+                                          <p className="text-xs text-[#55554e] dark:text-[#97978f]">Voer een code in om te bevestigen.</p>
+                                          <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={unenrollCode} onChange={(e) => setUnenrollCode(e.target.value.replace(/\D/g, ''))} className="w-32 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-red-300" />
                                           {unenrollError && <p className="text-xs text-red-600 dark:text-red-400">{unenrollError}</p>}
                                           <button onClick={handleUnenrollTotp} disabled={unenrollCode.length !== 6 || unenrollVerifying} className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50">{unenrollVerifying ? 'Verwijderen…' : 'Bevestig verwijderen'}</button>
                                         </div>
@@ -807,37 +807,37 @@ export default function SettingsPage() {
                                 </div>
                               )}
                               {!totpEnrolling && !unenrollFactorId && !totpResetting && totpFactors.length > 0 && (
-                                <button type="button" onClick={() => { setTotpResetting(true); setTotpResetCode(''); setTotpResetError('') }} className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 hover:underline">Reset alle apps</button>
+                                <button type="button" onClick={() => { setTotpResetting(true); setTotpResetCode(''); setTotpResetError('') }} className="text-xs text-[#97978f] dark:text-[#97978f] hover:text-red-500 hover:underline">Reset alle apps</button>
                               )}
                               {totpResetting && (
                                 <div className="rounded-xl border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 px-3 py-3 space-y-2">
-                                  <p className="text-xs text-gray-600 dark:text-gray-400">Voer een code in om alle gekoppelde apps te verwijderen.</p>
-                                  <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpResetCode} onChange={(e) => setTotpResetCode(e.target.value.replace(/\D/g, ''))} className="w-32 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-red-300" />
+                                  <p className="text-xs text-[#55554e] dark:text-[#97978f]">Voer een code in om alle gekoppelde apps te verwijderen.</p>
+                                  <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpResetCode} onChange={(e) => setTotpResetCode(e.target.value.replace(/\D/g, ''))} className="w-32 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-red-300" />
                                   {totpResetError && <p className="text-xs text-red-600 dark:text-red-400">{totpResetError}</p>}
                                   <div className="flex gap-2">
                                     <button onClick={handleResetTotp} disabled={totpResetCode.length !== 6 || totpResetWorking} className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50">{totpResetWorking ? 'Resetten…' : 'Alles verwijderen'}</button>
-                                    <button onClick={() => { setTotpResetting(false); setTotpResetCode(''); setTotpResetError('') }} className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Annuleren</button>
+                                    <button onClick={() => { setTotpResetting(false); setTotpResetCode(''); setTotpResetError('') }} className="px-3 py-1.5 text-xs font-medium text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 rounded-lg transition-colors">Annuleren</button>
                                   </div>
                                 </div>
                               )}
                               {totpError && !totpEnrolling && <p className="text-xs text-red-600 dark:text-red-400">{totpError}</p>}
                               {totpEnrolling && totpQr && (
-                                <div className="mt-2 pt-4 border-t border-gray-200 dark:border-neutral-700 space-y-4">
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">Scan de QR-code met je authenticator-app.</p>
+                                <div className="mt-2 pt-4 border-t border-[#e3e3de] dark:border-neutral-700 space-y-4">
+                                  <p className="text-sm text-[#55554e] dark:text-[#97978f]">Scan de QR-code met je authenticator-app.</p>
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={totpQr} alt="TOTP QR code" className="h-40 w-40 rounded-xl border border-gray-200 dark:border-neutral-700" />
-                                  <div className="rounded-xl bg-gray-50 dark:bg-neutral-800 px-3 py-2 max-w-xs">
-                                    <p className="text-xs text-gray-400 mb-0.5">Handmatige sleutel</p>
-                                    <p className="font-mono text-sm text-gray-800 dark:text-gray-200 break-all">{totpSecret}</p>
+                                  <img src={totpQr} alt="TOTP QR code" className="h-40 w-40 rounded-xl border border-[#e3e3de] dark:border-neutral-700" />
+                                  <div className="rounded-xl bg-[#f4f4f1] dark:bg-neutral-800 px-3 py-2 max-w-xs">
+                                    <p className="text-xs text-[#97978f] mb-0.5">Handmatige sleutel</p>
+                                    <p className="font-mono text-sm text-[#1a1c18] dark:text-gray-200 break-all">{totpSecret}</p>
                                   </div>
                                   <div className="space-y-1.5">
-                                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Voer de 6-cijferige code in</p>
-                                    <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))} className="w-36 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#163300]/20" />
+                                    <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Voer de 6-cijferige code in</p>
+                                    <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))} className="w-36 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
                                   </div>
                                   {totpError && <p className="text-xs text-red-600 dark:text-red-400">{totpError}</p>}
                                   <div className="flex gap-2">
-                                    <button onClick={handleVerifyTotp} disabled={totpVerifying || totpCode.length !== 6} className="px-4 py-2 text-sm font-medium text-white bg-[#163300] hover:bg-[#163300]/90 rounded-lg transition-colors disabled:opacity-50">{totpVerifying ? 'Verifiëren…' : 'Bevestigen'}</button>
-                                    <button onClick={async () => { if (totpFactorId) await unenrollMfa(totpFactorId); setTotpEnrolling(false); setTotpQr(''); setTotpSecret(''); setTotpCode(''); setTotpError(''); setTotpFactorId('') }} className="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors">Annuleren</button>
+                                    <button onClick={handleVerifyTotp} disabled={totpVerifying || totpCode.length !== 6} className="px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">{totpVerifying ? 'Verifiëren…' : 'Bevestigen'}</button>
+                                    <button onClick={async () => { if (totpFactorId) await unenrollMfa(totpFactorId); setTotpEnrolling(false); setTotpQr(''); setTotpSecret(''); setTotpCode(''); setTotpError(''); setTotpFactorId('') }} className="px-4 py-2 text-sm font-medium text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 rounded-lg transition-colors">Annuleren</button>
                                   </div>
                                 </div>
                               )}
@@ -858,7 +858,7 @@ export default function SettingsPage() {
               title="Huidige sessie"
               subtitle="Webbrowser · Nu actief"
               right={
-                <span className="inline-flex items-center rounded-full bg-[#9FE870]/20 dark:bg-[#9FE870]/10 px-2.5 py-0.5 text-xs font-medium text-[#163300] dark:text-[#9FE870] shrink-0">Actief</span>
+                <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477] shrink-0">Actief</span>
               }
             />
           </ActionListSection>
@@ -871,8 +871,8 @@ export default function SettingsPage() {
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Abonnement</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Bekijk je huidige plan en upgrade wanneer je portefeuille groeit.</p>
+            <h2 className="text-2xl font-bold text-[#1a1c18] dark:text-white">Abonnement</h2>
+            <p className="mt-1 text-sm text-[#97978f] dark:text-[#97978f]">Bekijk je huidige plan en upgrade wanneer je portefeuille groeit.</p>
           </div>
 
           {/* Huidig plan */}
@@ -882,7 +882,7 @@ export default function SettingsPage() {
               title="Starter"
               subtitle="Tot 3 woningen · Tot 10 huurders · 500 MB opslag"
               right={
-                <span className="inline-flex items-center rounded-full bg-[#9FE870]/20 dark:bg-[#9FE870]/10 px-2.5 py-0.5 text-xs font-semibold text-[#163300] dark:text-[#9FE870] shrink-0">Huidig</span>
+                <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-semibold text-[#161f13] dark:text-[#94f477] shrink-0">Huidig</span>
               }
             />
           </ActionListSection>
@@ -892,20 +892,20 @@ export default function SettingsPage() {
               icon={CreditCard}
               title="Starter"
               subtitle="Tot 3 woningen, WWS-calculator, basisrapportages · Gratis"
-              right={<CheckCircle2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870] shrink-0" />}
+              right={<CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />}
             />
             <ActionListRow
               icon={CreditCard}
               title="Pro"
               subtitle="Tot 25 woningen, bankkoppeling, VvE-beheer · € 29 / maand"
-              right={<span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">Binnenkort</span>}
+              right={<span className="text-xs text-[#97978f] dark:text-[#97978f] shrink-0">Binnenkort</span>}
               className="opacity-50"
             />
             <ActionListRow
               icon={CreditCard}
               title="Vastgoedbeheer"
               subtitle="Onbeperkt woningen, meerdere gebruikers, API-toegang · € 79 / maand"
-              right={<span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">Binnenkort</span>}
+              right={<span className="text-xs text-[#97978f] dark:text-[#97978f] shrink-0">Binnenkort</span>}
               className="opacity-50"
             />
           </ActionListSection>
@@ -926,8 +926,8 @@ export default function SettingsPage() {
         <div className="space-y-8 px-6 sm:px-8">
 
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Koppelingen</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Verbind je bankrekening, boekhoudsoftware en advertentieplatformen.</p>
+            <h2 className="text-2xl font-bold text-[#1a1c18] dark:text-white">Koppelingen</h2>
+            <p className="mt-1 text-sm text-[#97978f] dark:text-[#97978f]">Verbind je bankrekening, boekhoudsoftware en advertentieplatformen.</p>
           </div>
 
           {/* Bankieren */}
@@ -936,7 +936,7 @@ export default function SettingsPage() {
               icon={Landmark}
               title="Bankkoppeling"
               subtitle="Koppel je bankrekening via Yapily Open Banking"
-              right={<span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">Binnenkort</span>}
+              right={<span className="inline-flex items-center rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-[#97978f] dark:text-[#97978f] shrink-0">Binnenkort</span>}
               className="opacity-50"
             />
           </ActionListSection>
@@ -954,7 +954,7 @@ export default function SettingsPage() {
                 icon={Icon}
                 title={name}
                 subtitle={desc}
-                right={<span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">Binnenkort</span>}
+                right={<span className="inline-flex items-center rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-[#97978f] dark:text-[#97978f] shrink-0">Binnenkort</span>}
                 className="opacity-50"
               />
             ))}

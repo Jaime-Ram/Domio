@@ -4,7 +4,7 @@
 export default function DashboardPage() {
   return (
     <div className="min-h-screen w-full bg-white dark:bg-gray-900 flex items-center justify-center">
-      <div className="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-neutral-700 border-t-[#163300] dark:border-t-[#9FE870] animate-spin" />
+      <div className="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-neutral-700 border-t-[#161f13] dark:border-t-[#94f477] animate-spin" />
     </div>
   )
 }

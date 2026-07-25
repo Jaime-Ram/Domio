@@ -313,7 +313,7 @@ export function DocumentCard({
   return (
     <article
       className={cn(
-        '@container rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 shadow-sm',
+        '@container rounded-xl overflow-hidden border border-[#e3e3de] dark:border-neutral-700 shadow-sm',
         selectionMode && 'cursor-pointer'
       )}
       onClick={selectionMode ? handleArticleClick : undefined}
@@ -341,12 +341,12 @@ export function DocumentCard({
       >
         <div className="mb-1 flex flex-col gap-0 @[320px]:flex-row @[320px]:items-baseline @[320px]:gap-1.5 min-w-0">
           <p
-            className="font-semibold text-gray-900 dark:text-white text-sm min-w-0 truncate group-hover:underline"
+            className="font-semibold text-[#1a1c18] dark:text-white text-sm min-w-0 truncate group-hover:underline"
             title={realName}
           >
             {realName}
           </p>
-          <p className="text-gray-600 dark:text-gray-400 text-sm font-normal mt-0.5 @[320px]:mt-0 flex-shrink-0">
+          <p className="text-[#55554e] dark:text-[#97978f] text-sm font-normal mt-0.5 @[320px]:mt-0 flex-shrink-0">
             <span className="hidden @[320px]:inline"> · </span>{ext}
           </p>
         </div>
@@ -387,9 +387,9 @@ export function DocumentCard({
                   name={realName}
                   file_name={doc.file_name}
                   mime_type={doc.mime_type}
-                  className="h-8 w-8 text-gray-400 dark:text-neutral-500 shrink-0"
+                  className="h-8 w-8 text-[#97978f] dark:text-neutral-500 shrink-0"
                 />
-                <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-400 uppercase tracking-wide">{ext}</span>
+                <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-400 uppercase tracking-wide">{ext}</span>
                 {previewError && (
                   <span className="text-[9px] text-red-600 dark:text-red-400 max-w-full truncate" title={previewError}>
                     {previewError}
@@ -405,8 +405,8 @@ export function DocumentCard({
               'h-8 w-8 rounded-full flex-shrink-0 self-end mb-4',
               selectionMode
                 ? selected
-                  ? 'bg-[#163300] dark:bg-[#163300] border border-[#163300] shadow-none'
-                  : 'bg-transparent border border-[#163300] dark:border-[#9FE870] shadow-none hover:bg-[#163300]/10 dark:hover:bg-[#9FE870]/10'
+                  ? 'bg-[#161f13] dark:bg-[#161f13] border border-[#161f13] shadow-none'
+                  : 'bg-transparent border border-[#161f13] dark:border-[#94f477] shadow-none hover:bg-[#161f13]/10 dark:hover:bg-[#94f477]/10'
                 : 'bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 shadow-none'
             )}
             onClick={(e) => {
@@ -444,24 +444,24 @@ export function DocumentCard({
         <div className="bg-white dark:bg-neutral-900 px-4 py-3 relative">
           <div className="flex items-start justify-between gap-2 pr-8">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-[#1a1c18] dark:text-white">
                 {getTypeLabel(doc.type)}
               </p>
               {addedDate && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">
                   Toegevoegd {addedDate}
                 </p>
               )}
             </div>
           </div>
           <div
-            className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center pointer-events-none"
+            className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center pointer-events-none"
             aria-hidden
           >
             {bulkActionLoading && selected ? (
-              <Loader2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870] animate-spin" />
+              <Loader2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] animate-spin" />
             ) : (
-              <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <MoreHorizontal className="h-4 w-4 text-[#55554e] dark:text-[#97978f]" />
             )}
           </div>
         </div>
@@ -469,51 +469,51 @@ export function DocumentCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div
-              className="bg-white dark:bg-neutral-900 px-4 py-3 relative w-full text-left cursor-pointer outline-none transition-colors hover:bg-gray-50/90 dark:hover:bg-neutral-800/90 focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2"
+              className="bg-white dark:bg-neutral-900 px-4 py-3 relative w-full text-left cursor-pointer outline-none transition-colors hover:bg-[#f4f4f1]/90 dark:hover:bg-neutral-800/90 focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-2"
               onClick={(e) => e.stopPropagation()}
               aria-label={`Acties voor ${realName}`}
             >
               <div className="flex items-start justify-between gap-2 pr-8">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[#1a1c18] dark:text-white">
                     {getTypeLabel(doc.type)}
                   </p>
                   {addedDate && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">
                       Toegevoegd {addedDate}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center pointer-events-none">
-                <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              <div className="absolute right-4 bottom-3 h-8 w-8 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center pointer-events-none">
+                <MoreHorizontal className="h-4 w-4 text-[#55554e] dark:text-[#97978f]" />
               </div>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="rounded-xl min-w-[220px] border-gray-200 dark:border-neutral-700"
+            className="rounded-xl min-w-[220px] border-[#e3e3de] dark:border-neutral-700"
             sideOffset={6}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
             <DropdownMenuItem
               onClick={() => onAssign?.(doc)}
-              className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+              className="gap-2 focus:bg-[#f4f4f1] focus:text-[#1a1c18] hover:bg-[#f4f4f1] hover:text-[#1a1c18] dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
             >
               <Link2 className="h-4 w-4" />
               Toewijzen
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => { setTimeout(() => onDownload?.(doc), 0) }}
-              className="gap-2 focus:bg-gray-100 focus:text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+              className="gap-2 focus:bg-[#f4f4f1] focus:text-[#1a1c18] hover:bg-[#f4f4f1] hover:text-[#1a1c18] dark:focus:bg-neutral-700 dark:focus:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
             >
               <Download className="h-4 w-4" />
               Downloaden
             </DropdownMenuItem>
-            <div className="my-1 h-px bg-gray-200 dark:bg-neutral-700" role="separator" />
+            <div className="my-1 h-px bg-[#ebebe7] dark:bg-neutral-700" role="separator" />
             <DropdownMenuItem
               onSelect={() => { setTimeout(() => onDelete?.(doc), 0) }}
-              className="gap-2 text-red-600 dark:text-red-400 focus:bg-gray-100 focus:text-red-600 hover:bg-gray-100 hover:text-red-600 dark:focus:bg-neutral-700 dark:focus:text-red-400 dark:hover:bg-neutral-700 dark:hover:text-red-400"
+              className="gap-2 text-red-600 dark:text-red-400 focus:bg-[#f4f4f1] focus:text-red-600 hover:bg-[#f4f4f1] hover:text-red-600 dark:focus:bg-neutral-700 dark:focus:text-red-400 dark:hover:bg-neutral-700 dark:hover:text-red-400"
             >
               <Trash2 className="h-4 w-4" />
               Verwijderen

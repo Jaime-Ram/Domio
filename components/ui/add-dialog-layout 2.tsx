@@ -34,4 +34,4 @@ export const ADD_DIALOG_FOOTER_CLASS =
 export const ADD_DIALOG_FOOTER_SPLIT_CLASS =
   'border-t border-gray-100 dark:border-neutral-800 p-4 flex w-full flex-row items-center justify-between gap-3'
 
-export const ADD_DIALOG_TITLE_CLASS = 'text-xl font-bold text-[#163300] dark:text-[#9FE870]'
+export const ADD_DIALOG_TITLE_CLASS = 'text-xl font-bold text-[#161f13] dark:text-[#94f477]'

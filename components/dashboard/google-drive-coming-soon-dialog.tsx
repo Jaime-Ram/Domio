@@ -28,7 +28,7 @@ export function GoogleDriveComingSoonDialog({ open, onOpenChange }: Props) {
       >
         <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
           <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Google Drive</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <DialogDescription className="text-sm text-[#97978f] dark:text-[#97978f] mt-1">
             De koppeling met Google Drive komt binnenkort. Tot die tijd kun je bestanden van je computer toevoegen
             of documenten uit Domio kiezen via het paperclipmenu of met @ in je bericht.
           </DialogDescription>

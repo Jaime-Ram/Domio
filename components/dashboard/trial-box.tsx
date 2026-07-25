@@ -27,9 +27,9 @@ export function TrialBox({ collapsed }: { collapsed: boolean }) {
         <Link
           href="/dashboard/landlord/upgrade"
           title={`${days} dagen proefperiode resterend`}
-          className="flex items-center justify-center w-full h-9 rounded-lg bg-[#163300] hover:bg-[#1e4500] transition-colors"
+          className="flex items-center justify-center w-full h-9 rounded-lg bg-[#161f13] hover:bg-[#1e4500] transition-colors"
         >
-          <span className="text-[10px] font-bold text-[#9FE870]/70">{days}d</span>
+          <span className="text-[10px] font-bold text-[#94f477]/70">{days}d</span>
         </Link>
       </div>
     )
@@ -37,11 +37,11 @@ export function TrialBox({ collapsed }: { collapsed: boolean }) {
 
   return (
     <div className="flex-shrink-0 px-3 pb-3">
-      <div className="bg-[#163300] rounded-xl p-4 relative overflow-hidden">
+      <div className="bg-[#161f13] rounded-xl p-4 relative overflow-hidden">
         <GeometricShapes
           variant="trapezoid"
           className="right-0 bottom-0 w-40 h-40"
-          color="#9FE870"
+          color="#94f477"
           opacity={0.12}
           layers={2}
         />
@@ -49,11 +49,11 @@ export function TrialBox({ collapsed }: { collapsed: boolean }) {
           <h3 className="text-sm font-semibold text-white mb-0.5">Proefperiode</h3>
           <p className="text-xs text-white/70 mb-3">{days} dagen resterend</p>
           <div className="h-1 rounded-full bg-white/15 mb-3 overflow-hidden">
-            <div className="h-full rounded-full bg-[#9FE870]" style={{ width: `${pct}%` }} />
+            <div className="h-full rounded-full bg-[#94f477]" style={{ width: `${pct}%` }} />
           </div>
           <Link
             href="/dashboard/landlord/upgrade"
-            className="block w-full text-center bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl text-sm font-semibold py-2 transition-colors"
+            className="block w-full text-center bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90 rounded-xl text-sm font-semibold py-2 transition-colors"
           >
             Abonnement starten
           </Link>

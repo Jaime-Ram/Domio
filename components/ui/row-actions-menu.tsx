@@ -33,7 +33,7 @@ export function RowActionsMenu({
           type="button"
           onClick={(e) => e.stopPropagation()}
           aria-label={label}
-          className="h-8 w-8 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#9FE870]/40"
+          className="h-8 w-8 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#94f477]/40"
         >
           <MoreHorizontal className="h-4 w-4" />
         </button>

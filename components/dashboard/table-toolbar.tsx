@@ -57,10 +57,10 @@ export function TableToolbar({
       {hasLeft && (
         <div>
           {title && (
-            <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">{title}</p>
+            <p className="text-lg font-semibold text-[#161f13] dark:text-[#94f477]">{title}</p>
           )}
           {count !== undefined && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{count}</p>
+            <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">{count}</p>
           )}
         </div>
       )}
@@ -75,8 +75,8 @@ export function TableToolbar({
               type="button"
               onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
               className={cn(
-                'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
-                search && 'text-[#163300] dark:text-[#9FE870]',
+                'h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors shrink-0',
+                search && 'text-[#161f13] dark:text-[#94f477]',
               )}
             >
               <Search className="h-4 w-4" />
@@ -92,7 +92,7 @@ export function TableToolbar({
                 onBlur={() => { if (!search) setSearchExpanded(false) }}
                 onKeyDown={e => { if (e.key === 'Escape') { onSearchChange(''); setSearchExpanded(false) } }}
                 placeholder={searchPlaceholder}
-                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#94f477]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
               />
             </div>
           </div>
@@ -105,7 +105,7 @@ export function TableToolbar({
               <button
                 type="button"
                 suppressHydrationWarning
-                className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
               >
                 <Filter className="h-4 w-4" />
               </button>
@@ -123,7 +123,7 @@ export function TableToolbar({
             suppressHydrationWarning
             onClick={() => onViewModeChange(viewMode === 'table' ? 'grid' : 'table')}
             aria-label={viewMode === 'table' ? 'Toon als raster' : 'Toon als lijst'}
-            className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+            className="h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
           >
             {viewMode === 'table' ? <Grid3x3 className="h-4 w-4" /> : <Table2 className="h-4 w-4" />}
           </button>
@@ -146,7 +146,7 @@ export function TableToolbar({
             type="button"
             onClick={onAdd}
             disabled={addDisabled}
-            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
+            className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
           >
             <Plus className="h-4 w-4" />
             {addLabel}

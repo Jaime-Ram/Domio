@@ -46,7 +46,7 @@ export function PageTitleBar({ basePath = '/dashboard/landlord' }: PageTitleBarP
           variant="underline"
         />
       ) : !pageDef.noDivider ? (
-        <div className="w-full h-px bg-gray-100 dark:bg-neutral-800" />
+        <div className="w-full h-px bg-[#f4f4f1] dark:bg-neutral-800" />
       ) : null}
     </div>
   )

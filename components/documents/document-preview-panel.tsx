@@ -197,7 +197,7 @@ export function DocumentPreviewPanel({
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="h-10 w-10 rounded-full bg-white dark:bg-neutral-700 text-[#163300] dark:text-white hover:bg-gray-100 dark:hover:bg-neutral-600 shadow-sm border border-gray-200/70 dark:border-neutral-600"
+          className="h-10 w-10 rounded-full bg-white dark:bg-neutral-700 text-[#161f13] dark:text-white hover:bg-[#f4f4f1] dark:hover:bg-neutral-600 shadow-sm border border-[#e3e3de]/70 dark:border-neutral-600"
           aria-label="Terug"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -212,7 +212,7 @@ export function DocumentPreviewPanel({
         style={{ touchAction: 'pan-y' }}
       >
         {mode === 'loading' && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Document laden…</p>
+          <p className="text-sm text-[#97978f] dark:text-[#97978f]">Document laden…</p>
         )}
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -251,26 +251,26 @@ export function DocumentPreviewPanel({
 
       {/* Witte pil: links page selector, midden vergrootglas, rechts min + plus */}
       <div className="flex-shrink-0 flex justify-center py-4">
-        <div className="flex items-center gap-2 sm:gap-4 px-3 py-2 rounded-full bg-white dark:bg-neutral-700 shadow-sm border border-gray-200/80 dark:border-neutral-600 min-w-[280px] sm:min-w-[320px]">
+        <div className="flex items-center gap-2 sm:gap-4 px-3 py-2 rounded-full bg-white dark:bg-neutral-700 shadow-sm border border-[#e3e3de]/80 dark:border-neutral-600 min-w-[280px] sm:min-w-[320px]">
           {/* Links: page selector */}
           <div className="flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
+              className="h-9 w-9 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
               onClick={prevPage}
               disabled={page <= 1}
               aria-label="Vorige pagina"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="min-w-[3rem] text-center text-sm font-medium text-gray-700 dark:text-gray-200 tabular-nums py-1.5">
+            <span className="min-w-[3rem] text-center text-sm font-medium text-[#55554e] dark:text-gray-200 tabular-nums py-1.5">
               {page}/{totalPages}
             </span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
+              className="h-9 w-9 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
               onClick={nextPage}
               disabled={page >= totalPages}
               aria-label="Volgende pagina"
@@ -283,7 +283,7 @@ export function DocumentPreviewPanel({
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
+              className="h-9 w-9 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500"
               onClick={() => setZoom(DEFAULT_ZOOM)}
               aria-label="Zoom op 100%"
               title="Zoom 100%"
@@ -296,20 +296,20 @@ export function DocumentPreviewPanel({
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
+              className="h-9 w-9 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
               onClick={zoomOut}
               disabled={zoom <= MIN_ZOOM}
               aria-label="Uitzoomen"
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="min-w-[3rem] text-center text-sm font-medium text-gray-700 dark:text-gray-200 tabular-nums py-1.5">
+            <span className="min-w-[3rem] text-center text-sm font-medium text-[#55554e] dark:text-gray-200 tabular-nums py-1.5">
               {zoom}%
             </span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full bg-gray-200 dark:bg-neutral-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
+              className="h-9 w-9 rounded-full bg-[#ebebe7] dark:bg-neutral-600 text-[#55554e] dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-neutral-500 disabled:opacity-50"
               onClick={zoomIn}
               disabled={zoom >= MAX_ZOOM}
               aria-label="Inzoomen"

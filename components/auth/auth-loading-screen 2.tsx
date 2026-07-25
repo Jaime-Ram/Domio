@@ -84,7 +84,7 @@ export function AuthLoadingScreen({ onAnimationComplete }: AuthLoadingScreenProp
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-[#9FE870] px-4 sm:px-6 overflow-hidden"
+      className="min-h-screen flex items-center justify-center bg-[#94f477] px-4 sm:px-6 overflow-hidden"
       style={{
         opacity: fadeOut ? 0 : 1,
         transition: `opacity ${FADEOUT_DURATION_MS}ms ${EASE_CURVE}`,
@@ -118,7 +118,7 @@ function LogoReveal({ phase, revealPctValue, fadeZone, moveDurationMs }: LogoRev
     phase === 0 ? 'scale(0.97)' : phase === 1 ? 'scale(1.18)' : 'scale(1)'
   return (
     <div
-      className="flex items-baseline min-w-0 max-w-full text-[#163300] text-2xl sm:text-4xl md:text-5xl tracking-tight pb-[0.15em]"
+      className="flex items-baseline min-w-0 max-w-full text-[#161f13] text-2xl sm:text-4xl md:text-5xl tracking-tight pb-[0.15em]"
       style={{
         fontFamily: 'var(--font-body)',
         transform: scale,

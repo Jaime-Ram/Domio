@@ -226,7 +226,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
   return (
     <div ref={containerRef} className="relative flex-1 max-w-2xl min-w-0">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#97978f] dark:text-[#97978f]" />
         <Input
           ref={inputRef}
           type="search"
@@ -234,7 +234,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-4 h-10 rounded-full placeholder:text-gray-400 bg-[#f4f4f4] dark:bg-neutral-800 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+          className="pl-10 pr-4 h-10 rounded-full placeholder:text-[#97978f] bg-[#f4f4f4] dark:bg-neutral-800 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
         />
       </div>
 
@@ -243,7 +243,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
         <div className="absolute top-full mt-2 w-full rounded-2xl z-50 max-h-96 overflow-y-auto overflow-x-hidden bg-white dark:bg-neutral-800 border-0 shadow-soft-lg">
           {query.trim() === '' && (
             <div className="px-4 pt-3 pb-1.5">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Populaire acties</p>
+              <p className="text-xs font-medium text-[#97978f] dark:text-[#97978f]">Populaire acties</p>
             </div>
           )}
           <div className="p-1.5">
@@ -262,19 +262,19 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
                   )}
                 >
                   <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#f4f4f4] dark:bg-neutral-900 flex items-center justify-center">
-                    <Icon className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                    <Icon className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      <span className="text-sm font-medium text-[#1a1c18] dark:text-white">
                         {action.label}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-[#f4f4f4] dark:bg-neutral-900 px-2 py-0.5 rounded-lg">
+                      <span className="text-xs text-[#97978f] dark:text-[#97978f] bg-[#f4f4f4] dark:bg-neutral-900 px-2 py-0.5 rounded-lg">
                         {action.category}
                       </span>
                     </div>
                     {action.description && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                      <p className="text-xs text-[#97978f] dark:text-[#97978f] line-clamp-1">
                         {action.description}
                       </p>
                     )}
@@ -290,8 +290,8 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
       {isOpen && query.trim() !== '' && filteredActions.length === 0 && (
         <div className="absolute top-full mt-2 w-full rounded-2xl z-50 overflow-hidden bg-white dark:bg-neutral-800 border-0 shadow-soft-lg">
           <div className="px-4 py-8 text-center">
-            <Search className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <Search className="h-8 w-8 text-[#97978f] dark:text-[#97978f] mx-auto mb-2" />
+            <p className="text-sm text-[#97978f] dark:text-[#97978f]">
               Geen resultaten gevonden voor &quot;{query}&quot;
             </p>
           </div>

@@ -16,7 +16,7 @@ export function SectionHeroHeader({ title, description, className }: SectionHero
   if (!description) return null
   return (
     <div className={cn('mb-6', className)}>
-      <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+      <p className="text-[#55554e] dark:text-[#97978f] text-sm sm:text-base">
         {description}
       </p>
     </div>

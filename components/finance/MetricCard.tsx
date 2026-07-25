@@ -24,13 +24,13 @@ export function MetricCard({ label, value, icon, delta, className }: MetricCardP
         className
       )}
     >
-      <div className="flex justify-end [&_svg]:h-5 [&_svg]:w-5 text-gray-500 dark:text-gray-400">
+      <div className="flex justify-end [&_svg]:h-5 [&_svg]:w-5 text-[#97978f] dark:text-[#97978f]">
         {icon}
       </div>
       <div>
-        <p className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] leading-tight">{value}</p>
+        <p className="text-3xl font-bold text-[#161f13] dark:text-[#94f477] leading-tight">{value}</p>
         <div className="flex items-baseline gap-2 mt-0.5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{label}</p>
+          <p className="text-sm text-[#97978f] dark:text-[#97978f] font-medium">{label}</p>
           {delta && (
             <span className="text-xs font-semibold text-[#15803D] dark:text-[#4ADE80]">{delta}</span>
           )}

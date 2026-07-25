@@ -26,10 +26,10 @@ function lastMonths(n: number) {
 }
 
 function SectionLabel({ children, href }: { children: React.ReactNode; href?: string }) {
-  const cls = 'text-sm font-semibold text-gray-500 dark:text-gray-400'
+  const cls = 'text-sm font-semibold text-[#97978f] dark:text-[#97978f]'
   if (href) {
     return (
-      <Link href={href} className={cn(cls, 'group inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200 transition-colors')}>
+      <Link href={href} className={cn(cls, 'group inline-flex items-center gap-1 hover:text-[#55554e] dark:hover:text-gray-200 transition-colors')}>
         {children}
         <ArrowUpRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
       </Link>
@@ -41,13 +41,13 @@ function SectionLabel({ children, href }: { children: React.ReactNode; href?: st
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 shadow-soft px-3 py-2.5 text-xs space-y-1">
-      <p className="font-medium text-gray-700 dark:text-white mb-1">{label}</p>
+    <div className="rounded-xl bg-white dark:bg-neutral-800 border border-[#e3e3de] dark:border-neutral-700 shadow-soft px-3 py-2.5 text-xs space-y-1">
+      <p className="font-medium text-[#55554e] dark:text-white mb-1">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: p.name === 'income' ? '#163300' : '#9ca3af' }} />
-          <span className="text-gray-500 dark:text-gray-400">{p.name === 'income' ? 'Huurinkomsten' : 'Uitgaven'}</span>
-          <span className="font-medium text-gray-800 dark:text-white ml-auto">{fmt(p.value)}</span>
+          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: p.name === 'income' ? '#161f13' : '#97978f' }} />
+          <span className="text-[#97978f] dark:text-[#97978f]">{p.name === 'income' ? 'Huurinkomsten' : 'Uitgaven'}</span>
+          <span className="font-medium text-[#1a1c18] dark:text-white ml-auto">{fmt(p.value)}</span>
         </div>
       ))}
     </div>
@@ -72,8 +72,8 @@ function TrendBadge({ value }: { value: number }) {
 function MetricItem({ label, value, href }: { label: string; value: React.ReactNode; href?: string }) {
   const inner = (
     <>
-      <p className="text-xs text-gray-400 dark:text-gray-500 leading-none mb-1.5">{label}</p>
-      <p className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] leading-none">{value}</p>
+      <p className="text-xs text-[#97978f] dark:text-[#97978f] leading-none mb-1.5">{label}</p>
+      <p className="text-2xl font-bold text-[#161f13] dark:text-[#94f477] leading-none">{value}</p>
     </>
   )
   return href ? <Link href={href} className="group">{inner}</Link> : <div>{inner}</div>
@@ -142,28 +142,28 @@ export default function EmployerDashboardPage() {
   const bezet = Math.min(kpi.huurders, kpi.eenheden)
   const leeg = Math.max(0, kpi.eenheden - bezet)
   const bezettingData = [
-    { name: 'Bezet', value: bezet, color: '#163300' },
-    { name: 'Leeg', value: leeg, color: '#e5e7eb' },
+    { name: 'Bezet', value: bezet, color: '#161f13' },
+    { name: 'Leeg', value: leeg, color: '#e3e3de' },
   ]
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_288px] gap-x-10 gap-y-8 items-stretch">
 
       {/* ——— Links: KPI-kaart ——— */}
-      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 flex flex-col lg:flex-row">
+      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-[#e3e3de] dark:border-neutral-700 flex flex-col lg:flex-row">
         {/* Grafiek */}
         <div className="flex flex-col flex-1 min-w-0 p-5">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0">
               <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
               <div className="flex items-baseline gap-2 mt-1.5">
-                <p className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">{fmt(verwacht)}</p>
+                <p className="text-[26px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{fmt(verwacht)}</p>
                 <TrendBadge value={incomeTrendPct} />
               </div>
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-gray-400 dark:text-gray-500 shrink-0">
+            <div className="flex items-center gap-3 text-[11px] text-[#97978f] dark:text-[#97978f] shrink-0">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-3 rounded-full bg-[#163300] dark:bg-[#9FE870] inline-block" />
+                <span className="h-2 w-3 rounded-full bg-[#161f13] dark:bg-[#94f477] inline-block" />
                 Huurinkomsten
               </span>
               <span className="flex items-center gap-1.5">
@@ -177,29 +177,29 @@ export default function EmployerDashboardPage() {
             <AreaChart data={history} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#163300" stopOpacity={0.12} />
-                  <stop offset="100%" stopColor="#163300" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#161f13" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="#161f13" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="uitgavenGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#9ca3af" stopOpacity={0.10} />
-                  <stop offset="100%" stopColor="#9ca3af" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#97978f" stopOpacity={0.10} />
+                  <stop offset="100%" stopColor="#97978f" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`} width={44} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#ecece8" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#97978f' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#97978f' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`} width={44} />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="uitgaven" name="uitgaven" stroke="#9ca3af" strokeWidth={1.5} strokeDasharray="4 3" fill="url(#uitgavenGradient)" dot={false} activeDot={{ r: 3, fill: '#9ca3af' }} />
-              <Area type="monotone" dataKey="income" name="income" stroke="#163300" strokeWidth={2.5} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#163300' }} />
+              <Area type="monotone" dataKey="uitgaven" name="uitgaven" stroke="#97978f" strokeWidth={1.5} strokeDasharray="4 3" fill="url(#uitgavenGradient)" dot={false} activeDot={{ r: 3, fill: '#97978f' }} />
+              <Area type="monotone" dataKey="income" name="income" stroke="#161f13" strokeWidth={2.5} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#161f13' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Divider */}
-        <div className="hidden lg:block w-px bg-gray-100 dark:bg-neutral-700 my-5 shrink-0" />
+        <div className="hidden lg:block w-px bg-[#f4f4f1] dark:bg-neutral-700 my-5 shrink-0" />
 
         {/* Kerncijfers */}
-        <div className="flex flex-row lg:flex-col justify-around gap-4 px-5 lg:px-6 py-4 lg:py-5 lg:w-48 shrink-0 border-t lg:border-t-0 border-gray-100 dark:border-neutral-700">
+        <div className="flex flex-row lg:flex-col justify-around gap-4 px-5 lg:px-6 py-4 lg:py-5 lg:w-48 shrink-0 border-t lg:border-t-0 border-[#e3e3de] dark:border-neutral-700">
           <MetricItem label="Panden" value={kpi.panden} href="/dashboard/landlord/portfolio" />
           <MetricItem label="Eenheden" value={kpi.eenheden} href="/dashboard/landlord/portfolio" />
           <MetricItem label="Huurders" value={kpi.huurders} href="/dashboard/landlord/tenants" />
@@ -208,11 +208,11 @@ export default function EmployerDashboardPage() {
       </div>
 
       {/* ——— Rechts: Bezetting ——— */}
-      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 p-5 flex flex-col h-full">
+      <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-[#e3e3de] dark:border-neutral-700 p-5 flex flex-col h-full">
         <SectionLabel>Bezetting</SectionLabel>
         <div className="flex items-baseline gap-2 mt-1.5">
-          <p className="text-[26px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">{kpi.bezetting}%</p>
-          <span className="text-xs text-gray-400 dark:text-gray-500">{bezet} / {kpi.eenheden} eenheden</span>
+          <p className="text-[26px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{kpi.bezetting}%</p>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{bezet} / {kpi.eenheden} eenheden</span>
         </div>
 
         {/* Grote donut — vult de hoogte */}
@@ -226,23 +226,23 @@ export default function EmployerDashboardPage() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[28px] font-bold text-[#163300] dark:text-[#9FE870] leading-none">{kpi.bezetting}%</span>
-              <span className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">bezet</span>
+              <span className="text-[28px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{kpi.bezetting}%</span>
+              <span className="text-[11px] text-[#97978f] dark:text-[#97978f] mt-1">bezet</span>
             </div>
           </div>
         </div>
 
         {/* Legenda onderaan */}
-        <div className="space-y-2 pt-3 border-t border-gray-100 dark:border-neutral-700">
+        <div className="space-y-2 pt-3 border-t border-[#e3e3de] dark:border-neutral-700">
           <div className="flex items-center gap-2 text-xs">
-            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#163300] dark:bg-[#9FE870]" />
-            <span className="text-gray-500 dark:text-gray-400">Bezet</span>
-            <span className="ml-auto font-semibold text-gray-700 dark:text-gray-200">{bezet}</span>
+            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#161f13] dark:bg-[#94f477]" />
+            <span className="text-[#97978f] dark:text-[#97978f]">Bezet</span>
+            <span className="ml-auto font-semibold text-[#55554e] dark:text-gray-200">{bezet}</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-gray-200 dark:bg-neutral-600" />
-            <span className="text-gray-500 dark:text-gray-400">Leeg</span>
-            <span className="ml-auto font-semibold text-gray-700 dark:text-gray-200">{leeg}</span>
+            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#ebebe7] dark:bg-neutral-600" />
+            <span className="text-[#97978f] dark:text-[#97978f]">Leeg</span>
+            <span className="ml-auto font-semibold text-[#55554e] dark:text-gray-200">{leeg}</span>
           </div>
         </div>
       </div>

@@ -136,7 +136,7 @@ const DropdownMenuWidgetCheckboxItem = React.forwardRef<
       className={cn(
         "absolute left-3 top-1/2 -translate-y-1/2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
         checked
-          ? "bg-[#163300] dark:bg-[#9FE870]"
+          ? "bg-[#161f13] dark:bg-[#94f477]"
           : "border-2 border-gray-400 dark:border-gray-500 bg-transparent"
       )}
       aria-hidden

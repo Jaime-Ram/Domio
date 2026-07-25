@@ -77,8 +77,8 @@ export function SortableHeader({ label, sortKey, sort, onSort, className }: Sort
       {label}
       {isActive ? (
         sort.dir === 'asc'
-          ? <ChevronUp className="h-3 w-3 text-[#163300] dark:text-[#9FE870] shrink-0" />
-          : <ChevronDown className="h-3 w-3 text-[#163300] dark:text-[#9FE870] shrink-0" />
+          ? <ChevronUp className="h-3 w-3 text-[#161f13] dark:text-[#94f477] shrink-0" />
+          : <ChevronDown className="h-3 w-3 text-[#161f13] dark:text-[#94f477] shrink-0" />
       ) : (
         <ChevronsUpDown className="h-3 w-3 shrink-0 opacity-40" />
       )}

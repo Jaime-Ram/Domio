@@ -64,7 +64,7 @@ export function LocalPdfThumbnail({ file, className }: Props) {
           name={file.name}
           file_name={file.name}
           mime_type="application/pdf"
-          className="h-10 w-10 text-gray-400 dark:text-neutral-500"
+          className="h-10 w-10 text-[#97978f] dark:text-neutral-500"
         />
       </div>
     )
@@ -73,7 +73,7 @@ export function LocalPdfThumbnail({ file, className }: Props) {
   return (
     <div className={cn('relative flex h-full w-full items-center justify-center overflow-hidden bg-white dark:bg-neutral-900', className)}>
       {status === 'loading' && (
-        <Loader2 className="h-5 w-5 shrink-0 animate-spin text-gray-400 dark:text-neutral-500" aria-hidden />
+        <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#97978f] dark:text-neutral-500" aria-hidden />
       )}
       <canvas
         ref={canvasRef}

@@ -2,9 +2,9 @@ export default function MjopLoading() {
   return (
     <div className="flex flex-col gap-8">
       {/* Tab bar skeleton */}
-      <div className="flex gap-6 border-b border-gray-100 dark:border-neutral-800 pb-3">
+      <div className="flex gap-6 border-b border-[#e3e3de] dark:border-neutral-800 pb-3">
         {[16, 20, 16].map((w, i) => (
-          <div key={i} className="h-4 rounded bg-gray-100 dark:bg-neutral-800 animate-pulse" style={{ width: w * 4 }} />
+          <div key={i} className="h-4 rounded bg-[#f4f4f1] dark:bg-neutral-800 animate-pulse" style={{ width: w * 4 }} />
         ))}
       </div>
 

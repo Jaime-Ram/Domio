@@ -155,9 +155,9 @@ export function DatePicker({ value, onChange, placeholder = 'Kies datum', min, m
                     disabled
                       ? 'text-gray-300 dark:text-neutral-700 cursor-not-allowed'
                       : isSelected
-                      ? 'bg-[#163300] text-white font-semibold'
+                      ? 'bg-[#161f13] text-white font-semibold'
                       : isToday
-                      ? 'border border-[#163300] text-[#163300] dark:border-[#9FE870] dark:text-[#9FE870] font-medium hover:bg-gray-100 dark:hover:bg-neutral-800'
+                      ? 'border border-[#161f13] text-[#161f13] dark:border-[#94f477] dark:text-[#94f477] font-medium hover:bg-gray-100 dark:hover:bg-neutral-800'
                       : isWeekend
                       ? 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800'
                       : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800'

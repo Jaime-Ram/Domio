@@ -58,14 +58,14 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
         <div className="px-6 pt-6 pb-6 space-y-5">
           <DialogHeader>
             <div className="flex items-start gap-3.5">
-              <div className="h-10 w-10 rounded-full bg-[#163300]/8 dark:bg-[#163300]/20 flex items-center justify-center shrink-0 mt-0.5">
-                <AlertTriangle className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+              <div className="h-10 w-10 rounded-full bg-[#161f13]/8 dark:bg-[#161f13]/20 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
               </div>
               <div>
-                <DialogTitle className="text-base font-semibold text-[#163300] dark:text-white">
+                <DialogTitle className="text-base font-semibold text-[#161f13] dark:text-white">
                   Account definitief verwijderen
                 </DialogTitle>
-                <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                <DialogDescription className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">
                   Deze actie kan niet ongedaan worden gemaakt.
                 </DialogDescription>
               </div>
@@ -74,8 +74,8 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
 
           {/* Wat er verwijderd wordt */}
           <div className="rounded-2xl bg-[#f4f4f4] dark:bg-neutral-800 px-4 py-3.5 space-y-2">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Wat er wordt verwijderd:</p>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1.5">
+            <p className="text-sm font-medium text-[#55554e] dark:text-gray-300">Wat er wordt verwijderd:</p>
+            <ul className="text-sm text-[#55554e] dark:text-[#97978f] space-y-1.5">
               {[
                 'Je accountgegevens en profiel',
                 'Alle documenten en bestanden',
@@ -83,7 +83,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
                 'Alle berichten en notities',
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#163300]/40 dark:bg-[#9FE870]/60 shrink-0" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#161f13]/40 dark:bg-[#94f477]/60 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -91,16 +91,16 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
           </div>
 
           {isDemo ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-2">
+            <p className="text-sm text-[#97978f] dark:text-[#97978f] text-center py-2">
               Account verwijderen is niet beschikbaar in de demo-omgeving.
             </p>
           ) : (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#55554e] dark:text-[#97978f]">
                   Typ de volgende zin om te bevestigen:
                 </p>
-                <p className="font-mono text-sm bg-[#163300]/6 dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870] px-3.5 py-2.5 rounded-xl select-all">
+                <p className="font-mono text-sm bg-[#161f13]/6 dark:bg-neutral-800 text-[#161f13] dark:text-[#94f477] px-3.5 py-2.5 rounded-xl select-all">
                   {CONFIRM_PHRASE}
                 </p>
               </div>
@@ -111,7 +111,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
                 onChange={(e) => { setInput(e.target.value); setError('') }}
                 onPaste={(e) => e.preventDefault()}
                 placeholder="Typ de zin hierboven..."
-                className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                className="w-full rounded-xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-2.5 text-sm focus:outline-none placeholder:text-[#97978f] dark:placeholder:text-[#97978f] transition-colors"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -123,7 +123,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
               <div className="flex gap-2.5 pt-1">
                 <Button
                   variant="outline"
-                  className="flex-1 h-11 rounded-full border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800 font-medium"
+                  className="flex-1 h-11 rounded-full border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 font-medium"
                   onClick={() => handleOpenChange(false)}
                   disabled={working}
                 >

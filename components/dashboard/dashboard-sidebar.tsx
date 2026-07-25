@@ -103,7 +103,7 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
       )}
       <div
         className={cn(
-          "fixed inset-y-0 start-0 z-60 bg-white border-e border-gray-200 transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 w-64 h-full",
+          "fixed inset-y-0 start-0 z-60 bg-white border-e border-[#e3e3de] transition-all duration-300 transform dark:bg-neutral-800 dark:border-neutral-700 w-64 h-full",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:static lg:z-auto"
         )}
@@ -121,7 +121,7 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
             </Button>
           </div>
 
-        <div className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+        <div className="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-[#f4f4f1] [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
           <nav className="p-3 w-full flex flex-col flex-wrap">
             <ul className="flex flex-col space-y-1">
               {menuItems.map((item, index) => {
@@ -134,7 +134,7 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
                       <button
                         type="button"
                         onClick={() => toggleItem(itemId)}
-                        className="w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200"
+                        className="w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-[#1a1c18] rounded-lg hover:bg-[#f4f4f1] focus:outline-none focus:ring-2 focus:ring-[#161f13] focus:bg-[#f4f4f1] dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200"
                       >
                         {item.icon}
                         {item.label}
@@ -151,7 +151,7 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
                               <li key={child.label}>
                                 <Link
                                   href={child.href}
-                                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200"
+                                  className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-[#1a1c18] rounded-lg hover:bg-[#f4f4f1] focus:outline-none focus:ring-2 focus:ring-[#161f13] focus:bg-[#f4f4f1] dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200"
                                 >
                                   {child.label}
                                 </Link>
@@ -169,8 +169,8 @@ export function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarPr
                     <Link
                       href={item.href || '#'}
                       className={cn(
-                        "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#163300] focus:bg-gray-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200",
-                        item.href && pathname === item.href && "bg-gray-100 dark:bg-neutral-700"
+                        "w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-[#1a1c18] rounded-lg hover:bg-[#f4f4f1] focus:outline-none focus:ring-2 focus:ring-[#161f13] focus:bg-[#f4f4f1] dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:text-neutral-200",
+                        item.href && pathname === item.href && "bg-[#f4f4f1] dark:bg-neutral-700"
                       )}
                     >
                       {item.icon}

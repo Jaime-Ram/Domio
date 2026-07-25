@@ -28,22 +28,22 @@ export function AddPaymentTile({
         'min-h-[160px] h-full',
         DASHBOARD_SURFACE_PADDING,
         'flex flex-col justify-between',
-        'bg-[#9FE870] dark:bg-[#9FE870]',
-        'transition-opacity hover:opacity-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+        'bg-[#94f477] dark:bg-[#94f477]',
+        'transition-opacity hover:opacity-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-2',
         className
       )}
     >
       <div
-        className="flex h-11 w-11 shrink-0 items-center justify-center self-start rounded-full bg-[#163300]/15 text-[#163300]"
+        className="flex h-11 w-11 shrink-0 items-center justify-center self-start rounded-full bg-[#161f13]/15 text-[#161f13]"
         aria-hidden
       >
         <Plus className="h-6 w-6 stroke-[2.25]" />
       </div>
       <div className="min-w-0 space-y-1 pt-4">
-        <p className="text-2xl font-extrabold tracking-tight text-[#163300] sm:text-[1.75rem] leading-tight">
+        <p className="text-2xl font-extrabold tracking-tight text-[#161f13] sm:text-[1.75rem] leading-tight">
           {title}
         </p>
-        <p className="text-sm font-medium text-[#163300]/80">{subtitle}</p>
+        <p className="text-sm font-medium text-[#161f13]/80">{subtitle}</p>
       </div>
     </button>
   )

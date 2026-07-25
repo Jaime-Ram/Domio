@@ -65,7 +65,7 @@ export default function UpgradePage() {
 
   return (
     <div className="flex flex-col items-center pt-8 pb-16">
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-10 text-center max-w-md">
+      <p className="text-[#97978f] dark:text-[#97978f] text-sm mb-10 text-center max-w-md">
         Je proefperiode is verlopen. Kies een plan om door te gaan met Domio.
       </p>
 
@@ -78,34 +78,34 @@ export default function UpgradePage() {
                 key={plan.id}
                 className={`flex-1 rounded-2xl border p-7 flex flex-col transition-shadow ${
                   plan.highlight
-                    ? 'border-[#163300] dark:border-[#9FE870] shadow-[0_0_0_1px_#163300] dark:shadow-[0_0_0_1px_#9FE870] bg-[#163300] dark:bg-[#163300]'
-                    : 'border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm'
+                    ? 'border-[#161f13] dark:border-[#94f477] shadow-[0_0_0_1px_#161f13] dark:shadow-[0_0_0_1px_#94f477] bg-[#161f13] dark:bg-[#161f13]'
+                    : 'border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-2.5 mb-5">
-                  <div className={`p-1.5 rounded-lg ${plan.highlight ? 'bg-[#9FE870]/20' : 'bg-gray-100 dark:bg-neutral-800'}`}>
-                    <Icon className={`h-4 w-4 ${plan.highlight ? 'text-[#9FE870]' : 'text-[#163300] dark:text-[#9FE870]'}`} />
+                  <div className={`p-1.5 rounded-lg ${plan.highlight ? 'bg-[#94f477]/20' : 'bg-[#f4f4f1] dark:bg-neutral-800'}`}>
+                    <Icon className={`h-4 w-4 ${plan.highlight ? 'text-[#94f477]' : 'text-[#161f13] dark:text-[#94f477]'}`} />
                   </div>
-                  <span className={`font-semibold text-base ${plan.highlight ? 'text-white' : 'text-[#163300] dark:text-white'}`}>
+                  <span className={`font-semibold text-base ${plan.highlight ? 'text-white' : 'text-[#161f13] dark:text-white'}`}>
                     {plan.name}
                   </span>
                 </div>
 
                 <div className="mb-1">
-                  <span className={`text-4xl font-bold ${plan.highlight ? 'text-white' : 'text-[#163300] dark:text-white'}`}>
+                  <span className={`text-4xl font-bold ${plan.highlight ? 'text-white' : 'text-[#161f13] dark:text-white'}`}>
                     €{plan.price}
                   </span>
-                  <span className={`text-sm ml-1.5 ${plan.highlight ? 'text-white/60' : 'text-gray-400'}`}>/maand</span>
+                  <span className={`text-sm ml-1.5 ${plan.highlight ? 'text-white/60' : 'text-[#97978f]'}`}>/maand</span>
                 </div>
-                <p className={`text-sm mb-6 ${plan.highlight ? 'text-white/70' : 'text-gray-400'}`}>
+                <p className={`text-sm mb-6 ${plan.highlight ? 'text-white/70' : 'text-[#97978f]'}`}>
                   {plan.description}
                 </p>
 
                 <ul className="flex flex-col gap-2.5 mb-8 flex-1">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${plan.highlight ? 'text-[#9FE870]' : 'text-[#163300] dark:text-[#9FE870]'}`} strokeWidth={2.5} />
-                      <span className={`text-sm ${plan.highlight ? 'text-white/85' : 'text-gray-600 dark:text-gray-300'}`}>{f}</span>
+                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${plan.highlight ? 'text-[#94f477]' : 'text-[#161f13] dark:text-[#94f477]'}`} strokeWidth={2.5} />
+                      <span className={`text-sm ${plan.highlight ? 'text-white/85' : 'text-[#55554e] dark:text-gray-300'}`}>{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -116,8 +116,8 @@ export default function UpgradePage() {
                   onClick={() => startCheckout(plan.id)}
                   className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     plan.highlight
-                      ? 'bg-[#9FE870] text-[#163300] hover:bg-[#8fd960] disabled:opacity-50'
-                      : 'bg-[#163300] text-white hover:bg-[#1e4500] disabled:opacity-50 dark:bg-[#9FE870] dark:text-[#163300] dark:hover:bg-[#8fd960]'
+                      ? 'bg-[#94f477] text-[#161f13] hover:bg-[#8fd960] disabled:opacity-50'
+                      : 'bg-[#161f13] text-white hover:bg-[#1e4500] disabled:opacity-50 dark:bg-[#94f477] dark:text-[#161f13] dark:hover:bg-[#8fd960]'
                   } ${loadingPlan ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {isLoading ? 'Laden…' : `Start ${plan.name}`}

@@ -310,7 +310,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
   const filterContent = uniqueProperties.length > 0 ? (
     <>
-      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Pand
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -323,7 +323,7 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
             className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
           >
             <span className="truncate max-w-[160px]">{prop}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-[#97978f] dark:text-[#97978f]">
               {rows.filter(r => r.property_name === prop).length}
             </span>
           </DropdownMenuCheckboxItem>
@@ -348,10 +348,10 @@ export function AchterstandenPanel({ onMetrics }: AchterstandenPanelProps) {
 
         {loading ? (
           <div className="flex flex-1 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+            <Loader2 className="h-5 w-5 animate-spin text-[#97978f]" />
           </div>
         ) : viewMode === 'board' ? (
-          <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+          <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900">
             <div className="h-full overflow-y-auto p-4">
               <BoardView rows={filtered} onSelect={setSelectedLeaseId} />
             </div>
@@ -388,19 +388,19 @@ function BoardView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
         const colRows = rows.filter(r => r.status === col.key)
         const cfg = STATUS_CONFIG[col.key]
         return (
-          <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-gray-100/80 dark:bg-neutral-800/50 p-3">
+          <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-[#f4f4f1]/80 dark:bg-neutral-800/50 p-3">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <span className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide">
                 {col.label}
               </span>
-              <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/15 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870] px-1.5">
+              <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/15 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477] px-1.5">
                 {colRows.length}
               </span>
             </div>
             <div className="flex flex-col gap-2 min-h-[80px]">
               {colRows.length === 0 && (
                 <div className="rounded-xl px-4 py-5 text-center">
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Geen</p>
+                  <p className="text-xs text-[#97978f] dark:text-[#97978f]">Geen</p>
                 </div>
               )}
               {colRows.map(r => (
@@ -427,19 +427,19 @@ function BoardCard({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-2xl bg-white dark:bg-neutral-900 px-4 py-4 flex flex-col gap-1 shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+      className="w-full text-left rounded-2xl bg-white dark:bg-neutral-900 px-4 py-4 flex flex-col gap-1 shadow-sm hover:shadow-md hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-all cursor-pointer"
     >
-      <p className="text-sm font-semibold leading-tight text-gray-900 dark:text-white">
+      <p className="text-sm font-semibold leading-tight text-[#1a1c18] dark:text-white">
         {row.property_name ?? '—'}
         {row.unit_number && (
-          <span className="font-normal text-gray-500 dark:text-gray-400"> · {row.unit_number}</span>
+          <span className="font-normal text-[#97978f] dark:text-[#97978f]"> · {row.unit_number}</span>
         )}
       </p>
       {row.tenant_name && (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{row.tenant_name}</p>
+        <p className="text-xs text-[#97978f] dark:text-[#97978f]">{row.tenant_name}</p>
       )}
       {row.subtext && (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{row.subtext}</p>
+        <p className="text-xs text-[#97978f] dark:text-[#97978f]">{row.subtext}</p>
       )}
       <span className={cn(
         'mt-1 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium',
@@ -472,7 +472,7 @@ function TableView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
               <TableCell colSpan={4} className="py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
                   <Building2 className="h-8 w-8 text-gray-300 dark:text-neutral-600" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                     Geen eenheden gevonden
                   </p>
                 </div>
@@ -484,19 +484,19 @@ function TableView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
             return (
               <TableRow
                 key={r.lease_id}
-                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+                className="cursor-pointer hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/50"
                 onClick={() => onSelect(r.lease_id)}
               >
-                <TableCell className="px-3.5 py-3 text-gray-900 dark:text-white font-medium">
+                <TableCell className="px-3.5 py-3 text-[#1a1c18] dark:text-white font-medium">
                   {r.property_name ?? '—'}
                   {r.unit_number && (
-                    <span className="font-normal text-gray-500 dark:text-gray-300"> · {r.unit_number}</span>
+                    <span className="font-normal text-[#97978f] dark:text-gray-300"> · {r.unit_number}</span>
                   )}
                 </TableCell>
-                <TableCell className="px-3.5 py-3 text-gray-600 dark:text-gray-300">
+                <TableCell className="px-3.5 py-3 text-[#55554e] dark:text-gray-300">
                   {r.tenant_name ?? '—'}
                 </TableCell>
-                <TableCell className="px-3.5 py-3 text-gray-400 dark:text-gray-500 text-xs">
+                <TableCell className="px-3.5 py-3 text-[#97978f] dark:text-[#97978f] text-xs">
                   {r.subtext ?? '—'}
                 </TableCell>
                 <TableCell className="px-3.5 py-3">

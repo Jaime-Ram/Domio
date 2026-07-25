@@ -264,38 +264,38 @@ label:has(input:not(:disabled)),
 :root {
     /* Color scheme variables */
     --color-background: #ffffff;
-    --color-foreground: #0F172A;
+    --color-foreground: #1a1c18;
 
-    /* Domio Brand Colors - Forest Green & Bright Green */
-    --color-primary-50: #E8F0E6;
-    --color-primary-100: #D1E1CC;
-    --color-primary-200: #A3C399;
-    --color-primary-300: #75A566;
-    --color-primary-400: #356258; /* Tertiary - Mid Green */
-    --color-primary-500: #163300; /* Forest Green - PMS 2411 */
-    --color-primary-600: #122900;
-    --color-primary-700: #0E2000;
-    --color-primary-800: #0A1600;
-    --color-primary-900: #050B00;
+    /* Domio Brand Colors - Forest Green & Bright Green (nieuw palet) */
+    --color-primary-50: #eef2ec;
+    --color-primary-100: #dbe4d6;
+    --color-primary-200: #b3c6a9;
+    --color-primary-300: #7fa06e;
+    --color-primary-400: #2f6a1e; /* Tertiary - Mid Green */
+    --color-primary-500: #161f13; /* Forest Green (nieuw) */
+    --color-primary-600: #10160c;
+    --color-primary-700: #0c1109;
+    --color-primary-800: #080b06;
+    --color-primary-900: #040603;
 
-    /* Neutrals - Text & UI */
-    --color-text-primary: #0F172A; /* Midnight */
-    --color-text-secondary: #475569; /* Slate */
-    --color-border: #E2E8F0; /* Soft Gray */
-    --color-surface: #F8FAFC; /* Off-White */
+    /* Neutrals - Text & UI (warm grijs) */
+    --color-text-primary: #1a1c18; /* Ink */
+    --color-text-secondary: #55554e; /* Grey */
+    --color-border: #e3e3de; /* Line */
+    --color-surface: #f4f4f1; /* Panel */
     --color-white: #FFFFFF;
 
-    /* Secondary colors (using neutrals) */
-    --color-secondary-50: #F8FAFC; /* Off-White */
-    --color-secondary-100: #F1F5F9;
-    --color-secondary-200: #E2E8F0; /* Soft Gray */
-    --color-secondary-300: #CBD5E1;
-    --color-secondary-400: #94A3B8;
-    --color-secondary-500: #475569; /* Slate */
-    --color-secondary-600: #334155;
-    --color-secondary-700: #1E293B;
-    --color-secondary-800: #0F172A; /* Midnight */
-    --color-secondary-900: #020617;
+    /* Secondary colors (warme neutralen) */
+    --color-secondary-50: #f7f7f4;
+    --color-secondary-100: #f4f4f1;
+    --color-secondary-200: #e3e3de; /* Line */
+    --color-secondary-300: #cfcfc8;
+    --color-secondary-400: #97978f; /* Grey-2 */
+    --color-secondary-500: #55554e; /* Grey */
+    --color-secondary-600: #3f3f39;
+    --color-secondary-700: #2b2b26;
+    --color-secondary-800: #1a1c18; /* Ink */
+    --color-secondary-900: #0f100d;
 
     /* Functional Colors - Status */
     --color-success: #4ADE80; /* Green */
@@ -307,19 +307,19 @@ label:has(input:not(:disabled)),
     --color-accent-100: #E1FFD9;
     --color-accent-200: #C3FFB3;
     --color-accent-300: #A5FF8D;
-    --color-accent-400: #9FE870; /* Bright Green - PMS 7487 */
-    --color-accent-500: #7FE65F;
+    --color-accent-400: #94f477; /* Bright Green (nieuw) */
+    --color-accent-500: #7ee85c;
     --color-accent-600: #64CC4C;
     --color-accent-700: #4A9939;
     --color-accent-800: #2F6626;
     --color-accent-900: #153313;
 
     /* Interactive tokens (use in components) */
-    --color-interactive-primary: #163300;   /* Forest Green – neutral interactive, active list items */
-    --color-interactive-accent: #9FE870;    /* Bright Green – primary buttons, pop of colour */
-    --color-interactive-secondary: #868685; /* De-emphasised: input/checkbox borders, clear button. Not on text. */
-    --color-interactive-control: #163300;   /* Text/icons on Bright Green surfaces (e.g. primary button text) */
-    --color-interactive-contrast: #9FE870;  /* Text/icons on Forest Green surfaces */
+    --color-interactive-primary: #161f13;   /* Forest Green – neutral interactive, active list items */
+    --color-interactive-accent: #94f477;    /* Bright Green – primary buttons, pop of colour */
+    --color-interactive-secondary: #97978f; /* De-emphasised: input/checkbox borders, clear button. Not on text. */
+    --color-interactive-control: #161f13;   /* Text/icons on Bright Green surfaces (e.g. primary button text) */
+    --color-interactive-contrast: #94f477;  /* Text/icons on Forest Green surfaces */
 
     /* Wise-style semantic spacing (use in components for consistency) */
     --space-x-small: 8px;
@@ -337,46 +337,46 @@ label:has(input:not(:disabled)),
 @layer base {
   :root {
         --background: 0 0% 100%; /* White */
-        --foreground: 222 47% 11%; /* Midnight #0F172A */
+        --foreground: 90 8% 10%; /* Ink #1a1c18 */
         --card: 0 0% 100%; /* White */
-        --card-foreground: 222 47% 11%; /* Midnight */
+        --card-foreground: 90 8% 10%; /* Ink */
         --popover: 0 0% 100%;
-        --popover-foreground: 222 47% 11%;
-        --primary: 104 100% 10%; /* Forest Green #163300 */
+        --popover-foreground: 90 8% 10%;
+        --primary: 105 24% 10%; /* Forest Green #161f13 */
         --primary-foreground: 0 0% 100%; /* White */
-        --secondary: 210 40% 98%; /* Off-White #F8FAFC */
-        --secondary-foreground: 222 47% 11%; /* Midnight */
-        --muted: 210 40% 96%;
-        --muted-foreground: 215 16% 47%; /* Slate #475569 */
-        --accent: 102 72% 68%; /* Bright Green #9FE870 */
-        --accent-foreground: 104 100% 10%; /* Forest Green for contrast */
+        --secondary: 60 12% 95%; /* Panel #f4f4f1 */
+        --secondary-foreground: 90 8% 10%; /* Ink */
+        --muted: 60 10% 92%;
+        --muted-foreground: 75 5% 32%; /* Grey #55554e */
+        --accent: 106 84% 71%; /* Bright Green #94f477 */
+        --accent-foreground: 105 24% 10%; /* Forest Green for contrast */
         --destructive: 0 84% 60%; /* Error Red #EF4444 */
         --destructive-foreground: 0 0% 98%;
-        --border: 214 32% 91%; /* Soft Gray #E2E8F0 */
-        --input: 214 32% 91%;
-        --ring: 104 100% 10%; /* Forest Green */
+        --border: 60 8% 88%; /* Line #e3e3de */
+        --input: 60 8% 88%;
+        --ring: 105 24% 10%; /* Forest Green */
         --radius: 0.5rem;
     }
   .dark {
-        --background: 222 47% 11%; /* Midnight */
+        --background: 100 12% 8%; /* Forest-donker */
         --foreground: 0 0% 98%;
-        --card: 222 47% 11%;
+        --card: 100 12% 8%;
         --card-foreground: 0 0% 98%;
-        --popover: 222 47% 11%;
+        --popover: 100 12% 8%;
         --popover-foreground: 0 0% 98%;
-        --primary: 104 100% 10%; /* Forest Green #163300 */
+        --primary: 105 24% 10%; /* Forest Green #161f13 */
         --primary-foreground: 0 0% 100%;
-        --secondary: 215 28% 17%;
+        --secondary: 90 6% 16%;
         --secondary-foreground: 0 0% 98%;
-        --muted: 215 28% 17%;
-        --muted-foreground: 215 16% 47%;
-        --accent: 102 72% 68%; /* Bright Green #9FE870 */
-        --accent-foreground: 104 100% 10%; /* Forest Green for contrast */
+        --muted: 90 6% 16%;
+        --muted-foreground: 75 5% 55%;
+        --accent: 106 84% 71%; /* Bright Green #94f477 */
+        --accent-foreground: 105 24% 10%; /* Forest Green for contrast */
         --destructive: 0 62% 50%;
         --destructive-foreground: 0 0% 98%;
-        --border: 215 28% 17%;
-        --input: 215 28% 17%;
-        --ring: 104 100% 10%; /* Forest Green */
+        --border: 90 6% 16%;
+        --input: 90 6% 16%;
+        --ring: 105 24% 10%; /* Forest Green */
     }
 }
 
@@ -394,21 +394,9 @@ label:has(input:not(:disabled)),
     overflow-x: hidden;
     }
   
-  /* Koppen in het nieuwe merkfont (Switzer), lichtere weights, minder vet dan Codec Pro */
+  /* Koppen in het nieuwe merkfont (Switzer), gewicht gelijk aan dashboard-nieuw (medium) */
   h1, h2, h3, h4, h5, h6 {
     font-family: "Switzer", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 600;
-  }
-
-  h1 {
-    font-weight: 600;
-  }
-
-  h2 {
-    font-weight: 600;
-  }
-
-  h3, h4, h5, h6 {
     font-weight: 500;
   }
   

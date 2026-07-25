@@ -51,7 +51,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   elektricien: 'bg-yellow-100 text-yellow-700',
   schilder:    'bg-purple-100 text-purple-700',
   schoonmaak:  'bg-green-100 text-green-700',
-  overig:      'bg-gray-100 text-gray-600',
+  overig:      'bg-[#f4f4f1] text-[#55554e]',
 }
 
 const EMPTY_FORM = {
@@ -133,7 +133,7 @@ export default function ContactsPage() {
 
   const filterContent = (
     <>
-      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Categorie
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -146,7 +146,7 @@ export default function ContactsPage() {
             className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
           >
             <span>{cat.label}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{categoryCounts[cat.value] ?? 0}</span>
+            <span className="text-xs text-[#97978f] dark:text-[#97978f]">{categoryCounts[cat.value] ?? 0}</span>
           </DropdownMenuCheckboxItem>
         ))}
       </div>
@@ -260,9 +260,9 @@ export default function ContactsPage() {
         <div className="flex items-center gap-3 min-w-0">
           <PersonAvatar />
           <div className="min-w-0">
-            <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate leading-tight">{c.name}</p>
+            <p className="text-[12.5px] font-semibold text-[#1a1c18] dark:text-white truncate leading-tight">{c.name}</p>
             {c.company && (
-              <p className="text-[12.5px] text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{c.company}</p>
+              <p className="text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate leading-tight mt-0.5">{c.company}</p>
             )}
           </div>
         </div>
@@ -279,14 +279,14 @@ export default function ContactsPage() {
     {
       key: 'phone', header: 'Telefoon', width: 'minmax(0,1.2fr)',
       render: (c) => c.phone ? (
-        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.phone}</a>
-      ) : <span className="text-[12.5px] text-gray-400 dark:text-gray-600">—</span>,
+        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors">{c.phone}</a>
+      ) : <span className="text-[12.5px] text-[#97978f] dark:text-[#55554e]">—</span>,
     },
     {
       key: 'email', header: 'E-mail', width: 'minmax(0,1.6fr)',
       render: (c) => c.email ? (
-        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-gray-600 dark:text-gray-300 truncate hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors">{c.email}</a>
-      ) : <span className="text-[12.5px] text-gray-400 dark:text-gray-600">—</span>,
+        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors">{c.email}</a>
+      ) : <span className="text-[12.5px] text-[#97978f] dark:text-[#55554e]">—</span>,
     },
   ]
 
@@ -310,11 +310,11 @@ export default function ContactsPage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-36 rounded-2xl bg-gray-100 dark:bg-neutral-800 animate-pulse" />
+            <div key={i} className="h-36 rounded-2xl bg-[#f4f4f1] dark:bg-neutral-800 animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 text-gray-400">
+        <div className="flex flex-col items-center justify-center py-24 gap-3 text-[#97978f]">
           <BookUser className="h-10 w-10" />
           <p className="text-sm font-medium">
             {contacts.length === 0 ? 'Nog geen contacten toegevoegd.' : 'Geen contacten gevonden.'}
@@ -337,13 +337,13 @@ export default function ContactsPage() {
               key={c.id}
               type="button"
               onClick={() => openDetail(c)}
-              className="group rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
+              className="group rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 dark:text-white truncate">{c.name}</p>
+                  <p className="font-semibold text-[#1a1c18] dark:text-white truncate">{c.name}</p>
                   {c.company && (
-                    <p className="text-xs text-gray-500 truncate mt-0.5">{c.company}</p>
+                    <p className="text-xs text-[#97978f] truncate mt-0.5">{c.company}</p>
                   )}
                 </div>
                 <Badge className={cn('shrink-0 text-xs font-medium rounded-full border-0', CATEGORY_COLORS[c.category] ?? CATEGORY_COLORS.overig)}>
@@ -352,20 +352,20 @@ export default function ContactsPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 {c.phone && (
-                  <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
+                  <p className="flex items-center gap-2 text-sm text-[#55554e] dark:text-neutral-300">
                     <Phone className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{c.phone}</span>
                   </p>
                 )}
                 {c.email && (
-                  <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
+                  <p className="flex items-center gap-2 text-sm text-[#55554e] dark:text-neutral-300">
                     <Mail className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{c.email}</span>
                   </p>
                 )}
               </div>
               {c.notes && (
-                <p className="text-xs text-gray-400 leading-5 line-clamp-2">{c.notes}</p>
+                <p className="text-xs text-[#97978f] leading-5 line-clamp-2">{c.notes}</p>
               )}
             </button>
           ))}
@@ -451,12 +451,12 @@ export default function ContactsPage() {
         }
         footer={
           deleteConfirm ? (
-            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex flex-col gap-3">
-              <p className="text-sm text-gray-700 dark:text-neutral-300 font-medium">Contact verwijderen?</p>
-              <p className="text-xs text-gray-500">Dit kan niet ongedaan worden gemaakt.</p>
+            <div className="border-t border-[#e3e3de] dark:border-neutral-800 p-4 flex flex-col gap-3">
+              <p className="text-sm text-[#55554e] dark:text-neutral-300 font-medium">Contact verwijderen?</p>
+              <p className="text-xs text-[#97978f]">Dit kan niet ongedaan worden gemaakt.</p>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setDeleteConfirm(false)}
-                  className="flex-1 text-sm text-gray-500 hover:text-gray-800 transition-colors py-2">
+                  className="flex-1 text-sm text-[#97978f] hover:text-[#1a1c18] transition-colors py-2">
                   Annuleren
                 </button>
                 <button type="button" onClick={handleDelete}
@@ -466,32 +466,32 @@ export default function ContactsPage() {
               </div>
             </div>
           ) : editMode ? (
-            <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end gap-3">
+            <div className="border-t border-[#e3e3de] dark:border-neutral-800 p-4 flex items-center justify-end gap-3">
               <button type="button" onClick={() => setEditMode(false)}
-                className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">
+                className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-1 py-1">
                 Annuleren
               </button>
               <button type="button" onClick={handleSaveEdit} disabled={editSaving || !editForm.name.trim()}
-                className="inline-flex items-center justify-center rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-5 py-2 transition-colors">
+                className="inline-flex items-center justify-center rounded-full bg-[#94f477] hover:bg-[#8AD45F] disabled:opacity-50 text-[#161f13] text-sm font-semibold px-5 py-2 transition-colors">
                 {editSaving ? 'Opslaan…' : 'Opslaan'}
               </button>
             </div>
           ) : (
-            <div className="border-t border-gray-100 dark:border-neutral-800 px-6 py-4 flex items-center justify-between">
+            <div className="border-t border-[#e3e3de] dark:border-neutral-800 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <button type="button" onClick={enterEditMode}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800">
+                  className="inline-flex items-center gap-1.5 text-sm text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 transition-colors px-2 py-1 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                   <Pencil className="h-4 w-4" />
                   Bewerken
                 </button>
                 <button type="button" onClick={() => setDeleteConfirm(true)}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10">
+                  className="inline-flex items-center gap-1.5 text-sm text-[#97978f] dark:text-[#97978f] hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10">
                   <Trash2 className="h-4 w-4" />
                   Verwijderen
                 </button>
               </div>
               <button type="button" onClick={() => setDetailContact(null)}
-                className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">
+                className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-1 py-1">
                 Sluiten
               </button>
             </div>
@@ -557,22 +557,22 @@ export default function ContactsPage() {
               {/* Contactgegevens */}
               <div className="space-y-3">
                 {detailContact.company && (
-                  <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300">
-                    <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
+                  <div className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300">
+                    <Building2 className="h-4 w-4 text-[#97978f] shrink-0" />
                     {detailContact.company}
                   </div>
                 )}
                 {detailContact.phone && (
                   <a href={`tel:${detailContact.phone}`}
-                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors">
-                    <Phone className="h-4 w-4 text-gray-400 shrink-0" />
+                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#161f13] dark:hover:text-[#94f477] transition-colors">
+                    <Phone className="h-4 w-4 text-[#97978f] shrink-0" />
                     {detailContact.phone}
                   </a>
                 )}
                 {detailContact.email && (
                   <a href={`mailto:${detailContact.email}`}
-                    className="flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors">
-                    <Mail className="h-4 w-4 text-gray-400 shrink-0" />
+                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#161f13] dark:hover:text-[#94f477] transition-colors">
+                    <Mail className="h-4 w-4 text-[#97978f] shrink-0" />
                     {detailContact.email}
                   </a>
                 )}
@@ -581,13 +581,13 @@ export default function ContactsPage() {
               {/* Gekoppeld aan */}
               {(linkPropertyIds.size > 0 || linkPortfolioIds.size > 0) && (
                 <div>
-                  <p className="text-xs font-medium text-gray-400 dark:text-neutral-500 uppercase tracking-wide mb-2">Gekoppeld aan</p>
+                  <p className="text-xs font-medium text-[#97978f] dark:text-neutral-500 uppercase tracking-wide mb-2">Gekoppeld aan</p>
                   <div className="flex flex-wrap gap-1.5">
                     {[...linkPropertyIds].map((id) => {
                       const p = (properties as any[]).find((x) => x.id === id)
                       return (
-                        <span key={`p-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-1 text-xs text-gray-700 dark:text-gray-300">
-                          <Building2 className="h-3 w-3 text-gray-400 shrink-0" />
+                        <span key={`p-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-2.5 py-1 text-xs text-[#55554e] dark:text-gray-300">
+                          <Building2 className="h-3 w-3 text-[#97978f] shrink-0" />
                           {p?.name || p?.address || 'Pand'}
                         </span>
                       )
@@ -595,8 +595,8 @@ export default function ContactsPage() {
                     {[...linkPortfolioIds].map((id) => {
                       const pf = (portfolios as any[]).find((x) => x.id === id)
                       return (
-                        <span key={`pf-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 px-2.5 py-1 text-xs text-gray-700 dark:text-gray-300">
-                          <Layers className="h-3 w-3 text-gray-400 shrink-0" />
+                        <span key={`pf-${id}`} className="inline-flex items-center gap-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-2.5 py-1 text-xs text-[#55554e] dark:text-gray-300">
+                          <Layers className="h-3 w-3 text-[#97978f] shrink-0" />
                           {pf?.name || 'Portefeuille'}
                         </span>
                       )
@@ -608,8 +608,8 @@ export default function ContactsPage() {
               {/* Notities */}
               {detailContact.notes && (
                 <div>
-                  <p className="text-xs font-medium text-gray-400 dark:text-neutral-500 uppercase tracking-wide mb-2">Notities</p>
-                  <p className="text-sm text-gray-600 dark:text-neutral-300 leading-relaxed">{detailContact.notes}</p>
+                  <p className="text-xs font-medium text-[#97978f] dark:text-neutral-500 uppercase tracking-wide mb-2">Notities</p>
+                  <p className="text-sm text-[#55554e] dark:text-neutral-300 leading-relaxed">{detailContact.notes}</p>
                 </div>
               )}
             </div>
@@ -639,21 +639,21 @@ function LinkSelectors({
   return (
     <>
       <div>
-        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Koppel aan panden</p>
+        <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f] mb-1.5">Koppel aan panden</p>
         {properties.length === 0 ? (
-          <p className="text-xs text-gray-400">Nog geen panden in je portefeuille.</p>
+          <p className="text-xs text-[#97978f]">Nog geen panden in je portefeuille.</p>
         ) : (
-          <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-[#e3e3de] dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
             {properties.map((p) => {
               const sel = propertyIds.has(p.id)
               return (
                 <button key={p.id} type="button" onClick={() => onToggleProperty(p.id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#163300] border-[#163300] dark:bg-[#9FE870] dark:border-[#9FE870]' : 'border-gray-300 dark:border-neutral-600')}>
-                    {sel && <Check className="h-3 w-3 text-white dark:text-[#163300]" />}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#161f13] border-[#161f13] dark:bg-[#94f477] dark:border-[#94f477]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
                   </span>
-                  <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{p.name || p.address || 'Pand'}</span>
+                  <Building2 className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
+                  <span className="text-sm text-[#55554e] dark:text-gray-300 truncate">{p.name || p.address || 'Pand'}</span>
                 </button>
               )
             })}
@@ -661,21 +661,21 @@ function LinkSelectors({
         )}
       </div>
       <div>
-        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Koppel aan portefeuilles</p>
+        <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f] mb-1.5">Koppel aan portefeuilles</p>
         {portfolios.length === 0 ? (
-          <p className="text-xs text-gray-400">Nog geen portefeuilles.</p>
+          <p className="text-xs text-[#97978f]">Nog geen portefeuilles.</p>
         ) : (
-          <div className="max-h-40 overflow-y-auto rounded-xl border border-gray-200 dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-[#e3e3de] dark:border-neutral-700 divide-y divide-gray-100 dark:divide-neutral-800">
             {portfolios.map((pf) => {
               const sel = portfolioIds.has(pf.id)
               return (
                 <button key={pf.id} type="button" onClick={() => onTogglePortfolio(pf.id)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#163300] border-[#163300] dark:bg-[#9FE870] dark:border-[#9FE870]' : 'border-gray-300 dark:border-neutral-600')}>
-                    {sel && <Check className="h-3 w-3 text-white dark:text-[#163300]" />}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#161f13] border-[#161f13] dark:bg-[#94f477] dark:border-[#94f477]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
                   </span>
-                  <Layers className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{pf.name || 'Portefeuille'}</span>
+                  <Layers className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
+                  <span className="text-sm text-[#55554e] dark:text-gray-300 truncate">{pf.name || 'Portefeuille'}</span>
                 </button>
               )
             })}

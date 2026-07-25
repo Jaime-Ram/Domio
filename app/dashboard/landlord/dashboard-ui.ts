@@ -17,13 +17,13 @@ export const DASHBOARD_PAGE_GUTTER_CLASS = 'pl-5'
  * Filter-knop (pill) zoals Documenten/Drive: combineer met `inline-flex` of `hidden md:inline-flex`.
  */
 export const DASHBOARD_FILTER_TRIGGER_BUTTON_CLASS =
-  'h-9 rounded-full border border-gray-200 dark:border-neutral-700 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4'
+  'h-9 rounded-full border border-[#e3e3de] dark:border-neutral-700 text-sm font-medium text-[#55554e] dark:text-gray-200 bg-white dark:bg-neutral-900 px-3 md:px-4'
 
 /**
  * Inhoud van het filter-`DropdownMenu` (zelfde schaduw/hoeken als Drive).
  */
 export const DASHBOARD_FILTER_MENU_CONTENT_CLASS =
-  'rounded-2xl bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]'
+  'rounded-2xl bg-white dark:bg-neutral-800 border border-[#e3e3de] dark:border-neutral-700 shadow-soft px-2 py-2 min-w-[220px]'
 
 /**
  * `DropdownMenuCheckboxItem` met vinkje-kolom. Gebruik samen met `onSelect={(e) => e.preventDefault()}` zodat het menu open blijft bij togglen.
@@ -44,19 +44,19 @@ export const DASHBOARD_TITLE_ALIGN_CLASS = DASHBOARD_PAGE_GUTTER_CLASS
  * Lichtgrijze tint voor tabelkop / schil (neutraal; geen groen-grijs).
  */
 export const DASHBOARD_TABLE_HEADER_TINT_CLASS =
-  'bg-gray-100 dark:bg-neutral-800/90'
+  'bg-[#f4f4f1] dark:bg-neutral-800/90'
 
 /**
  * Tabellen in dashboard-kaarten: `DashboardTableHead` (`px-5`); groene accenttekst op grijze kop (zie `DASHBOARD_TABLE_HEADER_TINT_CLASS` op `thead tr`).
  */
 export const DASHBOARD_TABLE_HEAD_CLASS =
-  'h-auto min-h-12 px-5 py-3 text-left align-middle text-sm font-semibold text-[#163300] dark:text-[#9FE870]'
+  'h-auto min-h-12 px-5 py-3 text-left align-middle text-sm font-semibold text-[#161f13] dark:text-[#94f477]'
 
 /**
  * Shadcn-tabelkoppen (gelijk aan toolbar); zelfde tint/tekst als `DASHBOARD_TABLE_HEAD_CLASS`.
  */
 export const DASHBOARD_TABLE_HEAD_SHADCN_CLASS =
-  'h-auto min-h-12 px-3.5 py-3 text-left align-middle text-sm font-semibold text-[#163300] dark:text-[#9FE870]'
+  'h-auto min-h-12 px-3.5 py-3 text-left align-middle text-sm font-semibold text-[#161f13] dark:text-[#94f477]'
 
 export const DASHBOARD_TABLE_CELL_CLASS =
   'px-5 py-3 align-middle text-sm'
@@ -66,14 +66,14 @@ export const DASHBOARD_TABLE_CELL_CLASS =
  * Combineer met vaste maat, bv. `h-10 w-10` + `rounded-lg` of `rounded-full`.
  */
 export const DASHBOARD_TABLE_ICON_WRAP_CLASS =
-  'flex shrink-0 items-center justify-center border border-gray-200/90 bg-transparent dark:border-neutral-600'
+  'flex shrink-0 items-center justify-center border border-[#e3e3de]/90 bg-transparent dark:border-neutral-600'
 
 /**
  * Één afgerond blok (`rounded-card`) voor **toolbar + tabel**: geen aparte CardHeader-rand naast tabelrand.
  * Binnen een `Card` met `p-0` vult dit het vlak; zelfde uitlijning voor boven- en onderdeel.
  */
 export const DASHBOARD_TABLE_FRAME_CLASS =
-  'flex min-h-0 flex-col overflow-hidden rounded-card border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900'
+  'flex min-h-0 flex-col overflow-hidden rounded-card border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900'
 
 /** Toolbar boven shadcn-default tabel (kolommen gelijk aan `DASHBOARD_TABLE_HEAD_SHADCN_CLASS`). */
 export const DASHBOARD_TABLE_FRAME_TOOLBAR_SHADCN = 'space-y-3 p-0 px-3.5 pt-5 pb-2.5'
@@ -83,17 +83,17 @@ export const DASHBOARD_TABLE_FRAME_TOOLBAR_DASHBOARD = 'space-y-3 p-0 px-5 pt-5 
 
 /** Alleen het tabelgedeelte (scheidingslijn, scroll). */
 export const DASHBOARD_TABLE_FRAME_TABLE_CLASS =
-  'min-h-0 overflow-x-auto border-t border-gray-200 dark:border-neutral-700'
+  'min-h-0 overflow-x-auto border-t border-[#e3e3de] dark:border-neutral-700'
 
 /**
  * Wanneer toolbar nog in `CardHeader` zit maar de tabel er direct onder: één visueel blok met ronde hoeken.
  * Header: boven + zijkanten; body: onder + zijkanten + dunne scheiding boven de tabel.
  */
 export const DASHBOARD_TABLE_SHELL_HEADER_CLASS =
-  'rounded-t-card border-x border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900'
+  'rounded-t-card border-x border-t border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900'
 
 export const DASHBOARD_TABLE_SHELL_BODY_CLASS =
-  'min-h-0 overflow-x-auto rounded-b-card border-x border-b border-t border-gray-200 dark:border-neutral-700'
+  'min-h-0 overflow-x-auto rounded-b-card border-x border-b border-t border-[#e3e3de] dark:border-neutral-700'
 
 /**
  * Eén visueel blok: lichtgrijze schil met afgeronde hoeken; één shadcn-`Table` erin.
@@ -104,22 +104,22 @@ export const DASHBOARD_TABLE_SHELL_BODY_CLASS =
 export const DASHBOARD_TABLE_BLOCK_CLASS =
   'min-h-0 w-full rounded-card overflow-hidden ' +
   // Iets minder padding boven: anders oogt de kopregel te “dik”
-  'bg-gray-100 dark:bg-neutral-800/90 px-2.5 pb-2.5 pt-1.5 ' +
+  'bg-[#f4f4f1] dark:bg-neutral-800/90 px-2.5 pb-2.5 pt-1.5 ' +
   '[&_table]:w-full [&_table]:border-separate [&_table]:border-spacing-0 ' +
   '[&_thead_tr]:!border-b-0 [&_tfoot_tr]:!border-b-0 ' +
-  '[&_thead_tr]:bg-gray-100 dark:[&_thead_tr]:bg-neutral-800/90 ' +
-  '[&_thead_tr]:hover:!bg-gray-100 dark:[&_thead_tr]:hover:!bg-neutral-800/90 ' +
-  '[&_thead_th]:!min-h-0 [&_thead_th]:!py-2.5 [&_thead_th]:text-[#163300] dark:[&_thead_th]:text-[#9FE870] ' +
+  '[&_thead_tr]:bg-[#f4f4f1] dark:[&_thead_tr]:bg-neutral-800/90 ' +
+  '[&_thead_tr]:hover:!bg-[#f4f4f1] dark:[&_thead_tr]:hover:!bg-neutral-800/90 ' +
+  '[&_thead_th]:!min-h-0 [&_thead_th]:!py-2.5 [&_thead_th]:text-[#161f13] dark:[&_thead_th]:text-[#94f477] ' +
   '[&_tbody]:bg-white dark:[&_tbody]:bg-neutral-900 ' +
   '[&_tbody_td]:bg-transparent ' +
   '[&_tbody_td]:transition-colors duration-150 ' +
   '[&_tbody_tr]:border-b-0 [&_tfoot_tr]:border-b-0 ' +
-  '[&_tbody_tr:not(:first-child)_td]:border-t [&_tbody_tr:not(:first-child)_td]:border-gray-100 dark:[&_tbody_tr:not(:first-child)_td]:border-t-neutral-800 ' +
+  '[&_tbody_tr:not(:first-child)_td]:border-t [&_tbody_tr:not(:first-child)_td]:border-[#e3e3de] dark:[&_tbody_tr:not(:first-child)_td]:border-t-neutral-800 ' +
   '[&_tbody_tr:first-child_td:first-child]:rounded-tl-card [&_tbody_tr:first-child_td:last-child]:rounded-tr-card ' +
   '[&_tbody_tr:last-child_td:first-child]:rounded-bl-card [&_tbody_tr:last-child_td:last-child]:rounded-br-card ' +
   '[&_tbody_tr:first-child:last-child_td:only-child]:rounded-card ' +
   '[&_tbody_tr:hover]:!bg-transparent ' +
-  '[&_tbody_tr:hover>td]:bg-gray-100/95 dark:[&_tbody_tr:hover>td]:bg-neutral-800 ' +
+  '[&_tbody_tr:hover>td]:bg-[#f4f4f1]/95 dark:[&_tbody_tr:hover>td]:bg-neutral-800 ' +
   '[&>div]:min-w-0 [&>div]:overflow-x-auto '
 
 /**

@@ -37,12 +37,12 @@ import {
 // ── Config ──────────────────────────────────────────────────────────────────
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
-  administratief: { label: 'Administratief', color: 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400' },
+  administratief: { label: 'Administratief', color: 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-[#97978f]' },
   onderhoud:      { label: 'Onderhoud',      color: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400' },
   financieel:     { label: 'Financieel',     color: 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' },
   huurder:        { label: 'Huurder',        color: 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400' },
   juridisch:      { label: 'Juridisch',      color: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' },
-  overig:         { label: 'Overig',         color: 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400' },
+  overig:         { label: 'Overig',         color: 'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-800 dark:text-[#97978f]' },
 }
 
 const PRIORITY_CONFIG: Record<string, { label: string; dot: string }> = {
@@ -224,7 +224,7 @@ export default function TasksPage() {
       searchPlaceholder="Zoek taken…"
       filterContent={
         <>
-          <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+          <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
             Categorie
           </DropdownMenuLabel>
           <div className="space-y-1">
@@ -275,8 +275,8 @@ export default function TasksPage() {
         const rec = RECURRING_LABEL[task.recurring] ?? ''
         return (
           <div className="min-w-0">
-            <span className={cn('text-[12.5px] font-semibold truncate block', done ? 'line-through text-gray-400 dark:text-gray-600' : 'text-gray-900 dark:text-white')}>{task.title}</span>
-            <span className="text-[12.5px] text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
+            <span className={cn('text-[12.5px] font-semibold truncate block', done ? 'line-through text-[#97978f] dark:text-[#55554e]' : 'text-[#1a1c18] dark:text-white')}>{task.title}</span>
+            <span className="text-[12.5px] text-[#97978f] dark:text-[#97978f] flex items-center gap-2 mt-0.5">
               {cat.label}
               {rec && (<><span>·</span><span className="inline-flex items-center gap-1"><RefreshCw className="h-3 w-3 shrink-0" />{rec}</span></>)}
             </span>
@@ -287,7 +287,7 @@ export default function TasksPage() {
     {
       key: 'property', header: 'Pand', sortable: true,
       render: (task) => task.properties ? (
-        <span className="text-[12.5px] text-gray-500 dark:text-gray-400 truncate block">{task.properties.name}</span>
+        <span className="text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate block">{task.properties.name}</span>
       ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
     {
@@ -297,20 +297,20 @@ export default function TasksPage() {
         const days = task.due_date ? daysUntil(task.due_date) : null
         const isOverdue = days !== null && days < 0 && !done
         return task.due_date ? (
-          <span className={cn('text-[12.5px]', isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : done ? 'text-gray-400 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400')}>{fmtDate(task.due_date)}</span>
+          <span className={cn('text-[12.5px]', isOverdue ? 'text-red-500 dark:text-red-400 font-medium' : done ? 'text-[#97978f] dark:text-[#55554e]' : 'text-[#97978f] dark:text-[#97978f]')}>{fmtDate(task.due_date)}</span>
         ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>
       },
     },
     {
       key: 'priority', header: 'Prioriteit', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
       render: (task) => task.priority && task.priority !== 'normaal' ? (
-        <span className="text-[12.5px] text-gray-500 dark:text-gray-400">{(PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal).label}</span>
+        <span className="text-[12.5px] text-[#97978f] dark:text-[#97978f]">{(PRIORITY_CONFIG[task.priority] ?? PRIORITY_CONFIG.normaal).label}</span>
       ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
     {
       key: 'notification_date', header: 'Herinnering', sortable: true, className: 'hidden md:block', headerClassName: 'hidden md:inline-flex',
       render: (task) => task.notification_date ? (
-        <span className="text-[12.5px] text-gray-500 dark:text-gray-400">{fmtDate(task.notification_date)}</span>
+        <span className="text-[12.5px] text-[#97978f] dark:text-[#97978f]">{fmtDate(task.notification_date)}</span>
       ) : <span className="text-[12.5px] text-gray-300 dark:text-neutral-600">—</span>,
     },
   ]
@@ -339,9 +339,9 @@ export default function TasksPage() {
         empty={
           <div className="px-4">
             <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}</p>
+            <p className="text-sm font-medium text-[#97978f] dark:text-[#97978f]">{search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}</p>
             {!search && filter === 'alle' && (
-              <button type="button" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] text-xs font-semibold px-3 py-1.5 transition-colors">
+              <button type="button" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] text-xs font-semibold px-3 py-1.5 transition-colors">
                 <Plus className="h-3.5 w-3.5" />
                 Eerste taak aanmaken
               </button>

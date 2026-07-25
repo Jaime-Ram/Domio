@@ -136,8 +136,8 @@ export default function EditPropertyPage() {
   if (fetching) {
     return (
       <div className="max-w-xl space-y-6 animate-pulse">
-        <div className="h-6 bg-gray-200 dark:bg-neutral-700 rounded w-1/3" />
-        <div className="h-96 bg-gray-200 dark:bg-neutral-700 rounded" />
+        <div className="h-6 bg-[#ebebe7] dark:bg-neutral-700 rounded w-1/3" />
+        <div className="h-96 bg-[#ebebe7] dark:bg-neutral-700 rounded" />
       </div>
     )
   }
@@ -146,7 +146,7 @@ export default function EditPropertyPage() {
     <div className="max-w-xl">
       <Link
         href={`/dashboard/landlord/portfolio/properties/${propertyId}`}
-        className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870] mb-6"
+        className="inline-flex items-center gap-2 text-sm text-[#55554e] dark:text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477] mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
         Terug naar pand
@@ -154,7 +154,7 @@ export default function EditPropertyPage() {
       <Card className={dashboardCardClass(undefined, isDemo)}>
         <CardHeader>
           <CardTitle>Pand bewerken</CardTitle>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-[#55554e] dark:text-[#97978f]">
             Wijzig de gegevens van je pand.
           </p>
         </CardHeader>
@@ -261,7 +261,7 @@ export default function EditPropertyPage() {
             </div>
             <div className="flex items-center justify-between pt-4">
               <div className="flex gap-3">
-                <Button type="submit" disabled={loading} className="bg-[#163300] hover:bg-[#356258]">
+                <Button type="submit" disabled={loading} className="bg-[#161f13] hover:bg-[#356258]">
                   {loading ? 'Bezig...' : 'Opslaan'}
                 </Button>
                 <Button type="button" variant="outline" asChild>

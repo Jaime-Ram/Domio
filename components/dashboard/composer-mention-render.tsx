@@ -31,7 +31,7 @@ export function renderMessageWithDocumentMentions(text: string, attachments: Com
 
     if (matchIndex > cursor) out.push(text.slice(cursor, matchIndex))
     out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#163300] dark:text-[#9FE870]">
+      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#161f13] dark:text-[#94f477]">
         {matchToken}
       </span>
     )
@@ -42,14 +42,14 @@ export function renderMessageWithDocumentMentions(text: string, attachments: Com
 }
 
 export function renderComposerWithDocumentMentions(text: string, attachments: ComposerAttachment[]) {
-  if (!text) return <span className="text-gray-500 dark:text-gray-400">Typ een bericht…</span>
+  if (!text) return <span className="text-[#97978f] dark:text-[#97978f]">Typ een bericht…</span>
 
   const docMentions = attachments
     .filter((a) => a.source === 'mention-document')
     .map((a) => `@${a.name}`)
     .filter(Boolean)
 
-  if (docMentions.length === 0) return <span className="text-gray-900 dark:text-gray-100">{text}</span>
+  if (docMentions.length === 0) return <span className="text-[#1a1c18] dark:text-gray-100">{text}</span>
 
   let cursor = 0
   const out: React.ReactNode[] = []
@@ -66,19 +66,19 @@ export function renderComposerWithDocumentMentions(text: string, attachments: Co
     }
 
     if (!matchToken || matchIndex === -1) {
-      out.push(<span key={`plain-${cursor}`} className="text-gray-900 dark:text-gray-100">{text.slice(cursor)}</span>)
+      out.push(<span key={`plain-${cursor}`} className="text-[#1a1c18] dark:text-gray-100">{text.slice(cursor)}</span>)
       break
     }
 
     if (matchIndex > cursor) {
       out.push(
-        <span key={`plain-${cursor}`} className="text-gray-900 dark:text-gray-100">
+        <span key={`plain-${cursor}`} className="text-[#1a1c18] dark:text-gray-100">
           {text.slice(cursor, matchIndex)}
         </span>
       )
     }
     out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#163300] dark:text-[#9FE870]">
+      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#161f13] dark:text-[#94f477]">
         {matchToken}
       </span>
     )

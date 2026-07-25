@@ -215,22 +215,22 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
       title={template?.name ?? ''}
       subtitle={template?.category}
       headerLeft={Icon ? (
-        <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-          <Icon className="h-[18px] w-[18px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+        <div className="w-10 h-10 rounded-xl bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
+          <Icon className="h-[18px] w-[18px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
         </div>
       ) : undefined}
       footer={
-        <div className="border-t border-gray-100 dark:border-neutral-800 p-4 flex items-center justify-end gap-3 shrink-0">
+        <div className="border-t border-[#e3e3de] dark:border-neutral-800 p-4 flex items-center justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1"
+            className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-1 py-1"
           >
             Sluiten
           </button>
           <Button
             onClick={onSetup}
-            className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
+            className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
           >
             Flow instellen
             <ArrowRight className="h-4 w-4 ml-1.5" />
@@ -241,33 +241,33 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
       {template && (
         <div className="px-6 py-5 space-y-5">
           {/* Beschrijving */}
-          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{template.description}</p>
+          <p className="text-sm text-[#97978f] dark:text-[#97978f] leading-relaxed">{template.description}</p>
 
           {/* Trigger */}
           <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Trigger</p>
-            <div className="flex items-center gap-2.5 rounded-xl bg-gray-50 dark:bg-neutral-800/60 border border-gray-100 dark:border-neutral-800 px-4 py-3">
-              <Clock className="h-4 w-4 text-gray-400 shrink-0" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{template.trigger}</span>
+            <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f] mb-2">Trigger</p>
+            <div className="flex items-center gap-2.5 rounded-xl bg-[#f4f4f1] dark:bg-neutral-800/60 border border-[#e3e3de] dark:border-neutral-800 px-4 py-3">
+              <Clock className="h-4 w-4 text-[#97978f] shrink-0" />
+              <span className="text-sm text-[#55554e] dark:text-gray-300">{template.trigger}</span>
             </div>
           </div>
 
           {/* Stappen */}
           <div>
-            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Stappen</p>
-            <div className="rounded-xl border border-gray-100 dark:border-neutral-800 px-4 py-3">
+            <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f] mb-2">Stappen</p>
+            <div className="rounded-xl border border-[#e3e3de] dark:border-neutral-800 px-4 py-3">
               {template.steps.map((step, i) => (
                 <div key={i} className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full bg-[#163300] dark:bg-[#9FE870] flex items-center justify-center text-[11px] font-bold text-white dark:text-[#163300] shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-[#161f13] dark:bg-[#94f477] flex items-center justify-center text-[11px] font-bold text-white dark:text-[#161f13] shrink-0">
                       {i + 1}
                     </div>
                     {i < template.steps.length - 1 && (
-                      <div className="w-px flex-1 my-1 bg-gray-200 dark:bg-neutral-700" />
+                      <div className="w-px flex-1 my-1 bg-[#ebebe7] dark:bg-neutral-700" />
                     )}
                   </div>
                   <div className="pb-4 pt-0.5 flex-1 min-w-0">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{step.label}</p>
+                    <p className="text-sm text-[#55554e] dark:text-gray-300">{step.label}</p>
                   </div>
                 </div>
               ))}
@@ -295,7 +295,7 @@ function FlowCard({ template, activeCount, onOpen }: {
     >
       <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Icon className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+          <Icon className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
         </div>
         {activeCount > 0 ? (
           <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -303,14 +303,14 @@ function FlowCard({ template, activeCount, onOpen }: {
             {activeCount > 1 ? `${activeCount}× actief` : 'Actief'}
           </span>
         ) : (
-          <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600 group-hover:text-gray-400 transition-colors mt-1" />
+          <ChevronRight className="h-4 w-4 text-gray-300 dark:text-neutral-600 group-hover:text-[#97978f] transition-colors mt-1" />
         )}
       </div>
       <div>
-        <p className="text-sm font-semibold text-gray-900 dark:text-white">{template.name}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2 leading-relaxed">{template.description}</p>
+        <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{template.name}</p>
+        <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5 line-clamp-2 leading-relaxed">{template.description}</p>
       </div>
-      <div className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-neutral-500">
+      <div className="flex items-center gap-1.5 text-[11px] text-[#97978f] dark:text-neutral-500">
         <Clock className="h-3 w-3 shrink-0" />
         {template.trigger}
       </div>
@@ -331,13 +331,13 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
   return (
     <GrayBlock className="flex items-start gap-4 p-4">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <Icon className="h-[22px] w-[22px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+        <Icon className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{flow.name}</p>
-            <p className="text-[11px] text-gray-400 dark:text-neutral-500 mt-0.5 flex items-center gap-1">
+            <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{flow.name}</p>
+            <p className="text-[11px] text-[#97978f] dark:text-neutral-500 mt-0.5 flex items-center gap-1">
               <Clock className="h-3 w-3 shrink-0" />
               {flow.trigger}
             </p>
@@ -346,7 +346,7 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
             <button
               type="button"
               onClick={onEdit}
-              className="text-xs text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700"
+              className="text-xs text-[#97978f] dark:text-neutral-500 hover:text-[#55554e] dark:hover:text-gray-300 transition-colors px-2 py-1 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-700"
             >
               Bewerken
             </button>
@@ -357,7 +357,7 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
                 'flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-all',
                 isActive
                   ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
-                  : 'text-gray-400 dark:text-neutral-500 bg-gray-100 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-700'
+                  : 'text-[#97978f] dark:text-neutral-500 bg-[#f4f4f1] dark:bg-neutral-800 border-[#e3e3de] dark:border-neutral-700 hover:bg-[#ebebe7] dark:hover:bg-neutral-700'
               )}
             >
               {isActive
@@ -367,13 +367,13 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
           </div>
         </div>
         <div className="flex gap-1.5 mt-2 flex-wrap">
-          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
             {flow.category}
           </span>
-          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
             {flow.configuredSteps.filter((s) => s.enabled).length} stappen actief
           </span>
-          <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500 bg-black/[0.06] dark:bg-neutral-700 px-2 py-0.5 rounded-full">
             {flow.propertyScope.type === 'all'
               ? 'Alle panden'
               : flow.propertyScope.propertyIds
@@ -500,8 +500,8 @@ export default function FlowsPage() {
         <div className="flex flex-col gap-10">
 
           {/* Intro block */}
-          <div className="rounded-2xl bg-[#163300] px-8 py-8 relative overflow-hidden">
-            <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#9FE870" opacity={0.15} layers={2} />
+          <div className="rounded-2xl bg-[#161f13] px-8 py-8 relative overflow-hidden">
+            <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#94f477" opacity={0.15} layers={2} />
             <div className="relative z-10 flex flex-col gap-3 max-w-xl">
               <h2 className="text-[26px] font-bold text-white leading-tight">
                 Maak je eigen flow aan
@@ -512,7 +512,7 @@ export default function FlowsPage() {
               <div className="mt-1 flex items-center gap-3">
                 <Button
                   disabled
-                  className="rounded-full bg-[#9FE870] text-[#163300] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#9FE870]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-full bg-[#94f477] text-[#161f13] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#94f477]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Plus className="h-4 w-4" />
                   Eigen flow aanmaken
@@ -528,7 +528,7 @@ export default function FlowsPage() {
               const templates = TEMPLATES.filter((t) => t.category === cat)
               return (
                 <section key={cat}>
-                  <h3 className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-3">{cat}</h3>
+                  <h3 className="text-xs font-semibold text-[#97978f] dark:text-neutral-500 uppercase tracking-wider mb-3">{cat}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {templates.map((template) => (
                       <FlowCard
@@ -550,17 +550,17 @@ export default function FlowsPage() {
         activeFlows.length === 0 ? (
           <GrayBlock className="px-8 py-8">
             <div className="flex flex-col gap-3 max-w-xl">
-              <h2 className="text-[26px] font-bold text-gray-900 dark:text-white leading-tight">
+              <h2 className="text-[26px] font-bold text-[#1a1c18] dark:text-white leading-tight">
                 Nog geen actieve flows
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-sm text-[#97978f] dark:text-[#97978f] leading-relaxed">
                 Kies een flow uit de bibliotheek, stel de stappen in op jouw situatie en activeer hem met één klik.
               </p>
               <div className="mt-1">
                 <button
                   type="button"
                   onClick={() => setTab('bibliotheek')}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#161f13] dark:bg-[#94f477] text-white dark:text-[#161f13] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
                 >
                   Naar bibliotheek
                   <ArrowRight className="h-4 w-4" />

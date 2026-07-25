@@ -138,7 +138,7 @@ export default function PuntentellingPage() {
         {/* Form */}
         <Card className={cn(dashboardCardClass(), 'lg:col-span-2')}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-base text-[#163300] dark:text-[#9FE870]">Puntentelling invoer</CardTitle>
+            <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Puntentelling invoer</CardTitle>
             <CardDescription>Vul de gegevens van het object in om de WWS-score te berekenen.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -224,14 +224,14 @@ export default function PuntentellingPage() {
             <div className="space-y-1.5">
               <Label htmlFor="huur">
                 Huidige huurprijs (€/mnd)
-                <span className="text-gray-400 font-normal text-xs ml-1">optioneel</span>
+                <span className="text-[#97978f] font-normal text-xs ml-1">optioneel</span>
               </Label>
               <Input id="huur" type="number" min={0} placeholder="bijv. 1200"
                 value={currentHuur} onChange={(e) => setCurrentHuur(e.target.value)}
                 className="rounded-xl" />
             </div>
 
-            <Button variant="outline" size="sm" className="rounded-full text-gray-500 w-full"
+            <Button variant="outline" size="sm" className="rounded-full text-[#97978f] w-full"
               onClick={() => { setForm(INITIAL_FORM); setCurrentHuur('') }}>
               <RotateCcw className="h-3.5 w-3.5 mr-2" />
               Reset formulier
@@ -244,7 +244,7 @@ export default function PuntentellingPage() {
           <Card className={dashboardCardClass()}>
             <CardContent className="p-6">
               {!canCalculate ? (
-                <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+                <div className="text-center py-8 text-[#97978f] dark:text-[#97978f]">
                   <Calculator className="h-10 w-10 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">Vul de woonoppervlakte in om te beginnen</p>
                   <p className="text-xs mt-1 opacity-60">Het resultaat wordt automatisch berekend</p>
@@ -253,17 +253,17 @@ export default function PuntentellingPage() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-5xl font-bold text-[#163300] dark:text-[#9FE870] mb-1">{totaalPunten}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">WWS-punten</div>
+                      <div className="text-5xl font-bold text-[#161f13] dark:text-[#94f477] mb-1">{totaalPunten}</div>
+                      <div className="text-sm text-[#97978f] dark:text-[#97978f]">WWS-punten</div>
                     </div>
                     <div className="text-right">
                       <Badge className={cn('text-sm px-3 py-1 border rounded-full', SECTOR_COLORS[sector])}>
                         {SECTOR_LABELS[sector]}
                       </Badge>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                      <div className="text-2xl font-bold text-[#1a1c18] dark:text-white mt-2">
                         €{maxHuur.toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500">max. huurprijs/mnd</div>
+                      <div className="text-xs text-[#97978f] dark:text-[#97978f]">max. huurprijs/mnd</div>
                     </div>
                   </div>
 
@@ -280,7 +280,7 @@ export default function PuntentellingPage() {
                             ? `Huur €${marge.toFixed(0)} onder maximum — compliant`
                             : `Huur €${Math.abs(marge).toFixed(0)} boven maximum — niet toegestaan`}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">
                           Huidige huur €{huidigeHuurNum.toLocaleString('nl-NL')} / max €{maxHuur.toLocaleString('nl-NL', { maximumFractionDigits: 0 })}
                         </p>
                       </div>
@@ -288,13 +288,13 @@ export default function PuntentellingPage() {
                   )}
 
                   <div>
-                    <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 mb-1.5">
+                    <div className="flex justify-between text-xs text-[#97978f] dark:text-[#97978f] mb-1.5">
                       <span>0</span>
                       <span className="text-slate-500">143 Sociaal</span>
                       <span className="text-amber-500">186 Midden</span>
                       <span className="text-emerald-500">Vrij →</span>
                     </div>
-                    <div className="relative h-3 rounded-full bg-gray-100 dark:bg-neutral-800 overflow-hidden">
+                    <div className="relative h-3 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 overflow-hidden">
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{
                           width: `${Math.min(100, (totaalPunten / 250) * 100)}%`,
@@ -312,22 +312,22 @@ export default function PuntentellingPage() {
           {canCalculate && breakdown.length > 0 && (
             <Card className={dashboardCardClass()}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-[#163300] dark:text-[#9FE870]">Puntenoverzicht</CardTitle>
+                <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Puntenoverzicht</CardTitle>
               </CardHeader>
               <CardContent className="p-0 pb-1">
                 <div className="divide-y divide-gray-50 dark:divide-neutral-800/80">
                   {breakdown.map((item, i) => (
                     <div key={i} className="flex items-center justify-between px-5 py-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{item.toelichting}</p>
+                        <p className="text-sm font-medium text-[#1a1c18] dark:text-white">{item.label}</p>
+                        <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">{item.toelichting}</p>
                       </div>
-                      <span className="text-sm font-bold text-[#163300] dark:text-[#9FE870] ml-4 shrink-0">+{item.punten}</span>
+                      <span className="text-sm font-bold text-[#161f13] dark:text-[#94f477] ml-4 shrink-0">+{item.punten}</span>
                     </div>
                   ))}
-                  <div className="flex items-center justify-between px-5 py-3.5 bg-[#163300]/5 dark:bg-[#9FE870]/5">
-                    <span className="text-sm font-bold text-[#163300] dark:text-[#9FE870]">Totaal</span>
-                    <span className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">{totaalPunten} punten</span>
+                  <div className="flex items-center justify-between px-5 py-3.5 bg-[#161f13]/5 dark:bg-[#94f477]/5">
+                    <span className="text-sm font-bold text-[#161f13] dark:text-[#94f477]">Totaal</span>
+                    <span className="text-lg font-bold text-[#161f13] dark:text-[#94f477]">{totaalPunten} punten</span>
                   </div>
                 </div>
               </CardContent>
@@ -337,19 +337,19 @@ export default function PuntentellingPage() {
           {canCalculate && (
             <Card className={dashboardCardClass()}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-[#163300] dark:text-[#9FE870]">Optimalisatie-adviezen</CardTitle>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Verbeteringen die extra punten en hogere maximale huur opleveren</p>
+                <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Optimalisatie-adviezen</CardTitle>
+                <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-1">Verbeteringen die extra punten en hogere maximale huur opleveren</p>
               </CardHeader>
               <CardContent className="space-y-3 pb-5">
                 {mockWwsOptimalisatieAdviezen.map((a) => (
-                  <div key={a.id} className="rounded-xl border border-gray-100 dark:border-neutral-800 p-4">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{a.titel}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{a.huidig} → {a.na}</p>
+                  <div key={a.id} className="rounded-xl border border-[#e3e3de] dark:border-neutral-800 p-4">
+                    <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{a.titel}</p>
+                    <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">{a.huidig} → {a.na}</p>
                     <div className="flex flex-wrap gap-3 mt-2">
-                      <span className="text-xs text-[#163300] dark:text-[#9FE870] font-medium">+{a.extraPunten} punten</span>
+                      <span className="text-xs text-[#161f13] dark:text-[#94f477] font-medium">+{a.extraPunten} punten</span>
                       <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">+€{a.extraHuur}/mnd</span>
-                      <span className="text-xs text-gray-400">Investering €{a.investering.toLocaleString('nl-NL')}</span>
-                      <span className="text-xs text-gray-400">~{a.terugverdientijd} jr terugverdien</span>
+                      <span className="text-xs text-[#97978f]">Investering €{a.investering.toLocaleString('nl-NL')}</span>
+                      <span className="text-xs text-[#97978f]">~{a.terugverdientijd} jr terugverdien</span>
                     </div>
                   </div>
                 ))}

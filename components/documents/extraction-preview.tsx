@@ -97,8 +97,8 @@ export function ExtractionPreview({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#163300] mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Document wordt gescand...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-[#161f13] mb-4" />
+        <p className="text-[#55554e] dark:text-[#97978f]">Document wordt gescand...</p>
       </div>
     )
   }
@@ -159,7 +159,7 @@ export function ExtractionPreview({
             <div key={field.key} className="space-y-2">
               <Label htmlFor={field.key}>
                 {field.label}
-                {field.optional && <span className="text-gray-500 text-sm"> (optioneel)</span>}
+                {field.optional && <span className="text-[#97978f] text-sm"> (optioneel)</span>}
               </Label>
               {field.type === 'textarea' ? (
                 <Textarea
@@ -188,8 +188,8 @@ export function ExtractionPreview({
             <div className="border-t pt-4">
               <h4 className="font-medium mb-3">Huurders</h4>
               {editedData.tenants.map((tenant: any, index: number) => (
-                <div key={index} className="border rounded-lg p-4 mb-3 bg-gray-50 dark:bg-gray-800/50">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Huurder {index + 1}</p>
+                <div key={index} className="border rounded-lg p-4 mb-3 bg-[#f4f4f1] dark:bg-gray-800/50">
+                  <p className="text-sm font-medium text-[#97978f] dark:text-[#97978f] mb-3">Huurder {index + 1}</p>
                   <div className="grid gap-3">
                     <div className="space-y-2">
                       <Label htmlFor={`tenant-${index}-name`}>Naam</Label>
@@ -247,7 +247,7 @@ export function ExtractionPreview({
         </Button>
         <Button
           onClick={() => onConfirm(editedData)}
-          className="flex-1 bg-[#163300] hover:bg-[#356258]"
+          className="flex-1 bg-[#161f13] hover:bg-[#356258]"
         >
           Gegevens opslaan
         </Button>

@@ -445,16 +445,16 @@ export default function MessagesPage() {
       <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
         {/* Linkerblok: type + lijst in één witte kaart */}
         <aside className="w-full max-w-[260px] md:max-w-[300px] lg:max-w-[340px] flex flex-col min-h-0 h-full">
-          <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
+          <div className="flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 shadow-sm flex flex-col min-h-0 pt-4 pb-3">
             {/* Zoekbalk */}
             <div className="mb-3 px-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#97978f]" />
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Zoek huurders of gesprekken..."
-                  className="pl-9 h-10 rounded-full bg-transparent border border-gray-200 dark:border-neutral-700 text-sm shadow-none"
+                  className="pl-9 h-10 rounded-full bg-transparent border border-[#e3e3de] dark:border-neutral-700 text-sm shadow-none"
                 />
               </div>
             </div>
@@ -469,45 +469,45 @@ export default function MessagesPage() {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors text-left ${
                     activeContactId === c.id
                       ? 'bg-[#f4f4f4] dark:bg-neutral-800'
-                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
+                      : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                   }`}
                 >
                   <div className="relative">
                     <div
                       className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                         activeContactId === c.id
-                          ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
-                          : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-800 dark:text-gray-100'
+                          ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                          : 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#1a1c18] dark:text-gray-100'
                       }`}
                     >
                       {c.handle === '@groep' ? <UsersRound className="h-4 w-4" /> : getInitials(c.name)}
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#9FE870] border-2 border-white dark:border-neutral-900" />
+                    <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#94f477] border-2 border-white dark:border-neutral-900" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">
                       {c.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs text-[#97978f] dark:text-[#97978f] truncate">
                       {c.handle}
                     </p>
                   </div>
                   {mutedChatIds.includes(c.id) && (
-                    <BellOff className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                    <BellOff className="h-3.5 w-3.5 text-[#97978f] dark:text-[#97978f]" />
                   )}
-                  <ChevronRight className="h-4 w-4 text-[#163300]" />
+                  <ChevronRight className="h-4 w-4 text-[#161f13]" />
                 </button>
               ))}
               {filteredContacts.length === 0 && (
                 <div className="h-full min-h-[220px] px-4 flex items-center justify-center">
                   <div className="text-center max-w-[220px]">
-                    <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
-                      <MessageCircle className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                    <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center">
+                      <MessageCircle className="h-5 w-5 text-[#55554e] dark:text-gray-300" />
                     </div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">
                       Geen gesprekken gevonden
                     </p>
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-xs text-[#97978f] dark:text-[#97978f]">
                       Pas je zoekopdracht aan of start een nieuw gesprek.
                     </p>
                   </div>
@@ -520,7 +520,7 @@ export default function MessagesPage() {
                   <Button
                     type="button"
                     size="icon"
-                    className="h-9 w-9 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300]"
+                    className="h-9 w-9 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]"
                     aria-label="Acties openen"
                   >
                     <Plus className={`h-4 w-4 transition-transform duration-200 ${plusMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
@@ -530,22 +530,22 @@ export default function MessagesPage() {
                   align="end"
                   side="top"
                   sideOffset={10}
-                  className="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[230px] p-1.5"
+                  className="rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[230px] p-1.5"
                 >
                   <DropdownMenuItem className="rounded-lg">
-                    <TicketPlus className="h-4 w-4 mr-2 text-[#163300]" />
+                    <TicketPlus className="h-4 w-4 mr-2 text-[#161f13]" />
                     Ticket aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuItem className="rounded-lg" onSelect={() => setCreateChatOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2 text-[#163300]" />
+                    <Plus className="h-4 w-4 mr-2 text-[#161f13]" />
                     Chat aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuItem className="rounded-lg" onSelect={() => setCreateGroupOpen(true)}>
-                    <UsersRound className="h-4 w-4 mr-2 text-[#163300]" />
+                    <UsersRound className="h-4 w-4 mr-2 text-[#161f13]" />
                     Groep aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <DropdownMenuLabel className="text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                     Suggesties
                   </DropdownMenuLabel>
                   {topSuggestedPeople.length > 0 ? (
@@ -555,12 +555,12 @@ export default function MessagesPage() {
                         className="rounded-lg"
                         onSelect={() => openOrCreateChatWithPerson(person)}
                       >
-                        <UserPlus className="h-4 w-4 mr-2 text-[#163300]" />
+                        <UserPlus className="h-4 w-4 mr-2 text-[#161f13]" />
                         {person.name}
                       </DropdownMenuItem>
                     ))
                   ) : (
-                    <DropdownMenuItem disabled className="rounded-lg text-gray-400">
+                    <DropdownMenuItem disabled className="rounded-lg text-[#97978f]">
                       Geen suggesties beschikbaar
                     </DropdownMenuItem>
                   )}
@@ -572,8 +572,8 @@ export default function MessagesPage() {
 
         {/* Rechterblok: chat interface */}
         <section
-          className={`relative flex-1 h-full flex flex-col min-w-0 min-h-0 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 shadow-sm overflow-hidden ${
-            dragActive ? 'ring-2 ring-[#9FE870] ring-offset-2 ring-offset-white dark:ring-offset-neutral-900' : ''
+          className={`relative flex-1 h-full flex flex-col min-w-0 min-h-0 rounded-3xl bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 shadow-sm overflow-hidden ${
+            dragActive ? 'ring-2 ring-[#94f477] ring-offset-2 ring-offset-white dark:ring-offset-neutral-900' : ''
           }`}
           onDragOver={(e) => {
             e.preventDefault()
@@ -593,12 +593,12 @@ export default function MessagesPage() {
             <div className="px-4 pt-3 pb-2">
               <div className="px-1 py-1 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-9 w-9 rounded-full bg-[#f1f1f1] dark:bg-neutral-800 flex items-center justify-center text-sm font-semibold text-gray-800 dark:text-gray-100">
+                  <div className="h-9 w-9 rounded-full bg-[#f1f1f1] dark:bg-neutral-800 flex items-center justify-center text-sm font-semibold text-[#1a1c18] dark:text-gray-100">
                   {activeContact.handle === '@groep' ? <UsersRound className="h-4 w-4" /> : getInitials(activeContact.name)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{activeContact.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{activeContact.handle}</p>
+                    <p className="text-sm font-semibold text-[#1a1c18] dark:text-white truncate">{activeContact.name}</p>
+                    <p className="text-xs text-[#97978f] dark:text-[#97978f] truncate">{activeContact.handle}</p>
                   </div>
                 </div>
                 <DropdownMenu>
@@ -607,7 +607,7 @@ export default function MessagesPage() {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="h-9 w-9 rounded-full bg-[#f1f1f1] hover:bg-[#e8e8e8] dark:bg-neutral-800 dark:hover:bg-neutral-700 text-[#163300] dark:text-[#9FE870]"
+                      className="h-9 w-9 rounded-full bg-[#f1f1f1] hover:bg-[#e8e8e8] dark:bg-neutral-800 dark:hover:bg-neutral-700 text-[#161f13] dark:text-[#94f477]"
                       aria-label="Chat opties"
                     >
                       <MoreHorizontal className="h-4 w-4" />
@@ -616,16 +616,16 @@ export default function MessagesPage() {
                   <DropdownMenuContent
                     align="end"
                     sideOffset={8}
-                    className="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[220px] p-1.5"
+                    className="rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[220px] p-1.5"
                   >
                     <DropdownMenuItem className="rounded-lg" onSelect={toggleMuteActiveChat}>
-                      <BellOff className="h-4 w-4 mr-2 text-[#163300]" />
+                      <BellOff className="h-4 w-4 mr-2 text-[#161f13]" />
                       {activeContactId && mutedChatIds.includes(activeContactId)
                         ? 'Notificaties inschakelen'
                         : 'Notificaties dempen'}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="rounded-lg">
-                      <Archive className="h-4 w-4 mr-2 text-[#163300]" />
+                      <Archive className="h-4 w-4 mr-2 text-[#161f13]" />
                       Chat archiveren
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -646,13 +646,13 @@ export default function MessagesPage() {
             {!activeContact ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center max-w-md">
-                  <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
-                    <MessageCircleMore className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center">
+                    <MessageCircleMore className="h-6 w-6 text-[#55554e] dark:text-gray-300" />
                   </div>
-                  <p className="text-gray-900 dark:text-white font-semibold mb-1">
+                  <p className="text-[#1a1c18] dark:text-white font-semibold mb-1">
                     Nog geen gesprek geselecteerd
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                     Kies links een contact om een chat te starten en berichten te versturen.
                   </p>
                 </div>
@@ -660,13 +660,13 @@ export default function MessagesPage() {
             ) : activeMessages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center max-w-md">
-                  <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center">
+                    <MessageCircle className="h-5 w-5 text-[#55554e] dark:text-gray-300" />
                   </div>
-                  <p className="text-[#163300] dark:text-[#9FE870] text-base font-semibold mb-1">
+                  <p className="text-[#161f13] dark:text-[#94f477] text-base font-semibold mb-1">
                     Start het gesprek met {activeContact.name}
                   </p>
-                  <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  <p className="text-sm leading-6 text-[#55554e] dark:text-gray-300">
                     Typ hieronder je eerste bericht.
                   </p>
                 </div>
@@ -678,8 +678,8 @@ export default function MessagesPage() {
                     <div
                       className={`max-w-[78%] rounded-2xl px-3 py-2 border ${
                         m.from === 'me'
-                          ? 'bg-[#163300] border-[#163300] text-white'
-                          : 'bg-[#f4f4f4] dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-900 dark:text-white'
+                          ? 'bg-[#161f13] border-[#161f13] text-white'
+                          : 'bg-[#f4f4f4] dark:bg-neutral-800 border-[#e3e3de] dark:border-neutral-700 text-[#1a1c18] dark:text-white'
                       }`}
                     >
                       {m.text && (
@@ -692,7 +692,7 @@ export default function MessagesPage() {
                           {m.attachments.map((a) => (
                             <span
                               key={a.id}
-                              className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700"
+                              className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700"
                             >
                               <FileText className="h-3 w-3" />
                               <span className="truncate max-w-[140px]">{a.name}</span>
@@ -720,28 +720,28 @@ export default function MessagesPage() {
               }}
             />
             {attachments.length > 0 && (
-              <div className="mb-2 rounded-2xl border border-gray-200 dark:border-neutral-700 bg-[#f8f8f8] dark:bg-neutral-800 p-2 overflow-x-auto">
+              <div className="mb-2 rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-[#f8f8f8] dark:bg-neutral-800 p-2 overflow-x-auto">
                 <div className="flex items-center gap-2 min-w-max">
                   {attachments.map((a) => (
                     <div
                       key={a.id}
-                      className="group relative flex items-center gap-2 rounded-xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5"
+                      className="group relative flex items-center gap-2 rounded-xl bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 px-2.5 py-1.5"
                     >
                       {a.previewUrl ? (
                         <img src={a.previewUrl} alt="" className="h-8 w-8 rounded-md object-cover" />
                       ) : (
-                        <FileText className="h-4 w-4 text-[#163300]" />
+                        <FileText className="h-4 w-4 text-[#161f13]" />
                       )}
                       <div className="max-w-[170px]">
-                        <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{a.name}</p>
-                        <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                        <p className="text-xs font-medium text-[#1a1c18] dark:text-white truncate">{a.name}</p>
+                        <p className="text-[10px] text-[#97978f] dark:text-[#97978f]">
                           {a.source === 'mention-document' ? 'Getagd document' : `${a.sizeKb ?? 1} KB`}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeAttachment(a.id)}
-                        className="h-5 w-5 rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-500 hover:text-gray-900 inline-flex items-center justify-center"
+                        className="h-5 w-5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 text-[#97978f] hover:text-[#1a1c18] inline-flex items-center justify-center"
                         aria-label="Bijlage verwijderen"
                       >
                         <X className="h-3 w-3" />
@@ -752,7 +752,7 @@ export default function MessagesPage() {
               </div>
             )}
             {mentionOpen && mentionResults.length > 0 && (
-              <div className="absolute left-4 right-16 bottom-16 rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-1.5 z-20">
+              <div className="absolute left-4 right-16 bottom-16 rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg p-1.5 z-20">
                 {mentionResults.map((item, idx) => {
                   const Icon = item.kind === 'ticket' ? Ticket : item.kind === 'document' ? FileText : Users
                   return (
@@ -765,8 +765,8 @@ export default function MessagesPage() {
                       }}
                       className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm ${
                         idx === mentionIndex
-                          ? 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#163300] dark:text-[#9FE870]'
-                          : 'text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
+                          ? 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#161f13] dark:text-[#94f477]'
+                          : 'text-[#55554e] dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
                       }`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -783,7 +783,7 @@ export default function MessagesPage() {
                 onPickDomioDocuments={() => setDomioDocPickerOpen(true)}
                 onPickGoogleDrive={() => setGoogleDriveDialogOpen(true)}
               />
-              <div className="relative flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700">
+              <div className="relative flex-1 rounded-3xl bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700">
                 <div className="absolute inset-0 px-4 py-2.5 text-sm whitespace-pre-wrap break-words pointer-events-none">
                   {renderComposerWithDocumentMentions(message, attachments)}
                 </div>
@@ -791,7 +791,7 @@ export default function MessagesPage() {
                   ref={messageInputRef}
                   placeholder=""
                   rows={1}
-                  className="min-h-[40px] max-h-32 w-full resize-none rounded-3xl border-0 bg-transparent text-transparent caret-[#163300] dark:caret-[#9FE870] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="min-h-[40px] max-h-32 w-full resize-none rounded-3xl border-0 bg-transparent text-transparent caret-[#161f13] dark:caret-[#94f477] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={message}
                   disabled={!activeContact}
                   onChange={(e) => {
@@ -835,7 +835,7 @@ export default function MessagesPage() {
               </div>
               <Button
                 size="icon"
-                className="size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300]"
+                className="size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]"
                 disabled={!activeContact || (!message.trim() && attachments.length === 0)}
                 onClick={sendMessage}
               >
@@ -858,7 +858,7 @@ export default function MessagesPage() {
       </div>
 
       <Dialog open={createChatOpen} onOpenChange={handleChatDialogOpenChange}>
-        <DialogContent className="border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+        <DialogContent className="border-[#e3e3de] dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
           <DialogHeader>
             <DialogTitle>Chat aanmaken</DialogTitle>
             <DialogDescription>Kies een of meerdere contacten uit je volledige huurderslijst.</DialogDescription>
@@ -870,18 +870,18 @@ export default function MessagesPage() {
               placeholder="Zoek in huurders..."
               className="h-10 rounded-full"
             />
-            <div className="h-64 overflow-y-auto rounded-2xl border border-gray-200 dark:border-neutral-700 p-2 space-y-1">
+            <div className="h-64 overflow-y-auto rounded-2xl border border-[#e3e3de] dark:border-neutral-700 p-2 space-y-1">
               {tenantPickerList.map((t) => (
                 <label key={t.id} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 cursor-pointer">
                   <Checkbox
                     checked={selectedTenantIds.includes(t.id)}
                     onCheckedChange={() => toggleTenant(t.id)}
                   />
-                  <span className="text-sm text-gray-900 dark:text-white">{t.name}</span>
+                  <span className="text-sm text-[#1a1c18] dark:text-white">{t.name}</span>
                 </label>
               ))}
               {tenantPickerList.length === 0 && (
-                <p className="text-xs text-gray-500 px-2 py-2">Geen huurders gevonden.</p>
+                <p className="text-xs text-[#97978f] px-2 py-2">Geen huurders gevonden.</p>
               )}
             </div>
           </div>
@@ -894,13 +894,13 @@ export default function MessagesPage() {
               Annuleer
             </Button>
             <Button
-              className="h-9 rounded-full px-4 w-auto bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
+              className="h-9 rounded-full px-4 w-auto bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
               disabled={selectedTenantIds.length === 0}
               onClick={startDirectChat}
             >
               {selectedTenantIds.length > 1 ? 'Start groepschat' : 'Start chat'}
               {selectedTenantIds.length > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300] px-1 text-[11px] font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13] px-1 text-[11px] font-semibold text-white">
                   {selectedTenantIds.length}
                 </span>
               )}
@@ -910,9 +910,9 @@ export default function MessagesPage() {
       </Dialog>
 
       <Dialog open={createGroupOpen} onOpenChange={handleGroupDialogOpenChange}>
-        <DialogContent className="border-gray-200 dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-gray-100 [&>button]:text-gray-600 [&>button]:opacity-100 [&>button:hover]:bg-gray-200 [&>button:hover]:text-gray-900 dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
+        <DialogContent className="border-[#e3e3de] dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#163300] dark:text-[#9FE870]">Groep aanmaken</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-[#161f13] dark:text-[#94f477]">Groep aanmaken</DialogTitle>
             <DialogDescription>Kies deelnemers uit je volledige contactenlijst.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 min-h-0 flex-1 flex flex-col">
@@ -922,18 +922,18 @@ export default function MessagesPage() {
               placeholder="Zoek in huurders..."
               className="h-10 rounded-full"
             />
-            <div className="h-64 overflow-y-auto rounded-2xl border border-gray-200 dark:border-neutral-700 p-2 space-y-1">
+            <div className="h-64 overflow-y-auto rounded-2xl border border-[#e3e3de] dark:border-neutral-700 p-2 space-y-1">
               {tenantPickerList.map((t) => (
                 <label key={t.id} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 cursor-pointer">
                   <Checkbox
                     checked={selectedTenantIds.includes(t.id)}
                     onCheckedChange={() => toggleTenant(t.id)}
                   />
-                  <span className="text-sm text-gray-900 dark:text-white">{t.name}</span>
+                  <span className="text-sm text-[#1a1c18] dark:text-white">{t.name}</span>
                 </label>
               ))}
               {tenantPickerList.length === 0 && (
-                <p className="text-xs text-gray-500 px-2 py-2">Geen huurders gevonden.</p>
+                <p className="text-xs text-[#97978f] px-2 py-2">Geen huurders gevonden.</p>
               )}
             </div>
           </div>
@@ -946,13 +946,13 @@ export default function MessagesPage() {
               Annuleer
             </Button>
             <Button
-              className="h-9 rounded-full px-4 w-auto text-sm font-semibold bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F]"
+              className="h-9 rounded-full px-4 w-auto text-sm font-semibold bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
               disabled={selectedTenantIds.length < 2}
               onClick={startGroupChat}
             >
               Start groepschat
               {selectedTenantIds.length > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300] px-1 text-[11px] font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13] px-1 text-[11px] font-semibold text-white">
                   {selectedTenantIds.length}
                 </span>
               )}

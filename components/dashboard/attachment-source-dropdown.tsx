@@ -36,7 +36,7 @@ export function AttachmentSourceDropdown({
   }, [])
 
   const triggerClass = cn(
-    'size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900',
+    'size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900',
     triggerClassName
   )
 
@@ -59,33 +59,33 @@ export function AttachmentSourceDropdown({
         align="start"
         side="top"
         sideOffset={8}
-        className="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[220px] p-1.5"
+        className="rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[220px] p-1.5"
       >
-        <DropdownMenuLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1.5">
+        <DropdownMenuLabel className="text-xs font-medium text-[#97978f] dark:text-[#97978f] px-2 py-1.5">
           Document toevoegen vanuit
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-100 dark:bg-neutral-800" />
+        <DropdownMenuSeparator className="bg-[#f4f4f1] dark:bg-neutral-800" />
         <DropdownMenuItem
           className="rounded-lg cursor-pointer"
           onSelect={() => {
             requestAnimationFrame(() => onPickComputer())
           }}
         >
-          <Laptop className="h-4 w-4 mr-2 text-[#163300] dark:text-[#9FE870] shrink-0" />
+          <Laptop className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
           Deze computer
         </DropdownMenuItem>
         <DropdownMenuItem
           className="rounded-lg cursor-pointer"
           onSelect={() => onPickDomioDocuments()}
         >
-          <FolderOpen className="h-4 w-4 mr-2 text-[#163300] dark:text-[#9FE870] shrink-0" />
+          <FolderOpen className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
           Domio documenten
         </DropdownMenuItem>
         <DropdownMenuItem
           className="rounded-lg cursor-pointer"
           onSelect={() => onPickGoogleDrive()}
         >
-          <Cloud className="h-4 w-4 mr-2 text-[#163300] dark:text-[#9FE870] shrink-0" />
+          <Cloud className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
           Google Drive
         </DropdownMenuItem>
       </DropdownMenuContent>

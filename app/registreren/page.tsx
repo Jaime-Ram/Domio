@@ -166,7 +166,7 @@ function RegistrerenContent() {
           )}
           {!emailExists && !success && (
             <>
-              <h1 className="text-4xl font-medium text-[#163300]">
+              <h1 className="text-4xl font-medium text-[#161f13]">
                 {step === 1
                   ? 'Maak je account'
                   : step === 2
@@ -178,7 +178,7 @@ function RegistrerenContent() {
                   Al een account?{' '}
                   <Link
                     href="/login"
-                    className="font-medium text-[#163300] underline underline-offset-2 hover:no-underline"
+                    className="font-medium text-[#161f13] underline underline-offset-2 hover:no-underline"
                   >
                     Inloggen
                   </Link>
@@ -251,7 +251,7 @@ function RegistrerenContent() {
                 exit={{ opacity: 0, x: -32 }}
                 transition={transition}
               >
-              <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#163300]">
+              <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#161f13]">
                 <span className="block text-[12px] text-gray-500">E-mailadres</span>
                 <input
                   id="email"
@@ -266,7 +266,7 @@ function RegistrerenContent() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 rounded-lg bg-[#9FE870] text-[#163300] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
+                className="w-full h-14 rounded-lg bg-[#94f477] text-[#161f13] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
               >
                 {loading ? 'Bezig...' : 'Volgende'}
               </Button>
@@ -420,11 +420,11 @@ function RegistrerenContent() {
 
           <p className="mt-8 text-center text-xs text-gray-500 leading-relaxed">
             Door te registreren ga je akkoord met onze{' '}
-            <Link href="/algemene-voorwaarden" className="font-medium text-[#163300] underline underline-offset-2">
+            <Link href="/algemene-voorwaarden" className="font-medium text-[#161f13] underline underline-offset-2">
               Algemene voorwaarden
             </Link>{' '}
             en{' '}
-            <Link href="/privacy" className="font-medium text-[#163300] underline underline-offset-2">
+            <Link href="/privacy" className="font-medium text-[#161f13] underline underline-offset-2">
               Privacybeleid
             </Link>
             .

@@ -47,7 +47,7 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
       >
         <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
           <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Domio documenten</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-1">Kies een document uit je bibliotheek om toe te voegen.</DialogDescription>
+          <DialogDescription className="text-sm text-[#97978f] dark:text-[#97978f] mt-1">Kies een document uit je bibliotheek om toe te voegen.</DialogDescription>
         </DialogHeader>
         <div className="px-6 py-5 space-y-3 flex flex-col flex-1 min-h-0">
         <Input
@@ -56,7 +56,7 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
           placeholder="Zoek op naam…"
           className="h-10 rounded-xl"
         />
-        <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-gray-200 dark:border-neutral-700 p-1 space-y-0.5 max-h-64">
+        <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-[#e3e3de] dark:border-neutral-700 p-1 space-y-0.5 max-h-64">
           {filtered.map((d) => (
             <button
               key={d.id}
@@ -65,14 +65,14 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
                 onPick(d)
                 onOpenChange(false)
               }}
-              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-gray-900 dark:text-gray-100 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800"
+              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-[#1a1c18] dark:text-gray-100 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800"
             >
-              <FileText className="h-4 w-4 shrink-0 text-[#163300] dark:text-[#9FE870]" />
+              <FileText className="h-4 w-4 shrink-0 text-[#161f13] dark:text-[#94f477]" />
               <span className="truncate">{d.name}</span>
             </button>
           ))}
           {filtered.length === 0 && (
-            <p className="text-xs text-gray-500 px-2 py-3 text-center">Geen documenten gevonden.</p>
+            <p className="text-xs text-[#97978f] px-2 py-3 text-center">Geen documenten gevonden.</p>
           )}
         </div>
         </div>

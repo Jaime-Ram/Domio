@@ -292,7 +292,7 @@ function TenantsPageContent() {
     return (
       <>
         <div className="flex items-center justify-center min-h-[200px]">
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-[#97978f]">Laden...</p>
         </div>
       </>
     )
@@ -300,7 +300,7 @@ function TenantsPageContent() {
 
   const filterContent = (
     <>
-      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Saldo
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -314,7 +314,7 @@ function TenantsPageContent() {
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#A8200D' }} />
             <span>Openstaand</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{balanceCounts.openstaand}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{balanceCounts.openstaand}</span>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={balanceFilter.opPeil}
@@ -326,7 +326,7 @@ function TenantsPageContent() {
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#2F5711' }} />
             <span>Op peil</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{balanceCounts.opPeil}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{balanceCounts.opPeil}</span>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={balanceFilter.teveelBetaald}
@@ -338,12 +338,12 @@ function TenantsPageContent() {
             <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#EDC843' }} />
             <span>Teveel betaald</span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{balanceCounts.teveelBetaald}</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f]">{balanceCounts.teveelBetaald}</span>
         </DropdownMenuCheckboxItem>
       </div>
       {uniqueProperties.length > 0 && (
         <>
-          <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+          <DropdownMenuLabel className="px-2 pb-1 pt-3 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
             Object
           </DropdownMenuLabel>
           <div className="space-y-1">
@@ -356,7 +356,7 @@ function TenantsPageContent() {
                 className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
               >
                 <span className="truncate max-w-[160px]">{prop}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-[#97978f] dark:text-[#97978f]">
                   {tenants.filter((t) => t.propertyName === prop).length}
                 </span>
               </DropdownMenuCheckboxItem>
@@ -374,11 +374,11 @@ function TenantsPageContent() {
         <div className="flex items-center gap-3 min-w-0">
           <PersonAvatar />
           <div className="min-w-0">
-            <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate leading-tight">{tenant.name}</p>
+            <p className="text-[12.5px] font-semibold text-[#1a1c18] dark:text-white truncate leading-tight">{tenant.name}</p>
             <a
               href={`mailto:${tenant.email}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-block max-w-full text-[12.5px] text-gray-500 dark:text-gray-400 truncate leading-tight hover:text-[#163300] dark:hover:text-[#9FE870] hover:underline transition-colors"
+              className="inline-block max-w-full text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate leading-tight hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors"
             >{tenant.email}</a>
           </div>
         </div>
@@ -394,7 +394,7 @@ function TenantsPageContent() {
             : tenant.status === 'concept'
             ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
             : tenant.status === 'geen contract'
-            ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
+            ? 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-[#97978f]'
             : 'bg-[#A8200D] text-white'
         )}>
           {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief Contract' : tenant.status}
@@ -408,14 +408,14 @@ function TenantsPageContent() {
           ? `${tenant.propertyName}${tenant.unitNumber ? ` (${tenant.unitNumber})` : ''}`
           : (tenant.unitNumber || '')
         return label
-          ? <p className="text-[12.5px] text-gray-700 dark:text-gray-300 truncate">{label}</p>
-          : <p className="text-[12.5px] text-gray-400 dark:text-gray-600">—</p>
+          ? <p className="text-[12.5px] text-[#55554e] dark:text-gray-300 truncate">{label}</p>
+          : <p className="text-[12.5px] text-[#97978f] dark:text-[#55554e]">—</p>
       },
     },
     {
       key: 'rent', header: 'Huurprijs', sortable: true, width: 'minmax(0,1fr)',
       render: (tenant) => (
-        <p className="text-[12.5px] font-medium text-gray-900 dark:text-white">
+        <p className="text-[12.5px] font-medium text-[#1a1c18] dark:text-white">
           {tenant.monthlyRent ? `€${tenant.monthlyRent.toLocaleString('nl-NL')}` : '—'}
         </p>
       ),
@@ -425,7 +425,7 @@ function TenantsPageContent() {
       render: (tenant) => (
         <div onClick={(e) => e.stopPropagation()}>
           {tenant.profileId !== null ? (
-            <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#9FE870]">
+            <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#94f477]">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span className="text-[12.5px] font-medium">Actief</span>
             </div>
@@ -446,7 +446,7 @@ function TenantsPageContent() {
             <button
               onClick={() => sendInvite(tenant.id)}
               disabled={invitingIds.has(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#161f13] hover:text-[#161f13] dark:hover:border-[#94f477] dark:hover:text-[#94f477] transition-colors disabled:opacity-50"
             >
               {invitingIds.has(tenant.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
               Uitnodigen
@@ -454,7 +454,7 @@ function TenantsPageContent() {
           ) : (
             <button
               onClick={() => openEmailDialog(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#161f13] hover:text-[#161f13] dark:hover:border-[#94f477] dark:hover:text-[#94f477] transition-colors"
             >
               <Mail className="h-3.5 w-3.5" />
               Uitnodigen
@@ -493,7 +493,7 @@ function TenantsPageContent() {
             {viewMode === 'grid' ? (
               <div className="flex-1 min-h-0 overflow-y-auto">
                 {sortedTenants.length === 0 ? (
-                  <p className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen huurders gevonden.</p>
+                  <p className="py-16 text-center text-sm text-[#97978f] dark:text-[#97978f]">Geen huurders gevonden.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-1">
                     {sortedTenants.map((tenant) => (
@@ -501,19 +501,19 @@ function TenantsPageContent() {
                         key={tenant.id}
                         type="button"
                         onClick={() => setSelectedTenantId(tenant.id)}
-                        className="group rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
+                        className="group rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all text-left"
                       >
                         <div className="flex items-start gap-3">
                           <PersonAvatar size="lg" />
                           <div className="min-w-0 flex-1">
-                            <p className="font-semibold text-gray-900 dark:text-white truncate">{tenant.name}</p>
-                            {tenant.email && <p className="text-xs text-gray-500 truncate">{tenant.email}</p>}
+                            <p className="font-semibold text-[#1a1c18] dark:text-white truncate">{tenant.name}</p>
+                            {tenant.email && <p className="text-xs text-[#97978f] truncate">{tenant.email}</p>}
                           </div>
                           <span className={cn(
                             'shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
                             tenant.status === 'actief' ? 'bg-[#2F5711] text-white'
                               : tenant.status === 'concept' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                              : tenant.status === 'geen contract' ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400'
+                              : tenant.status === 'geen contract' ? 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-[#97978f]'
                               : 'bg-[#A8200D] text-white',
                           )}>
                             {tenant.status === 'concept' ? 'Uitgenodigd' : tenant.status === 'geen contract' ? 'Geen contract' : tenant.status === 'actief' ? 'Actief' : tenant.status}
@@ -521,14 +521,14 @@ function TenantsPageContent() {
                         </div>
                         <div className="flex flex-col gap-1.5">
                           {(tenant.unitNumber || tenant.propertyName) && (
-                            <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
-                              <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                            <p className="flex items-center gap-2 text-sm text-[#55554e] dark:text-neutral-300">
+                              <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                               <span className="truncate">{[tenant.unitNumber, tenant.propertyName].filter(Boolean).join(' · ')}</span>
                             </p>
                           )}
                           {tenant.monthlyRent ? (
-                            <p className="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
-                              <Euro className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                            <p className="flex items-center gap-2 text-sm text-[#55554e] dark:text-neutral-300">
+                              <Euro className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                               <span>€{tenant.monthlyRent.toLocaleString('nl-NL')} / maand</span>
                             </p>
                           ) : null}
@@ -563,7 +563,7 @@ function TenantsPageContent() {
             <DialogTitle>E-mailadres toevoegen</DialogTitle>
             <DialogDescription>
               Voer het e-mailadres in van{' '}
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="font-medium text-[#1a1c18] dark:text-white">
                 {tenants.find((t) => t.id === emailDialogTenantId)?.name}
               </span>
               . De uitnodiging wordt daarna direct verstuurd.
@@ -582,14 +582,14 @@ function TenantsPageContent() {
           </DialogField>
           <DialogFooter className="mt-2">
             <DialogClose asChild>
-              <button className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-2">
+              <button className="text-sm text-[#97978f] hover:text-[#55554e] dark:text-[#97978f] dark:hover:text-gray-200 px-3 py-2">
                 Annuleren
               </button>
             </DialogClose>
             <button
               onClick={submitEmailAndInvite}
               disabled={emailDialogSaving || !emailDialogValue.trim()}
-              className="flex items-center gap-2 rounded-xl bg-[#163300] text-white text-sm font-medium px-4 py-2 hover:bg-[#1e4a00] disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-[#161f13] text-white text-sm font-medium px-4 py-2 hover:bg-[#1e4a00] disabled:opacity-50 transition-colors"
             >
               {emailDialogSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Opslaan & uitnodigen
@@ -620,7 +620,7 @@ function TenantsPageContent() {
           </DialogHeader>
           <DialogFooter>
             <button type="button" onClick={() => setDeleteTenant(null)}
-              className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-3 py-2">
+              className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-3 py-2">
               Annuleren
             </button>
             <button type="button" onClick={handleDeleteTenant} disabled={deletingTenant}

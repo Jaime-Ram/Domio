@@ -63,7 +63,7 @@ export default function EmployerDashboardLayout({
     <DocumentPreviewProvider>
       <div className="relative flex h-screen overflow-hidden w-full flex-col bg-white dark:bg-gray-900">
         <div
-          className="pointer-events-none fixed inset-0 z-[100] bg-[#9FE870] transition-opacity"
+          className="pointer-events-none fixed inset-0 z-[100] bg-[#94f477] transition-opacity"
           style={{
             opacity: enterDone ? 0 : 1,
             transitionDuration: `${ENTER_DURATION_MS}ms`,
@@ -185,7 +185,7 @@ function EmployerLayoutInner({
       >
           <Require2FaRedirect />
           <ContentHeader onMenuClick={() => setSidebarOpen(true)} />
-          <main className="flex-1 bg-white dark:bg-gray-900 overflow-x-hidden overflow-y-auto">
+          <main className="flex-1 bg-[#f4f4f1] dark:bg-neutral-950 overflow-x-hidden overflow-y-auto">
             <div
               className={cn(
                 'mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 flex flex-col h-full min-h-0',
@@ -201,7 +201,7 @@ function EmployerLayoutInner({
       </div>
       {showPreviewPanel && previewDocId && (
         <div
-          className="hidden lg:flex flex-col fixed right-0 top-0 bottom-0 z-40 w-full max-w-[50vw] min-w-[400px] border-l border-gray-200 dark:border-neutral-700 bg-[#f1f3f0] dark:bg-neutral-800 overflow-hidden"
+          className="hidden lg:flex flex-col fixed right-0 top-0 bottom-0 z-40 w-full max-w-[50vw] min-w-[400px] border-l border-[#e3e3de] dark:border-neutral-700 bg-[#f1f3f0] dark:bg-neutral-800 overflow-hidden"
           aria-label="Document preview"
         >
           <DocumentPreviewPanel docId={previewDocId} onClose={closePreview} />

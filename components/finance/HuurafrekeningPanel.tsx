@@ -175,7 +175,7 @@ const fmtDateTime = (d: string) =>
   })
 
 const STATUS_CONFIG: Record<SettlementStatus, { label: string; classes: string }> = {
-  concept: { label: 'Concept', classes: 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400' },
+  concept: { label: 'Concept', classes: 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-[#97978f]' },
   definitief: { label: 'Gepubliceerd', classes: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
   verzonden: { label: 'Verzonden', classes: 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' },
   verrekend: { label: 'Verrekend', classes: 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' },
@@ -212,10 +212,10 @@ function OverzichtTable({
   const colSpan = editable ? 9 : 8
 
   const SectionLabel = ({ label }: { label: string }) => (
-    <tr className="bg-gray-50/60 dark:bg-neutral-800/40">
+    <tr className="bg-[#f4f4f1]/60 dark:bg-neutral-800/40">
       <td
         colSpan={colSpan}
-        className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#97978f] dark:text-[#97978f]"
       >
         {label}
       </td>
@@ -246,10 +246,10 @@ function OverzichtTable({
             className="h-8 text-sm"
           />
         ) : (
-          <span className="text-gray-900 dark:text-white">
+          <span className="text-[#1a1c18] dark:text-white">
             {r.description || '—'}
             {r.category && (
-              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span className="ml-2 inline-flex items-center rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                 {CATEGORY_LABELS[r.category] ?? r.category}
               </span>
             )}
@@ -259,17 +259,17 @@ function OverzichtTable({
       <td className="px-3 py-2 text-sm">
         {r.is_property_level && r.cost_allocation_key_name && r.allocation_pct != null ? (
           <div className="flex flex-col leading-tight">
-            <span className="text-gray-700 dark:text-gray-300">{r.cost_allocation_key_name}</span>
-            <span className="text-xs text-gray-400 dark:text-gray-500">{r.allocation_pct.toFixed(1)}%</span>
+            <span className="text-[#55554e] dark:text-gray-300">{r.cost_allocation_key_name}</span>
+            <span className="text-xs text-[#97978f] dark:text-[#97978f]">{r.allocation_pct.toFixed(1)}%</span>
           </div>
         ) : (
-          <span className="text-gray-400">—</span>
+          <span className="text-[#97978f]">—</span>
         )}
       </td>
-      <td className="px-3 py-2 text-right text-gray-500 dark:text-gray-400">
+      <td className="px-3 py-2 text-right text-[#97978f] dark:text-[#97978f]">
         {r.is_property_level && r.full_amount != null ? fmt(-r.full_amount) : '—'}
       </td>
-      <td className="px-3 py-2 text-right text-gray-400">—</td>
+      <td className="px-3 py-2 text-right text-[#97978f]">—</td>
       <td className="px-3 py-2 text-right">
         {editable && r.source === 'inline' ? (
           <Input
@@ -291,7 +291,7 @@ function OverzichtTable({
           </span>
         )}
       </td>
-      <td className="px-3 py-2 text-right text-gray-400">—</td>
+      <td className="px-3 py-2 text-right text-[#97978f]">—</td>
       <td className="px-3 py-2 text-right font-medium text-red-600 dark:text-red-400">
         {editable && r.source === 'inline' ? fmt(-r.expense) : fmt(r.total)}
       </td>
@@ -300,7 +300,7 @@ function OverzichtTable({
           {r.source === 'inline' && (
             <button
               onClick={() => onRemoveExpense?.(r.id)}
-              className="text-gray-400 hover:text-red-500 transition-colors"
+              className="text-[#97978f] hover:text-red-500 transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -314,15 +314,15 @@ function OverzichtTable({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 dark:border-neutral-700 text-left">
+          <tr className="border-b border-[#e3e3de] dark:border-neutral-700 text-left">
             {editable && <th className="px-3 py-2.5 w-8"></th>}
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400">Omschrijving</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400">Verdeelsleutel</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Origineel</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Inkomen</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Uitgaven</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">BTW</th>
-            <th className="px-3 py-2.5 font-medium text-gray-500 dark:text-gray-400 text-right">Totaal</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f]">Omschrijving</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f]">Verdeelsleutel</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f] text-right">Origineel</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f] text-right">Inkomen</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f] text-right">Uitgaven</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f] text-right">BTW</th>
+            <th className="px-3 py-2.5 font-medium text-[#97978f] dark:text-[#97978f] text-right">Totaal</th>
             {editable && <th className="px-3 py-2.5 w-8"></th>}
           </tr>
         </thead>
@@ -332,15 +332,15 @@ function OverzichtTable({
           {incomeRows.map((r) => (
             <tr key={r.id} className="border-b border-gray-50 dark:border-neutral-800/50">
               {editable && <td className="px-3 py-2"></td>}
-              <td className="px-3 py-2 text-gray-900 dark:text-white">{r.description}</td>
-              <td className="px-3 py-2 text-gray-400">—</td>
-              <td className="px-3 py-2 text-right text-gray-400">—</td>
+              <td className="px-3 py-2 text-[#1a1c18] dark:text-white">{r.description}</td>
+              <td className="px-3 py-2 text-[#97978f]">—</td>
+              <td className="px-3 py-2 text-right text-[#97978f]">—</td>
               <td className="px-3 py-2 text-right text-green-600 dark:text-green-400 font-medium">
                 {r.income > 0 ? fmt(r.income) : '—'}
               </td>
-              <td className="px-3 py-2 text-right text-gray-400">—</td>
-              <td className="px-3 py-2 text-right text-gray-400">—</td>
-              <td className="px-3 py-2 text-right font-medium text-gray-900 dark:text-white">{fmt(r.total)}</td>
+              <td className="px-3 py-2 text-right text-[#97978f]">—</td>
+              <td className="px-3 py-2 text-right text-[#97978f]">—</td>
+              <td className="px-3 py-2 text-right font-medium text-[#1a1c18] dark:text-white">{fmt(r.total)}</td>
               {editable && <td className="px-3 py-2"></td>}
             </tr>
           ))}
@@ -359,7 +359,7 @@ function OverzichtTable({
               <td colSpan={9} className="px-3 py-2">
                 <button
                   onClick={onAddExpense}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#161f13] dark:text-[#94f477] hover:underline"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Kosten toevoegen
@@ -369,15 +369,15 @@ function OverzichtTable({
           )}
 
           {/* ── Totals row ── */}
-          <tr className="border-t-2 border-gray-200 dark:border-neutral-700 bg-gray-50/50 dark:bg-neutral-800/30">
+          <tr className="border-t-2 border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1]/50 dark:bg-neutral-800/30">
             {editable && <td className="px-3 py-3"></td>}
-            <td className="px-3 py-3 font-semibold text-gray-900 dark:text-white">Totaal</td>
+            <td className="px-3 py-3 font-semibold text-[#1a1c18] dark:text-white">Totaal</td>
             <td className="px-3 py-3"></td>
             <td className="px-3 py-3"></td>
             <td className="px-3 py-3 text-right font-semibold text-green-600 dark:text-green-400">{fmt(totalIncome)}</td>
             <td className="px-3 py-3 text-right font-semibold text-red-600 dark:text-red-400">{fmt(-totalExpense)}</td>
-            <td className="px-3 py-3 text-right font-semibold text-gray-400">—</td>
-            <td className="px-3 py-3 text-right font-bold text-gray-900 dark:text-white">{fmt(netTotal)}</td>
+            <td className="px-3 py-3 text-right font-semibold text-[#97978f]">—</td>
+            <td className="px-3 py-3 text-right font-bold text-[#1a1c18] dark:text-white">{fmt(netTotal)}</td>
             {editable && <td className="px-3 py-3"></td>}
           </tr>
         </tbody>
@@ -430,7 +430,7 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
 
   const filterContent = uniqueProperties.length > 0 ? (
     <>
-      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+      <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
         Pand
       </DropdownMenuLabel>
       <div className="space-y-1">
@@ -443,7 +443,7 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
             className={DASHBOARD_FILTER_CHECKBOX_ITEM_CLASS}
           >
             <span className="truncate max-w-[160px]">{prop}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-[#97978f] dark:text-[#97978f]">
               {settlements.filter(s => s.properties?.name === prop).length}
             </span>
           </DropdownMenuCheckboxItem>
@@ -527,10 +527,10 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
 
       {loading ? (
         <div className="flex flex-1 items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+          <Loader2 className="h-5 w-5 animate-spin text-[#97978f]" />
         </div>
       ) : viewMode === 'board' ? (
-        <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+        <div className="flex-1 min-h-0 overflow-hidden rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900">
           <div className="h-full overflow-y-auto p-4">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {([
@@ -541,28 +541,28 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
             ] as const).map((col) => {
               const colItems = filteredSettlements.filter(s => (col.statuses as readonly string[]).includes(s.status))
               return (
-                <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-gray-100/80 dark:bg-neutral-800/50 p-3">
+                <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-[#f4f4f1]/80 dark:bg-neutral-800/50 p-3">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{col.label}</span>
-                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#163300]/15 text-[11px] font-medium text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870] px-1.5">
+                    <span className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide">{col.label}</span>
+                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/15 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477] px-1.5">
                       {colItems.length}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2 min-h-[80px]">
                     {colItems.length === 0 && (
                       <div className="rounded-xl px-4 py-5 text-center">
-                        <p className="text-xs text-gray-400 dark:text-gray-500">Geen</p>
+                        <p className="text-xs text-[#97978f] dark:text-[#97978f]">Geen</p>
                       </div>
                     )}
                     {colItems.map(s => {
                       const isVoided = s.status === 'nietig'
                       const balanceColor = isVoided
-                        ? 'text-gray-400 dark:text-gray-500'
+                        ? 'text-[#97978f] dark:text-[#97978f]'
                         : s.balance > 0.01
                           ? 'text-green-600 dark:text-green-400'
                           : s.balance < -0.01
                             ? 'text-red-600 dark:text-red-400'
-                            : 'text-gray-500 dark:text-gray-400'
+                            : 'text-[#97978f] dark:text-[#97978f]'
                       return (
                         <button
                           key={s.id}
@@ -570,17 +570,17 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                           onClick={() => openSettlement(s)}
                           className={cn(
                             'w-full text-left rounded-2xl bg-white dark:bg-neutral-900 px-4 py-4 flex flex-col gap-1.5 shadow-sm',
-                            'transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#163300]',
+                            'transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13]',
                             isVoided && 'opacity-50'
                           )}
                         >
-                          <p className={cn('text-sm font-semibold leading-tight', isVoided ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white')}>
+                          <p className={cn('text-sm font-semibold leading-tight', isVoided ? 'line-through text-[#97978f]' : 'text-[#1a1c18] dark:text-white')}>
                             {s.properties?.name ?? '—'}
                           </p>
                           {s.tenants?.full_name && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{s.tenants.full_name}</p>
+                            <p className="text-xs text-[#97978f] dark:text-[#97978f]">{s.tenants.full_name}</p>
                           )}
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                          <p className="text-xs text-[#97978f] dark:text-[#97978f]">
                             {fmtDate(s.period_start)} — {fmtDate(s.period_end)}
                           </p>
                           <p className={cn('text-base font-bold tabular-nums', balanceColor)}>
@@ -618,7 +618,7 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                     <TableCell colSpan={8} className="py-12 text-center">
                       <div className="flex flex-col items-center gap-3">
                         <FileText className="h-8 w-8 text-gray-300 dark:text-neutral-600" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                           {searchQuery ? 'Geen afrekeningen gevonden' : 'Nog geen afrekeningen aangemaakt'}
                         </p>
                         {!searchQuery && (
@@ -633,12 +633,12 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                 {filteredSettlements.map((s) => {
                   const isVoided = s.status === 'nietig'
                   const balanceColor = isVoided
-                    ? 'text-gray-400 dark:text-gray-500'
+                    ? 'text-[#97978f] dark:text-[#97978f]'
                     : s.balance > 0.01
                       ? 'text-green-600 dark:text-green-400'
                       : s.balance < -0.01
                         ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-500 dark:text-gray-400'
+                        : 'text-[#97978f] dark:text-[#97978f]'
                   const cfg = STATUS_CONFIG[s.status]
                   return (
                     <TableRow
@@ -646,22 +646,22 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                       className={cn('cursor-pointer', isVoided && 'opacity-50')}
                       onClick={() => openSettlement(s)}
                     >
-                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-white')}>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-[#97978f] line-through' : 'text-[#1a1c18] dark:text-white')}>
                         {s.properties?.name ?? '—'}
                       </TableCell>
-                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                         {s.units?.unit_number ?? '—'}
                       </TableCell>
-                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                         {s.tenants?.full_name ?? '—'}
                       </TableCell>
-                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
+                      <TableCell className={cn('px-3.5 py-3', isVoided ? 'text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                         {fmtDate(s.period_start)} — {fmtDate(s.period_end)}
                       </TableCell>
-                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
+                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                         {fmt(s.total_voorschot)}
                       </TableCell>
-                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300')}>
+                      <TableCell className={cn('px-3.5 py-3 text-right', isVoided ? 'text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                         {fmt(s.total_actual_costs)}
                       </TableCell>
                       <TableCell className={cn('px-3.5 py-3 text-right font-medium', balanceColor)}>
@@ -777,32 +777,32 @@ function SettlementDetail({ open, onOpenChange, settlement, onClose }: DetailPro
           )}
 
           {/* Info */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-gray-50 dark:bg-neutral-800/50 rounded-2xl p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-[#f4f4f1] dark:bg-neutral-800/50 rounded-2xl p-4">
             <div>
-              <span className="text-gray-500 dark:text-gray-400 block">Huurder</span>
-              <span className="font-medium text-gray-900 dark:text-white">{settlement.tenants?.full_name ?? '—'}</span>
+              <span className="text-[#97978f] dark:text-[#97978f] block">Huurder</span>
+              <span className="font-medium text-[#1a1c18] dark:text-white">{settlement.tenants?.full_name ?? '—'}</span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400 block">Eenheid</span>
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="text-[#97978f] dark:text-[#97978f] block">Eenheid</span>
+              <span className="font-medium text-[#1a1c18] dark:text-white">
                 {settlement.properties?.name}, {settlement.units?.unit_number}
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400 block">Periode</span>
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="text-[#97978f] dark:text-[#97978f] block">Periode</span>
+              <span className="font-medium text-[#1a1c18] dark:text-white">
                 {fmtDate(settlement.period_start)} — {fmtDate(settlement.period_end)}
               </span>
             </div>
             <div>
-              <span className="text-gray-500 dark:text-gray-400 block">Aangemaakt</span>
-              <span className="font-medium text-gray-900 dark:text-white">{fmtDateTime(settlement.created_at)}</span>
+              <span className="text-[#97978f] dark:text-[#97978f] block">Aangemaakt</span>
+              <span className="font-medium text-[#1a1c18] dark:text-white">{fmtDateTime(settlement.created_at)}</span>
             </div>
           </div>
 
           {/* Lifecycle timestamps */}
           {(settlement.published_at || settlement.sent_at || settlement.voided_at) && (
-            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 dark:text-gray-400 px-1">
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-[#97978f] dark:text-[#97978f] px-1">
               {settlement.published_at && <span>Gepubliceerd: {fmtDateTime(settlement.published_at)}</span>}
               {settlement.sent_at && <span>Verzonden: {fmtDateTime(settlement.sent_at)}</span>}
               {settlement.voided_at && <span className="text-red-500 dark:text-red-400">Nietig verklaard: {fmtDateTime(settlement.voided_at)}</span>}
@@ -817,27 +817,27 @@ function SettlementDetail({ open, onOpenChange, settlement, onClose }: DetailPro
           />
 
           {/* Summary */}
-          <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
+          <div className="rounded-2xl border border-[#e3e3de] dark:border-neutral-800 p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-[#1a1c18] dark:text-white">Servicekosten afrekening</h3>
             <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen</span>
+              <span className="text-[#97978f] dark:text-[#97978f]">Totaal ontvangen</span>
               <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
-              <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
+              <span className="text-[#97978f] dark:text-[#97978f]">Totaal uitgaven</span>
               <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
             </div>
-            <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Voorschot</span>
-              <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_voorschot)}</span>
-              <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
-              <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(settlement.total_actual_costs)}</span>
+            <div className="border-t border-[#e3e3de] dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+              <span className="text-[#97978f] dark:text-[#97978f]">Voorschot</span>
+              <span className="text-right font-medium text-[#1a1c18] dark:text-white">{fmt(settlement.total_voorschot)}</span>
+              <span className="text-[#97978f] dark:text-[#97978f]">Werkelijke kosten</span>
+              <span className="text-right font-medium text-[#1a1c18] dark:text-white">{fmt(settlement.total_actual_costs)}</span>
             </div>
-            <div className="border-t border-gray-200 dark:border-neutral-700 pt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Saldo servicekosten</span>
+            <div className="border-t border-[#e3e3de] dark:border-neutral-700 pt-3 flex items-center justify-between">
+              <span className="text-sm font-semibold text-[#1a1c18] dark:text-white">Saldo servicekosten</span>
               <span className={cn(
                 'text-lg font-bold',
                 settlement.balance > 0.01 ? 'text-green-600 dark:text-green-400'
                   : settlement.balance < -0.01 ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-500'
+                  : 'text-[#97978f]'
               )}>
                 {fmt(settlement.balance)}
               </span>
@@ -848,7 +848,7 @@ function SettlementDetail({ open, onOpenChange, settlement, onClose }: DetailPro
           {settlement.notes && (
             <div className="space-y-1">
               <Label>Notities</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{settlement.notes}</p>
+              <p className="text-sm text-[#55554e] dark:text-gray-300 whitespace-pre-wrap">{settlement.notes}</p>
             </div>
           )}
           </div>
@@ -858,7 +858,7 @@ function SettlementDetail({ open, onOpenChange, settlement, onClose }: DetailPro
           <button
             type="button"
             onClick={onClose}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
           >
             Sluiten
           </button>
@@ -1289,10 +1289,10 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               {settlementId ? 'Afrekening bewerken' : 'Nieuwe afrekening'}
             </DialogTitle>
             <div className="flex items-center gap-1.5 mt-2">
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 1 ? 'w-6' : 'w-3 opacity-30')} />
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 2 ? 'w-6' : 'w-3 opacity-30')} />
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#163300] dark:bg-[#9FE870]', step === 3 ? 'w-6' : 'w-3 opacity-30')} />
-              <span className="ml-1 text-xs text-gray-400">
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 1 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 2 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 3 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className="ml-1 text-xs text-[#97978f]">
                 {step === 1 ? 'Eenheid & periode' : step === 2 ? 'Overzicht' : 'Samenvatting'}
               </span>
             </div>
@@ -1304,7 +1304,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             {step === 1 && (
               loadingProps ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[#97978f]" />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1321,8 +1321,8 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         className={cn(
                           'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                           propertyId
-                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
+                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                         )}
                       >
                         <Building2 className="h-4 w-4 shrink-0" />
@@ -1333,7 +1333,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         <>
                           <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setPropPickerOpen(false)} />
                           <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
-                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
                           >
                             {properties.map(p => {
                               const isSel = propertyId === p.id
@@ -1341,10 +1341,10 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 <button key={p.id} type="button"
                                   onClick={() => { setPropertyId(p.id); setUnitId(''); setPropPickerOpen(false) }}
                                   className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
-                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                                   <span className="flex-1">{p.name}</span>
                                   {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                                 </button>
@@ -1369,8 +1369,8 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         className={cn(
                           'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                           unitId
-                            ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
-                            : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
+                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
                         )}
                       >
                         <Home className="h-4 w-4 shrink-0" />
@@ -1381,7 +1381,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         <>
                           <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'auto' }} onClick={() => setUnitPickerOpen(false)} />
                           <div style={{ position: 'fixed', top: pickerPos.top, left: pickerPos.left, width: pickerPos.width, zIndex: 9999, pointerEvents: 'auto' }}
-                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
+                            className="bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-[#e3e3de] dark:border-neutral-700 py-1 max-h-60 overflow-y-auto"
                           >
                             {(selectedProperty?.units ?? []).map(u => {
                               const isSel = unitId === u.id
@@ -1389,10 +1389,10 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 <button key={u.id} type="button"
                                   onClick={() => { setUnitId(u.id); setUnitPickerOpen(false) }}
                                   className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
-                                  <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                  <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
                                   <span className="flex-1">{u.unit_number}</span>
                                   {isSel && <Check className="h-3.5 w-3.5 shrink-0" />}
                                 </button>
@@ -1409,15 +1409,15 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label>Periode *</Label>
-                      <div className="inline-flex rounded-full border border-gray-200 dark:border-neutral-700 p-0.5">
+                      <div className="inline-flex rounded-full border border-[#e3e3de] dark:border-neutral-700 p-0.5">
                         {(['months', 'custom'] as const).map((mode) => (
                           <button key={mode} type="button"
                             onClick={() => { setPeriodMode(mode); setPeriodStart(''); setPeriodEnd(''); setMonthRangeStart(''); setMonthRangeEnd('') }}
                             className={cn(
                               'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                               periodMode === mode
-                                ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                                ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                : 'text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200'
                             )}
                           >
                             {mode === 'months' ? 'Maanden' : 'Aangepast'}
@@ -1428,15 +1428,15 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
 
                     {/* Month grid */}
                     {periodMode === 'months' && (
-                      <div className="rounded-xl border border-gray-200 dark:border-neutral-700 p-4 space-y-3">
+                      <div className="rounded-xl border border-[#e3e3de] dark:border-neutral-700 p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <button type="button" onClick={() => setYearView(y => y - 1)}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            className="p-1.5 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] dark:text-[#97978f] transition-colors">
                             <ChevronLeft className="h-4 w-4" />
                           </button>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{yearView}</span>
+                          <span className="text-sm font-semibold text-[#1a1c18] dark:text-white">{yearView}</span>
                           <button type="button" onClick={() => setYearView(y => y + 1)}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            className="p-1.5 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] dark:text-[#97978f] transition-colors">
                             <ChevronRight className="h-4 w-4" />
                           </button>
                         </div>
@@ -1459,10 +1459,10 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 className={cn(
                                   'rounded-lg py-2.5 text-sm font-medium transition-colors',
                                   inRange && isEdge
-                                    ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                                    ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
                                     : inRange
-                                      ? 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/20 dark:text-[#9FE870]'
-                                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                                      ? 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]'
+                                      : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                 )}
                               >
                                 {label}
@@ -1472,7 +1472,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         </div>
 
                         {monthRangeStart && (
-                          <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-center text-[#97978f] dark:text-[#97978f]">
                             {monthRangeEnd && monthRangeEnd !== monthRangeStart
                               ? `${format(parseISO(`${monthRangeStart}-01`), 'MMM yyyy', { locale: nl })} — ${format(parseISO(`${monthRangeEnd}-01`), 'MMM yyyy', { locale: nl })}`
                               : format(parseISO(`${monthRangeStart}-01`), 'MMMM yyyy', { locale: nl })
@@ -1484,28 +1484,28 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
 
                     {/* Custom date range calendar */}
                     {periodMode === 'custom' && (
-                      <div className="rounded-xl border border-gray-200 dark:border-neutral-700 p-4 space-y-3">
-                        <p className="text-xs text-gray-400">
+                      <div className="rounded-xl border border-[#e3e3de] dark:border-neutral-700 p-4 space-y-3">
+                        <p className="text-xs text-[#97978f]">
                           {!periodStart ? 'Klik op een startdatum' : !periodEnd ? 'Klik op een einddatum' : 'Bereik geselecteerd — klik om opnieuw te beginnen'}
                         </p>
 
                         <div className="flex items-center justify-between">
                           <button type="button" onClick={() => setCalView(d => subMonths(d, 1))}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            className="p-1.5 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] dark:text-[#97978f] transition-colors">
                             <ChevronLeft className="h-4 w-4" />
                           </button>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                          <span className="text-sm font-semibold text-[#1a1c18] dark:text-white capitalize">
                             {format(calView, 'MMMM yyyy', { locale: nl })}
                           </span>
                           <button type="button" onClick={() => setCalView(d => addMonths(d, 1))}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400 transition-colors">
+                            className="p-1.5 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] dark:text-[#97978f] transition-colors">
                             <ChevronRight className="h-4 w-4" />
                           </button>
                         </div>
 
                         <div className="grid grid-cols-7">
                           {WEEKDAYS_NL.map((wd, i) => (
-                            <div key={wd} className={cn('text-center text-xs font-semibold py-1', i >= 5 ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300')}>
+                            <div key={wd} className={cn('text-center text-xs font-semibold py-1', i >= 5 ? 'text-[#97978f] dark:text-[#97978f]' : 'text-[#55554e] dark:text-gray-300')}>
                               {wd}
                             </div>
                           ))}
@@ -1532,10 +1532,10 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 className={cn(
                                   'flex items-center justify-center h-8 w-8 mx-auto text-sm transition-colors',
                                   isSelected
-                                    ? 'rounded-full bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300] font-semibold'
+                                    ? 'rounded-full bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13] font-semibold'
                                     : inRange
-                                      ? 'bg-[#163300]/10 text-[#163300] dark:bg-[#9FE870]/15 dark:text-[#9FE870]'
-                                      : 'rounded-full text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800'
+                                      ? 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/15 dark:text-[#94f477]'
+                                      : 'rounded-full text-[#1a1c18] dark:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                 )}
                               >
                                 {format(day, 'd')}
@@ -1545,12 +1545,12 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         </div>
 
                         {(periodStart || periodEnd) && (
-                          <div className="flex items-center gap-2 text-xs pt-2 border-t border-gray-100 dark:border-neutral-800">
-                            <span className="text-gray-400">Van:</span>
-                            <span className="font-medium text-gray-700 dark:text-gray-300">{periodStart ? format(parseISO(periodStart), 'd MMM yyyy', { locale: nl }) : '—'}</span>
+                          <div className="flex items-center gap-2 text-xs pt-2 border-t border-[#e3e3de] dark:border-neutral-800">
+                            <span className="text-[#97978f]">Van:</span>
+                            <span className="font-medium text-[#55554e] dark:text-gray-300">{periodStart ? format(parseISO(periodStart), 'd MMM yyyy', { locale: nl }) : '—'}</span>
                             <span className="text-gray-300 dark:text-neutral-600 mx-0.5">→</span>
-                            <span className="text-gray-400">Tot:</span>
-                            <span className="font-medium text-gray-700 dark:text-gray-300">{periodEnd ? format(parseISO(periodEnd), 'd MMM yyyy', { locale: nl }) : '—'}</span>
+                            <span className="text-[#97978f]">Tot:</span>
+                            <span className="font-medium text-[#55554e] dark:text-gray-300">{periodEnd ? format(parseISO(periodEnd), 'd MMM yyyy', { locale: nl }) : '—'}</span>
                           </div>
                         )}
                       </div>
@@ -1564,7 +1564,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             {step === 2 && (
               loadingCosts ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[#97978f]" />
                 </div>
               ) : (
                 <OverzichtTable
@@ -1582,26 +1582,26 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             {/* ── Step 3 ── */}
             {step === 3 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-gray-50 dark:bg-neutral-800/50 rounded-2xl p-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm bg-[#f4f4f1] dark:bg-neutral-800/50 rounded-2xl p-4">
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400 block">Huurder</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{tenantName ?? '—'}</span>
+                    <span className="text-[#97978f] dark:text-[#97978f] block">Huurder</span>
+                    <span className="font-medium text-[#1a1c18] dark:text-white">{tenantName ?? '—'}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400 block">Eenheid</span>
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <span className="text-[#97978f] dark:text-[#97978f] block">Eenheid</span>
+                    <span className="font-medium text-[#1a1c18] dark:text-white">
                       {selectedProperty?.name}, {selectedUnit?.unit_number}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400 block">Periode</span>
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <span className="text-[#97978f] dark:text-[#97978f] block">Periode</span>
+                    <span className="font-medium text-[#1a1c18] dark:text-white">
                       {fmtDate(periodStart)} — {fmtDate(periodEnd)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400 block">Maanden</span>
-                    <span className="font-medium text-gray-900 dark:text-white">{monthsInPeriod.length}</span>
+                    <span className="text-[#97978f] dark:text-[#97978f] block">Maanden</span>
+                    <span className="font-medium text-[#1a1c18] dark:text-white">{monthsInPeriod.length}</span>
                   </div>
                 </div>
 
@@ -1611,27 +1611,27 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                   editable={false}
                 />
 
-                <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-4 space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Servicekosten afrekening</h3>
+                <div className="rounded-2xl border border-[#e3e3de] dark:border-neutral-800 p-4 space-y-3">
+                  <h3 className="text-sm font-semibold text-[#1a1c18] dark:text-white">Servicekosten afrekening</h3>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Totaal ontvangen (werkelijk)</span>
+                    <span className="text-[#97978f] dark:text-[#97978f]">Totaal ontvangen (werkelijk)</span>
                     <span className="text-right font-medium text-green-600 dark:text-green-400">{fmt(totalIncome)}</span>
-                    <span className="text-gray-500 dark:text-gray-400">Totaal uitgaven</span>
+                    <span className="text-[#97978f] dark:text-[#97978f]">Totaal uitgaven</span>
                     <span className="text-right font-medium text-red-600 dark:text-red-400">{fmt(-totalExpenses)}</span>
                   </div>
-                  <div className="border-t border-gray-100 dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Totaal voorschot betaald</span>
-                    <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(expectedVoorschotForPeriod)}</span>
-                    <span className="text-gray-500 dark:text-gray-400">Werkelijke kosten</span>
-                    <span className="text-right font-medium text-gray-900 dark:text-white">{fmt(totalExpenses)}</span>
+                  <div className="border-t border-[#e3e3de] dark:border-neutral-800 pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <span className="text-[#97978f] dark:text-[#97978f]">Totaal voorschot betaald</span>
+                    <span className="text-right font-medium text-[#1a1c18] dark:text-white">{fmt(expectedVoorschotForPeriod)}</span>
+                    <span className="text-[#97978f] dark:text-[#97978f]">Werkelijke kosten</span>
+                    <span className="text-right font-medium text-[#1a1c18] dark:text-white">{fmt(totalExpenses)}</span>
                   </div>
-                  <div className="border-t border-gray-200 dark:border-neutral-700 pt-3 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Saldo servicekosten</span>
+                  <div className="border-t border-[#e3e3de] dark:border-neutral-700 pt-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[#1a1c18] dark:text-white">Saldo servicekosten</span>
                     <span className={cn(
                       'text-lg font-bold',
                       servicekostenSaldo > 0.01 ? 'text-green-600 dark:text-green-400'
                         : servicekostenSaldo < -0.01 ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-500'
+                        : 'text-[#97978f]'
                     )}>
                       {fmt(servicekostenSaldo)}
                     </span>
@@ -1640,7 +1640,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                     'text-xs',
                     servicekostenSaldo > 0.01 ? 'text-green-600 dark:text-green-400'
                       : servicekostenSaldo < -0.01 ? 'text-red-600 dark:text-red-400'
-                      : 'text-gray-500'
+                      : 'text-[#97978f]'
                   )}>
                     {servicekostenSaldo > 0.01
                       ? `Terug te betalen aan huurder: ${fmt(servicekostenSaldo)}`
@@ -1669,7 +1669,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
               >
                 Annuleren
               </button>
@@ -1677,7 +1677,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               <button
                 type="button"
                 onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
-                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors"
               >
                 ← Vorige
               </button>
@@ -1688,7 +1688,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                 type="button"
                 disabled={!step1Valid}
                 onClick={goToStep2}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 Volgende →
               </button>
@@ -1697,7 +1697,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               <button
                 type="button"
                 onClick={() => setStep(3)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] px-4 py-2 text-sm font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors"
               >
                 Volgende →
               </button>
@@ -1711,7 +1711,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                 <Button
                   onClick={() => setConfirmOpen(true)}
                   disabled={saving}
-                  className="bg-[#163300] hover:bg-[#356258]"
+                  className="bg-[#161f13] hover:bg-[#356258]"
                 >
                   Publiceren
                 </Button>
@@ -1734,7 +1734,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             <AlertDialogAction
               onClick={() => save('definitief')}
               disabled={saving}
-              className="bg-[#163300] hover:bg-[#356258]"
+              className="bg-[#161f13] hover:bg-[#356258]"
             >
               {saving ? 'Bezig...' : 'Publiceren'}
             </AlertDialogAction>

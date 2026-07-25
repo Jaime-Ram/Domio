@@ -181,9 +181,9 @@ export default function PropertyDetailPage() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-12 bg-gray-200 dark:bg-neutral-700 rounded w-1/3" />
-        <div className="h-64 bg-gray-200 dark:bg-neutral-700 rounded" />
-        <div className="h-96 bg-gray-200 dark:bg-neutral-700 rounded" />
+        <div className="h-12 bg-[#ebebe7] dark:bg-neutral-700 rounded w-1/3" />
+        <div className="h-64 bg-[#ebebe7] dark:bg-neutral-700 rounded" />
+        <div className="h-96 bg-[#ebebe7] dark:bg-neutral-700 rounded" />
       </div>
     )
   }
@@ -191,7 +191,7 @@ export default function PropertyDetailPage() {
   if (!property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] mb-4">
+        <h2 className="text-2xl font-bold text-[#161f13] dark:text-[#94f477] mb-4">
           Object niet gevonden
         </h2>
         <Button onClick={() => router.push(`${basePath}/portfolio`)}>
@@ -396,10 +396,10 @@ export default function PropertyDetailPage() {
               
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870] mb-2">
+                  <h1 className="text-3xl font-bold text-[#161f13] dark:text-[#94f477] mb-2">
                     {isEditing ? (editForm.name || 'Nieuw pand') : property.name}
                   </h1>
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-[#55554e] dark:text-[#97978f]">
                     <MapPin className="h-4 w-4" />
                     {isEditing ? (editForm.address || 'Geen adres') : property.address}
                   </div>
@@ -471,7 +471,7 @@ export default function PropertyDetailPage() {
 
                     {/* Locatie Info */}
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Locatie</p>
+                      <p className="text-sm font-medium text-[#1a1c18] dark:text-white mb-3">Locatie</p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {isEditing ? (
                           <>
@@ -507,16 +507,16 @@ export default function PropertyDetailPage() {
                         ) : (
                           <>
                             <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Adres</p>
-                              <p className="font-medium text-gray-900 dark:text-white">{property.address}</p>
+                              <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Adres</p>
+                              <p className="font-medium text-[#1a1c18] dark:text-white">{property.address}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Postcode</p>
-                              <p className="font-medium text-gray-900 dark:text-white">{property.postcode || '-'}</p>
+                              <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Postcode</p>
+                              <p className="font-medium text-[#1a1c18] dark:text-white">{property.postcode || '-'}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Stad</p>
-                              <p className="font-medium text-gray-900 dark:text-white">{property.city || '-'}</p>
+                              <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Stad</p>
+                              <p className="font-medium text-[#1a1c18] dark:text-white">{property.city || '-'}</p>
                             </div>
                           </>
                         )}
@@ -525,7 +525,7 @@ export default function PropertyDetailPage() {
 
                     {/* Naam + Kenmerken */}
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Kenmerken</p>
+                      <p className="text-sm font-medium text-[#1a1c18] dark:text-white mb-3">Kenmerken</p>
                       {isEditing ? (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div className="space-y-2">
@@ -579,26 +579,26 @@ export default function PropertyDetailPage() {
                       ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Type</p>
-                            <p className="font-medium text-gray-900 dark:text-white capitalize">{property.type}</p>
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Type</p>
+                            <p className="font-medium text-[#1a1c18] dark:text-white capitalize">{property.type}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bouwjaar</p>
-                            <p className="font-medium text-gray-900 dark:text-white">{property.build_year || '-'}</p>
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Bouwjaar</p>
+                            <p className="font-medium text-[#1a1c18] dark:text-white">{property.build_year || '-'}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Energielabel</p>
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Energielabel</p>
                             {property.energy_label ? (
                               <Badge variant="outline">{property.energy_label}</Badge>
                             ) : (
-                              <p className="font-medium text-gray-900 dark:text-white">-</p>
+                              <p className="font-medium text-[#1a1c18] dark:text-white">-</p>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Aantal units</p>
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Aantal units</p>
                             <div className="flex items-center gap-1">
-                              <DoorOpen className="h-4 w-4 text-gray-400" />
-                              <p className="font-medium text-gray-900 dark:text-white">{property.units?.length || 0}</p>
+                              <DoorOpen className="h-4 w-4 text-[#97978f]" />
+                              <p className="font-medium text-[#1a1c18] dark:text-white">{property.units?.length || 0}</p>
                             </div>
                           </div>
                         </div>
@@ -607,7 +607,7 @@ export default function PropertyDetailPage() {
 
                     {/* Financiële Gegevens */}
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Financiële Gegevens</p>
+                      <p className="text-sm font-medium text-[#1a1c18] dark:text-white mb-3">Financiële Gegevens</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {isEditing ? (
                           <div className="space-y-2">
@@ -622,15 +622,15 @@ export default function PropertyDetailPage() {
                           </div>
                         ) : (
                           <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">WOZ-waarde</p>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">WOZ-waarde</p>
+                            <p className="font-medium text-[#1a1c18] dark:text-white">
                               {property.woz_value ? `€${property.woz_value.toLocaleString('nl-NL')}` : '-'}
                             </p>
                           </div>
                         )}
                         <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Totale maandhuur</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-1">Totale maandhuur</p>
+                          <p className="font-medium text-[#1a1c18] dark:text-white">
                             €{(property.units?.reduce((sum: number, u: any) => sum + (u.monthly_rent || 0), 0) || 0).toLocaleString('nl-NL')}
                           </p>
                         </div>
@@ -639,7 +639,7 @@ export default function PropertyDetailPage() {
 
                     {/* Save/Delete buttons in edit mode */}
                     {isEditing && (
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                      <div className="flex items-center justify-between pt-4 border-t border-[#e3e3de] dark:border-neutral-700">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="destructive" disabled={deleting}>
@@ -668,7 +668,7 @@ export default function PropertyDetailPage() {
                         <Button
                           onClick={handleSave}
                           disabled={saving || !editForm.name || !editForm.address}
-                          className="bg-[#163300] hover:bg-[#356258] text-white"
+                          className="bg-[#161f13] hover:bg-[#356258] text-white"
                         >
                           {saving ? 'Opslaan...' : 'Opslaan'}
                         </Button>
@@ -688,7 +688,7 @@ export default function PropertyDetailPage() {
                         <CardDescription>Alle units in dit object</CardDescription>
                       </div>
                       <Button 
-                        className="bg-[#163300] hover:bg-[#356258] text-white"
+                        className="bg-[#161f13] hover:bg-[#356258] text-white"
                         onClick={handleAddUnit}
                         disabled={newUnitDraft !== null}
                       >
@@ -701,10 +701,10 @@ export default function PropertyDetailPage() {
                     <div className="space-y-4">
                       {/* New unit draft card */}
                       {newUnitDraft && (
-                        <div className="border-2 border-dashed border-[#163300]/40 dark:border-[#9FE870]/40 rounded-lg p-6">
+                        <div className="border-2 border-dashed border-[#161f13]/40 dark:border-[#94f477]/40 rounded-lg p-6">
                           <div className="flex items-center gap-3 mb-4">
-                            <DoorOpen className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
-                            <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">Nieuwe unit</h3>
+                            <DoorOpen className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
+                            <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">Nieuwe unit</h3>
                           </div>
 
                           {newUnitError && (
@@ -768,7 +768,7 @@ export default function PropertyDetailPage() {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                          <div className="flex items-center justify-between pt-4 border-t border-[#e3e3de] dark:border-neutral-700">
                             <Button variant="outline" onClick={handleCancelNewUnit} disabled={savingNewUnit}>
                               <X className="h-4 w-4 mr-2" />
                               Annuleren
@@ -776,7 +776,7 @@ export default function PropertyDetailPage() {
                             <Button
                               onClick={handleSaveNewUnit}
                               disabled={savingNewUnit || !newUnitDraft.unit_number}
-                              className="bg-[#163300] hover:bg-[#356258] text-white"
+                              className="bg-[#161f13] hover:bg-[#356258] text-white"
                             >
                               {savingNewUnit ? 'Opslaan...' : 'Opslaan'}
                             </Button>
@@ -801,13 +801,13 @@ export default function PropertyDetailPage() {
                           }
                           const tenants = Array.from(tenantMap.values())
                           return (
-                            <div key={unit.id} className="border border-gray-200 dark:border-neutral-700 rounded-lg p-6 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
+                            <div key={unit.id} className="border border-[#e3e3de] dark:border-neutral-700 rounded-lg p-6 hover:border-gray-300 dark:hover:border-neutral-600 transition-colors">
                               {isUnitEditing && unitForm ? (
                                 <>
                                   {/* Edit mode */}
                                   <div className="flex items-center gap-3 mb-4">
-                                    <DoorOpen className="h-5 w-5 text-gray-400" />
-                                    <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">{unitForm.unit_number || unit.unit_number}</h3>
+                                    <DoorOpen className="h-5 w-5 text-[#97978f]" />
+                                    <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">{unitForm.unit_number || unit.unit_number}</h3>
                                   </div>
 
                                   {unitErrors[unit.id] && (
@@ -869,29 +869,29 @@ export default function PropertyDetailPage() {
 
                                   {/* Tenants (read-only in edit mode) */}
                                   <div className="mb-4">
-                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
+                                    <p className="text-xs font-medium text-[#97978f] dark:text-[#97978f] uppercase mb-3">Huurders</p>
                                     {tenants.length > 0 ? (
                                       <div className="flex flex-wrap gap-2">
                                         {tenants.map((tenant) => (
                                           <Link
                                             key={tenant.id}
                                             href={`${basePath}/tenants/${tenant.id}`}
-                                            className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                                            className="inline-flex items-center gap-2 p-2.5 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg border border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors"
                                           >
-                                            <span className="font-medium text-sm text-gray-900 dark:text-white">{tenant.full_name}</span>
-                                            <Eye className="h-4 w-4 text-gray-400" />
+                                            <span className="font-medium text-sm text-[#1a1c18] dark:text-white">{tenant.full_name}</span>
+                                            <Eye className="h-4 w-4 text-[#97978f]" />
                                           </Link>
                                         ))}
                                       </div>
                                     ) : (
-                                      <div className="p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-center">
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">Geen huurder</span>
+                                      <div className="p-3 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg text-center">
+                                        <span className="text-sm text-[#97978f] dark:text-[#97978f]">Geen huurder</span>
                                       </div>
                                     )}
                                   </div>
 
                                   {/* Edit action buttons */}
-                                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-neutral-700">
+                                  <div className="flex items-center justify-between pt-4 border-t border-[#e3e3de] dark:border-neutral-700">
                                     <div className="flex items-center gap-2">
                                       <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -927,7 +927,7 @@ export default function PropertyDetailPage() {
                                       size="sm"
                                       onClick={() => handleSaveUnit(unit.id)}
                                       disabled={savingUnits.has(unit.id) || !unitForm.unit_number}
-                                      className="bg-[#163300] hover:bg-[#356258] text-white"
+                                      className="bg-[#161f13] hover:bg-[#356258] text-white"
                                     >
                                       {savingUnits.has(unit.id) ? 'Opslaan...' : 'Opslaan'}
                                     </Button>
@@ -939,9 +939,9 @@ export default function PropertyDetailPage() {
                                   {/* Unit Header */}
                                   <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                      <DoorOpen className="h-5 w-5 text-gray-400" />
+                                      <DoorOpen className="h-5 w-5 text-[#97978f]" />
                                       <div>
-                                        <h3 className="font-semibold text-[#163300] dark:text-[#9FE870]">{unit.unit_number}</h3>
+                                        <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">{unit.unit_number}</h3>
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -961,43 +961,43 @@ export default function PropertyDetailPage() {
                                   </div>
 
                                   {/* Unit Details Grid */}
-                                  <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-neutral-700">
+                                  <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-[#e3e3de] dark:border-neutral-700">
                                     <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Kamers</p>
-                                      <p className="font-medium text-gray-900 dark:text-white">{unit.rooms ? `${unit.rooms}` : '-'}</p>
+                                      <p className="text-xs text-[#97978f] dark:text-[#97978f] mb-1">Kamers</p>
+                                      <p className="font-medium text-[#1a1c18] dark:text-white">{unit.rooms ? `${unit.rooms}` : '-'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Oppervlakte</p>
-                                      <p className="font-medium text-gray-900 dark:text-white">{unit.size_m2 ? `${unit.size_m2} m²` : '-'}</p>
+                                      <p className="text-xs text-[#97978f] dark:text-[#97978f] mb-1">Oppervlakte</p>
+                                      <p className="font-medium text-[#1a1c18] dark:text-white">{unit.size_m2 ? `${unit.size_m2} m²` : '-'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Huurprijs</p>
-                                      <p className="font-medium text-gray-900 dark:text-white">{unit.monthly_rent ? `€${unit.monthly_rent.toLocaleString('nl-NL')}` : '-'}</p>
+                                      <p className="text-xs text-[#97978f] dark:text-[#97978f] mb-1">Huurprijs</p>
+                                      <p className="font-medium text-[#1a1c18] dark:text-white">{unit.monthly_rent ? `€${unit.monthly_rent.toLocaleString('nl-NL')}` : '-'}</p>
                                     </div>
                                   </div>
 
                                   {/* Tenants Section */}
                                   <div className="mb-4">
-                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">Huurders</p>
+                                    <p className="text-xs font-medium text-[#97978f] dark:text-[#97978f] uppercase mb-3">Huurders</p>
                                     {tenants.length > 0 ? (
                                       <div className="flex flex-wrap gap-2">
                                         {tenants.map((tenant) => (
                                           <Link
                                             key={tenant.id}
                                             href={`${basePath}/tenants/${tenant.id}`}
-                                            className="inline-flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                                            className="inline-flex items-center gap-2 p-2.5 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg border border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors"
                                           >
-                                            <span className="font-medium text-sm text-gray-900 dark:text-white">
+                                            <span className="font-medium text-sm text-[#1a1c18] dark:text-white">
                                               {tenant.full_name}
                                             </span>
-                                            <Eye className="h-4 w-4 text-gray-400" />
+                                            <Eye className="h-4 w-4 text-[#97978f]" />
                                           </Link>
                                         ))}
                                       </div>
                                     ) : inviteUnitId === unit.id ? (
                                       /* Inline invite form */
-                                      <div className="border border-[#163300]/20 dark:border-[#9FE870]/20 rounded-lg p-4 space-y-3">
-                                        <p className="text-xs font-semibold text-[#163300] dark:text-[#9FE870]">Huurder uitnodigen</p>
+                                      <div className="border border-[#161f13]/20 dark:border-[#94f477]/20 rounded-lg p-4 space-y-3">
+                                        <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477]">Huurder uitnodigen</p>
                                         <Input
                                           placeholder="Volledige naam"
                                           value={inviteForm.name}
@@ -1025,7 +1025,7 @@ export default function PropertyDetailPage() {
                                           </Button>
                                           <Button
                                             size="sm"
-                                            className="bg-[#163300] hover:bg-[#356258] text-white"
+                                            className="bg-[#161f13] hover:bg-[#356258] text-white"
                                             onClick={() => handleInviteToUnit(unit.id)}
                                             disabled={inviteSending || !inviteForm.name || !inviteForm.email}
                                           >
@@ -1042,7 +1042,7 @@ export default function PropertyDetailPage() {
                                     ) : (
                                       <button
                                         onClick={() => { setInviteUnitId(unit.id); setInviteForm({ name: '', email: '' }); setInviteError(null) }}
-                                        className="w-full flex items-center justify-center gap-2 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg border border-dashed border-gray-300 dark:border-neutral-600 hover:border-[#163300] dark:hover:border-[#9FE870] hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors text-sm text-gray-500 dark:text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
+                                        className="w-full flex items-center justify-center gap-2 p-3 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg border border-dashed border-gray-300 dark:border-neutral-600 hover:border-[#161f13] dark:hover:border-[#94f477] hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors text-sm text-[#97978f] dark:text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477]"
                                       >
                                         <Mail className="h-4 w-4" />
                                         Huurder uitnodigen
@@ -1068,15 +1068,15 @@ export default function PropertyDetailPage() {
                         })
                       ) : !newUnitDraft ? (
                         <div className="py-12 text-center">
-                          <DoorOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <h3 className="text-lg font-medium text-[#163300] dark:text-[#9FE870] mb-2">
+                          <DoorOpen className="h-12 w-12 text-[#97978f] mx-auto mb-4" />
+                          <h3 className="text-lg font-medium text-[#161f13] dark:text-[#94f477] mb-2">
                             Geen units beschikbaar
                           </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                          <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-4">
                             Voeg units toe aan dit object
                           </p>
                           <Button 
-                            className="bg-[#163300] hover:bg-[#356258] text-white"
+                            className="bg-[#161f13] hover:bg-[#356258] text-white"
                             onClick={handleAddUnit}
                           >
                             <DoorOpen className="h-4 w-4 mr-2" />
@@ -1098,7 +1098,7 @@ export default function PropertyDetailPage() {
                         <CardTitle>Documenten</CardTitle>
                         <CardDescription>Alle documenten voor dit object</CardDescription>
                       </div>
-                      <Button className="bg-[#163300] hover:bg-[#356258] text-white">
+                      <Button className="bg-[#161f13] hover:bg-[#356258] text-white">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Document
                       </Button>
@@ -1110,18 +1110,18 @@ export default function PropertyDetailPage() {
                         {propertyDocuments.map((doc) => (
                           <div 
                             key={doc.id}
-                            className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors"
+                            className="flex items-center justify-between p-4 border border-[#e3e3de] dark:border-neutral-700 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
                           >
                             <div className="flex items-center gap-3 flex-1">
-                              <FileText className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+                              <FileText className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">
                                   {doc.name}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge variant="outline" className="text-xs">{doc.type}</Badge>
-                                  <span className="text-xs text-gray-500">{doc.size}</span>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-[#97978f]">{doc.size}</span>
+                                  <span className="text-xs text-[#97978f]">
                                     {new Date(doc.uploadDate).toLocaleDateString('nl-NL')}
                                   </span>
                                 </div>
@@ -1143,8 +1143,8 @@ export default function PropertyDetailPage() {
                       </div>
                     ) : (
                       <div className="py-12 text-center">
-                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <FileText className="h-12 w-12 text-[#97978f] mx-auto mb-4" />
+                        <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                           Geen documenten beschikbaar
                         </p>
                       </div>

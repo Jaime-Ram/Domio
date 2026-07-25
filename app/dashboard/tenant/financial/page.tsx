@@ -215,7 +215,7 @@ export default function TenantFinancialPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-5 py-4">
           <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Betaald {new Date().getFullYear()}</p>
-          <p className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] mt-1">{formatEur(stats.paidThisYear)}</p>
+          <p className="text-2xl font-bold text-[#161f13] dark:text-[#94f477] mt-1">{formatEur(stats.paidThisYear)}</p>
         </div>
 
         <div className={cn(

@@ -100,7 +100,7 @@ function ReminderBuilder({
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
         {value.length === 0 && (
-          <span className="text-xs text-gray-400 dark:text-gray-500 italic">Geen herinneringen</span>
+          <span className="text-xs text-[#97978f] dark:text-[#97978f] italic">Geen herinneringen</span>
         )}
         {value.map((d) => (
           <span key={d} className={cn(
@@ -108,7 +108,7 @@ function ReminderBuilder({
             d < 0
               ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
               : d === 0
-              ? 'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300'
+              ? 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-gray-300'
               : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
           )}>
             {reminderLabel(d)}
@@ -134,7 +134,7 @@ function ReminderBuilder({
           Toevoegen
         </Button>
       </div>
-      <p className="text-xs text-gray-400 dark:text-gray-500">
+      <p className="text-xs text-[#97978f] dark:text-[#97978f]">
         Negatief = vóór betaaldag · Positief = dagen na betaaldag · 0 = op betaaldag
       </p>
     </div>
@@ -205,9 +205,9 @@ export default function BetaalflowPage() {
   }
 
   function SortIcon({ col }: { col: SortCol }) {
-    if (sort.column !== col) return <ChevronsUpDown className="h-3.5 w-3.5 text-gray-400" />
-    if (sort.direction === 'asc') return <ChevronUp className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
-    return <ChevronDown className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
+    if (sort.column !== col) return <ChevronsUpDown className="h-3.5 w-3.5 text-[#97978f]" />
+    if (sort.direction === 'asc') return <ChevronUp className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+    return <ChevronDown className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
   }
 
   // ── Dialog open ───────────────────────────────────────────────────────────
@@ -290,7 +290,7 @@ export default function BetaalflowPage() {
     <>
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-[#97978f]" />
         </div>
       ) : (
         <Card className={dashboardCardClass()}>
@@ -298,17 +298,17 @@ export default function BetaalflowPage() {
           <CardHeader className={cn('space-y-3', DASHBOARD_TABLE_TOOLBAR_HEADER_SHADCN_CLASS)}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Workflow className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                <h2 className="text-base font-semibold text-[#1a1c18] dark:text-white flex items-center gap-2">
+                  <Workflow className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                   Betaalflow
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">
                   Herbruikbare betaalprofielen die je aan huurders koppelt
                 </p>
               </div>
               <Button
                 onClick={openCreate}
-                className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 h-9 text-sm font-medium shrink-0"
+                className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 h-9 text-sm font-medium shrink-0"
               >
                 <Plus className="h-4 w-4 mr-1.5" />
                 Nieuw profiel
@@ -351,7 +351,7 @@ export default function BetaalflowPage() {
                       <TableCell colSpan={5} className="py-12 text-center">
                         <div className="flex flex-col items-center gap-3">
                           <Workflow className="h-8 w-8 text-gray-300 dark:text-neutral-600" />
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                             Nog geen betaalprofielen aangemaakt
                           </p>
                           <Button onClick={openCreate} variant="outline" size="sm" className="rounded-full text-xs mt-1">
@@ -365,27 +365,27 @@ export default function BetaalflowPage() {
                     <TableRow key={p.id} className="group cursor-pointer" onClick={() => openEdit(p)}>
                       <TableCell className="px-3.5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-                            <Workflow className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                          <div className="h-8 w-8 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center shrink-0">
+                            <Workflow className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{p.name}</p>
+                            <p className="text-sm font-semibold text-[#1a1c18] dark:text-white truncate">{p.name}</p>
                             {p.description && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">{p.description}</p>
+                              <p className="text-xs text-[#97978f] dark:text-[#97978f] truncate max-w-[220px]">{p.description}</p>
                             )}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="px-3.5 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
-                          <CalendarClock className="h-3.5 w-3.5 text-gray-400" />
+                        <span className="inline-flex items-center gap-1.5 text-sm text-[#55554e] dark:text-gray-300">
+                          <CalendarClock className="h-3.5 w-3.5 text-[#97978f]" />
                           {payDateLabel(p.pay_date)}
                         </span>
                       </TableCell>
                       <TableCell className="px-3.5 py-3">
                         <div className="flex flex-wrap gap-1">
                           {p.reminders.length === 0 ? (
-                            <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                            <span className="text-xs text-[#97978f] dark:text-[#97978f]">—</span>
                           ) : (
                             p.reminders.map((d) => (
                               <span key={d} className={cn(
@@ -393,7 +393,7 @@ export default function BetaalflowPage() {
                                 d < 0
                                   ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                                   : d === 0
-                                  ? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-300'
+                                  ? 'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-gray-300'
                                   : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
                               )}>
                                 <Bell className="h-2.5 w-2.5 mr-1" />
@@ -404,8 +404,8 @@ export default function BetaalflowPage() {
                         </div>
                       </TableCell>
                       <TableCell className="px-3.5 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-300">
-                          <Users className="h-3.5 w-3.5 text-gray-400" />
+                        <span className="inline-flex items-center gap-1.5 text-sm text-[#55554e] dark:text-gray-300">
+                          <Users className="h-3.5 w-3.5 text-[#97978f]" />
                           {p.tenant_count ?? 0}
                         </span>
                       </TableCell>
@@ -417,7 +417,7 @@ export default function BetaalflowPage() {
                             className="h-7 w-7 rounded-lg"
                             onClick={(e) => { e.stopPropagation(); openEdit(p) }}
                           >
-                            <Pencil className="h-3.5 w-3.5 text-gray-500" />
+                            <Pencil className="h-3.5 w-3.5 text-[#97978f]" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -466,7 +466,7 @@ export default function BetaalflowPage() {
 
             {/* Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="bf-desc">Omschrijving <span className="text-gray-400 font-normal">(optioneel)</span></Label>
+              <Label htmlFor="bf-desc">Omschrijving <span className="text-[#97978f] font-normal">(optioneel)</span></Label>
               <Textarea
                 id="bf-desc"
                 value={formDesc}
@@ -490,7 +490,7 @@ export default function BetaalflowPage() {
                   onChange={(e) => setFormPayDate(Math.min(28, Math.max(1, parseInt(e.target.value) || 1)))}
                   className="w-24 rounded-xl text-sm"
                 />
-                <span className="text-sm text-gray-500 dark:text-gray-400">van de maand (1–28)</span>
+                <span className="text-sm text-[#97978f] dark:text-[#97978f]">van de maand (1–28)</span>
               </div>
             </div>
 
@@ -507,7 +507,7 @@ export default function BetaalflowPage() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-5 py-2"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] text-sm font-semibold px-5 py-2"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {saving ? 'Opslaan…' : editingProfile ? 'Wijzigingen opslaan' : 'Profiel aanmaken'}
@@ -523,7 +523,7 @@ export default function BetaalflowPage() {
             <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Profiel verwijderen</DialogTitle>
           </DialogHeader>
           <div className={cn(ADD_DIALOG_BODY_CLASS)}>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-[#55554e] dark:text-[#97978f]">
               Weet je zeker dat je dit betaalprofiel wilt verwijderen? Huurders die dit profiel gebruiken worden losgekoppeld.
             </p>
           </div>

@@ -203,7 +203,7 @@ export default function GeldstromenPage() {
   const syncButton = noConnection ? (
     <a
       href="/dashboard/landlord/settings?tab=koppelingen"
-      className="inline-flex items-center gap-1.5 h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors shrink-0"
+      className="inline-flex items-center gap-1.5 h-9 rounded-full border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-[#55554e] dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 transition-colors shrink-0"
     >
       <span className="hidden sm:inline">Bankrekening koppelen</span>
     </a>
@@ -225,7 +225,7 @@ export default function GeldstromenPage() {
           ? `${syncResult.imported} nieuw, ${syncResult.skipped} overgeslagen`
           : 'Synchroniseer transacties'
       }
-      className="inline-flex items-center gap-1.5 h-9 rounded-full border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors shrink-0"
+      className="inline-flex items-center gap-1.5 h-9 rounded-full border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm font-medium text-[#55554e] dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800 disabled:opacity-50 transition-colors shrink-0"
     >
       {syncing
         ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -243,7 +243,7 @@ export default function GeldstromenPage() {
 
       {loading ? (
         <div className="flex items-center justify-center min-h-[200px]">
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-[#97978f]">Laden...</p>
         </div>
       ) : (
         <GeldstromenPanel

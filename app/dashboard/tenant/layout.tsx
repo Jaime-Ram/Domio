@@ -66,7 +66,7 @@ export default function TenantDashboardLayout({ children }: { children: React.Re
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-900">
       <div
-        className="pointer-events-none fixed inset-0 z-[100] bg-[#9FE870] transition-opacity"
+        className="pointer-events-none fixed inset-0 z-[100] bg-[#94f477] transition-opacity"
         style={{
           opacity: enterDone ? 0 : 1,
           transitionDuration: `${ENTER_DURATION_MS}ms`,

@@ -116,7 +116,7 @@ const STATUS_PILL_CLS: Record<string, string> = {
   in_behandeling: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   gepland:        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
   afgerond:       'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  geannuleerd:    'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-500',
+  geannuleerd:    'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-800 dark:text-[#97978f]',
 }
 const STATUS_DOT_CLS: Record<string, string> = {
   open: 'bg-yellow-500', in_behandeling: 'bg-blue-500', gepland: 'bg-purple-500',
@@ -128,8 +128,8 @@ const PRIORITY_LABEL: Record<string, string> = {
 const PRIORITY_PILL_CLS: Record<string, string> = {
   urgent: 'bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400',
   hoog:   'bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400',
-  normaal:'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400',
-  laag:   'bg-gray-50 text-gray-400 dark:bg-neutral-900/50 dark:text-gray-600',
+  normaal:'bg-[#f4f4f1] text-[#55554e] dark:bg-neutral-800 dark:text-[#97978f]',
+  laag:   'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-900/50 dark:text-[#55554e]',
 }
 
 function StatusPill({ status, ticketId, onUpdate }: {
@@ -570,8 +570,8 @@ export default function MaintenancePage() {
       {/* Toolbar — no Card wrapper */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-lg font-semibold text-[#163300] dark:text-[#9FE870]">Tickets</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-lg font-semibold text-[#161f13] dark:text-[#94f477]">Tickets</p>
+          <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-1">
             {filteredTickets.length} van {tickets.length} ticket{tickets.length === 1 ? '' : 's'}
           </p>
         </div>
@@ -582,8 +582,8 @@ export default function MaintenancePage() {
               type="button"
               onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
               className={cn(
-                'h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0',
-                searchQuery && 'text-[#163300] dark:text-[#9FE870]',
+                'h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors shrink-0',
+                searchQuery && 'text-[#161f13] dark:text-[#94f477]',
               )}
             >
               <Search className="h-4 w-4" />
@@ -599,7 +599,7 @@ export default function MaintenancePage() {
                 onBlur={() => { if (!searchQuery) setSearchExpanded(false) }}
                 onKeyDown={e => { if (e.key === 'Escape') { setSearchQuery(''); setSearchExpanded(false) } }}
                 placeholder="Zoeken…"
-                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-gray-100 dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#9FE870]/40 text-gray-700 dark:text-gray-200 placeholder:text-gray-400"
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#94f477]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
               />
             </div>
           </div>
@@ -610,7 +610,7 @@ export default function MaintenancePage() {
               <button
                 type="button"
                 suppressHydrationWarning
-                className="h-8 w-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
               >
                 <Filter className="h-4 w-4" />
               </button>
@@ -623,7 +623,7 @@ export default function MaintenancePage() {
                 'max-h-[min(70vh,480px)] overflow-y-auto'
               )}
             >
-              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                 Status
               </DropdownMenuLabel>
               <div className="space-y-1 pb-2">
@@ -639,7 +639,7 @@ export default function MaintenancePage() {
                   </DropdownMenuCheckboxItem>
                 ))}
               </div>
-              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                 Prioriteit
               </DropdownMenuLabel>
               <div className="space-y-1 pb-2">
@@ -655,7 +655,7 @@ export default function MaintenancePage() {
                   </DropdownMenuCheckboxItem>
                 ))}
               </div>
-              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                 Categorie
               </DropdownMenuLabel>
               <div className="space-y-1 pb-2">
@@ -673,7 +673,7 @@ export default function MaintenancePage() {
               </div>
               {uniquePropertyNames.length > 0 && (
                 <>
-                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                  <DropdownMenuLabel className="px-2 pb-1 text-xs font-medium text-[#97978f] dark:text-[#97978f]">
                     Pand
                   </DropdownMenuLabel>
                   <div className="space-y-1">
@@ -699,7 +699,7 @@ export default function MaintenancePage() {
               resetCreateForm()
               setCreateOpen(true)
             }}
-            className="bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
+            className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nieuw ticket
@@ -712,25 +712,25 @@ export default function MaintenancePage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-36 bg-gray-200 dark:bg-neutral-700 rounded-block animate-pulse" />
+              <div key={i} className="h-36 bg-[#ebebe7] dark:bg-neutral-700 rounded-block animate-pulse" />
             ))}
           </div>
         ) : sortedTickets.length === 0 ? (
-          <div className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">Geen tickets gevonden.</div>
+          <div className="py-16 text-center text-sm text-[#97978f] dark:text-[#97978f]">Geen tickets gevonden.</div>
         ) : (
           <>
             {/* Column headers */}
-            <div className="grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] items-center gap-4 px-3 pb-2 border-b border-gray-100 dark:border-neutral-800">
+            <div className="grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] items-center gap-4 px-3 pb-2 border-b border-[#e3e3de] dark:border-neutral-800">
               {/* Action zone header: # normally, select-all when items selected */}
               <div className="flex items-center">
                 {selectedIds.length > 0 ? (
                   <button type="button" onClick={toggleSelectAll} className="ml-[26px] flex items-center justify-center">
                     {selectedIds.length === sortedTickets.length
-                      ? <CheckSquare className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
-                      : <Square className="h-3.5 w-3.5 text-gray-400" />}
+                      ? <CheckSquare className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+                      : <Square className="h-3.5 w-3.5 text-[#97978f]" />}
                   </button>
                 ) : (
-                  <span className="text-xs font-medium text-gray-400 dark:text-gray-500">#</span>
+                  <span className="text-xs font-medium text-[#97978f] dark:text-[#97978f]">#</span>
                 )}
               </div>
               <SortableHeader label="Titel" sortKey="title" sort={ticketSort} onSort={toggleSort} className="text-xs" />
@@ -747,8 +747,8 @@ export default function MaintenancePage() {
                   className={cn(
                     'group grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] w-full items-center gap-4 px-3 py-3 transition-colors rounded-xl cursor-pointer',
                     selectedIds.includes(t.id)
-                      ? 'bg-[#9FE870]/20 dark:bg-[#9FE870]/10'
-                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800/40',
+                      ? 'bg-[#94f477]/20 dark:bg-[#94f477]/10'
+                      : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/40',
                   )}
                   onClick={() => openDetail(t.id)}
                 >
@@ -756,7 +756,7 @@ export default function MaintenancePage() {
                   <div className="relative flex items-center h-full" onClick={e => e.stopPropagation()}>
                     {/* Ticket number — hidden on hover or when selected */}
                     <span className={cn(
-                      'text-xs font-mono text-gray-400 dark:text-gray-500 transition-opacity absolute pointer-events-none',
+                      'text-xs font-mono text-[#97978f] dark:text-[#97978f] transition-opacity absolute pointer-events-none',
                       selectedIds.includes(t.id) ? 'opacity-0' : 'group-hover:opacity-0',
                     )}>
                       {t.ticket_number ? `#${t.ticket_number}` : '—'}
@@ -768,7 +768,7 @@ export default function MaintenancePage() {
                     )}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button suppressHydrationWarning className="h-5 w-5 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                          <button suppressHydrationWarning className="h-5 w-5 flex items-center justify-center rounded hover:bg-[#ebebe7] dark:hover:bg-neutral-700 text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200 transition-colors">
                             <MoreHorizontal className="h-3.5 w-3.5" />
                           </button>
                         </DropdownMenuTrigger>
@@ -838,15 +838,15 @@ export default function MaintenancePage() {
                         className="h-5 w-5 flex items-center justify-center"
                       >
                         {selectedIds.includes(t.id)
-                          ? <CheckSquare className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
-                          : <Square className="h-3.5 w-3.5 text-gray-400" />}
+                          ? <CheckSquare className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+                          : <Square className="h-3.5 w-3.5 text-[#97978f]" />}
                       </button>
                     </div>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{t.title}</p>
+                    <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{t.title}</p>
                     {t.unitLabel && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{t.unitLabel}</p>
+                      <p className="text-xs text-[#97978f] dark:text-[#97978f] truncate mt-0.5">{t.unitLabel}</p>
                     )}
                   </div>
                   <div className="flex items-center" onClick={e => e.stopPropagation()}>
@@ -857,7 +857,7 @@ export default function MaintenancePage() {
                   </div>
                   <div className="pl-2.5 flex flex-col gap-0.5 justify-center">
                     <span className={cn('text-xs whitespace-nowrap', t.due_date
-                      ? (new Date(t.due_date) < new Date() ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-600 dark:text-gray-300')
+                      ? (new Date(t.due_date) < new Date() ? 'text-red-500 dark:text-red-400 font-medium' : 'text-[#55554e] dark:text-gray-300')
                       : 'text-gray-300 dark:text-neutral-600')}>
                       {t.due_date ? format(new Date(t.due_date), 'd MMM yy', { locale: nl }) : '—'}
                     </span>
@@ -876,7 +876,7 @@ export default function MaintenancePage() {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-400 hover:text-[#163300] dark:hover:text-[#9FE870]"
+                      className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477]"
                       onClick={e => { e.stopPropagation(); router.push(`${basePath}/messages?ticket=${t.id}`) }}
                       aria-label="Open chat"
                     >
@@ -890,13 +890,13 @@ export default function MaintenancePage() {
             {/* Floating bulk action bar */}
             {selectedIds.length > 0 && (
               <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
-                <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white dark:bg-neutral-800 shadow-lg border border-gray-200/80 dark:border-neutral-700">
-                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 tabular-nums">
+                <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white dark:bg-neutral-800 shadow-lg border border-[#e3e3de]/80 dark:border-neutral-700">
+                  <span className="text-sm font-semibold text-[#1a1c18] dark:text-gray-100 tabular-nums">
                     {selectedIds.length} geselecteerd
                   </span>
-                  <div className="w-px h-4 bg-gray-200 dark:bg-neutral-600" />
+                  <div className="w-px h-4 bg-[#ebebe7] dark:bg-neutral-600" />
                   <Select value={bulkStatus} onValueChange={v => { setBulkStatus(v); handleBulkStatusChange(v) }} disabled={bulkBusy}>
-                    <SelectTrigger className="h-8 rounded-full border-gray-200 dark:border-neutral-600 text-xs px-3 w-auto min-w-[140px]">
+                    <SelectTrigger className="h-8 rounded-full border-[#e3e3de] dark:border-neutral-600 text-xs px-3 w-auto min-w-[140px]">
                       <SelectValue placeholder="Markeer als…" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -910,7 +910,7 @@ export default function MaintenancePage() {
                   <button
                     type="button"
                     onClick={exitSelectionMode}
-                    className="text-sm text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+                    className="text-sm text-[#97978f] hover:text-[#55554e] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors flex items-center gap-1"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -934,7 +934,7 @@ export default function MaintenancePage() {
         >
           <DialogHeader className={ADD_DIALOG_HEADER_CLASS}>
             <DialogTitle className={ADD_DIALOG_TITLE_CLASS}>Nieuw ticket</DialogTitle>
-            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 pt-1">
+            <DialogDescription className="text-sm text-[#97978f] dark:text-[#97978f] pt-1">
               Beschrijf kort het probleem. Je kunt later vanuit het ticket chatten en details toevoegen.
             </DialogDescription>
           </DialogHeader>
@@ -977,7 +977,7 @@ export default function MaintenancePage() {
                         </SelectContent>
                       </Select>
                       {newLeaseId && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-[#97978f] dark:text-[#97978f]">
                           Automatisch gekoppeld aan de eenheid van deze huurder.
                         </p>
                       )}
@@ -1051,10 +1051,10 @@ export default function MaintenancePage() {
           <DialogFooter className={ADD_DIALOG_FOOTER_SPLIT_CLASS}>
             <span />
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
+              <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
                 disabled={!newTitle.trim() || creating || (!isDemo && (!user?.id ||
                   (newScope === 'persoon' && !newLeaseId) ||
                   (newScope === 'pand' && !newPropertyId)

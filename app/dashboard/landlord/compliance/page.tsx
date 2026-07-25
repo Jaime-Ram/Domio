@@ -107,9 +107,9 @@ export default function CompliancePage() {
         <div className="flex items-center gap-3 min-w-0">
           <BuildingAvatar />
           <div className="min-w-0">
-            <p className="text-[12.5px] font-semibold text-gray-900 dark:text-white truncate leading-tight">{p.name || p.address || 'Pand'}</p>
+            <p className="text-[12.5px] font-semibold text-[#1a1c18] dark:text-white truncate leading-tight">{p.name || p.address || 'Pand'}</p>
             {(p.address || p.city) && (
-              <p className="text-[12.5px] text-gray-500 dark:text-gray-400 truncate leading-tight">{[p.address, p.city].filter(Boolean).join(', ')}</p>
+              <p className="text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate leading-tight">{[p.address, p.city].filter(Boolean).join(', ')}</p>
             )}
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function CompliancePage() {
         const pct = compliancePct(checkedSet(p.id))
         return (
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex-1 h-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 overflow-hidden min-w-[60px]">
+            <div className="flex-1 h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 overflow-hidden min-w-[60px]">
               <div className={cn('h-full rounded-full transition-all', barColor(pct))} style={{ width: `${pct}%` }} />
             </div>
             <span className={cn('text-[12.5px] font-semibold tabular-nums w-9 text-right', pctColor(pct))}>{pct}%</span>
@@ -142,13 +142,13 @@ export default function CompliancePage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Overzicht */}
-      <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 p-5">
+      <div className="rounded-2xl border border-[#e3e3de] dark:border-neutral-800 p-5">
         <div className="flex items-end justify-between gap-4 mb-4">
           <div>
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">Compliance</p>
+            <p className="text-sm font-semibold text-[#97978f] dark:text-[#97978f]">Compliance</p>
             <div className="flex items-baseline gap-2 mt-1">
               <p className={cn('text-[26px] font-bold leading-none', pctColor(overall.pct))}>{overall.pct}%</p>
-              <span className="text-xs text-gray-400 dark:text-gray-500">gemiddeld over {properties.length} pand{properties.length === 1 ? '' : 'en'}</span>
+              <span className="text-xs text-[#97978f] dark:text-[#97978f]">gemiddeld over {properties.length} pand{properties.length === 1 ? '' : 'en'}</span>
             </div>
           </div>
         </div>
@@ -156,10 +156,10 @@ export default function CompliancePage() {
           {COMPLIANCE_CHECKLIST.map((cat, i) => (
             <div key={cat.key}>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{cat.label}</span>
+                <span className="text-xs text-[#97978f] dark:text-[#97978f] truncate">{cat.label}</span>
                 <span className={cn('text-xs font-semibold tabular-nums', pctColor(overall.perCat[i]))}>{overall.perCat[i]}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-gray-100 dark:bg-neutral-800 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 overflow-hidden">
                 <div className={cn('h-full rounded-full', barColor(overall.perCat[i]))} style={{ width: `${overall.perCat[i]}%` }} />
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function CompliancePage() {
               return (
                 <div key={cat.key}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{cat.label}</h3>
+                    <h3 className="text-sm font-semibold text-[#1a1c18] dark:text-white">{cat.label}</h3>
                     <span className={cn('text-xs font-semibold tabular-nums', pctColor(cpct))}>{cpct}%</span>
                   </div>
                   <div className="space-y-1">
@@ -204,15 +204,15 @@ export default function CompliancePage() {
                           key={item.key}
                           type="button"
                           onClick={() => toggleItem(openProperty.id, item.key)}
-                          className="w-full flex items-start gap-3 py-2 text-left rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800/40 -mx-2 px-2 transition-colors"
+                          className="w-full flex items-start gap-3 py-2 text-left rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/40 -mx-2 px-2 transition-colors"
                         >
                           <span className={cn(
                             'h-5 w-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-colors',
                             done ? 'bg-[#15803D] border-[#15803D] dark:bg-[#4ADE80] dark:border-[#4ADE80]' : 'border-gray-300 dark:border-neutral-600',
                           )}>
-                            {done && <Check className="h-3 w-3 text-white dark:text-[#163300]" />}
+                            {done && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
                           </span>
-                          <span className={cn('text-[13px] leading-snug', done ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-700 dark:text-gray-300')}>
+                          <span className={cn('text-[13px] leading-snug', done ? 'text-[#97978f] dark:text-[#97978f] line-through' : 'text-[#55554e] dark:text-gray-300')}>
                             {item.label}
                           </span>
                         </button>
@@ -222,7 +222,7 @@ export default function CompliancePage() {
                 </div>
               )
             })}
-            <p className="text-xs text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-100 dark:border-neutral-800">
+            <p className="text-xs text-[#97978f] dark:text-[#97978f] pt-2 border-t border-[#e3e3de] dark:border-neutral-800">
               Handmatig afvinken voor nu. Binnenkort vullen tools deze status automatisch (energielabel, WWS, keuringen).
             </p>
           </div>

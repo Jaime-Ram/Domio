@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
 import { Logo } from '@/components/Logo'
 
@@ -45,9 +44,8 @@ export function AuthPageShell({ children, variant = 'centered' }: AuthPageShellP
 
   const LogoTopLeft = (
     <div className="absolute left-6 top-6 z-10 sm:left-10 sm:top-8">
-      <Link href="/" aria-label="Naar home">
-        <Logo height={20} />
-      </Link>
+      {/* Logo bevat zelf al een link naar home, dus geen extra <Link> eromheen */}
+      <Logo height={20} href="/" />
     </div>
   )
 

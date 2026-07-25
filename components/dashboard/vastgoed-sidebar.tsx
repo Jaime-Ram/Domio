@@ -160,8 +160,8 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const itemClass = (active: boolean) => cn(
     "flex items-center w-full py-[5px] px-3 text-[14px] rounded-md transition-colors duration-150 focus:outline-none text-left",
     active
-      ? "bg-[#9FE870]/40 text-[#163300] font-medium dark:bg-[#9FE870]/20 dark:text-[#9FE870]"
-      : "text-gray-700 hover:bg-gray-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
+      ? "bg-[#f4f4f1] text-[#161f13] font-medium dark:bg-neutral-800 dark:text-[#94f477]"
+      : "text-[#55554e] hover:bg-[#f4f4f1] dark:text-neutral-300 dark:hover:bg-neutral-800"
   )
 
   const labelClass = cn(
@@ -181,7 +181,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
       <div
         data-vastgoed-sidebar
         className={cn(
-          "fixed top-0 bottom-0 start-0 z-[110] bg-gray-50 dark:bg-neutral-800 transform rounded-tr-2xl rounded-br-2xl overflow-hidden",
+          "fixed top-0 bottom-0 start-0 z-[110] bg-white dark:bg-neutral-900 border-r border-[#e3e3de] dark:border-neutral-800 transform overflow-hidden",
           "transition-[width,transform] duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
           "md:translate-x-0 md:fixed md:z-auto md:flex-shrink-0",
@@ -189,11 +189,6 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
         )}
         style={{ transitionProperty: 'width, transform', transitionDuration: '300ms', transitionTimingFunction: 'ease-in-out', willChange: 'width' }}
       >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-tr-2xl rounded-br-2xl bg-gradient-to-l from-black/[0.03] to-transparent dark:from-black/[0.08] z-10"
-        />
-
         <div className="relative flex flex-col h-full max-h-full">
           {/* Header */}
           <div className={cn(
@@ -210,7 +205,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               {onToggleCollapse && (
                 <button
                   type="button"
-                  className="hidden md:flex items-center py-1.5 px-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="hidden md:flex items-center py-1.5 px-1.5 rounded-md text-[#97978f] dark:text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors"
                   onClick={onToggleCollapse}
                   title={collapsed ? "Uitklappen" : "Inklappen"}
                 >
@@ -220,7 +215,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden flex items-center justify-center h-7 w-7 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-neutral-700"
+                className="md:hidden flex items-center justify-center h-7 w-7 text-[#97978f] hover:bg-[#f4f4f1] dark:text-[#97978f] dark:hover:bg-neutral-700"
                 onClick={onClose}
               >
                 <PanelLeftClose className="size-4 shrink-0" />
@@ -259,7 +254,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                             <Icon className="shrink-0 size-[17px]" strokeWidth={hasActiveChild ? 2.5 : 2} />
                             <span className={labelClass}>{item.label}</span>
                             <ChevronDown className={cn(
-                              "shrink-0 size-3.5 text-gray-400 transition-[transform,opacity,max-width,margin] duration-300",
+                              "shrink-0 size-3.5 text-[#97978f] transition-[transform,opacity,max-width,margin] duration-300",
                               isOpenAccordion && "rotate-180",
                               collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[1rem] opacity-100 ml-auto"
                             )} />
@@ -310,19 +305,19 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           <span className={labelClass}>{item.label}</span>
                           {item.comingSoon && (
                             <span className={cn(
-                              "text-[10px] font-medium text-gray-400 dark:text-neutral-500 shrink-0 overflow-hidden whitespace-nowrap transition-[max-width,opacity,margin] duration-300",
+                              "text-[10px] font-medium text-[#97978f] dark:text-neutral-500 shrink-0 overflow-hidden whitespace-nowrap transition-[max-width,opacity,margin] duration-300",
                               collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[80px] opacity-100 ml-auto"
                             )}>Binnenkort</span>
                           )}
                           {item.badge && !item.comingSoon && (
                             <span className={cn(
-                              "px-1.5 py-0.5 text-[10px] font-medium bg-[#163300] text-white rounded-full shrink-0 overflow-hidden transition-[max-width,opacity,margin] duration-300",
+                              "px-1.5 py-0.5 text-[10px] font-medium bg-[#161f13] text-white rounded-full shrink-0 overflow-hidden transition-[max-width,opacity,margin] duration-300",
                               collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-auto"
                             )}>{item.badge}</span>
                           )}
                           {item.badge && (
                             <span className={cn(
-                              "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#163300] rounded-full transition-opacity duration-300",
+                              "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#161f13] rounded-full transition-opacity duration-300",
                               collapsed ? "opacity-100" : "opacity-0"
                             )} />
                           )}
@@ -335,7 +330,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                     <div key={groupIndex} className={groupIndex > 0 ? "mt-4" : ""}>
                       {groupLabel && (
                         <p className={cn(
-                          "px-3 pt-0.5 pb-1 text-[12px] font-normal text-gray-500 dark:text-neutral-400 select-none transition-opacity duration-300",
+                          "px-3 pb-1 pt-1 text-[11px] font-medium uppercase tracking-wide text-[#97978f] dark:text-neutral-400 select-none transition-opacity duration-300",
                           collapsed ? "opacity-0" : "opacity-100"
                         )}>
                           {groupLabel}

@@ -35,7 +35,7 @@ const EXPENSE_CATEGORIES = ['onderhoud', 'verzekering', 'belasting', 'energie', 
 
 const INCOME_COLORS: Record<string, string> = {
   huur: '#22c55e',
-  overig: '#9ca3af',
+  overig: '#97978f',
 }
 
 const EXPENSE_COLORS: Record<string, string> = {
@@ -171,12 +171,12 @@ function ChartTooltip({ active, payload, label, view }: any) {
   const colors = view === 'inkomsten' ? INCOME_COLORS : EXPENSE_COLORS
   const total = payload.reduce((s: number, p: any) => s + (p.value || 0), 0)
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 shadow-lg text-sm min-w-[160px]">
-      <p className="font-medium text-gray-900 dark:text-white mb-1.5">{label}</p>
-      <p className="text-xs text-gray-500 mb-1">Totaal: {formatEur(total)}</p>
+    <div className="rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 shadow-lg text-sm min-w-[160px]">
+      <p className="font-medium text-[#1a1c18] dark:text-white mb-1.5">{label}</p>
+      <p className="text-xs text-[#97978f] mb-1">Totaal: {formatEur(total)}</p>
       <div className="space-y-0.5">
         {payload.filter((p: any) => p.value > 0).map((entry: any) => (
-          <p key={entry.dataKey} className="text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+          <p key={entry.dataKey} className="text-[#55554e] dark:text-[#97978f] flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: colors[entry.dataKey] || '#ccc' }} />
             {CATEGORY_LABELS[entry.dataKey] ?? entry.dataKey}: {formatEur(entry.value)}
           </p>
@@ -343,14 +343,14 @@ export function RendementChart({ properties }: RendementChartProps) {
         {/* Controls row */}
         <div className="flex items-center justify-between gap-4 mb-4">
           {/* Left: View toggle */}
-          <div className="inline-flex rounded-lg bg-gray-100 dark:bg-neutral-800 p-0.5">
+          <div className="inline-flex rounded-lg bg-[#f4f4f1] dark:bg-neutral-800 p-0.5">
             <button
               onClick={() => setView('inkomsten')}
               className={cn(
                 'px-3.5 py-1.5 text-sm font-medium rounded-md transition-all',
                 view === 'inkomsten'
                   ? 'bg-white dark:bg-neutral-700 text-green-700 dark:text-green-400 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-300'
               )}
             >
               Inkomsten
@@ -361,7 +361,7 @@ export function RendementChart({ properties }: RendementChartProps) {
                 'px-3.5 py-1.5 text-sm font-medium rounded-md transition-all',
                 view === 'kosten'
                   ? 'bg-white dark:bg-neutral-700 text-red-700 dark:text-red-400 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  : 'text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-300'
               )}
             >
               Kosten
@@ -373,36 +373,36 @@ export function RendementChart({ properties }: RendementChartProps) {
             {selectedPropertyName ? (
               <button
                 onClick={() => { setPropertyFilter(null); setSearchQuery('') }}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors"
               >
                 {selectedPropertyName}
-                <X className="h-3.5 w-3.5 text-gray-400" />
+                <X className="h-3.5 w-3.5 text-[#97978f]" />
               </button>
             ) : (
               <>
                 <button
                   onClick={() => { setSearchOpen(!searchOpen); setTimeout(() => inputRef.current?.focus(), 50) }}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors"
                 >
                   <Search className="h-3.5 w-3.5" />
                   Alle panden
                 </button>
                 {searchOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-20 w-64 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden">
-                    <div className="px-3 py-2 border-b border-gray-100 dark:border-neutral-800">
+                  <div className="absolute right-0 top-full mt-1 z-20 w-64 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-lg overflow-hidden">
+                    <div className="px-3 py-2 border-b border-[#e3e3de] dark:border-neutral-800">
                       <input
                         ref={inputRef}
                         type="text"
                         placeholder="Zoek pand..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full text-sm bg-transparent outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+                        className="w-full text-sm bg-transparent outline-none text-[#1a1c18] dark:text-white placeholder:text-[#97978f]"
                       />
                     </div>
                     <div className="max-h-48 overflow-y-auto">
                       <button
                         onClick={() => { setPropertyFilter(null); setSearchOpen(false); setSearchQuery('') }}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                        className="w-full text-left px-3 py-2 text-sm text-[#55554e] dark:text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800"
                       >
                         Alle panden
                       </button>
@@ -410,13 +410,13 @@ export function RendementChart({ properties }: RendementChartProps) {
                         <button
                           key={p.id}
                           onClick={() => { setPropertyFilter(p.id); setSearchOpen(false); setSearchQuery('') }}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-neutral-800"
+                          className="w-full text-left px-3 py-2 text-sm text-[#1a1c18] dark:text-white hover:bg-[#f4f4f1] dark:hover:bg-neutral-800"
                         >
                           {p.name}
                         </button>
                       ))}
                       {filteredProperties.length === 0 && (
-                        <p className="px-3 py-2 text-sm text-gray-400">Geen resultaten</p>
+                        <p className="px-3 py-2 text-sm text-[#97978f]">Geen resultaten</p>
                       )}
                     </div>
                   </div>
@@ -430,12 +430,12 @@ export function RendementChart({ properties }: RendementChartProps) {
         <div className="h-[320px]">
           {chartLoading ? (
             <div className="h-full flex items-center justify-center">
-              <p className="text-sm text-gray-400">Laden...</p>
+              <p className="text-sm text-[#97978f]">Laden...</p>
             </div>
           ) : !hasData ? (
             <div className="h-full flex flex-col items-center justify-center gap-2">
-              <BarChartSquare02 className="h-8 w-8 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm text-gray-400">Geen gegevens voor deze periode</p>
+              <BarChartSquare02 className="h-8 w-8 text-gray-300 dark:text-[#55554e]" />
+              <p className="text-sm text-[#97978f]">Geen gegevens voor deze periode</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -443,14 +443,14 @@ export function RendementChart({ properties }: RendementChartProps) {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(156,163,175,0.15)" />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 11, fill: '#9ca3af' }}
+                  tick={{ fontSize: 11, fill: '#97978f' }}
                   axisLine={false}
                   tickLine={false}
                   interval="preserveStartEnd"
                 />
                 <YAxis
                   tickFormatter={(v) => formatEur(v)}
-                  tick={{ fontSize: 11, fill: '#9ca3af' }}
+                  tick={{ fontSize: 11, fill: '#97978f' }}
                   axisLine={false}
                   tickLine={false}
                   width={70}
@@ -479,7 +479,7 @@ export function RendementChart({ properties }: RendementChartProps) {
         {hasData && visibleCategories.length > 0 && (
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 mb-2 justify-center">
             {visibleCategories.map(cat => (
-              <div key={cat} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+              <div key={cat} className="flex items-center gap-1.5 text-xs text-[#97978f] dark:text-[#97978f]">
                 <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: colors[cat] }} />
                 {CATEGORY_LABELS[cat] ?? cat}
               </div>
@@ -494,10 +494,10 @@ export function RendementChart({ properties }: RendementChartProps) {
               key={key}
               onClick={() => setChartPeriod(key)}
               className={cn(
-                'px-3 py-1 text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#163300] dark:focus-visible:ring-[#9FE870]',
+                'px-3 py-1 text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] dark:focus-visible:ring-[#94f477]',
                 chartPeriod === key
-                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-700 dark:hover:text-gray-200'
+                  ? 'bg-gray-900 dark:bg-white text-white dark:text-[#1a1c18]'
+                  : 'text-[#97978f] dark:text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 hover:text-[#55554e] dark:hover:text-gray-200'
               )}
             >
               {label}

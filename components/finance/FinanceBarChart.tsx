@@ -26,10 +26,10 @@ const formatEur = (value: number) =>
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 shadow-lg text-sm">
-      <p className="font-medium text-gray-900 dark:text-white mb-1">{label}</p>
+    <div className="rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 shadow-lg text-sm">
+      <p className="font-medium text-[#1a1c18] dark:text-white mb-1">{label}</p>
       {payload.map((entry: any) => (
-        <p key={entry.dataKey} className="text-gray-600 dark:text-gray-400">
+        <p key={entry.dataKey} className="text-[#55554e] dark:text-[#97978f]">
           <span
             className="inline-block h-2 w-2 rounded-full mr-1.5"
             style={{ backgroundColor: entry.color }}
@@ -54,7 +54,7 @@ export function FinanceBarChart({ data }: { data: BarData[] }) {
         <XAxis
           type="number"
           tickFormatter={(v) => formatEur(v)}
-          tick={{ fontSize: 11, fill: '#9ca3af' }}
+          tick={{ fontSize: 11, fill: '#97978f' }}
           axisLine={false}
           tickLine={false}
         />

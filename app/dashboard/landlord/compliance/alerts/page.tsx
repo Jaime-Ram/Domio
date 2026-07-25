@@ -42,7 +42,7 @@ export default function ComplianceAlertsPage() {
       {/* Alert list */}
       <Card className={dashboardCardClass()}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-base text-[#163300] dark:text-[#9FE870]">Actieve alerts</CardTitle>
+          <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Actieve alerts</CardTitle>
         </CardHeader>
         <CardContent className="p-0 pb-2">
           {alerts.length === 0 ? (
@@ -50,15 +50,15 @@ export default function ComplianceAlertsPage() {
               <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mb-4">
                 <ShieldCheck className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <p className="text-base font-semibold text-gray-900 dark:text-white mb-1">Geen actieve alerts</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-base font-semibold text-[#1a1c18] dark:text-white mb-1">Geen actieve alerts</p>
+              <p className="text-sm text-[#97978f] dark:text-[#97978f]">
                 {isDemo ? 'Alle alerts zijn afgehandeld.' : 'Voeg objecten toe om compliance bij te houden.'}
               </p>
             </div>
           ) : (
             <div className="divide-y divide-gray-50 dark:divide-neutral-800/80">
               {alerts.map((alert) => (
-                <div key={alert.id} className="flex items-start gap-4 px-5 py-4 hover:bg-gray-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                <div key={alert.id} className="flex items-start gap-4 px-5 py-4 hover:bg-[#f4f4f1]/50 dark:hover:bg-neutral-800/30 transition-colors">
                   <div className={cn('h-10 w-10 rounded-full flex items-center justify-center shrink-0 mt-0.5',
                     alert.urgency === 'hoog' ? 'bg-red-50 dark:bg-red-500/10' : 'bg-amber-50 dark:bg-amber-500/10')}>
                     <AlertTriangle className={cn('h-5 w-5', alert.urgency === 'hoog' ? 'text-red-500' : 'text-amber-500')} />
@@ -66,7 +66,7 @@ export default function ComplianceAlertsPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{alert.title}</p>
+                      <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{alert.title}</p>
                       <Badge className={cn('border-0 text-xs px-2 py-0.5',
                         alert.urgency === 'hoog'
                           ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400'
@@ -74,18 +74,18 @@ export default function ComplianceAlertsPage() {
                         {URGENCY_LABEL[alert.urgency]}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{alert.address} — {alert.description}</p>
-                    <div className="flex items-center gap-1.5 mt-2 text-xs text-[#163300] dark:text-[#9FE870] font-medium">
+                    <p className="text-sm text-[#97978f] dark:text-[#97978f]">{alert.address} — {alert.description}</p>
+                    <div className="flex items-center gap-1.5 mt-2 text-xs text-[#161f13] dark:text-[#94f477] font-medium">
                       <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                       {alert.actie}
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 shrink-0">
-                    <Button size="sm" className="rounded-full h-8 px-3 text-xs bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300]">
+                    <Button size="sm" className="rounded-full h-8 px-3 text-xs bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]">
                       Oplossen
                     </Button>
-                    <Button size="sm" variant="ghost" className="rounded-full h-8 px-3 text-xs text-gray-400 hover:text-gray-600"
+                    <Button size="sm" variant="ghost" className="rounded-full h-8 px-3 text-xs text-[#97978f] hover:text-[#55554e]"
                       onClick={() => setDismissed((prev) => new Set([...prev, alert.id]))}>
                       Negeer
                     </Button>

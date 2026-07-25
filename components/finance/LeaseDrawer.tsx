@@ -26,7 +26,7 @@ const EXP_STATUS_CONFIG: Record<ExpectationStatus, { label: string; classes: str
   ...STATUS_CONFIG,
   toekomst: {
     label: 'Toekomst',
-    classes: 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-gray-400',
+    classes: 'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-800 dark:text-[#97978f]',
     icon: <CalendarDays className="h-3.5 w-3.5" />,
   },
 }
@@ -392,10 +392,10 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
         className="sm:max-w-[520px] p-0 flex flex-col overflow-hidden"
       >
         {/* Header — SheetTitle/SheetDescription must always be in the DOM (Radix a11y) */}
-        <SheetHeader className="border-b border-gray-100 dark:border-neutral-800 px-6 py-5 shrink-0">
-          <SheetTitle className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+        <SheetHeader className="border-b border-[#e3e3de] dark:border-neutral-800 px-6 py-5 shrink-0">
+          <SheetTitle className="text-base font-semibold text-[#1a1c18] dark:text-white leading-tight">
             {loadingHeader ? (
-              <span className="text-gray-400 font-normal text-sm flex items-center gap-2">
+              <span className="text-[#97978f] font-normal text-sm flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Laden…
               </span>
@@ -403,7 +403,7 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
               <>
                 {header?.propertyName ?? '—'}
                 {header?.unitNumber && (
-                  <span className="font-normal text-gray-500 dark:text-gray-400">
+                  <span className="font-normal text-[#97978f] dark:text-[#97978f]">
                     {' · '}{header.unitNumber}
                   </span>
                 )}
@@ -414,10 +414,10 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
             <div className="space-y-0.5 mt-1">
               {!loadingHeader && (
                 <>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <p className="text-sm text-[#55554e] dark:text-gray-300">
                     {header?.tenantName ?? '—'}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[#97978f] dark:text-[#97978f]">
                     {header ? `€${fmtAmt(header.monthlyRent)}/maand · sinds ${fmtShortDate(header.startDate)}` : '—'}
                   </p>
                 </>
@@ -430,7 +430,7 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
         <div className="flex-1 overflow-y-auto">
           {/* Status section */}
           {statusCfg && (
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-neutral-800">
+            <div className="px-6 py-4 border-b border-[#e3e3de] dark:border-neutral-800">
               <div className="flex items-center gap-2 mb-1.5">
                 <span className={cn(
                   'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
@@ -441,28 +441,28 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
                 </span>
               </div>
               {loadingSummary ? (
-                <p className="text-xs text-gray-400">Laden…</p>
+                <p className="text-xs text-[#97978f]">Laden…</p>
               ) : summarySentence ? (
-                <p className="text-sm text-gray-600 dark:text-gray-400">{summarySentence}</p>
+                <p className="text-sm text-[#55554e] dark:text-[#97978f]">{summarySentence}</p>
               ) : null}
             </div>
           )}
 
           {/* Betalingsoverzicht */}
           <div className="px-6 py-4">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide mb-3">
               Betalingsoverzicht
             </h3>
 
             {expDetails.length === 0 && loadingExps && (
-              <div className="flex items-center gap-2 py-4 text-gray-400">
+              <div className="flex items-center gap-2 py-4 text-[#97978f]">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">Laden…</span>
               </div>
             )}
 
             {expDetails.length === 0 && !loadingExps && (
-              <p className="text-sm text-gray-400 py-4">Geen verwachtingen gevonden</p>
+              <p className="text-sm text-[#97978f] py-4">Geen verwachtingen gevonden</p>
             )}
 
             <div className="space-y-4">
@@ -501,13 +501,13 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
                   <div key={exp.id}>
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-[#1a1c18] dark:text-white">
                           {dutchPeriodLabel(exp.due_period)}
                           {exp.expectation_type === 'service_charges' && (
-                            <span className="ml-1.5 text-[11px] font-normal text-gray-400">(servicekosten)</span>
+                            <span className="ml-1.5 text-[11px] font-normal text-[#97978f]">(servicekosten)</span>
                           )}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">
                           Verwacht €{fmtAmt(expected)} · Betaald €{fmtAmt(paid)}
                         </p>
                       </div>
@@ -522,20 +522,20 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
 
                     {/* Matched transactions */}
                     {exp.transactions.length > 0 ? (
-                      <div className="mt-1.5 ml-3 space-y-1 border-l-2 border-gray-100 dark:border-neutral-800 pl-3">
+                      <div className="mt-1.5 ml-3 space-y-1 border-l-2 border-[#e3e3de] dark:border-neutral-800 pl-3">
                         {exp.transactions.map((tx, i) => (
-                          <div key={i} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                          <div key={i} className="flex items-center gap-1.5 text-xs text-[#97978f] dark:text-[#97978f]">
                             <span className="text-gray-300 dark:text-neutral-600 shrink-0">↳</span>
                             <span>€{fmtAmt(tx.amount_assigned)} op {fmtShortDate(tx.booking_date)}</span>
-                            <span className="rounded-full bg-gray-100 dark:bg-neutral-800 px-1.5 py-0 text-[10px] font-medium text-gray-500 dark:text-gray-400 shrink-0">
+                            <span className="rounded-full bg-[#f4f4f1] dark:bg-neutral-800 px-1.5 py-0 text-[10px] font-medium text-[#97978f] dark:text-[#97978f] shrink-0">
                               {MATCH_METHOD_LABEL[tx.match_method] ?? tx.match_method}
                             </span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="mt-1.5 ml-3 pl-3 border-l-2 border-gray-100 dark:border-neutral-800">
-                        <p className="text-xs text-gray-400 dark:text-gray-600">Geen betalingen gekoppeld</p>
+                      <div className="mt-1.5 ml-3 pl-3 border-l-2 border-[#e3e3de] dark:border-neutral-800">
+                        <p className="text-xs text-[#97978f] dark:text-[#55554e]">Geen betalingen gekoppeld</p>
                       </div>
                     )}
                   </div>
@@ -547,7 +547,7 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="mt-4 w-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="mt-4 w-full text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200"
                 onClick={handleLoadMore}
                 disabled={loadingExps}
               >
@@ -561,23 +561,23 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
 
           {/* Niet-gekoppelde betalingen */}
           <div className="px-6 py-4 pb-8">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+            <h3 className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide mb-3">
               Niet-gekoppelde betalingen
             </h3>
 
             {!header?.tenantIban && !loadingHeader && (
-              <p className="text-sm text-gray-400">Geen IBAN bekend voor deze huurder</p>
+              <p className="text-sm text-[#97978f]">Geen IBAN bekend voor deze huurder</p>
             )}
 
             {header?.tenantIban && loadingUnmatched && (
-              <div className="flex items-center gap-2 py-2 text-gray-400">
+              <div className="flex items-center gap-2 py-2 text-[#97978f]">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">Laden…</span>
               </div>
             )}
 
             {header?.tenantIban && !loadingUnmatched && unmatched.length === 0 && (
-              <p className="text-sm text-gray-400">Geen</p>
+              <p className="text-sm text-[#97978f]">Geen</p>
             )}
 
             {unmatched.length > 0 && (
@@ -585,15 +585,15 @@ export function LeaseDrawer({ leaseId, status, onClose }: LeaseDrawerProps) {
                 {unmatched.map(tx => (
                   <div key={tx.id} className="text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-[#1a1c18] dark:text-white">
                         €{fmtAmt(tx.amount)}
                       </span>
-                      <span className="text-gray-500 dark:text-gray-400 text-xs">
+                      <span className="text-[#97978f] dark:text-[#97978f] text-xs">
                         op {fmtShortDate(tx.booking_date)}
                       </span>
                     </div>
                     {tx.description && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
+                      <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5 truncate">
                         {tx.description}
                       </p>
                     )}

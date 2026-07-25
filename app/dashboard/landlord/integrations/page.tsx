@@ -41,7 +41,7 @@ export default function IntegrationsPage() {
     <div className="flex flex-col gap-10">
       {CATEGORIES.map((cat) => (
         <section key={cat.label}>
-          <h2 className="text-xs font-semibold text-gray-400 dark:text-neutral-500 mb-3">{cat.label}</h2>
+          <h2 className="text-xs font-semibold text-[#97978f] dark:text-neutral-500 mb-3">{cat.label}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {cat.integrations.map((integration) => (
               <GrayBlock
@@ -53,17 +53,17 @@ export default function IntegrationsPage() {
                 </div>
                 <div className="flex-1 min-w-0 pt-0.5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{integration.name}</span>
+                    <span className="text-sm font-semibold text-[#1a1c18] dark:text-white">{integration.name}</span>
                     {integration.status === 'active' ? (
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#163300]/10 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870]">In ontwikkeling</span>
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#161f13]/10 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">In ontwikkeling</span>
                     ) : (
-                      <span className="text-[10px] font-medium text-gray-400 dark:text-neutral-500">Binnenkort</span>
+                      <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500">Binnenkort</span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{integration.description}</p>
+                  <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5 leading-relaxed">{integration.description}</p>
                   {integration.banks && integration.banks.length > 0 && (
                     <div className="mt-2.5 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.06]">
-                      <p className="text-[10px] font-medium text-gray-400 dark:text-neutral-500 mb-1.5">Ondersteunde banken</p>
+                      <p className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500 mb-1.5">Ondersteunde banken</p>
                       <div className="flex flex-wrap gap-1.5">
                         {integration.banks.map((bank) => (
                           <div key={bank.name} title={bank.name} className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center">
