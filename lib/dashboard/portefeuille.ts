@@ -138,12 +138,9 @@ export async function getPortefeuille(
 /* Gezondheid van een pand in één signaal. Ook bruikbaar buiten de UI,
    bijvoorbeeld om een agent te laten bepalen waar hij moet ingrijpen. */
 export function gezondheid(p: PandRij): { toon: 'goed' | 'let-op' | 'slecht'; titel: string } {
-  if (p.eenheden > 0 && p.bezet === 0) return { toon: 'slecht', titel: 'Volledig leeg' }
-  if (p.achterstand > 900) return { toon: 'slecht', titel: `Achterstand van ${p.achterstand} euro` }
-  const punten: string[] = []
-  if (p.bezet < p.eenheden) punten.push('leegstand')
-  if (p.achterstand > 0) punten.push('achterstand')
-  if (p.aflopend > 0) punten.push(`${p.aflopend} contract(en) aflopend`)
-  if (p.openTickets > 1) punten.push(`${p.openTickets} open tickets`)
-  return punten.length ? { toon: 'let-op', titel: punten.join(' · ') } : { toon: 'goed', titel: 'Alles in orde' }
+  if (p.openTickets >= 3) return { toon: 'slecht', titel: `${p.openTickets} open meldingen` }
+  if (p.openTickets > 0) {
+    return { toon: 'let-op', titel: `${p.openTickets} open ${p.openTickets === 1 ? 'melding' : 'meldingen'}` }
+  }
+  return { toon: 'goed', titel: 'Geen openstaande meldingen' }
 }

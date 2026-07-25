@@ -24,27 +24,21 @@ const navGroups: { header?: string; items: Item[] }[] = [
     { label: "Dashboard", href: BASE, icon: LayoutDashboard },
     { label: "Taken", href: `${BASE}/taken`, icon: ClipboardCheck },
   ]},
-  { header: "Vastgoedbeheer", items: [
-    { label: "Portefeuille", href: `${BASE}/portefeuille`, icon: Building2 },
-    { label: "Huurders", href: `${BASE}/huurders`, icon: Users },
-    { label: "Documenten", href: `${BASE}/documenten`, icon: HardDrive },
-    { label: "Financieel", icon: Euro, children: [
-      { label: "Dashboard", href: `${BASE}/financieel`, icon: LayoutDashboard },
-      { label: "Betalingen", href: `${BASE}/betalingen`, icon: CreditCard },
-      { label: "Achterstanden", href: `${BASE}/achterstanden`, icon: AlertTriangle },
-      { label: "Huurafrekeningen", href: `${BASE}/huurafrekeningen`, icon: Receipt },
-    ]},
+  { header: "Onderhoud", items: [
+    { label: "Meldingen", href: `${BASE}/tickets`, icon: Ticket },
+    { label: "MJOP", href: `${BASE}/mjop`, icon: CalendarRange },
+    { label: "Kosten", href: `${BASE}/kosten`, icon: Euro },
     { label: "Compliance", href: `${BASE}/compliance`, icon: ShieldCheck },
-    { label: "Onderhoud", icon: Wrench, children: [
-      { label: "Tickets", href: `${BASE}/tickets`, icon: Ticket },
-      { label: "MJOP", href: `${BASE}/mjop`, icon: CalendarRange },
-    ]},
-    { label: "Contactboek", href: `${BASE}/contactboek`, icon: BookUser },
-    { label: "Flows", href: `${BASE}/flows`, icon: Workflow },
+  ]},
+  { header: "Vastgoed", items: [
+    { label: "Panden", href: `${BASE}/portefeuille`, icon: Building2 },
+    { label: "Partners", href: `${BASE}/contactboek`, icon: BookUser },
+    { label: "Documenten", href: `${BASE}/documenten`, icon: HardDrive },
   ]},
   { header: "Meer", items: [
-    { label: "Integraties", href: `${BASE}/integraties`, icon: Plug },
     { label: "Domio Agentic", href: `${BASE}/agentic`, icon: Sparkles },
+    { label: "Beleid", href: `${BASE}/beleid`, icon: ShieldCheck },
+    { label: "Integraties", href: `${BASE}/integraties`, icon: Plug },
     { label: "App", href: `${BASE}/app`, icon: Smartphone },
     { label: "Accountinstellingen", href: `${BASE}/instellingen`, icon: Settings },
   ]},

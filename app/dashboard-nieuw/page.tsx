@@ -8,20 +8,21 @@ import { Pencil, Check, X, Plus } from "lucide-react";
 import { BudgetCard, ResolvedCard, MeldingenCard, AutomatischCard } from "./_kpis";
 import { UpcomingTimeline } from "./_widgets";
 
-const kpi = { panden: 8, eenheden: 42, huurders: 38, bezetting: 90 };
-const verwacht = 48500;
+const kpi = { panden: 8, eenheden: 42, openMeldingen: 12, doorlooptijd: "1,8" };
+const besteedDitJaar = 57340;
+
+/* onderhoudsuitgaven per maand, begroot tegenover werkelijk */
 const history = [
-  { month: "jul", income: 46200, uitgaven: 9800 },
-  { month: "aug", income: 47100, uitgaven: 8600 },
-  { month: "sep", income: 46800, uitgaven: 11200 },
-  { month: "okt", income: 48000, uitgaven: 9100 },
-  { month: "nov", income: 48200, uitgaven: 10400 },
-  { month: "dec", income: 48500, uitgaven: 8900 },
-].map((m) => ({ ...m, netto: m.income - m.uitgaven }));
+  { month: "feb", begroot: 6800, werkelijk: 7400 },
+  { month: "mrt", begroot: 6800, werkelijk: 5900 },
+  { month: "apr", begroot: 6800, werkelijk: 8100 },
+  { month: "mei", begroot: 6800, werkelijk: 6200 },
+  { month: "jun", begroot: 6800, werkelijk: 5400 },
+  { month: "jul", begroot: 6800, werkelijk: 4900 },
+];
 
 const FOREST = "#161f13";
 const GREY = "#97978f";
-const LIME = "#5cc93f";
 
 function fmt(n: number) {
   return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
@@ -29,21 +30,6 @@ function fmt(n: number) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[13px] font-medium text-grey">{children}</p>;
-}
-
-function TrendBadge({ value }: { value: number }) {
-  if (!value) return null;
-  const up = value > 0;
-  return (
-    <span className={`inline-flex items-center gap-0.5 text-[12px] font-semibold ${up ? "text-emerald-600" : "text-red-500"}`}>
-      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        {up
-          ? <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></>
-          : <><polyline points="23 18 13.5 8.5 8.5 13.5 1 6" /><polyline points="17 18 23 18 23 12" /></>}
-      </svg>
-      {Math.abs(value)}%
-    </span>
-  );
 }
 
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string }[]; label?: string }) {
@@ -55,11 +41,9 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
         <div key={p.name} className="flex items-center gap-2">
           <span
             className="h-2 w-2 shrink-0 rounded-full"
-            style={{ background: p.name === "income" ? FOREST : p.name === "netto" ? LIME : GREY }}
+            style={{ background: p.name === "werkelijk" ? FOREST : GREY }}
           />
-          <span className="text-grey">
-            {p.name === "income" ? "Huurinkomsten" : p.name === "netto" ? "Netto" : "Uitgaven"}
-          </span>
+          <span className="text-grey">{p.name === "werkelijk" ? "Werkelijk" : "Begroot"}</span>
           <span className="ml-auto font-medium text-ink">{fmt(p.value)}</span>
         </div>
       ))}
@@ -110,10 +94,6 @@ const ALL_BLOCKS: { id: string; label: string }[] = [
 const STORAGE_KEY = "domio-dash-hidden";
 
 export default function OverzichtPage() {
-  const lastIncome = history[history.length - 1].income;
-  const prevIncome = history[history.length - 2].income;
-  const incomeTrendPct = prevIncome ? Math.round(((lastIncome - prevIncome) / prevIncome) * 100) : 0;
-
   const [editing, setEditing] = useState(false);
   const [hidden, setHidden] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -198,21 +178,18 @@ export default function OverzichtPage() {
           <div className="flex min-w-0 flex-1 flex-col p-5">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <SectionLabel>Huurinkomsten</SectionLabel>
+                <SectionLabel>Onderhoudsuitgaven</SectionLabel>
                 <div className="mt-1.5 flex items-baseline gap-2">
-                  <p className="text-[26px] font-medium leading-none text-forest">{fmt(verwacht)}</p>
-                  <TrendBadge value={incomeTrendPct} />
+                  <p className="text-[26px] font-medium leading-none text-forest">{fmt(besteedDitJaar)}</p>
+                  <span className="text-[12px] text-grey-2">dit jaar besteed</span>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-3 text-[11px] text-grey-2">
                 <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2 w-3 rounded-full bg-forest" /> Huurinkomsten
+                  <span className="inline-block h-2 w-3 rounded-full bg-forest" /> Werkelijk
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-px w-3 border-t-2 border-dashed border-grey-2/60" /> Uitgaven
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-3 rounded-full" style={{ background: LIME }} /> Netto
+                  <span className="inline-block h-px w-3 border-t-2 border-dashed border-grey-2/60" /> Begroot
                 </span>
               </div>
             </div>
@@ -224,18 +201,13 @@ export default function OverzichtPage() {
                     <stop offset="0%" stopColor={FOREST} stopOpacity={0.14} />
                     <stop offset="100%" stopColor={FOREST} stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="uit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={GREY} stopOpacity={0.1} />
-                    <stop offset="100%" stopColor={GREY} stopOpacity={0} />
-                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ecece8" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`} width={44} />
                 <Tooltip content={<ChartTooltip />} />
-                <Area type="monotone" dataKey="uitgaven" name="uitgaven" stroke={GREY} strokeWidth={1.5} strokeDasharray="4 3" fill="url(#uit)" dot={false} activeDot={{ r: 3, fill: GREY }} />
-                <Area type="monotone" dataKey="income" name="income" stroke={FOREST} strokeWidth={2.5} fill="url(#inc)" dot={false} activeDot={{ r: 4, fill: FOREST }} />
-                <Area type="monotone" dataKey="netto" name="netto" stroke={LIME} strokeWidth={2} fill="none" dot={false} activeDot={{ r: 4, fill: LIME }} />
+                <Area type="monotone" dataKey="begroot" name="begroot" stroke={GREY} strokeWidth={1.5} strokeDasharray="4 3" fill="none" dot={false} activeDot={{ r: 3, fill: GREY }} />
+                <Area type="monotone" dataKey="werkelijk" name="werkelijk" stroke={FOREST} strokeWidth={2.5} fill="url(#inc)" dot={false} activeDot={{ r: 4, fill: FOREST }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -245,8 +217,8 @@ export default function OverzichtPage() {
           <div className="flex shrink-0 flex-row justify-around gap-4 border-t border-line px-5 py-4 lg:w-56 lg:flex-col lg:justify-between lg:border-t-0 lg:px-7 lg:py-6">
             <MetricItem label="Panden" value={kpi.panden} />
             <MetricItem label="Eenheden" value={kpi.eenheden} />
-            <MetricItem label="Huurders" value={kpi.huurders} />
-            <MetricItem label="Bezetting" value={`${kpi.bezetting}%`} />
+            <MetricItem label="Open meldingen" value={kpi.openMeldingen} />
+            <MetricItem label="Doorlooptijd" value={`${kpi.doorlooptijd} d`} />
           </div>
         </div>
 

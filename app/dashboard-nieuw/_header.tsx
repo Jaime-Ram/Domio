@@ -33,14 +33,14 @@ function useOutside<T extends HTMLElement>(onClose: () => void) {
 const notificaties = [
   { id: 1, titel: "Nieuwe storingsmelding", body: "Lekkage in de badkamer · Prinsengracht 42-1", tijd: "12 min", icon: Wrench, ongelezen: true },
   { id: 2, titel: "Factuur ontvangen", body: "Loodgieter Jansen · € 340", tijd: "1 uur", icon: FileText, ongelezen: true },
-  { id: 3, titel: "Betaling te laat", body: "Kade 12-3 · 4 dagen achterstand", tijd: "3 uur", icon: AlertTriangle, ongelezen: false },
+  { id: 3, titel: "Keuring verloopt", body: "Liftkeuring Kade 12 · over 14 dagen", tijd: "3 uur", icon: AlertTriangle, ongelezen: false },
 ];
 
 const snelActies = [
+  { label: "Melding aanmaken", icon: Ticket, href: `${BASE}/tickets` },
+  { label: "MJOP-post toevoegen", icon: Receipt, href: `${BASE}/mjop` },
   { label: "Pand toevoegen", icon: Building2, href: `${BASE}/portefeuille` },
-  { label: "Huurder toevoegen", icon: Users, href: `${BASE}/huurders` },
-  { label: "Ticket aanmaken", icon: Ticket, href: `${BASE}/tickets` },
-  { label: "Betaling boeken", icon: Receipt, href: `${BASE}/betalingen` },
+  { label: "Partner toevoegen", icon: Users, href: `${BASE}/contactboek` },
 ];
 
 export function DashboardHeader() {
@@ -72,7 +72,7 @@ export function DashboardHeader() {
           <Search className="h-4 w-4 shrink-0 text-grey-2" />
           <input
             ref={searchRef}
-            placeholder="Zoek panden, huurders, tickets..."
+            placeholder="Zoek meldingen, panden, partners..."
             className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-grey-2"
           />
           <kbd className="hidden shrink-0 rounded border border-line bg-paper px-1.5 py-0.5 text-[10px] font-medium text-grey-2 sm:block">

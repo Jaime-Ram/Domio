@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   LayoutList, LayoutGrid, Building2, Check, Sparkles, MapPin, Home, Users,
-  Euro, Wrench, TrendingUp, Archive, Trash2, CalendarRange, AlertTriangle, FileClock,
+  Euro, Wrench, TrendingUp, Archive, Trash2, CalendarRange, AlertTriangle,
 } from "lucide-react";
 import {
   PageHeader, ViewToggle, Toolbar, ToolbarSearch, ToolbarToggle,
@@ -29,8 +29,7 @@ const COL = {
   status: "w-4 shrink-0",
   type: "hidden w-[120px] shrink-0 lg:block",
   bezetting: "w-[74px] shrink-0 text-right",
-  achterstand: "hidden w-[86px] shrink-0 text-right md:block",
-  signalen: "hidden w-[72px] shrink-0 text-right xl:block",
+  signalen: "hidden w-[92px] shrink-0 text-right md:block",
   huur: "w-[86px] shrink-0 text-right",
   beheerder: "w-6 shrink-0",
 };
@@ -39,16 +38,13 @@ const COL = {
 const KOLOM_WAARDE: Record<string, (p: Pand) => string> = {
   type: (p) => p.type,
   bezetting: (p) => (p.bezet === 0 ? "Volledig leeg" : p.bezet < p.eenheden ? "Deels leeg" : "Volledig bezet"),
-  achterstand: (p) => (p.achterstand > 0 ? "Met achterstand" : "Geen achterstand"),
-  signalen: (p) =>
-    p.aflopend > 0 ? "Aflopend contract" : p.openTickets > 0 ? "Open tickets" : "Geen signalen",
+  signalen: (p) => (p.openTickets > 1 ? "Meerdere meldingen" : p.openTickets > 0 ? "Eén melding" : "Geen meldingen"),
 };
 
 const KOLOM_OPTIES: Record<string, string[]> = {
   type: ["Appartementen", "Bedrijfsruimte", "Woonhuis"],
   bezetting: ["Volledig bezet", "Deels leeg", "Volledig leeg"],
-  achterstand: ["Met achterstand", "Geen achterstand"],
-  signalen: ["Aflopend contract", "Open tickets", "Geen signalen"],
+  signalen: ["Meerdere meldingen", "Eén melding", "Geen meldingen"],
 };
 
 /* ─────────────────────────── pagina ─────────────────────────── */
@@ -133,9 +129,6 @@ export default function PortefeuillePage() {
   const totBezet = panden.reduce((s, p) => s + p.bezet, 0);
   const bezettingPct = totEenheden ? (totBezet / totEenheden) * 100 : 0;
   const maandhuur = panden.reduce((s, p) => s + p.huur, 0);
-  const achterstand = panden.reduce((s, p) => s + p.achterstand, 0);
-  const gefactureerd = maandhuur + achterstand;
-  const incassoPct = gefactureerd ? (maandhuur / gefactureerd) * 100 : 100;
   const openTickets = panden.reduce((s, p) => s + p.openTickets, 0);
   const pandenMetTickets = panden.filter((p) => p.openTickets > 0).length;
   const detailPand = panden.find((p) => p.id === detail) || null;
@@ -148,13 +141,12 @@ export default function PortefeuillePage() {
   }, [panden]);
 
   const huurTeller = useCountUp(maandhuur);
-  const achterstandTeller = useCountUp(achterstand);
   const ticketTeller = useCountUp(openTickets);
 
   return (
     <>
       <PageHeader
-        title="Portefeuille"
+        title="Panden"
         subtitle={`${panden.length} panden · ${totEenheden} eenheden`}
         action={{ label: "Pand toevoegen" }}
       >
@@ -196,12 +188,12 @@ export default function PortefeuillePage() {
           />
 
           <KpiCard
-            label="Achterstand"
-            waarde={euro(achterstandTeller)}
-            toon={achterstand > 0 ? "slecht" : "goed"}
-            sub={`${procent(incassoPct)} van de huur geïnd`}
+            label="Panden zonder meldingen"
+            waarde={procent(((panden.length - pandenMetTickets) / Math.max(1, panden.length)) * 100)}
+            toon={pandenMetTickets === 0 ? "goed" : "let-op"}
+            sub={`${panden.length - pandenMetTickets} van ${panden.length} panden`}
           >
-            <MiniProgress pct={incassoPct} />
+            <MiniProgress pct={((panden.length - pandenMetTickets) / Math.max(1, panden.length)) * 100} />
           </KpiCard>
         </KpiRow>
       )}
@@ -287,15 +279,7 @@ export default function PortefeuillePage() {
                   onWijzig={(v) => zetFilter("bezetting", v)}
                 />
                 <HeadCell
-                  label="Achterstand"
-                  className={COL.achterstand}
-                  rechts
-                  opties={KOLOM_OPTIES.achterstand}
-                  actief={filters.achterstand ?? []}
-                  onWijzig={(v) => zetFilter("achterstand", v)}
-                />
-                <HeadCell
-                  label="Signalen"
+                  label="Meldingen"
                   className={COL.signalen}
                   rechts
                   opties={KOLOM_OPTIES.signalen}
@@ -346,23 +330,10 @@ export default function PortefeuillePage() {
                             {pct === 0 ? <span className="text-red-500">0%</span> : `${pct}%`}
                           </span>
 
-                          <span className={`${COL.achterstand} text-[13px] tabular-nums ${p.achterstand > 0 ? "font-medium text-red-500" : "text-grey-2"}`}>
-                            {p.achterstand > 0 ? euro(p.achterstand) : "—"}
-                          </span>
-
                           <span className={`${COL.signalen} text-[13px] tabular-nums text-grey-2`}>
-                            {p.aflopend > 0 || p.openTickets > 0 ? (
-                              <span className="inline-flex items-center justify-end gap-2">
-                                {p.aflopend > 0 && (
-                                  <span className="inline-flex items-center gap-0.5 text-[#c99a1f]" title={`${p.aflopend} contracten lopen af`}>
-                                    <FileClock className="h-3 w-3" />{p.aflopend}
-                                  </span>
-                                )}
-                                {p.openTickets > 0 && (
-                                  <span className="inline-flex items-center gap-0.5" title={`${p.openTickets} open tickets`}>
-                                    <Wrench className="h-3 w-3" />{p.openTickets}
-                                  </span>
-                                )}
+                            {p.openTickets > 0 ? (
+                              <span className={`inline-flex items-center justify-end gap-1 ${p.openTickets > 1 ? "font-medium text-[#c99a1f]" : ""}`}>
+                                <Wrench className="h-3 w-3" />{p.openTickets} open
                               </span>
                             ) : "—"}
                           </span>
@@ -424,9 +395,9 @@ export default function PortefeuillePage() {
                     </span>
                   </span>
                   <span>
-                    <span className="block text-[11px] uppercase tracking-wide text-grey-2">Achterstand</span>
-                    <span className={`mt-0.5 block text-[15px] font-medium tabular-nums ${p.achterstand > 0 ? "text-red-500" : "text-grey-2"}`}>
-                      {p.achterstand > 0 ? euro(p.achterstand) : "—"}
+                    <span className="block text-[11px] uppercase tracking-wide text-grey-2">Open meldingen</span>
+                    <span className={`mt-0.5 block text-[15px] font-medium tabular-nums ${p.openTickets > 0 ? "text-[#c99a1f]" : "text-grey-2"}`}>
+                      {p.openTickets > 0 ? p.openTickets : "—"}
                     </span>
                   </span>
                 </div>
@@ -533,16 +504,6 @@ export default function PortefeuillePage() {
                 <span className="text-[12px] text-grey-2">
                   {detailPand.bezet} verhuurde {detailPand.bezet === 1 ? "eenheid" : "eenheden"}
                 </span>
-              </DetailVeld>
-              <DetailVeld label="Huurincasso">
-                <span className={detailPand.incasso === 100 ? "text-forest" : "text-red-500"}>{detailPand.incasso}%</span>
-                {detailPand.achterstand > 0 && (
-                  <span className="text-[12px] text-red-500">achterstand {euro(detailPand.achterstand)}</span>
-                )}
-              </DetailVeld>
-              <DetailVeld label="Contracten">
-                <FileClock className="h-3.5 w-3.5 text-grey-2" />
-                {detailPand.aflopend > 0 ? `${detailPand.aflopend} aflopend binnen 90 dagen` : "Geen aflopende contracten"}
               </DetailVeld>
               <DetailVeld label="Open tickets">
                 <Wrench className="h-3.5 w-3.5 text-grey-2" />
