@@ -3,7 +3,7 @@
 /* De KPI-rij van het overzicht, opgebouwd uit de gedeelde widgets. */
 
 import {
-  KpiRow, KpiCard, KpiPill, TrendBadge, MiniBars, MiniSpark, MiniRing,
+  KpiRow, KpiCard, KpiPill, TrendBadge, MiniBars, MiniHeatmap, MiniRing,
   useCountUp, euro, getal,
 } from "./_kpi";
 
@@ -25,16 +25,31 @@ export function ResolvedCard() {
   );
 }
 
+/* meldingen per dag van deze maand, -1 voor dagen die nog moeten komen */
+const PER_DAG = [0, 2, 1, 0, 0, 3, 1, 2, 0, 1, 0, 0, 2, 1, 3, 0, 1, 0, 0, 2, 1, 0, 3, 2, 1];
+
 export function MeldingenCard() {
-  const v = useCountUp(26);
+  const nu = new Date();
+  const dagenInMaand = new Date(nu.getFullYear(), nu.getMonth() + 1, 0).getDate();
+  const vandaag = nu.getDate();
+  /* maandag als eerste kolom */
+  const offset = (new Date(nu.getFullYear(), nu.getMonth(), 1).getDay() + 6) % 7;
+  const maand = nu.toLocaleDateString("nl-NL", { month: "long" });
+
+  const data = Array.from({ length: dagenInMaand }, (_, i) =>
+    i + 1 > vandaag ? -1 : PER_DAG[i] ?? 0,
+  );
+  const totaal = data.filter((n) => n > 0).reduce((s, n) => s + n, 0);
+  const v = useCountUp(totaal);
+
   return (
     <KpiCard
       label="Nieuwe meldingen"
       waarde={getal(v)}
-      sub="deze maand"
-      badge={<TrendBadge pct={-19} omlaagIsGoed />}
+      sub={`in ${maand}`}
+      badge={<TrendBadge pct={-19} />}
     >
-      <MiniSpark data={[42, 38, 45, 40, 36, 41, 33, 35, 30, 32, 28, 26]} />
+      <MiniHeatmap data={data} offset={offset} maand={maand} />
     </KpiCard>
   );
 }

@@ -158,6 +158,77 @@ export function MiniSpark({ data, omlaag = false }: { data: number[]; omlaag?: b
   );
 }
 
+/* maand-heatmap: één vakje per dag, donkerder bij meer meldingen.
+   `data` bevat één waarde per dag van de maand, -1 voor dagen die nog moeten komen.
+   `offset` is de weekdag waarop de eerste van de maand valt (0 = maandag). */
+const HEAT = ["#ebebe7", "#d7f3cb", "#a9e894", "#7ee85c", "#4bb52f"];
+const DAGEN = ["m", "d", "w", "d", "v", "z", "z"];
+
+export function MiniHeatmap({
+  data, offset = 0, maand,
+}: {
+  data: number[];
+  offset?: number;
+  maand?: string;
+}) {
+  const max = Math.max(1, ...data);
+  const cellen: (number | null)[] = [...Array(offset).fill(null), ...data];
+  while (cellen.length % 7 !== 0) cellen.push(null);
+  const weken = cellen.length / 7;
+
+  const kleur = (n: number) => {
+    if (n <= 0) return HEAT[0];
+    return HEAT[Math.min(HEAT.length - 1, Math.ceil((n / max) * (HEAT.length - 1)))];
+  };
+
+  return (
+    <div className="flex items-start gap-3">
+      <div>
+        <div className="mb-1 grid grid-cols-7 gap-[3px]">
+          {DAGEN.map((d, i) => (
+            <span key={i} className="text-center text-[8px] uppercase leading-none text-grey-2">{d}</span>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-[3px]" style={{ gridTemplateRows: `repeat(${weken}, 1fr)` }}>
+          {cellen.map((n, i) => {
+            if (n === null) return <span key={i} className="aspect-square w-[11px]" />;
+            if (n < 0) {
+              return (
+                <span
+                  key={i}
+                  className="aspect-square w-[11px] rounded-[3px] border border-dashed border-line"
+                  title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
+                />
+              );
+            }
+            return (
+              <motion.span
+                key={i}
+                className="aspect-square w-[11px] rounded-[3px]"
+                style={{ background: kleur(n) }}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25, delay: 0.1 + i * 0.008 }}
+                title={`${i - offset + 1} ${maand ?? ""} · ${n} ${n === 1 ? "melding" : "meldingen"}`}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col justify-end gap-1 self-stretch pb-0.5">
+        <span className="text-[10px] text-grey-2">meer</span>
+        <span className="flex flex-col-reverse gap-[3px]">
+          {HEAT.map((c) => (
+            <span key={c} className="h-[7px] w-[7px] rounded-[2px]" style={{ background: c }} />
+          ))}
+        </span>
+        <span className="text-[10px] text-grey-2">minder</span>
+      </div>
+    </div>
+  );
+}
+
 /* rij met kaarten */
 export function KpiRow({ children, kolommen = 4 }: { children: React.ReactNode; kolommen?: 3 | 4 }) {
   return (
