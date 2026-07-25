@@ -36,9 +36,6 @@ const navGroups: { header?: string; items: Item[] }[] = [
     { label: "Documenten", href: `${BASE}/documenten`, icon: HardDrive },
   ]},
   { header: "Meer", items: [
-    { label: "Domio Agentic", href: `${BASE}/agentic`, icon: Sparkles },
-    { label: "Beleid", href: `${BASE}/beleid`, icon: ShieldCheck },
-    { label: "Integraties", href: `${BASE}/integraties`, icon: Plug },
     { label: "App", href: `${BASE}/app`, icon: Smartphone },
     { label: "Accountinstellingen", href: `${BASE}/instellingen`, icon: Settings },
   ]},

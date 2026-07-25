@@ -9,9 +9,6 @@ const titels: Record<string, string> = {
   portefeuille: "Panden",
   contactboek: "Partners",
   documenten: "Documenten",
-  agentic: "Domio Agentic",
-  beleid: "Beleid",
-  integraties: "Integraties",
   app: "App",
   instellingen: "Accountinstellingen",
 };

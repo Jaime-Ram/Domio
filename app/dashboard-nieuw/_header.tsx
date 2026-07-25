@@ -107,11 +107,6 @@ export function DashboardHeader() {
           )}
         </div>
 
-        {/* assistent */}
-        <Link href={`${BASE}/agentic`} className={iconBtn} title="Domio Assistent">
-          <Sparkles className="h-[18px] w-[18px]" />
-        </Link>
-
         {/* notificaties */}
         <div className="relative" ref={bellRef}>
           <button
