@@ -8,6 +8,7 @@ import {
   Euro, CreditCard, AlertTriangle, Receipt, ShieldCheck, Wrench, CalendarRange,
   BookUser, Workflow, Plug, Sparkles, Smartphone, Settings, Ticket, ChevronDown,
 } from "lucide-react";
+import { DashboardHeader, SidebarUser } from "./_header";
 
 const BASE = "/dashboard-nieuw";
 
@@ -140,20 +141,13 @@ export default function DashboardNieuwLayout({ children }: { children: React.Rea
             ))}
           </nav>
           <div className="border-t border-line p-3">
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-forest text-[13px] font-medium text-paper">MB</span>
-              <span className="min-w-0">
-                <span className="block truncate text-[13px] font-medium text-ink">Mark Bakker</span>
-                <span className="block truncate text-[12px] text-grey">Verhuurder</span>
-              </span>
-            </div>
+            <SidebarUser />
           </div>
         </aside>
 
         {/* main */}
         <div className="flex-1">
-          {/* Header-balk (voorlopig leeg) */}
-          <header className="sticky top-0 z-10 h-16 border-b border-line bg-paper/80 backdrop-blur-md" />
+          <DashboardHeader />
 
           <main className="px-5 py-6 lg:px-8 lg:py-8">{children}</main>
         </div>

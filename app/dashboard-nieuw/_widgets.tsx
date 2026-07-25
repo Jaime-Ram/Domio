@@ -1,59 +1,290 @@
 "use client";
 
-import { motion } from "motion/react";
-import { Bot, CalendarRange } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  CalendarRange, Sparkles, Check, Clock, BadgeCheck, Receipt, CalendarClock, Mail,
+  ArrowUp, ArrowLeft, MessageSquarePlus,
+} from "lucide-react";
 
-/* ---------- 1. Agents aan het werk (witte brede kaart) ---------- */
-const agentFeed = [
-  { taak: "Offerte opgevraagd bij Loodgieter Jansen", pand: "Prinsengracht 42-1", tijd: "nu bezig", live: true },
-  { taak: "Huurder ingelicht over inplanning", pand: "Kade 12-3", tijd: "2 min", live: false },
-  { taak: "Factuur gecontroleerd en goedgekeurd", pand: "Havenweg 8", tijd: "5 min", live: false },
-  { taak: "Monteur ingepland voor CV-storing", pand: "Lindenlaan 21", tijd: "12 min", live: false },
-  { taak: "Ticket automatisch afgehandeld", pand: "Molenstraat 5", tijd: "18 min", live: false },
+/* ---------- 1. Dagbriefing van de assistent (witte brede kaart) ---------- */
+const gepland = [
+  { taak: "CV-onderhoud inplannen", pand: "Kade 12", tijd: "10:30" },
+  { taak: "Bezichtiging nieuwe huurder", pand: "Prinsengracht 42", tijd: "14:00" },
+  { taak: "Offerte dakinspectie beoordelen", pand: "Havenweg 8", tijd: "vandaag" },
 ];
 
-export function AgentsAtWork({ className = "" }: { className?: string }) {
+const gedaanStart = [
+  "Offerte opgevraagd bij Loodgieter Jansen · Prinsengracht 42-1",
+  "Huurder ingelicht over inplanning · Kade 12-3",
+  "Factuur van € 84 gecontroleerd en geboekt · Havenweg 8",
+];
+
+type Approval = { id: string; titel: string; context: string; icon: React.ElementType };
+const approvalsStart: Approval[] = [
+  { id: "a1", titel: "Offerte loodgieter goedkeuren · € 340", context: "Lekkage Prinsengracht 42-1", icon: Receipt },
+  { id: "a2", titel: "Monteur inplannen buiten kantooruren", context: "CV-storing Lindenlaan 21", icon: CalendarClock },
+  { id: "a3", titel: "Huurindexatie-brief versturen", context: "3 huurders · jaarlijkse verhoging", icon: Mail },
+];
+
+const suggesties = ["Wat staat er vandaag?", "Zijn er betalingsachterstanden?", "Plan onderhoud in"];
+
+function replyFor(text: string): string {
+  const t = text.toLowerCase();
+  if (t.includes("betaal") || t.includes("achterstand") || t.includes("huur"))
+    return "Er staan 2 betalingen open: Kade 12-3 (€ 1.620, 4 dagen te laat) en Molenstraat 5 (€ 980, 11 dagen). Zal ik een vriendelijke herinnering sturen?";
+  if (t.includes("onderhoud") || t.includes("plan") || t.includes("monteur") || t.includes("storing"))
+    return "Ik kan direct een monteur inplannen en offertes opvragen bij je vaste partners. Voor welk pand is het en wat is de klacht?";
+  if (t.includes("vandaag") || t.includes("planning") || t.includes("agenda") || t.includes("staat"))
+    return "Vandaag: CV-onderhoud inplannen (Kade 12, 10:30), bezichtiging nieuwe huurder (Prinsengracht 42, 14:00) en de offerte voor de dakinspectie beoordelen. Er wachten ook 3 acties op je akkoord.";
+  return "Ik kijk het meteen voor je na. Ik kan taken inplannen, offertes opvragen, huurders informeren en betalingen opvolgen. Waarmee kan ik helpen?";
+}
+
+type Message = { role: "user" | "assistant"; text: string };
+
+export function AssistantBriefing({ className = "" }: { className?: string }) {
+  const [approvals, setApprovals] = useState(approvalsStart);
+  const [gedaan, setGedaan] = useState(gedaanStart);
+
+  const [mode, setMode] = useState<"briefing" | "chat">("briefing");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, typing]);
+
+  const handle = (a: Approval, akkoord: boolean) => {
+    setApprovals((prev) => prev.filter((x) => x.id !== a.id));
+    if (akkoord) setGedaan((prev) => [`${a.titel.split(" · ")[0]} · goedgekeurd`, ...prev]);
+  };
+
+  const send = (raw: string) => {
+    const text = raw.trim();
+    if (!text) return;
+    setMode("chat");
+    setMessages((m) => [...m, { role: "user", text }]);
+    setInput("");
+    setTyping(true);
+    setTimeout(() => {
+      setTyping(false);
+      setMessages((m) => [...m, { role: "assistant", text: replyFor(text) }]);
+    }, 900);
+  };
+
   return (
     <div className={`flex flex-col rounded-2xl bg-paper p-5 ring-1 ring-line ${className}`}>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-lime/20 text-forest">
-            <Bot className="h-4 w-4" />
-          </span>
-          <div>
-            <div className="text-[14px] font-medium text-ink">Agents aan het werk</div>
-            <div className="text-[12px] text-grey-2">realtime activiteit</div>
-          </div>
-        </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-lime/20 px-2.5 py-1 text-[11px] font-medium text-forest">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime-2 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-lime-2" />
-          </span>
-          3 actief
+      {/* kop */}
+      <div className="flex items-center gap-3">
+        {mode === "chat" && (
+          <button
+            type="button"
+            onClick={() => setMode("briefing")}
+            aria-label="Terug naar briefing"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-grey transition-colors hover:bg-panel hover:text-ink"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+        )}
+        <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest text-lime-2">
+          <Sparkles className="h-4 w-4" strokeWidth={2} />
+          <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-paper bg-lime-2" />
         </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-[14px] font-medium text-ink">Domio Assistent</div>
+          <div className="text-[12px] text-grey-2">{mode === "chat" ? "Online · reageert direct" : "Je dagbriefing voor vandaag"}</div>
+        </div>
+        {mode === "briefing" ? (
+          <span className="shrink-0 rounded-full bg-panel px-2.5 py-1 text-[11px] font-medium text-grey">Vandaag</span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => { setMessages([]); setMode("briefing"); }}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-panel px-2.5 py-1 text-[11px] font-medium text-grey transition-colors hover:bg-panel-2 hover:text-ink"
+          >
+            <MessageSquarePlus className="h-3.5 w-3.5" /> Nieuw
+          </button>
+        )}
       </div>
 
-      <ul className="flex flex-col divide-y divide-line">
-        {agentFeed.map((a, i) => (
-          <motion.li
-            key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 + i * 0.1, ease: "easeOut" }}
-            className="flex items-center gap-3 py-2.5"
+      {mode === "briefing" ? (
+        <div className="mt-3">
+          <p className="text-[13px] leading-relaxed text-grey">
+            Goedemorgen Mark. Ik heb <span className="font-medium text-ink">{gedaan.length} taken</span> afgehandeld en{" "}
+            <span className="font-medium text-ink">{gepland.length} ingepland</span>.{" "}
+            {approvals.length > 0 ? (
+              <><span className="font-medium text-forest">{approvals.length} acties</span> wachten op je akkoord.</>
+            ) : (
+              <span className="font-medium text-forest">Alles is afgehandeld.</span>
+            )}
+          </p>
+
+          {/* twee kolommen: gepland + afgehandeld */}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-panel/70 p-3">
+              <div className="mb-2 flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-grey-2">
+                <Clock className="h-3.5 w-3.5" /> Vandaag gepland
+              </div>
+              <ul className="space-y-2">
+                {gepland.map((g, i) => (
+                  <li key={i} className="flex items-center gap-2 text-[13px]">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-forest/40" />
+                    <span className="min-w-0 flex-1 truncate text-ink">{g.taak}</span>
+                    <span className="shrink-0 text-[11px] text-grey-2">{g.tijd}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-xl bg-panel/70 p-3">
+              <div className="mb-2 flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-grey-2">
+                <BadgeCheck className="h-3.5 w-3.5" /> Alvast afgehandeld
+              </div>
+              <ul className="space-y-2">
+                <AnimatePresence initial={false}>
+                  {gedaan.slice(0, 3).map((g) => (
+                    <motion.li
+                      key={g}
+                      layout
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="flex items-start gap-2 text-[13px]"
+                    >
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lime-2" strokeWidth={3} />
+                      <span className="min-w-0 flex-1 text-ink">{g}</span>
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </ul>
+            </div>
+          </div>
+
+          {/* goedkeuringen */}
+          <div className="mt-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[11px] uppercase tracking-wide text-grey-2">Wacht op je akkoord</span>
+              {approvals.length > 0 && (
+                <span className="rounded-full bg-lime-2 px-2 py-0.5 text-[11px] font-medium text-forest">{approvals.length}</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <AnimatePresence initial={false}>
+                {approvals.map((a) => {
+                  const Icon = a.icon;
+                  return (
+                    <motion.div
+                      key={a.id}
+                      layout
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex items-center gap-3 rounded-xl bg-panel p-2.5"
+                    >
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-paper text-forest ring-1 ring-line">
+                        <Icon className="h-4 w-4" strokeWidth={2} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[13px] font-medium text-ink">{a.titel}</span>
+                        <span className="block truncate text-[12px] text-grey-2">{a.context}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handle(a, false)}
+                        className="shrink-0 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-grey transition-colors hover:bg-panel-2 hover:text-ink"
+                      >
+                        Later
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handle(a, true)}
+                        className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-lime-2 px-2.5 py-1.5 text-[12px] font-medium text-forest transition-colors hover:bg-lime"
+                      >
+                        <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> Goedkeuren
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+              {approvals.length === 0 && (
+                <div className="flex items-center gap-2 rounded-xl bg-panel p-3 text-[13px] text-grey">
+                  <Check className="h-4 w-4 text-lime-2" strokeWidth={3} /> Niets meer om goed te keuren, alles is bijgewerkt.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* chat-modus */
+        <div ref={scrollRef} className="mt-4 max-h-[340px] min-h-[220px] flex-1 space-y-3 overflow-y-auto pr-1 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
+          {messages.map((m, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                  m.role === "user" ? "bg-forest text-paper" : "bg-panel text-ink"
+                }`}
+              >
+                {m.text}
+              </div>
+            </motion.div>
+          ))}
+          {typing && (
+            <div className="flex justify-start">
+              <div className="flex items-center gap-1 rounded-2xl bg-panel px-3.5 py-3">
+                {[0, 1, 2].map((d) => (
+                  <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-grey-2" style={{ animationDelay: `${d * 0.15}s` }} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* composer */}
+      <div className="mt-4">
+        {mode === "briefing" && (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {suggesties.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => send(s)}
+                className="rounded-full bg-panel px-2.5 py-1 text-[12px] font-medium text-grey transition-colors hover:bg-panel-2 hover:text-ink"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+        <form
+          onSubmit={(e) => { e.preventDefault(); send(input); }}
+          className="flex items-center gap-2 rounded-xl bg-panel px-3 py-2 ring-1 ring-transparent transition focus-within:bg-paper focus-within:ring-line"
+        >
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Vraag je assistent iets..."
+            className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-grey-2"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            aria-label="Versturen"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-lime-2 text-forest transition-colors hover:bg-lime disabled:cursor-not-allowed disabled:bg-panel-2 disabled:text-grey-2"
           >
-            <span className={`h-2 w-2 shrink-0 rounded-full ${a.live ? "bg-lime-2" : "bg-line"}`}>
-              {a.live && <span className="block h-2 w-2 animate-ping rounded-full bg-lime-2" />}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] text-ink">{a.taak}</span>
-              <span className="block truncate text-[12px] text-grey-2">{a.pand}</span>
-            </span>
-            <span className={`shrink-0 text-[11px] ${a.live ? "font-medium text-forest" : "text-grey-2"}`}>{a.tijd}</span>
-          </motion.li>
-        ))}
-      </ul>
+            <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -141,17 +372,3 @@ export function UpcomingTimeline({ className = "" }: { className?: string }) {
   );
 }
 
-/* ---------- compositie ---------- */
-export function DashboardWidgets() {
-  return (
-    <>
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <AgentsAtWork className="xl:col-span-2" />
-        <UpcomingTimeline />
-      </div>
-      <div className="mt-6">
-        <TicketStatusCard />
-      </div>
-    </>
-  );
-}

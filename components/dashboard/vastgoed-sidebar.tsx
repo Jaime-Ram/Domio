@@ -199,7 +199,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
               "flex items-center transition-all duration-300 ease-in-out",
               collapsed ? "opacity-0 scale-0 max-w-0 overflow-hidden" : "opacity-100 scale-100 max-w-full"
             )}>
-              <Logo width={58} height={16} href={basePath} />
+              <Logo width={97} height={20} href={basePath} />
             </div>
             <div className={cn("flex items-center gap-1.5 transition-all duration-300", collapsed ? "" : "ml-auto")}>
               {onToggleCollapse && (
