@@ -114,13 +114,14 @@ export function MiniProgress({ pct }: { pct: number }) {
 
 /* vullende ring */
 export function MiniRing({
-  pct, formaat = 64, kleur = "#161f13", dik = 3, tekstKlasse = "text-[13px] text-forest",
+  pct, formaat = 64, kleur = "#161f13", dik = 3, tekstKlasse = "text-[13px] text-forest", vol = false,
 }: {
   pct: number;
   formaat?: number;
   kleur?: string;
   dik?: number;
   tekstKlasse?: string;
+  vol?: boolean;   // vult de hoogte van de container
 }) {
   const [v, setV] = useState(0);
   useEffect(() => {
@@ -129,8 +130,15 @@ export function MiniRing({
   }, [pct]);
   const omtrek = 97.4;
   return (
-    <div className="relative shrink-0" style={{ width: formaat, height: formaat }}>
-      <svg viewBox="0 0 36 36" className="-rotate-90" style={{ width: formaat, height: formaat }}>
+    <div
+      className={vol ? "relative aspect-square h-full" : "relative shrink-0"}
+      style={vol ? undefined : { width: formaat, height: formaat }}
+    >
+      <svg
+        viewBox="0 0 36 36"
+        className={vol ? "h-full w-full -rotate-90" : "-rotate-90"}
+        style={vol ? undefined : { width: formaat, height: formaat }}
+      >
         <circle cx="18" cy="18" r="15.5" fill="none" stroke="#ebebe7" strokeWidth={dik} />
         <circle
           cx="18" cy="18" r="15.5" fill="none" stroke={kleur} strokeWidth={dik} strokeLinecap="round"
@@ -185,20 +193,20 @@ export function MiniHeatmap({
 
   return (
     <div className="w-full">
-      <div className="mb-1 grid w-fit grid-cols-7 gap-[3px]">
+      <div className="mb-1.5 grid w-full grid-cols-7 gap-[5px]">
         {DAGEN.map((d, i) => (
-          <span key={i} className="w-[11px] text-center text-[8px] uppercase leading-none text-grey-2">{d}</span>
+          <span key={i} className="text-center text-[10px] uppercase leading-none text-grey-2">{d}</span>
         ))}
       </div>
 
-      <div className="grid w-fit grid-cols-7 gap-[3px]">
+      <div className="grid w-full grid-cols-7 gap-[5px]">
         {cellen.map((n, i) => {
-          if (n === null) return <span key={i} className="h-[11px] w-[11px]" />;
+          if (n === null) return <span key={i} className="aspect-square w-full" />;
           if (n < 0) {
             return (
               <span
                 key={i}
-                className="h-[11px] w-[11px] rounded-[3px] border border-dashed border-line"
+                className="aspect-square w-full rounded-[4px] border border-dashed border-line"
                 title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
               />
             );
@@ -206,7 +214,7 @@ export function MiniHeatmap({
           return (
             <motion.span
               key={i}
-              className="h-[11px] w-[11px] rounded-[3px]"
+              className="aspect-square w-full rounded-[4px]"
               style={{ background: kleur(n) }}
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -39,31 +39,29 @@ export function MeldingenCard() {
   const data = Array.from({ length: dagenInMaand }, (_, i) =>
     i + 1 > vandaag ? -1 : PER_DAG[i] ?? 0,
   );
-  const totaal = data.filter((n) => n > 0).reduce((s, n) => s + n, 0);
-  const v = useCountUp(totaal);
 
   return (
-    <KpiCard
-      label="Nieuwe meldingen"
-      waarde={getal(v)}
-      sub={`in ${maand}`}
-      badge={<TrendBadge pct={-19} />}
-    >
-      <MiniHeatmap data={data} offset={offset} maand={maand} />
-    </KpiCard>
+    <div className="flex h-full flex-col rounded-2xl bg-paper p-5 ring-1 ring-line">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[12px] uppercase tracking-wide text-grey-2">Meldingen</span>
+        <KpiPill>{maand}</KpiPill>
+      </div>
+      <div className="mt-4 flex flex-1 items-center">
+        <MiniHeatmap data={data} offset={offset} maand={maand} />
+      </div>
+    </div>
   );
 }
 
 export function AutomatischCard() {
   return (
     <div className="flex h-full flex-col rounded-2xl bg-paper p-5 ring-1 ring-line">
-      <span className="text-[12px] uppercase tracking-wide text-grey-2">Automatisch afgehandeld</span>
-      <div className="mt-4 flex flex-1 items-end gap-4">
-        <MiniRing pct={71} formaat={92} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[17px] text-forest" />
-        <div className="min-w-0 pb-1">
-          <div className="text-[20px] font-medium leading-tight text-ink">Door agents</div>
-          <div className="mt-1.5 text-[12px] text-grey-2">zonder tussenkomst</div>
-        </div>
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[12px] uppercase tracking-wide text-grey-2">Door agents</span>
+        <KpiPill>zonder tussenkomst</KpiPill>
+      </div>
+      <div className="mt-4 flex flex-1 items-center justify-center">
+        <MiniRing vol pct={71} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[22px] text-forest" />
       </div>
     </div>
   );
