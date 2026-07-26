@@ -10,7 +10,7 @@ import {
 export function BudgetCard() {
   const v = useCountUp(84250);
   return (
-    <KpiCard label="Onderhoudsbudget" waarde={euro(v)} badge={<KpiPill>68% besteed</KpiPill>}>
+    <KpiCard label="Onderhoudsbudget" waarde={euro(v)} sub="van € 124.000 begroot" badge={<KpiPill>68% besteed</KpiPill>}>
       <MiniBars data={[40, 52, 48, 63, 70, 66, 82, 90]} vanaf={5} />
     </KpiCard>
   );
@@ -19,7 +19,7 @@ export function BudgetCard() {
 export function ResolvedCard() {
   const v = useCountUp(1284);
   return (
-    <KpiCard label="Meldingen opgelost" waarde={getal(v)} badge={<TrendBadge pct={8} />}>
+    <KpiCard label="Meldingen opgelost" waarde={getal(v)} sub="sinds januari" badge={<TrendBadge pct={8} />}>
       <MiniBars data={[30, 44, 40, 58, 52, 70, 66, 88]} vanaf={0} />
     </KpiCard>
   );
@@ -56,11 +56,14 @@ export function MeldingenCard() {
 
 export function AutomatischCard() {
   return (
-    <div className="flex h-full items-center gap-4 rounded-2xl bg-paper p-5 ring-1 ring-line">
-      <MiniRing pct={71} formaat={76} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[15px] text-forest" />
-      <div className="min-w-0">
-        <div className="text-[20px] font-medium leading-tight text-ink">Door agents</div>
-        <div className="mt-1.5 text-[12px] text-grey-2">afgehandeld zonder tussenkomst</div>
+    <div className="flex h-full flex-col rounded-2xl bg-paper p-5 ring-1 ring-line">
+      <span className="text-[12px] uppercase tracking-wide text-grey-2">Automatisch afgehandeld</span>
+      <div className="mt-4 flex flex-1 items-center gap-4">
+        <MiniRing pct={71} formaat={80} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[16px] text-forest" />
+        <div className="min-w-0">
+          <div className="text-[20px] font-medium leading-tight text-ink">Door agents</div>
+          <div className="mt-1.5 text-[12px] text-grey-2">zonder tussenkomst</div>
+        </div>
       </div>
     </div>
   );

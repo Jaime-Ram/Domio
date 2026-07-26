@@ -49,14 +49,16 @@ export function KpiCard({
     slecht: "text-red-500",
   }[toon];
   return (
-    <div className="flex h-full flex-col justify-between rounded-2xl bg-paper p-5 ring-1 ring-line">
+    <div className="flex h-full flex-col rounded-2xl bg-paper p-5 ring-1 ring-line">
+      {/* kop en cijfer horen bij elkaar en staan dus strak onder elkaar */}
       <div className="flex items-start justify-between gap-2">
         <span className="text-[12px] uppercase tracking-wide text-grey-2">{label}</span>
         {badge}
       </div>
-      <div className={`mt-2 text-[28px] font-medium leading-none tabular-nums ${kleur}`}>{waarde}</div>
+      <div className={`mt-2.5 text-[28px] font-medium leading-none tabular-nums ${kleur}`}>{waarde}</div>
       {sub && <div className="mt-1.5 text-[12px] text-grey-2">{sub}</div>}
-      {children && <div className="mt-4">{children}</div>}
+      {/* de visualisatie zakt naar de onderkant van de kaart */}
+      {children && <div className="mt-4 flex flex-1 items-end">{children}</div>}
     </div>
   );
 }
@@ -82,7 +84,7 @@ export function KpiPill({ children }: { children: React.ReactNode }) {
 export function MiniBars({ data, vanaf }: { data: number[]; vanaf?: number }) {
   const grens = vanaf ?? 0;
   return (
-    <div className="flex h-8 items-end gap-1">
+    <div className="flex h-full max-h-20 min-h-[44px] w-full items-end gap-1">
       {data.map((h, i) => (
         <motion.div
           key={i}
@@ -191,12 +193,12 @@ export function MiniHeatmap({
         </div>
         <div className="grid grid-cols-7 gap-[3px]" style={{ gridTemplateRows: `repeat(${weken}, 1fr)` }}>
           {cellen.map((n, i) => {
-            if (n === null) return <span key={i} className="aspect-square w-[11px]" />;
+            if (n === null) return <span key={i} className="aspect-square w-[10px]" />;
             if (n < 0) {
               return (
                 <span
                   key={i}
-                  className="aspect-square w-[11px] rounded-[3px] border border-dashed border-line"
+                  className="aspect-square w-[10px] rounded-[3px] border border-dashed border-line"
                   title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
                 />
               );
@@ -204,7 +206,7 @@ export function MiniHeatmap({
             return (
               <motion.span
                 key={i}
-                className="aspect-square w-[11px] rounded-[3px]"
+                className="aspect-square w-[10px] rounded-[3px]"
                 style={{ background: kleur(n) }}
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
