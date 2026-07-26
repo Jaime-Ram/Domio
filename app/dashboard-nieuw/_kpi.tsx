@@ -84,7 +84,7 @@ export function KpiPill({ children }: { children: React.ReactNode }) {
 export function MiniBars({ data, vanaf }: { data: number[]; vanaf?: number }) {
   const grens = vanaf ?? 0;
   return (
-    <div className="flex h-full max-h-20 min-h-[44px] w-full items-end gap-1">
+    <div className="flex h-full min-h-[44px] w-full items-end gap-1">
       {data.map((h, i) => (
         <motion.div
           key={i}
@@ -184,48 +184,45 @@ export function MiniHeatmap({
   };
 
   return (
-    <div className="flex items-start gap-3">
-      <div>
-        <div className="mb-1 grid grid-cols-7 gap-[3px]">
-          {DAGEN.map((d, i) => (
-            <span key={i} className="text-center text-[8px] uppercase leading-none text-grey-2">{d}</span>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-[3px]" style={{ gridTemplateRows: `repeat(${weken}, 1fr)` }}>
-          {cellen.map((n, i) => {
-            if (n === null) return <span key={i} className="aspect-square w-[10px]" />;
-            if (n < 0) {
-              return (
-                <span
-                  key={i}
-                  className="aspect-square w-[10px] rounded-[3px] border border-dashed border-line"
-                  title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
-                />
-              );
-            }
-            return (
-              <motion.span
-                key={i}
-                className="aspect-square w-[10px] rounded-[3px]"
-                style={{ background: kleur(n) }}
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.25, delay: 0.1 + i * 0.008 }}
-                title={`${i - offset + 1} ${maand ?? ""} · ${n} ${n === 1 ? "melding" : "meldingen"}`}
-              />
-            );
-          })}
-        </div>
+    <div className="w-full">
+      <div className="mb-1 grid w-fit grid-cols-7 gap-[3px]">
+        {DAGEN.map((d, i) => (
+          <span key={i} className="w-[11px] text-center text-[8px] uppercase leading-none text-grey-2">{d}</span>
+        ))}
       </div>
 
-      <div className="flex flex-col justify-end gap-1 self-stretch pb-0.5">
-        <span className="text-[10px] text-grey-2">meer</span>
-        <span className="flex flex-col-reverse gap-[3px]">
-          {HEAT.map((c) => (
-            <span key={c} className="h-[7px] w-[7px] rounded-[2px]" style={{ background: c }} />
-          ))}
-        </span>
-        <span className="text-[10px] text-grey-2">minder</span>
+      <div className="grid w-fit grid-cols-7 gap-[3px]">
+        {cellen.map((n, i) => {
+          if (n === null) return <span key={i} className="h-[11px] w-[11px]" />;
+          if (n < 0) {
+            return (
+              <span
+                key={i}
+                className="h-[11px] w-[11px] rounded-[3px] border border-dashed border-line"
+                title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
+              />
+            );
+          }
+          return (
+            <motion.span
+              key={i}
+              className="h-[11px] w-[11px] rounded-[3px]"
+              style={{ background: kleur(n) }}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25, delay: 0.1 + i * 0.008 }}
+              title={`${i - offset + 1} ${maand ?? ""} · ${n} ${n === 1 ? "melding" : "meldingen"}`}
+            />
+          );
+        })}
+      </div>
+
+      <div className="mt-2.5 flex items-center gap-1 text-[10px] text-grey-2">
+        minder
+        {HEAT.map((c) => (
+          <span key={c} className="h-[7px] w-[7px] rounded-[2px]" style={{ background: c }} />
+        ))}
+        meer
       </div>
     </div>
   );

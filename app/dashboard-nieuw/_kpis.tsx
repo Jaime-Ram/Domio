@@ -58,9 +58,9 @@ export function AutomatischCard() {
   return (
     <div className="flex h-full flex-col rounded-2xl bg-paper p-5 ring-1 ring-line">
       <span className="text-[12px] uppercase tracking-wide text-grey-2">Automatisch afgehandeld</span>
-      <div className="mt-4 flex flex-1 items-center gap-4">
-        <MiniRing pct={71} formaat={80} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[16px] text-forest" />
-        <div className="min-w-0">
+      <div className="mt-4 flex flex-1 items-end gap-4">
+        <MiniRing pct={71} formaat={92} dik={3.4} kleur="#5cc93f" tekstKlasse="text-[17px] text-forest" />
+        <div className="min-w-0 pb-1">
           <div className="text-[20px] font-medium leading-tight text-ink">Door agents</div>
           <div className="mt-1.5 text-[12px] text-grey-2">zonder tussenkomst</div>
         </div>
