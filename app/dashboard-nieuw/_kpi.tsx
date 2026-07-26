@@ -131,7 +131,7 @@ export function MiniRing({
   const omtrek = 97.4;
   return (
     <div
-      className={vol ? "relative aspect-square h-full" : "relative shrink-0"}
+      className={vol ? "relative aspect-square w-full max-w-[150px]" : "relative shrink-0"}
       style={vol ? undefined : { width: formaat, height: formaat }}
     >
       <svg
@@ -192,10 +192,11 @@ export function MiniHeatmap({
   };
 
   return (
-    <div className="w-full">
+    /* de bovengrens houdt de kaart op een prettige hoogte */
+    <div className="w-full max-w-[150px]">
       <div className="mb-1.5 grid w-full grid-cols-7 gap-[5px]">
         {DAGEN.map((d, i) => (
-          <span key={i} className="text-center text-[10px] uppercase leading-none text-grey-2">{d}</span>
+          <span key={i} className="text-center text-[9px] uppercase leading-none text-grey-2">{d}</span>
         ))}
       </div>
 
