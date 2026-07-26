@@ -203,25 +203,38 @@ export function MiniHeatmap({
       <div className="grid w-full grid-cols-7 gap-[5px]">
         {cellen.map((n, i) => {
           if (n === null) return <span key={i} className="aspect-square w-full" />;
-          if (n < 0) {
-            return (
-              <span
-                key={i}
-                className="aspect-square w-full rounded-[4px] border border-dashed border-line"
-                title={`${i - offset + 1} ${maand ?? ""}, nog te gaan`}
-              />
-            );
-          }
+
+          const dag = i - offset + 1;
+          const kolom = i % 7;
+          /* houd het label binnen de kaart bij de buitenste kolommen */
+          const uitlijning =
+            kolom <= 1 ? "left-0" : kolom >= 5 ? "right-0" : "left-1/2 -translate-x-1/2";
+
+          const label =
+            n < 0
+              ? `${dag} ${maand ?? ""} · nog te gaan`
+              : `${dag} ${maand ?? ""} · ${n === 0 ? "geen meldingen" : `${n} ${n === 1 ? "melding" : "meldingen"}`}`;
+
           return (
-            <motion.span
-              key={i}
-              className="aspect-square w-full rounded-[4px]"
-              style={{ background: kleur(n) }}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.25, delay: 0.1 + i * 0.008 }}
-              title={`${i - offset + 1} ${maand ?? ""} · ${n} ${n === 1 ? "melding" : "meldingen"}`}
-            />
+            <span key={i} className="group/cel relative aspect-square w-full">
+              {n < 0 ? (
+                <span className="block h-full w-full rounded-[4px] border border-dashed border-line transition-colors group-hover/cel:border-grey-2" />
+              ) : (
+                <motion.span
+                  className="block h-full w-full rounded-[4px] ring-forest/40 transition-shadow group-hover/cel:ring-2"
+                  style={{ background: kleur(n) }}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25, delay: 0.1 + i * 0.008 }}
+                />
+              )}
+
+              <span
+                className={`pointer-events-none absolute bottom-[calc(100%+7px)] z-30 hidden whitespace-nowrap rounded-lg bg-forest px-2 py-1 text-[11px] font-medium text-paper shadow-soft-lg group-hover/cel:block ${uitlijning}`}
+              >
+                {label}
+              </span>
+            </span>
           );
         })}
       </div>
