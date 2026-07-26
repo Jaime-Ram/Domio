@@ -55,7 +55,7 @@ function MetricItem({ label, value }: { label: string; value: React.ReactNode })
   return (
     <div>
       <p className="mb-2 text-[12px] uppercase tracking-wide leading-none text-grey-2">{label}</p>
-      <p className="text-[32px] font-medium leading-none tabular-nums text-forest">{value}</p>
+      <p className="text-[26px] font-medium leading-none tabular-nums text-forest">{value}</p>
     </div>
   );
 }
