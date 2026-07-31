@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import HeroProduct from "./HeroProduct";
+import BackgroundPaths from "./BackgroundPaths";
 
 const agentStats = [
   ["MELDINGEN GETRIEERD", 313278],
@@ -36,23 +37,14 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-paper">
-      {/* heel subtiel flowend gloed op de achtergrond */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="hero-blob-a absolute -left-[6%] top-[4%] h-[52vh] w-[52vh] rounded-full opacity-[0.16] blur-3xl"
-          style={{ background: "radial-gradient(circle, #94f477 0%, transparent 68%)" }}
-        />
-        <div
-          className="hero-blob-b absolute right-[0%] top-[20%] h-[58vh] w-[58vh] rounded-full opacity-[0.13] blur-3xl"
-          style={{ background: "radial-gradient(circle, #2f6a1e 0%, transparent 68%)" }}
-        />
-      </div>
+      {/* animerende lijn-paden (kokonut Background Paths) als onderste laag */}
+      <BackgroundPaths />
 
       {/* dotted side grids */}
       <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
 
-      <div className="mx-auto max-w-[1440px] px-6 lg:px-16">
+      <div className="relative z-10 mx-auto max-w-[1440px] px-6 lg:px-16">
         <div className="pt-16 lg:pt-24">
           <div className="flex flex-wrap items-center gap-2 text-[12px] font-medium uppercase tracking-wide text-grey">
             Agents bezig met vastgoedbeheer:
@@ -95,7 +87,7 @@ export default function Hero() {
       </div>
 
       {/* Agents at work bar */}
-      <div className="border-y border-line bg-paper">
+      <div className="relative z-10 border-y border-line bg-paper">
         <div className="mx-auto flex max-w-[1440px] items-center gap-6 overflow-x-auto px-6 py-3 lg:px-16">
           <span className="flex shrink-0 items-center gap-2 text-[12px] font-medium uppercase tracking-wide text-ink">
             Vandaag automatisch geregeld:

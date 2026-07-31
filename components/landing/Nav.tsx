@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import Logo from "./Logo";
 import { menus, MegaPanel } from "./NavMenu";
 
@@ -133,23 +134,25 @@ export default function Nav() {
           </button>
         </nav>
 
-        {/* Mega-menu flyout (desktop): hoogte morpht soepel bij openen en wisselen */}
-        <div
+        {/* Mega-menu flyout (desktop): hoogte morpht soepel bij openen, sluiten en
+            wisselen. Motion tweent altijd vanaf de huidige hoogte, dus groter én
+            kleiner worden gaan even netjes geanimeerd. */}
+        <motion.div
           className="absolute inset-x-0 top-full z-50 hidden overflow-hidden lg:block"
-          style={{
-            height: menu ? panelH : 0,
-            opacity: menu ? 1 : 0,
-            pointerEvents: menu ? "auto" : "none",
-            transition:
-              "height 360ms cubic-bezier(0.25,0.46,0.45,0.94), opacity 240ms ease-out",
+          initial={false}
+          animate={{ height: menu ? panelH : 0, opacity: menu ? 1 : 0 }}
+          transition={{
+            height: { duration: 0.36, ease: [0.25, 0.46, 0.45, 0.94] },
+            opacity: { duration: menu ? 0.24 : 0.18, ease: "easeOut" },
           }}
+          style={{ pointerEvents: menu ? "auto" : "none" }}
         >
           <div ref={panelRef}>
             {displayMenu && menus[displayMenu] && (
               <MegaPanel key={displayMenu} menu={menus[displayMenu]} />
             )}
           </div>
-        </div>
+        </motion.div>
 
         {open && (
           <div className="border-t border-line bg-paper px-6 py-4 lg:hidden">

@@ -3,10 +3,10 @@ import Nav from "@/components/landing/Nav";
 import Hero from "@/components/landing/Hero";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Platform from "@/components/landing/Platform";
-import SystemsSection from "@/components/landing/SystemsSection";
 import StackSection from "@/components/landing/StackSection";
 import AgenticStatement from "@/components/landing/AgenticStatement";
 import SocialProof from "@/components/landing/SocialProof";
+
 import Pricing from "@/components/landing/Pricing";
 import Faq from "@/components/landing/Faq";
 import CTA from "@/components/landing/CTA";
@@ -28,7 +28,6 @@ export default function V2Landing() {
         <HowItWorks />
         <Platform />
         <AgenticStatement />
-        <SystemsSection />
         <StackSection />
         <Pricing />
         <Faq />

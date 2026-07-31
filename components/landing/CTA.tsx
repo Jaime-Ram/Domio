@@ -1,9 +1,12 @@
 "use client";
 
+import BackgroundPaths from "./BackgroundPaths";
+
 export default function CTA() {
   return (
-    <section className="bg-paper px-6 py-24 text-center lg:px-16 lg:py-32">
-      <div className="mx-auto max-w-2xl">
+    <section className="relative overflow-hidden bg-paper px-6 py-24 text-center lg:px-16 lg:py-32">
+      <BackgroundPaths />
+      <div className="relative z-10 mx-auto max-w-2xl">
         <h2 className="display text-[clamp(1.9rem,3.4vw,2.5rem)] text-ink">
           Laat je onderhoud draaien op agents.
         </h2>
