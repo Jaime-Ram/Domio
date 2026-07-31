@@ -15,6 +15,12 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Switzer', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['Switzer', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        body: ['Switzer', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
       /* Domio brand + Interactive tokens */
       colors: {
         /* Domio landing (v2), vaste tokens, los van shadcn theming */
