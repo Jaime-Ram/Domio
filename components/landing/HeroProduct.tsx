@@ -154,7 +154,7 @@ function CentralWindow() {
               return (
                 <div key={m.id} className={`${GRID} px-4 py-2.5 ${k > 0 ? "border-t border-line" : ""}`}>
                   <span className="grid h-4 w-4 place-items-center">
-                    <span className={`h-2 w-2 rounded-full ${dotKleur[m.toon]} ${m.live ? "animate-pulse" : ""}`} />
+                    <span className={`h-2 w-2 rounded-full ${dotKleur[m.toon]} ${"live" in m ? "animate-pulse" : ""}`} />
                   </span>
 
                   <span className="flex min-w-0 items-center gap-2">
