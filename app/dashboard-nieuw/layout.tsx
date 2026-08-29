@@ -73,7 +73,7 @@ export default function DashboardNieuwLayout({ children }: { children: React.Rea
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-paper lg:flex">
           <div className="flex h-16 items-center px-6">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/DomioLogo.png" alt="Domio" className="h-5 w-auto" />
+            <img src="/images/domio-logo.png" alt="Domio" className="h-5 w-auto" />
           </div>
           <nav className="flex-1 space-y-4 overflow-y-auto px-2 py-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
             {navGroups.map((g, gi) => (
