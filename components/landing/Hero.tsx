@@ -1,108 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import HeroProduct from "./HeroProduct";
-import BackgroundPaths from "./BackgroundPaths";
-
-const agentStats = [
-  ["MELDINGEN GETRIEERD", 313278],
-  ["VAKLIEDEN AANGESTUURD", 177518],
-  ["WERKBONNEN GEMAAKT", 93],
-  ["FACTUREN GEMATCHT", 30932],
-  ["SLA'S BEWAAKT", 2421],
-  ["UREN BESPAARD", 906],
-] as const;
-
+/**
+ * Hero overgenomen uit de /site-omgeving (split-image): tekst + e-mail/CTA links,
+ * foto met dashboard-mockup rechts. Zelfstandig nagebouwd in de Domio-brandtokens
+ * (forest/lime), zonder externe UI-afhankelijkheden. Main's <Nav /> blijft erboven.
+ */
 export default function Hero() {
-  const [stats, setStats] = useState<number[]>(agentStats.map(([, n]) => n));
-  const [busy, setBusy] = useState(1345);
-
-  useEffect(() => {
-    const b = setInterval(
-      () =>
-        setStats((s) =>
-          s.map((n) => n + (Math.random() < 0.6 ? Math.ceil(Math.random() * 3) : 0))
-        ),
-      900
-    );
-    const c = setInterval(
-      () => setBusy((v) => Math.max(1280, Math.min(1420, v + Math.round((Math.random() - 0.45) * 6)))),
-      1600
-    );
-    return () => {
-      clearInterval(b);
-      clearInterval(c);
-    };
-  }, []);
-
   return (
-    <section className="relative overflow-hidden bg-paper">
-      {/* animerende lijn-paden (kokonut Background Paths) als onderste laag */}
-      <BackgroundPaths />
+    <section className="relative bg-paper py-16 lg:flex lg:min-h-[44rem] lg:items-center lg:py-24">
+      <div className="mx-auto flex w-full max-w-7xl items-center px-4 md:px-8">
+        <div className="flex flex-col items-start md:max-w-3xl lg:w-1/2 lg:pr-8">
+          {/* Badge */}
+          <a
+            href="#"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-white py-1 pr-3 pl-1 text-sm shadow-sm transition hover:bg-panel"
+          >
+            <span className="rounded-full bg-forest px-2 py-0.5 text-xs font-semibold text-white">Nieuw</span>
+            <span className="font-medium text-ink">Agents voor je onderhoud</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-grey">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
 
-      {/* dotted side grids */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[6%] dotgrid opacity-70 lg:block" />
-
-      <div className="relative z-10 mx-auto max-w-[1440px] px-6 lg:px-16">
-        <div className="pt-16 lg:pt-24">
-          <div className="flex flex-wrap items-center gap-2 text-[12px] font-medium uppercase tracking-wide text-grey">
-            Agents bezig met vastgoedbeheer:
-            <span className="rounded bg-panel px-2 py-1 font-mono text-ink tabular-nums">
-              {busy.toLocaleString("nl-NL")}
-            </span>
-          </div>
-
-          <h1 className="display mt-6 max-w-[1050px] text-[clamp(2.5rem,5vw,4rem)] text-ink">
-            Onderhoud dat zichzelf regelt.
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-ink sm:text-5xl lg:text-6xl">
+            Al je onderhoud geregeld onder een dak
           </h1>
-
-          <p className="mt-5 max-w-3xl text-[clamp(1.05rem,1.5vw,1.25rem)] leading-snug text-grey">
-            Van melding tot factuur, geregeld door agents. Jij houdt de regie.
+          <p className="mt-5 max-w-lg text-lg text-grey md:text-xl">
+            Beheer meldingen, huurders, compliance en financiën vanuit een platform. Domio-agents pakken het onderhoud van begin tot eind voor je op.
           </p>
 
-          {/* email capture */}
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="mt-8 flex max-w-md items-center gap-2 rounded-xl border border-line bg-panel p-2"
-          >
+          <form onSubmit={(e) => e.preventDefault()} className="mt-8 flex w-full max-w-lg flex-col gap-3 md:mt-10 md:flex-row md:items-center">
             <input
               type="email"
-              placeholder="Je zakelijke e-mailadres"
-              className="min-w-0 flex-1 bg-transparent px-3 text-[15px] text-ink outline-none placeholder:text-grey-2"
+              required
+              placeholder="Vul je e-mailadres in"
+              className="h-12 w-full rounded-xl border border-line bg-white px-4 text-ink outline-none transition placeholder:text-grey/70 focus:border-forest focus:ring-2 focus:ring-forest/20"
             />
             <button
               type="submit"
-              className="shrink-0 rounded-lg bg-lime px-4 py-2.5 text-[15px] font-medium text-ink transition-colors hover:bg-lime-2"
+              className="h-12 shrink-0 rounded-xl bg-lime px-6 font-semibold text-forest transition hover:brightness-95"
             >
-              Gratis starten
+              Aan de slag
             </button>
           </form>
-        </div>
-
-        {/* Product in actie: melding door de onderhoudsloop */}
-        <div className="mt-12 mb-6">
-          <HeroProduct />
+          <p className="mt-3 text-sm text-grey">Wij gaan zorgvuldig met je gegevens om.</p>
         </div>
       </div>
 
-      {/* Agents at work bar */}
-      <div className="relative z-10 border-y border-line bg-paper">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-6 overflow-x-auto px-6 py-3 lg:px-16">
-          <span className="flex shrink-0 items-center gap-2 text-[12px] font-medium uppercase tracking-wide text-ink">
-            Vandaag automatisch geregeld:
-          </span>
-          {agentStats.map(([label], i) => (
-            <span
-              key={label}
-              className="flex shrink-0 items-center gap-2 text-[12px] uppercase tracking-wide text-grey-2"
-            >
-              {label}:
-              <span className="rounded bg-panel px-1.5 py-0.5 font-mono text-[12px] tabular-nums text-ink">
-                {stats[i].toLocaleString("en-US")}
-              </span>
-            </span>
-          ))}
+      {/* Rechterkant: foto + dashboard-mockup */}
+      <div className="relative mt-16 w-full px-4 md:px-8 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-full lg:w-1/2 lg:overflow-hidden lg:px-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="absolute inset-0 size-full object-cover" src="/images/hero/hero-bg.webp" alt="" />
+        <div className="relative mx-auto w-full max-w-xl lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[32rem] lg:max-w-none">
+          <div className="w-full max-w-5xl rounded-2xl bg-white p-1 shadow-2xl ring-1 ring-line lg:absolute lg:-top-24 lg:left-16 lg:w-max">
+            <div className="overflow-hidden rounded-xl ring-1 ring-line">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                alt="Domio dashboard"
+                src="https://www.untitledui.com/marketing/screen-mockups/dashboard-desktop-mockup-light-01.webp"
+                className="object-cover object-left-top"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>
