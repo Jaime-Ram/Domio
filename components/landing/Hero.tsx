@@ -22,7 +22,7 @@ export default function Hero() {
             </svg>
           </a>
 
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-ink sm:text-5xl lg:text-6xl">
+          <h1 className="display mt-5 text-[clamp(2.5rem,5vw,4.25rem)] text-ink">
             Al je onderhoud geregeld onder een dak
           </h1>
           <p className="mt-5 max-w-lg text-lg text-grey md:text-xl">
@@ -38,7 +38,7 @@ export default function Hero() {
             />
             <button
               type="submit"
-              className="h-12 shrink-0 rounded-xl bg-lime px-6 font-semibold text-forest transition hover:brightness-95"
+              className="h-12 shrink-0 rounded-xl bg-lime px-6 font-medium text-forest transition hover:bg-lime-2"
             >
               Aan de slag
             </button>
