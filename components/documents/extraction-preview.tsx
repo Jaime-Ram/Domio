@@ -97,7 +97,7 @@ export function ExtractionPreview({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#161f13] mb-4" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1d3014] mb-4" />
         <p className="text-[#55554e] dark:text-[#97978f]">Document wordt gescand...</p>
       </div>
     )
@@ -247,7 +247,7 @@ export function ExtractionPreview({
         </Button>
         <Button
           onClick={() => onConfirm(editedData)}
-          className="flex-1 bg-[#161f13] hover:bg-[#356258]"
+          className="flex-1 bg-[#1d3014] hover:bg-[#356258]"
         >
           Gegevens opslaan
         </Button>

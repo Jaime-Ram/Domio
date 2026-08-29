@@ -32,18 +32,18 @@ export default async function BlogArticlePage({ params }: PageProps) {
         <div className="border-b border-gray-100 bg-gray-50/30 py-8 md:py-10">
           <div className="container mx-auto max-w-4xl px-4 md:px-8">
             <nav className="flex items-center gap-2 text-sm text-gray-500">
-              <Link href="/" className="hover:text-[#163300]">Home</Link>
+              <Link href="/" className="hover:text-[#1d3014]">Home</Link>
               <ChevronRight className="h-4 w-4" />
-              <Link href="/blog" className="hover:text-[#163300]">Kennisbank</Link>
+              <Link href="/blog" className="hover:text-[#1d3014]">Kennisbank</Link>
               <ChevronRight className="h-4 w-4" />
-              <Link href={`/blog/categorie/${article.category}`} className="hover:text-[#163300]">
+              <Link href={`/blog/categorie/${article.category}`} className="hover:text-[#1d3014]">
                 {CATEGORY_LABELS[article.category]}
               </Link>
               <ChevronRight className="h-4 w-4" />
               <span className="text-gray-700 truncate">{article.title}</span>
             </nav>
             <CategoryBadge category={article.category} href className="mt-4" />
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#163300] sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#1d3014] sm:text-4xl">
               {article.title}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-500">
@@ -68,11 +68,11 @@ export default async function BlogArticlePage({ params }: PageProps) {
               )}
 
               {/* CTA */}
-              <div className="mt-12 rounded-2xl border border-[#163300]/20 bg-[#163300]/5 p-6 md:p-8">
+              <div className="mt-12 rounded-2xl border border-[#1d3014]/20 bg-[#1d3014]/5 p-6 md:p-8">
                 <p className="text-base text-gray-700">
                   Domio helpt je bij {CATEGORY_LABELS[article.category].toLowerCase()}. Probeer 30 dagen gratis.
                 </p>
-                <Button asChild className="mt-4 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0">
+                <Button asChild className="mt-4 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 border-0">
                   <Link href="/registreren" className="inline-flex items-center gap-2">
                     Start proefperiode
                     <ArrowRight className="h-4 w-4" />
@@ -83,7 +83,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
               {/* Gerelateerde artikelen */}
               {related.length > 0 && (
                 <div className="mt-14">
-                  <h2 className="text-xl font-semibold text-[#163300]">Gerelateerde artikelen</h2>
+                  <h2 className="text-xl font-semibold text-[#1d3014]">Gerelateerde artikelen</h2>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     {related.map((a) => (
                       <ArticleCard key={a.slug} article={a} />

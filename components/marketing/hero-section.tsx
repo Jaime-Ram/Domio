@@ -94,7 +94,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             className="text-5xl sm:text-6xl md:text-7xl font-light text-white leading-[1.05] tracking-tight max-w-3xl"
           >
             Een nieuwe standaard<br />
-            voor <span className="font-semibold text-[#9FE870]">vastgoedbeheer.</span>
+            voor <span className="font-semibold text-[#c8e957]">vastgoedbeheer.</span>
           </motion.h1>
 
           <motion.div
@@ -106,7 +106,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
             <button
               type="button"
               onClick={onSignupClick}
-              className="rounded-full bg-white text-[#163300] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
+              className="rounded-full bg-white text-[#1d3014] px-8 py-3.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-lg"
             >
               Start direct
             </button>

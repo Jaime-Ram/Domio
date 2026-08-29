@@ -97,8 +97,8 @@ export default function MjopPage() {
       <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-10">
             {/* Intro / coming soon block */}
-            <div className="rounded-2xl bg-[#161f13] px-8 py-8 relative overflow-hidden">
-              <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#94f477" opacity={0.15} layers={2} />
+            <div className="rounded-2xl bg-[#1d3014] px-8 py-8 relative overflow-hidden">
+              <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#c8e957" opacity={0.15} layers={2} />
               <div className="relative z-10 flex flex-col gap-3 max-w-xl">
                 <h2 className="text-[26px] font-bold text-white leading-tight">
                   Meerjarenonderhoudsplan
@@ -109,7 +109,7 @@ export default function MjopPage() {
                 <div className="mt-1 flex items-center gap-3">
                   <Button
                     disabled
-                    className="rounded-full bg-[#94f477] text-[#161f13] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#94f477]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-full bg-[#c8e957] text-[#1d3014] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#c8e957]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Sparkles className="h-4 w-4" />
                     MJOP automatisch genereren
@@ -133,8 +133,8 @@ export default function MjopPage() {
                 </div>
               ) : properties.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="h-16 w-16 rounded-2xl bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center mb-5">
-                    <CalendarRange className="h-8 w-8 text-[#161f13] dark:text-[#94f477]" />
+                  <div className="h-16 w-16 rounded-2xl bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center mb-5">
+                    <CalendarRange className="h-8 w-8 text-[#1d3014] dark:text-[#c8e957]" />
                   </div>
                   <h3 className="text-lg font-semibold text-[#1a1c18] dark:text-white mb-2">Geen panden gevonden</h3>
                   <p className="text-sm text-[#97978f] dark:text-neutral-400 max-w-sm">
@@ -171,7 +171,7 @@ export default function MjopPage() {
       >
         {selectedProperty?.build_year && (
           <div className="flex items-center gap-2 rounded-xl bg-[#f4f4f1] dark:bg-neutral-800 px-3 py-2.5 text-sm text-[#55554e] dark:text-neutral-300">
-            <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] shrink-0" />
+            <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
             Bouwjaar <span className="font-semibold">{selectedProperty.build_year}</span> overgenomen uit portefeuille
           </div>
         )}
@@ -211,7 +211,7 @@ function BuildingCard({ building, onOpen }: { building: MjopBuilding; onOpen: ()
     >
       <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Building2 className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
+          <Building2 className="h-[22px] w-[22px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
         </div>
         <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
           <CheckCircle2 className="h-3 w-3 shrink-0" />
@@ -232,7 +232,7 @@ function BuildingCard({ building, onOpen }: { building: MjopBuilding; onOpen: ()
           <CalendarRange className="h-3 w-3 shrink-0" />
           {building.bouwjaar ? `Bouwjaar ${building.bouwjaar}` : 'Bouwjaar onbekend'}
         </span>
-        <span className="flex items-center gap-0.5 text-[#161f13] dark:text-[#94f477] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="flex items-center gap-0.5 text-[#1d3014] dark:text-[#c8e957] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
           Bekijk
           <ChevronRight className="h-3.5 w-3.5" />
         </span>
@@ -260,7 +260,7 @@ function PropertyCard({
     <>
       <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Building2 className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
+          <Building2 className="h-[22px] w-[22px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
         </div>
         {hasActive ? (
           <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -268,7 +268,7 @@ function PropertyCard({
             Actief
           </span>
         ) : (
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-[#161f13] dark:text-[#94f477] bg-[#161f13]/8 dark:bg-[#94f477]/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-[#1d3014] dark:text-[#c8e957] bg-[#1d3014]/8 dark:bg-[#c8e957]/10 px-2 py-0.5 rounded-full whitespace-nowrap">
             <Plus className="h-3 w-3 shrink-0" />
             Initialiseren
           </span>

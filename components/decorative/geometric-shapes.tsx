@@ -13,7 +13,7 @@ interface GeometricShapesProps {
 export function GeometricShapes({ 
   variant = 'rhombus', 
   className,
-  color = '#163300',
+  color = '#1d3014',
   opacity = 0.1,
   layers = 1
 }: GeometricShapesProps) {

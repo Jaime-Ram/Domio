@@ -210,7 +210,7 @@ export default function CompliancePage() {
                             'h-5 w-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-colors',
                             done ? 'bg-[#15803D] border-[#15803D] dark:bg-[#4ADE80] dark:border-[#4ADE80]' : 'border-gray-300 dark:border-neutral-600',
                           )}>
-                            {done && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
+                            {done && <Check className="h-3 w-3 text-white dark:text-[#1d3014]" />}
                           </span>
                           <span className={cn('text-[13px] leading-snug', done ? 'text-[#97978f] dark:text-[#97978f] line-through' : 'text-[#55554e] dark:text-gray-300')}>
                             {item.label}

@@ -261,7 +261,7 @@ function AgentCard() {
 function ConnectLines() {
   const paths = ["M12 60 C 28 54, 34 40, 44 34", "M88 30 C 74 26, 66 30, 58 34", "M16 40 C 30 42, 40 46, 50 50"];
   return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full text-[#163300]" viewBox="0 0 100 76" preserveAspectRatio="none" fill="none" aria-hidden>
+    <svg className="pointer-events-none absolute inset-0 h-full w-full text-[#1d3014]" viewBox="0 0 100 76" preserveAspectRatio="none" fill="none" aria-hidden>
       {paths.map((d, k) => (
         <motion.path key={k} d={d} stroke="currentColor" strokeWidth="0.28" strokeLinecap="round" strokeOpacity={0.16} vectorEffect="non-scaling-stroke"
           initial={{ pathLength: 0.6, opacity: 0.4 }} animate={{ pathLength: 1, opacity: [0.25, 0.5, 0.25] }} transition={{ duration: 9 + k * 2, repeat: Infinity, ease: "easeInOut" }} />

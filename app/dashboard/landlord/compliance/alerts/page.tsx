@@ -42,7 +42,7 @@ export default function ComplianceAlertsPage() {
       {/* Alert list */}
       <Card className={dashboardCardClass()}>
         <CardHeader className="pb-4">
-          <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Actieve alerts</CardTitle>
+          <CardTitle className="text-base text-[#1d3014] dark:text-[#c8e957]">Actieve alerts</CardTitle>
         </CardHeader>
         <CardContent className="p-0 pb-2">
           {alerts.length === 0 ? (
@@ -75,14 +75,14 @@ export default function ComplianceAlertsPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-[#97978f] dark:text-[#97978f]">{alert.address} — {alert.description}</p>
-                    <div className="flex items-center gap-1.5 mt-2 text-xs text-[#161f13] dark:text-[#94f477] font-medium">
+                    <div className="flex items-center gap-1.5 mt-2 text-xs text-[#1d3014] dark:text-[#c8e957] font-medium">
                       <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                       {alert.actie}
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 shrink-0">
-                    <Button size="sm" className="rounded-full h-8 px-3 text-xs bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]">
+                    <Button size="sm" className="rounded-full h-8 px-3 text-xs bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014]">
                       Oplossen
                     </Button>
                     <Button size="sm" variant="ghost" className="rounded-full h-8 px-3 text-xs text-[#97978f] hover:text-[#55554e]"

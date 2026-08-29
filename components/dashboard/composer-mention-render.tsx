@@ -31,7 +31,7 @@ export function renderMessageWithDocumentMentions(text: string, attachments: Com
 
     if (matchIndex > cursor) out.push(text.slice(cursor, matchIndex))
     out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#161f13] dark:text-[#94f477]">
+      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#1d3014] dark:text-[#c8e957]">
         {matchToken}
       </span>
     )
@@ -78,7 +78,7 @@ export function renderComposerWithDocumentMentions(text: string, attachments: Co
       )
     }
     out.push(
-      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#161f13] dark:text-[#94f477]">
+      <span key={`${matchToken}-${matchIndex}`} className="font-semibold text-[#1d3014] dark:text-[#c8e957]">
         {matchToken}
       </span>
     )

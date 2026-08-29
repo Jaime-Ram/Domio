@@ -92,7 +92,7 @@ export function ActivityTimeline({ events, className }: ActivityTimelineProps) {
                 <div className={cn(
                   'h-10 w-10 shrink-0 rounded-full flex items-center justify-center z-10 transition-colors',
                   'bg-gray-100 dark:bg-neutral-800',
-                  hasExpand && 'group-hover:bg-[#161f13] dark:group-hover:bg-[#161f13]',
+                  hasExpand && 'group-hover:bg-[#1d3014] dark:group-hover:bg-[#1d3014]',
                 )}>
                   <Icon className={cn(
                     'h-4 w-4 text-gray-500 dark:text-gray-400 transition-colors',
@@ -138,7 +138,7 @@ export function ActivityTimeline({ events, className }: ActivityTimelineProps) {
                           <dd className={cn(
                             'text-sm font-semibold',
                             m.highlight
-                              ? 'text-[#161f13] dark:text-[#94f477]'
+                              ? 'text-[#1d3014] dark:text-[#c8e957]'
                               : 'text-gray-800 dark:text-gray-200',
                           )}>
                             {m.value}
@@ -171,7 +171,7 @@ export function ActivityTimeline({ events, className }: ActivityTimelineProps) {
                     <Link
                       href={event.href}
                       onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#161f13] dark:text-[#94f477] hover:underline underline-offset-2"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline underline-offset-2"
                     >
                       {event.hrefLabel ?? 'Bekijken'}
                       <ArrowRight className="h-3.5 w-3.5" />

@@ -197,7 +197,7 @@ export function DocumentPreviewPanel({
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="h-10 w-10 rounded-full bg-white dark:bg-neutral-700 text-[#161f13] dark:text-white hover:bg-[#f4f4f1] dark:hover:bg-neutral-600 shadow-sm border border-[#e3e3de]/70 dark:border-neutral-600"
+          className="h-10 w-10 rounded-full bg-white dark:bg-neutral-700 text-[#1d3014] dark:text-white hover:bg-[#f4f4f1] dark:hover:bg-neutral-600 shadow-sm border border-[#e3e3de]/70 dark:border-neutral-600"
           aria-label="Terug"
         >
           <ChevronLeft className="h-5 w-5" />

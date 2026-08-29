@@ -50,7 +50,7 @@ export function ArticleCard({
         href={href}
         className={cn(
           'group block overflow-hidden bg-white dark:bg-neutral-900',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-2',
           className
         )}
       >
@@ -64,18 +64,18 @@ export function ArticleCard({
           />
         </div>
         <div className="px-0 py-6 sm:py-8">
-          <span className="text-xs font-normal text-[#163300] dark:text-[#9FE870] underline underline-offset-2 group-hover:text-[#0d1f00] dark:group-hover:text-[#9FE870] transition-colors">
+          <span className="text-xs font-normal text-[#1d3014] dark:text-[#c8e957] underline underline-offset-2 group-hover:text-[#0d1f00] dark:group-hover:text-[#c8e957] transition-colors">
             {CATEGORY_LABELS[article.category]}
           </span>
-          <h2 className="mt-2 text-xl font-bold text-gray-900 dark:text-white group-hover:underline group-hover:text-[#163300] dark:group-hover:text-[#9FE870] transition-colors sm:text-2xl">
+          <h2 className="mt-2 text-xl font-bold text-gray-900 dark:text-white group-hover:underline group-hover:text-[#1d3014] dark:group-hover:text-[#c8e957] transition-colors sm:text-2xl">
             {article.title}
           </h2>
           <p className="mt-2 text-base font-normal text-gray-600 dark:text-gray-400 line-clamp-2">
             {article.summary}
           </p>
           <div className="mt-5 flex items-center gap-3 pt-4">
-            <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] flex items-center justify-center">
-              <span className="text-[#9FE870] text-sm font-bold">D</span>
+            <div className="h-10 w-10 shrink-0 rounded-full bg-[#1d3014] flex items-center justify-center">
+              <span className="text-[#c8e957] text-sm font-bold">D</span>
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-gray-900 dark:text-white">Domio</p>
@@ -94,7 +94,7 @@ export function ArticleCard({
       href={href}
       className={cn(
         'group flex flex-col overflow-hidden bg-white dark:bg-neutral-900',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-2',
         className
       )}
     >
@@ -108,18 +108,18 @@ export function ArticleCard({
         />
       </div>
       <div className="flex flex-1 flex-col px-0 py-5 sm:py-6">
-        <span className="text-xs font-normal text-[#163300] dark:text-[#9FE870] underline underline-offset-2 group-hover:text-[#0d1f00] dark:group-hover:text-[#9FE870] transition-colors">
+        <span className="text-xs font-normal text-[#1d3014] dark:text-[#c8e957] underline underline-offset-2 group-hover:text-[#0d1f00] dark:group-hover:text-[#c8e957] transition-colors">
           {CATEGORY_LABELS[article.category]}
         </span>
-        <h3 className="mt-2 text-base font-bold leading-snug text-gray-900 dark:text-white group-hover:underline group-hover:text-[#163300] dark:group-hover:text-[#9FE870] transition-colors sm:text-lg">
+        <h3 className="mt-2 text-base font-bold leading-snug text-gray-900 dark:text-white group-hover:underline group-hover:text-[#1d3014] dark:group-hover:text-[#c8e957] transition-colors sm:text-lg">
           {article.title}
         </h3>
         <p className="mt-2 flex-1 text-sm font-normal leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-3">
           {article.summary}
         </p>
         <div className="mt-5 flex items-center gap-3 pt-4">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] flex items-center justify-center">
-            <span className="text-[#9FE870] text-sm font-bold">D</span>
+          <div className="h-10 w-10 shrink-0 rounded-full bg-[#1d3014] flex items-center justify-center">
+            <span className="text-[#c8e957] text-sm font-bold">D</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-gray-900 dark:text-white">Domio</p>

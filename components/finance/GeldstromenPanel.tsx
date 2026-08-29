@@ -767,7 +767,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               <button
                 type="button"
                 onClick={() => { setIsEditing(true); resetAssignState(selectedTx) }}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#161f13] dark:text-[#94f477] hover:opacity-80 transition-opacity"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1d3014] dark:text-[#c8e957] hover:opacity-80 transition-opacity"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Toewijzing wijzigen
@@ -784,7 +784,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                   type="button"
                   onClick={handleAssign}
                   disabled={submitting || !canSave}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
                 >
                   {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   Opslaan
@@ -854,10 +854,10 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                 if (e.key === 'Enter') { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }
                                 if (e.key === 'Escape') setCatEditId(null)
                               }}
-                              className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                              className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                             />
                             <button type="button" onClick={async () => { await renameCategory(cat.id, catEditLabel); setCatEditId(null) }}
-                              className="h-7 px-2 rounded-md bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0">
+                              className="h-7 px-2 rounded-md bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0">
                               Ok
                             </button>
                             <button type="button" onClick={() => setCatEditId(null)}
@@ -879,13 +879,13 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               className={cn(
                                 'flex-1 flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
                                 isSelected
-                                  ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold'
+                                  ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold'
                                   : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
                               <Icon className="h-4 w-4 shrink-0 text-[#97978f]" />
                               <span className="flex-1">{cat.label}</span>
-                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#161f13] dark:text-[#94f477]" />}
+                              {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#1d3014] dark:text-[#c8e957]" />}
                             </button>
                             <button type="button"
                               onClick={e => { e.stopPropagation(); setCatEditId(cat.id); setCatEditLabel(cat.label) }}
@@ -916,12 +916,12 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                             if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                           }}
-                          className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                          className="flex-1 min-w-0 h-7 rounded-md border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-2 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                         />
                         <button type="button"
                           disabled={!catAddLabel.trim()}
                           onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                          className="h-7 px-2 rounded-md bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
+                          className="h-7 px-2 rounded-md bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0 disabled:opacity-40">
                           Ok
                         </button>
                         <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
@@ -978,7 +978,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         </span>
                         {!showIbanAssignForm && (
                           <button type="button" onClick={() => setShowIbanAssignForm(true)}
-                            className="text-xs font-medium text-[#161f13] dark:text-[#94f477] underline underline-offset-2"
+                            className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957] underline underline-offset-2"
                           >
                             Koppelen
                           </button>
@@ -998,14 +998,14 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             onClick={() => setSelectedIbanTenantId(tenant.id === selectedIbanTenantId ? null : tenant.id)}
                             className={cn('w-full flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors',
                               selectedIbanTenantId === tenant.id
-                                ? 'border-[#161f13] bg-[#161f13]/5 dark:border-[#94f477] dark:bg-[#94f477]/10'
+                                ? 'border-[#1d3014] bg-[#1d3014]/5 dark:border-[#c8e957] dark:bg-[#c8e957]/10'
                                 : 'border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
                             <User className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
                             <span className="font-medium flex-1 truncate">{tenant.name}</span>
                             <span className="text-xs text-[#97978f] shrink-0">{tenant.propertyName}</span>
-                            {selectedIbanTenantId === tenant.id && <Check className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477] shrink-0" />}
+                            {selectedIbanTenantId === tenant.id && <Check className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />}
                           </button>
                         ))}
                       </div>
@@ -1019,7 +1019,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                       </button>
                       <button type="button" onClick={handleSaveIban}
                         disabled={!selectedIbanTenantId || savingIban}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-40"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-40"
                       >
                         {savingIban && <Loader2 className="h-3 w-3 animate-spin" />}
                         Opslaan
@@ -1097,7 +1097,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                   )}
                   <div className="flex items-center gap-1">
                     {([1, 2, 3] as const).map(s => (
-                      <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', assignStep === s ? 'w-6' : 'w-2 opacity-30')} />
+                      <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#1d3014] dark:bg-[#c8e957]', assignStep === s ? 'w-6' : 'w-2 opacity-30')} />
                     ))}
                   </div>
                   <span className="text-xs text-[#97978f]">Stap {assignStep} van 3</span>
@@ -1121,7 +1121,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               }}
                               className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
                                 isSel
-                                  ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                  ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                                   : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                               )}
                             >
@@ -1152,11 +1152,11 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
                               if (e.key === 'Escape') setCatEditId(null)
                             }}
-                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                           />
                           <button type="button" disabled={!catEditLabel.trim()}
                             onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
-                            className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                            className="h-8 px-3 rounded-lg bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
                           <button type="button" onClick={() => setCatEditId(null)}
                             className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                             <XIcon className="h-3.5 w-3.5" />
@@ -1175,12 +1175,12 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                               if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                               if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                             }}
-                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                            className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                           />
                           <button type="button"
                             disabled={!catAddLabel.trim()}
                             onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                            className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
+                            className="h-8 px-3 rounded-lg bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0 disabled:opacity-40">
                             Ok
                           </button>
                           <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
@@ -1220,7 +1220,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                           className={cn(
                             'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
                             assignLevel === key
-                              ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                              ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                               : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
                           )}
                         >
@@ -1242,7 +1242,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                       className={cn(
                         'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
                         assignLevel === 'geen'
-                          ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                          ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                           : 'border-[#e3e3de] dark:border-neutral-700 text-[#97978f] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 hover:text-[#55554e] dark:hover:text-gray-300'
                       )}
                     >
@@ -1267,7 +1267,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                           className={cn(
                             'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                             selectedCategoryProperty
-                              ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                              ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                               : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                           )}
                         >
@@ -1285,7 +1285,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                   onClick={() => { setSelectedCategoryProperty(p.id); setSelectedUnit(null); setPropPickerOpen(false) }}
                                   className={cn(
                                     'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
                                   <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1307,7 +1307,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             className={cn(
                               'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                               selectedUnit
-                                ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                                 : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
@@ -1327,7 +1327,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                     onClick={() => { setSelectedUnit(isSel ? null : u.id); setUnitPickerOpen(false) }}
                                     className={cn(
                                       'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                      isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                      isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                     )}
                                   >
                                     <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1350,7 +1350,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             className={cn(
                               'relative z-20 w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                               selectedAllocationKey
-                                ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                                ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                                 : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                             )}
                           >
@@ -1367,7 +1367,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                                     onClick={() => { setSelectedAllocationKey(isSel ? null : k.id); setAllocKeyPickerOpen(false) }}
                                     className={cn(
                                       'w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                      isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                      isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                     )}
                                   >
                                     <span className="flex-1">{k.name}</span>
@@ -1441,7 +1441,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
             )}
             <div className="flex items-center gap-1">
               {([1, 2, 3, 4] as const).map(s => (
-                <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', payStep === s ? 'w-6' : 'w-2 opacity-30')} />
+                <span key={s} className={cn('h-1.5 rounded-full transition-all bg-[#1d3014] dark:bg-[#c8e957]', payStep === s ? 'w-6' : 'w-2 opacity-30')} />
               ))}
             </div>
             <span className="text-xs text-[#97978f]">Stap {payStep} van 4</span>
@@ -1498,7 +1498,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         onClick={() => { setPayCategory(cat.id); setPayStep(3) }}
                         className={cn('w-full flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3 transition-colors',
                           isSel
-                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                             : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                         )}
                       >
@@ -1529,11 +1529,11 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         if (e.key === 'Enter' && catEditLabel.trim()) { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }
                         if (e.key === 'Escape') setCatEditId(null)
                       }}
-                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                     />
                     <button type="button" disabled={!catEditLabel.trim()}
                       onClick={async () => { await renameCategory(catEditId, catEditLabel); setCatEditId(null) }}
-                      className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
+                      className="h-8 px-3 rounded-lg bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0 disabled:opacity-40">Ok</button>
                     <button type="button" onClick={() => setCatEditId(null)}
                       className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e3e3de] dark:border-neutral-700 text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800">
                       <XIcon className="h-3.5 w-3.5" />
@@ -1552,12 +1552,12 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         if (e.key === 'Enter' && catAddLabel.trim()) { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }
                         if (e.key === 'Escape') { setCatAddOpen(false); setCatAddLabel('') }
                       }}
-                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#161f13] dark:focus:ring-[#94f477]"
+                      className="flex-1 h-8 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-[#f4f4f1] dark:bg-neutral-800 px-3 text-sm placeholder:text-[#97978f] focus:outline-none focus:ring-1 focus:ring-[#1d3014] dark:focus:ring-[#c8e957]"
                     />
                     <button type="button"
                       disabled={!catAddLabel.trim()}
                       onClick={async () => { await addCategory(catAddLabel); setCatAddLabel(''); setCatAddOpen(false) }}
-                      className="h-8 px-3 rounded-lg bg-[#94f477] text-[#161f13] text-xs font-semibold shrink-0 disabled:opacity-40">
+                      className="h-8 px-3 rounded-lg bg-[#c8e957] text-[#1d3014] text-xs font-semibold shrink-0 disabled:opacity-40">
                       Ok
                     </button>
                     <button type="button" onClick={() => { setCatAddOpen(false); setCatAddLabel('') }}
@@ -1590,7 +1590,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left transition-colors',
                       payLevel === key
-                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                         : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-gray-300 hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
@@ -1606,7 +1606,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 className={cn(
                   'w-full flex items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium transition-colors',
                   payLevel === 'geen'
-                    ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                    ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                     : 'border-[#e3e3de] dark:border-neutral-700 text-[#97978f] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 hover:text-[#55554e] dark:hover:text-gray-300'
                 )}
               >
@@ -1632,7 +1632,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 className={cn(
                   'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                   payPropertyId
-                    ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                    ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                     : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                 )}
               >
@@ -1652,7 +1652,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                         <button key={p.id} type="button"
                           onClick={() => { setPayPropertyId(p.id); setPayUnitId(null); setPayAllocationKeyId(null); setPayPropOpen(false) }}
                           className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                            isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                            isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                           )}
                         >
                           <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1678,7 +1678,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                       payUnitId
-                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                         : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
@@ -1700,7 +1700,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             <button key={u.id} type="button"
                               onClick={() => { setPayUnitId(isSel ? null : u.id); setPayUnitOpen(false) }}
                               className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
                               <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1728,7 +1728,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                     className={cn(
                       'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                       payAllocationKeyId
-                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                         : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                     )}
                   >
@@ -1747,7 +1747,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                             <button key={k.id} type="button"
                               onClick={() => { setPayAllocationKeyId(isSel ? null : k.id); setPayAllocOpen(false) }}
                               className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                               )}
                             >
                               <span className="flex-1">{k.name}</span>
@@ -1786,7 +1786,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
               type="button"
               disabled={!payDate || !payAmount.trim()}
               onClick={() => setPayStep(2)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
             >
               Volgende →
             </button>
@@ -1802,7 +1802,7 @@ const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
                 type="button"
                 onClick={handleSaveManualPayment}
                 disabled={savingPayment || !payCanSave}
-                className="inline-flex items-center gap-2 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 {savingPayment && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Opslaan

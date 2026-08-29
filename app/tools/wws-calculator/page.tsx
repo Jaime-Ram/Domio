@@ -90,7 +90,7 @@ export default function WWSCalculatorPage() {
           </Link>
           <Link
             href="/"
-            className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#163300] flex items-center gap-1"
+            className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1d3014] flex items-center gap-1"
           >
             <Home className="h-4 w-4" />
             Terug
@@ -100,7 +100,7 @@ export default function WWSCalculatorPage() {
 
       <main className="container mx-auto max-w-4xl px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#163300] dark:text-[#9FE870]">
+          <h1 className="text-3xl font-bold text-[#1d3014] dark:text-[#c8e957]">
             WWS Puntentelling Calculator
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -116,7 +116,7 @@ export default function WWSCalculatorPage() {
               key={s}
               className={cn(
                 'h-2 flex-1 rounded-full transition-colors',
-                s <= step ? 'bg-[#163300]' : 'bg-gray-200 dark:bg-neutral-700'
+                s <= step ? 'bg-[#1d3014]' : 'bg-gray-200 dark:bg-neutral-700'
               )}
             />
           ))}
@@ -175,7 +175,7 @@ export default function WWSCalculatorPage() {
                   onChange={(e) => update({ bouwjaar: Number(e.target.value) || 0 })}
                 />
               </div>
-              <Button onClick={() => setStep(2)} className="w-full mt-4 bg-[#163300] hover:bg-[#163300]/90">
+              <Button onClick={() => setStep(2)} className="w-full mt-4 bg-[#1d3014] hover:bg-[#1d3014]/90">
                 Volgende
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -232,7 +232,7 @@ export default function WWSCalculatorPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Terug
                 </Button>
-                <Button onClick={() => setStep(3)} className="flex-1 bg-[#163300] hover:bg-[#163300]/90">
+                <Button onClick={() => setStep(3)} className="flex-1 bg-[#1d3014] hover:bg-[#1d3014]/90">
                   Volgende
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -298,7 +298,7 @@ export default function WWSCalculatorPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Terug
                 </Button>
-                <Button onClick={() => setStep(4)} className="flex-1 bg-[#163300] hover:bg-[#163300]/90">
+                <Button onClick={() => setStep(4)} className="flex-1 bg-[#1d3014] hover:bg-[#1d3014]/90">
                   Volgende
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -350,7 +350,7 @@ export default function WWSCalculatorPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Terug
                 </Button>
-                <Button onClick={() => setStep(5)} className="flex-1 bg-[#163300] hover:bg-[#163300]/90">
+                <Button onClick={() => setStep(5)} className="flex-1 bg-[#1d3014] hover:bg-[#1d3014]/90">
                   Bereken
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -420,7 +420,7 @@ export default function WWSCalculatorPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border shadow-lg bg-[#163300]/5 dark:bg-[#163300]/10 border-[#163300]/20">
+            <Card className="rounded-2xl border shadow-lg bg-[#1d3014]/5 dark:bg-[#1d3014]/10 border-[#1d3014]/20">
               <CardContent className="pt-6">
                 <h3 className="font-semibold text-lg mb-2">Optimalisatie suggesties</h3>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
@@ -449,13 +449,13 @@ export default function WWSCalculatorPage() {
             </div>
 
             {/* CTA banner */}
-            <Card className="rounded-2xl border-2 border-[#163300] bg-[#163300]/5">
+            <Card className="rounded-2xl border-2 border-[#1d3014] bg-[#1d3014]/5">
               <CardContent className="pt-6">
                 <h3 className="font-semibold text-xl mb-2">🏠 Beheer je hele portefeuille met Domio</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Automatische puntentellingen, compliance alerts, en PDF-generatie voor al je woningen.
                 </p>
-                <Button asChild className="bg-[#163300] hover:bg-[#163300]/90">
+                <Button asChild className="bg-[#1d3014] hover:bg-[#1d3014]/90">
                   <Link href="/registreren">Start 30 dagen gratis</Link>
                 </Button>
               </CardContent>

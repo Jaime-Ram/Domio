@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
     <AuthPageShell>
           {!submitted && (
             <>
-              <h1 className="text-4xl font-bold text-[#163300]">
+              <h1 className="text-4xl font-bold text-[#1d3014]">
                 Wachtwoord vergeten
               </h1>
               <p className="mt-2 text-sm text-gray-600">
@@ -125,7 +125,7 @@ export default function ForgotPasswordPage() {
                   placeholder="naam@voorbeeld.nl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]"
+                  className="h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#1d3014] focus-visible:border-[#1d3014]"
                   required
                 />
               </div>
@@ -133,13 +133,13 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+                className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
               >
                 {loading ? 'Bezig met versturen...' : 'Reset link versturen'}
               </Button>
 
               <div className="text-center">
-                <Link href="/login" className="text-sm font-medium text-[#163300] underline underline-offset-2 hover:no-underline">
+                <Link href="/login" className="text-sm font-medium text-[#1d3014] underline underline-offset-2 hover:no-underline">
                   ← Terug naar inloggen
                 </Link>
               </div>

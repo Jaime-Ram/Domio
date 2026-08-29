@@ -354,9 +354,9 @@ export function TransactionsInbox({
       return <ChevronsUpDown className="h-3 w-3 text-[#97978f]" />
     }
     if (sort.direction === 'asc') {
-      return <ChevronUp className="h-3 w-3 text-[#161f13] dark:text-[#94f477]" />
+      return <ChevronUp className="h-3 w-3 text-[#1d3014] dark:text-[#c8e957]" />
     }
-    return <ChevronDown className="h-3 w-3 text-[#161f13] dark:text-[#94f477]" />
+    return <ChevronDown className="h-3 w-3 text-[#1d3014] dark:text-[#c8e957]" />
   }
 
   const sortedTransactions = [...searchFiltered]
@@ -397,18 +397,18 @@ export function TransactionsInbox({
                 className={cn(
                   'inline-flex items-center justify-center gap-0 pb-2 shrink-0 whitespace-nowrap transition-colors duration-200 font-semibold',
                   filter === tab.key
-                    ? 'text-[#161f13] dark:text-[#94f477]'
+                    ? 'text-[#1d3014] dark:text-[#c8e957]'
                     : 'text-[#97978f] dark:text-[#97978f]'
                 )}
               >
                 <span>{tab.label}</span>
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/25 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1d3014]/25 text-[11px] font-medium text-[#1d3014] dark:bg-[#c8e957]/20 dark:text-[#c8e957]">
                   {tab.count}
                 </span>
               </button>
             ))}
             <div
-              className="absolute bottom-0 h-[2px] rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all duration-200"
+              className="absolute bottom-0 h-[2px] rounded-full bg-[#1d3014] dark:bg-[#c8e957] transition-all duration-200"
               style={{ left: indicator.left, width: indicator.width }}
             />
           </div>
@@ -432,7 +432,7 @@ export function TransactionsInbox({
               }}
               disabled={isDemo || !user?.id}
               title={isDemo ? 'Niet beschikbaar in demo' : !user?.id ? 'Niet ingelogd' : undefined}
-              className="shrink-0 h-9 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] font-medium px-4"
+              className="shrink-0 h-9 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] font-medium px-4"
             >
               <Plus className="h-4 w-4 mr-2" />
               Betaling toevoegen
@@ -591,7 +591,7 @@ export function TransactionsInbox({
       >
         <DialogContent className="border border-[#e3e3de] dark:border-neutral-700 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#161f13] dark:text-[#94f477]">Betaling toevoegen</DialogTitle>
+            <DialogTitle className="text-[#1d3014] dark:text-[#c8e957]">Betaling toevoegen</DialogTitle>
             <DialogDescription>
               Handmatige inkomende betaling registreren. Daarna kun je hem koppelen aan een pand of huurder.
             </DialogDescription>
@@ -663,7 +663,7 @@ export function TransactionsInbox({
             </Button>
             <Button
               type="button"
-              className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
+              className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F]"
               onClick={handleAddPayment}
               disabled={addSubmitting}
             >

@@ -476,13 +476,13 @@ export default function MessagesPage() {
                     <div
                       className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                         activeContactId === c.id
-                          ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                          ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                           : 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#1a1c18] dark:text-gray-100'
                       }`}
                     >
                       {c.handle === '@groep' ? <UsersRound className="h-4 w-4" /> : getInitials(c.name)}
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#94f477] border-2 border-white dark:border-neutral-900" />
+                    <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#c8e957] border-2 border-white dark:border-neutral-900" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">
@@ -495,7 +495,7 @@ export default function MessagesPage() {
                   {mutedChatIds.includes(c.id) && (
                     <BellOff className="h-3.5 w-3.5 text-[#97978f] dark:text-[#97978f]" />
                   )}
-                  <ChevronRight className="h-4 w-4 text-[#161f13]" />
+                  <ChevronRight className="h-4 w-4 text-[#1d3014]" />
                 </button>
               ))}
               {filteredContacts.length === 0 && (
@@ -520,7 +520,7 @@ export default function MessagesPage() {
                   <Button
                     type="button"
                     size="icon"
-                    className="h-9 w-9 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]"
+                    className="h-9 w-9 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014]"
                     aria-label="Acties openen"
                   >
                     <Plus className={`h-4 w-4 transition-transform duration-200 ${plusMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
@@ -533,15 +533,15 @@ export default function MessagesPage() {
                   className="rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[230px] p-1.5"
                 >
                   <DropdownMenuItem className="rounded-lg">
-                    <TicketPlus className="h-4 w-4 mr-2 text-[#161f13]" />
+                    <TicketPlus className="h-4 w-4 mr-2 text-[#1d3014]" />
                     Ticket aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuItem className="rounded-lg" onSelect={() => setCreateChatOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2 text-[#161f13]" />
+                    <Plus className="h-4 w-4 mr-2 text-[#1d3014]" />
                     Chat aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuItem className="rounded-lg" onSelect={() => setCreateGroupOpen(true)}>
-                    <UsersRound className="h-4 w-4 mr-2 text-[#161f13]" />
+                    <UsersRound className="h-4 w-4 mr-2 text-[#1d3014]" />
                     Groep aanmaken
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -555,7 +555,7 @@ export default function MessagesPage() {
                         className="rounded-lg"
                         onSelect={() => openOrCreateChatWithPerson(person)}
                       >
-                        <UserPlus className="h-4 w-4 mr-2 text-[#161f13]" />
+                        <UserPlus className="h-4 w-4 mr-2 text-[#1d3014]" />
                         {person.name}
                       </DropdownMenuItem>
                     ))
@@ -573,7 +573,7 @@ export default function MessagesPage() {
         {/* Rechterblok: chat interface */}
         <section
           className={`relative flex-1 h-full flex flex-col min-w-0 min-h-0 rounded-3xl bg-white dark:bg-neutral-900 border border-[#e3e3de] dark:border-neutral-700 shadow-sm overflow-hidden ${
-            dragActive ? 'ring-2 ring-[#94f477] ring-offset-2 ring-offset-white dark:ring-offset-neutral-900' : ''
+            dragActive ? 'ring-2 ring-[#c8e957] ring-offset-2 ring-offset-white dark:ring-offset-neutral-900' : ''
           }`}
           onDragOver={(e) => {
             e.preventDefault()
@@ -607,7 +607,7 @@ export default function MessagesPage() {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="h-9 w-9 rounded-full bg-[#f1f1f1] hover:bg-[#e8e8e8] dark:bg-neutral-800 dark:hover:bg-neutral-700 text-[#161f13] dark:text-[#94f477]"
+                      className="h-9 w-9 rounded-full bg-[#f1f1f1] hover:bg-[#e8e8e8] dark:bg-neutral-800 dark:hover:bg-neutral-700 text-[#1d3014] dark:text-[#c8e957]"
                       aria-label="Chat opties"
                     >
                       <MoreHorizontal className="h-4 w-4" />
@@ -619,13 +619,13 @@ export default function MessagesPage() {
                     className="rounded-2xl border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 min-w-[220px] p-1.5"
                   >
                     <DropdownMenuItem className="rounded-lg" onSelect={toggleMuteActiveChat}>
-                      <BellOff className="h-4 w-4 mr-2 text-[#161f13]" />
+                      <BellOff className="h-4 w-4 mr-2 text-[#1d3014]" />
                       {activeContactId && mutedChatIds.includes(activeContactId)
                         ? 'Notificaties inschakelen'
                         : 'Notificaties dempen'}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="rounded-lg">
-                      <Archive className="h-4 w-4 mr-2 text-[#161f13]" />
+                      <Archive className="h-4 w-4 mr-2 text-[#1d3014]" />
                       Chat archiveren
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -663,7 +663,7 @@ export default function MessagesPage() {
                   <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center">
                     <MessageCircle className="h-5 w-5 text-[#55554e] dark:text-gray-300" />
                   </div>
-                  <p className="text-[#161f13] dark:text-[#94f477] text-base font-semibold mb-1">
+                  <p className="text-[#1d3014] dark:text-[#c8e957] text-base font-semibold mb-1">
                     Start het gesprek met {activeContact.name}
                   </p>
                   <p className="text-sm leading-6 text-[#55554e] dark:text-gray-300">
@@ -678,7 +678,7 @@ export default function MessagesPage() {
                     <div
                       className={`max-w-[78%] rounded-2xl px-3 py-2 border ${
                         m.from === 'me'
-                          ? 'bg-[#161f13] border-[#161f13] text-white'
+                          ? 'bg-[#1d3014] border-[#1d3014] text-white'
                           : 'bg-[#f4f4f4] dark:bg-neutral-800 border-[#e3e3de] dark:border-neutral-700 text-[#1a1c18] dark:text-white'
                       }`}
                     >
@@ -730,7 +730,7 @@ export default function MessagesPage() {
                       {a.previewUrl ? (
                         <img src={a.previewUrl} alt="" className="h-8 w-8 rounded-md object-cover" />
                       ) : (
-                        <FileText className="h-4 w-4 text-[#161f13]" />
+                        <FileText className="h-4 w-4 text-[#1d3014]" />
                       )}
                       <div className="max-w-[170px]">
                         <p className="text-xs font-medium text-[#1a1c18] dark:text-white truncate">{a.name}</p>
@@ -765,7 +765,7 @@ export default function MessagesPage() {
                       }}
                       className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm ${
                         idx === mentionIndex
-                          ? 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#161f13] dark:text-[#94f477]'
+                          ? 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#1d3014] dark:text-[#c8e957]'
                           : 'text-[#55554e] dark:text-gray-200 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800'
                       }`}
                     >
@@ -791,7 +791,7 @@ export default function MessagesPage() {
                   ref={messageInputRef}
                   placeholder=""
                   rows={1}
-                  className="min-h-[40px] max-h-32 w-full resize-none rounded-3xl border-0 bg-transparent text-transparent caret-[#161f13] dark:caret-[#94f477] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="min-h-[40px] max-h-32 w-full resize-none rounded-3xl border-0 bg-transparent text-transparent caret-[#1d3014] dark:caret-[#c8e957] text-sm leading-5 px-4 py-2.5 relative z-10 overflow-y-auto outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={message}
                   disabled={!activeContact}
                   onChange={(e) => {
@@ -835,7 +835,7 @@ export default function MessagesPage() {
               </div>
               <Button
                 size="icon"
-                className="size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13]"
+                className="size-10 min-w-10 min-h-10 p-0 shrink-0 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014]"
                 disabled={!activeContact || (!message.trim() && attachments.length === 0)}
                 onClick={sendMessage}
               >
@@ -894,13 +894,13 @@ export default function MessagesPage() {
               Annuleer
             </Button>
             <Button
-              className="h-9 rounded-full px-4 w-auto bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
+              className="h-9 rounded-full px-4 w-auto bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F]"
               disabled={selectedTenantIds.length === 0}
               onClick={startDirectChat}
             >
               {selectedTenantIds.length > 1 ? 'Start groepschat' : 'Start chat'}
               {selectedTenantIds.length > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13] px-1 text-[11px] font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1d3014] px-1 text-[11px] font-semibold text-white">
                   {selectedTenantIds.length}
                 </span>
               )}
@@ -912,7 +912,7 @@ export default function MessagesPage() {
       <Dialog open={createGroupOpen} onOpenChange={handleGroupDialogOpenChange}>
         <DialogContent className="border-[#e3e3de] dark:border-neutral-700 sm:max-w-xl max-h-[80vh] overflow-hidden flex flex-col [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#161f13] dark:text-[#94f477]">Groep aanmaken</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-[#1d3014] dark:text-[#c8e957]">Groep aanmaken</DialogTitle>
             <DialogDescription>Kies deelnemers uit je volledige contactenlijst.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 min-h-0 flex-1 flex flex-col">
@@ -946,13 +946,13 @@ export default function MessagesPage() {
               Annuleer
             </Button>
             <Button
-              className="h-9 rounded-full px-4 w-auto text-sm font-semibold bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]"
+              className="h-9 rounded-full px-4 w-auto text-sm font-semibold bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F]"
               disabled={selectedTenantIds.length < 2}
               onClick={startGroupChat}
             >
               Start groepschat
               {selectedTenantIds.length > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13] px-1 text-[11px] font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1d3014] px-1 text-[11px] font-semibold text-white">
                   {selectedTenantIds.length}
                 </span>
               )}

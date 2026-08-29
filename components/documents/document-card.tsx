@@ -405,8 +405,8 @@ export function DocumentCard({
               'h-8 w-8 rounded-full flex-shrink-0 self-end mb-4',
               selectionMode
                 ? selected
-                  ? 'bg-[#161f13] dark:bg-[#161f13] border border-[#161f13] shadow-none'
-                  : 'bg-transparent border border-[#161f13] dark:border-[#94f477] shadow-none hover:bg-[#161f13]/10 dark:hover:bg-[#94f477]/10'
+                  ? 'bg-[#1d3014] dark:bg-[#1d3014] border border-[#1d3014] shadow-none'
+                  : 'bg-transparent border border-[#1d3014] dark:border-[#c8e957] shadow-none hover:bg-[#1d3014]/10 dark:hover:bg-[#c8e957]/10'
                 : 'bg-[#b8bfb4] hover:bg-[#a8b0a4] text-[#3d4a38] dark:bg-neutral-600 dark:hover:bg-neutral-500 dark:text-[#c8d4c0] border-0 shadow-none'
             )}
             onClick={(e) => {
@@ -459,7 +459,7 @@ export function DocumentCard({
             aria-hidden
           >
             {bulkActionLoading && selected ? (
-              <Loader2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] animate-spin" />
+              <Loader2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] animate-spin" />
             ) : (
               <MoreHorizontal className="h-4 w-4 text-[#55554e] dark:text-[#97978f]" />
             )}
@@ -469,7 +469,7 @@ export function DocumentCard({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div
-              className="bg-white dark:bg-neutral-900 px-4 py-3 relative w-full text-left cursor-pointer outline-none transition-colors hover:bg-[#f4f4f1]/90 dark:hover:bg-neutral-800/90 focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-2"
+              className="bg-white dark:bg-neutral-900 px-4 py-3 relative w-full text-left cursor-pointer outline-none transition-colors hover:bg-[#f4f4f1]/90 dark:hover:bg-neutral-800/90 focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-2"
               onClick={(e) => e.stopPropagation()}
               aria-label={`Acties voor ${realName}`}
             >

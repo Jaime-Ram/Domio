@@ -46,19 +46,19 @@ export function RampFooter() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div>
             <Logo width={80} height={22} href="/agentic" />
-            <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-[#163300]/50">
+            <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-[#1d3014]/50">
               Agentic vastgoedbeheer. Van melding tot factuur, volledig zelfstandig.
             </p>
           </div>
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <p className="text-[13px] font-semibold text-[#163300]">{col.title}</p>
+              <p className="text-[13px] font-semibold text-[#1d3014]">{col.title}</p>
               <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="text-[14px] text-[#163300]/55 transition-colors hover:text-[#163300]"
+                      className="text-[14px] text-[#1d3014]/55 transition-colors hover:text-[#1d3014]"
                     >
                       {l.label}
                     </Link>
@@ -70,8 +70,8 @@ export function RampFooter() {
         </div>
 
         <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-black/[0.08] pt-8 sm:flex-row sm:items-center">
-          <p className="text-[13px] text-[#163300]/45">© 2026 Domio. Alle rechten voorbehouden.</p>
-          <p className="text-[13px] text-[#163300]/45">Gemaakt in Amsterdam · Nederlandse hosting</p>
+          <p className="text-[13px] text-[#1d3014]/45">© 2026 Domio. Alle rechten voorbehouden.</p>
+          <p className="text-[13px] text-[#1d3014]/45">Gemaakt in Amsterdam · Nederlandse hosting</p>
         </div>
       </div>
     </footer>

@@ -341,7 +341,7 @@ export default function TasksPage() {
             <ListTodo className="h-10 w-10 text-gray-300 dark:text-neutral-600 mx-auto mb-3" />
             <p className="text-sm font-medium text-[#97978f] dark:text-[#97978f]">{search ? 'Geen taken gevonden' : filter === 'afgerond' ? 'Nog niets afgerond' : 'Geen taken'}</p>
             {!search && filter === 'alle' && (
-              <button type="button" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] text-xs font-semibold px-3 py-1.5 transition-colors">
+              <button type="button" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] text-xs font-semibold px-3 py-1.5 transition-colors">
                 <Plus className="h-3.5 w-3.5" />
                 Eerste taak aanmaken
               </button>

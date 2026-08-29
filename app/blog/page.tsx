@@ -54,10 +54,10 @@ export default function BlogPage() {
       <div className="min-h-screen bg-white">
         <section className="relative border-b border-gray-200 overflow-hidden py-12 md:py-16 bg-gray-100 dark:bg-neutral-800">
           <div className="container relative z-10 mx-auto max-w-7xl px-4 md:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-[#163300] dark:text-[#9FE870] sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-[#1d3014] dark:text-[#c8e957] sm:text-4xl md:text-5xl">
               Kennisbank
             </h1>
-            <p className="mt-3 max-w-2xl text-lg text-[#163300]/90 dark:text-[#9FE870]/90">
+            <p className="mt-3 max-w-2xl text-lg text-[#1d3014]/90 dark:text-[#c8e957]/90">
               Uitgebreide artikelen over wetgeving, financieel beheer, verduurzaming en meer. Voor verhuurders en vastgoedbeheerders in Nederland.
             </p>
           </div>
@@ -75,7 +75,7 @@ export default function BlogPage() {
                     placeholder="Zoek in artikelen..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-xl border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-neutral-400 py-3 pl-12 pr-4 text-base focus:border-[#163300] focus:outline-none focus:ring-1 focus:ring-[#163300]"
+                    className="w-full rounded-xl border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-neutral-400 py-3 pl-12 pr-4 text-base focus:border-[#1d3014] focus:outline-none focus:ring-1 focus:ring-[#1d3014]"
                   />
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default function BlogPage() {
                   className={cn(
                     'rounded-full px-4 py-2 text-sm font-medium transition-colors',
                     selectedCategories.length === 0
-                      ? 'bg-[#163300] text-white'
+                      ? 'bg-[#1d3014] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   )}
                 >
@@ -100,7 +100,7 @@ export default function BlogPage() {
                     className={cn(
                       'rounded-full px-4 py-2 text-sm font-medium transition-colors',
                       selectedCategories.includes(cat)
-                        ? 'bg-[#163300] text-white'
+                        ? 'bg-[#1d3014] text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     )}
                   >

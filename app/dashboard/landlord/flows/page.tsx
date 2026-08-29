@@ -216,7 +216,7 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
       subtitle={template?.category}
       headerLeft={Icon ? (
         <div className="w-10 h-10 rounded-xl bg-[#f4f4f1] dark:bg-neutral-800 flex items-center justify-center shrink-0">
-          <Icon className="h-[18px] w-[18px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
+          <Icon className="h-[18px] w-[18px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
         </div>
       ) : undefined}
       footer={
@@ -230,7 +230,7 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
           </button>
           <Button
             onClick={onSetup}
-            className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
+            className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
           >
             Flow instellen
             <ArrowRight className="h-4 w-4 ml-1.5" />
@@ -259,7 +259,7 @@ function FlowDetailSheet({ open, template, onClose, onSetup }: {
               {template.steps.map((step, i) => (
                 <div key={i} className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full bg-[#161f13] dark:bg-[#94f477] flex items-center justify-center text-[11px] font-bold text-white dark:text-[#161f13] shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-[#1d3014] dark:bg-[#c8e957] flex items-center justify-center text-[11px] font-bold text-white dark:text-[#1d3014] shrink-0">
                       {i + 1}
                     </div>
                     {i < template.steps.length - 1 && (
@@ -295,7 +295,7 @@ function FlowCard({ template, activeCount, onOpen }: {
     >
       <div className="flex items-start justify-between gap-2">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Icon className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
+          <Icon className="h-[22px] w-[22px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
         </div>
         {activeCount > 0 ? (
           <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -331,7 +331,7 @@ function ActiveFlowCard({ flow, properties, onToggle, onEdit }: {
   return (
     <GrayBlock className="flex items-start gap-4 p-4">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <Icon className="h-[22px] w-[22px] text-[#161f13] dark:text-[#94f477]" strokeWidth={2} />
+        <Icon className="h-[22px] w-[22px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
@@ -500,8 +500,8 @@ export default function FlowsPage() {
         <div className="flex flex-col gap-10">
 
           {/* Intro block */}
-          <div className="rounded-2xl bg-[#161f13] px-8 py-8 relative overflow-hidden">
-            <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#94f477" opacity={0.15} layers={2} />
+          <div className="rounded-2xl bg-[#1d3014] px-8 py-8 relative overflow-hidden">
+            <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-40 h-40" color="#c8e957" opacity={0.15} layers={2} />
             <div className="relative z-10 flex flex-col gap-3 max-w-xl">
               <h2 className="text-[26px] font-bold text-white leading-tight">
                 Maak je eigen flow aan
@@ -512,7 +512,7 @@ export default function FlowsPage() {
               <div className="mt-1 flex items-center gap-3">
                 <Button
                   disabled
-                  className="rounded-full bg-[#94f477] text-[#161f13] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#94f477]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-full bg-[#c8e957] text-[#1d3014] font-semibold text-sm px-4 h-9 gap-1.5 hover:bg-[#c8e957]/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Plus className="h-4 w-4" />
                   Eigen flow aanmaken
@@ -560,7 +560,7 @@ export default function FlowsPage() {
                 <button
                   type="button"
                   onClick={() => setTab('bibliotheek')}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#161f13] dark:bg-[#94f477] text-white dark:text-[#161f13] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#1d3014] dark:bg-[#c8e957] text-white dark:text-[#1d3014] font-semibold text-sm px-4 h-9 hover:bg-[#1e4a00] transition-colors"
                 >
                   Naar bibliotheek
                   <ArrowRight className="h-4 w-4" />

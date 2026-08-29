@@ -74,15 +74,15 @@ export function PandenKaart({ locaties = STANDAARD_LOCATIES }: { locaties?: Loca
             {/* land in een zachte forest-tint */}
             <path
               d={pad(OMTREK)}
-              fill="#161f13" fillOpacity="0.07"
-              stroke="#161f13" strokeOpacity="0.16"
+              fill="#1d3014" fillOpacity="0.07"
+              stroke="#1d3014" strokeOpacity="0.16"
               strokeWidth="0.7" strokeLinejoin="round"
             />
             {/* IJsselmeer als uitsparing */}
             <path
               d={pad(IJSSELMEER)}
               fill="#ffffff"
-              stroke="#161f13" strokeOpacity="0.12"
+              stroke="#1d3014" strokeOpacity="0.12"
               strokeWidth="0.5" strokeLinejoin="round"
             />
 
@@ -100,7 +100,7 @@ export function PandenKaart({ locaties = STANDAARD_LOCATIES }: { locaties?: Loca
                 >
                   {/* zachte lime gloed */}
                   <motion.circle
-                    cx={x} cy={y} r={r * 2.3} fill="#94f477"
+                    cx={x} cy={y} r={r * 2.3} fill="#c8e957"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: aan ? 0.4 : 0.18 }}
                     transition={{ duration: 0.25 }}
@@ -116,7 +116,7 @@ export function PandenKaart({ locaties = STANDAARD_LOCATIES }: { locaties?: Loca
                   {/* kern in forest, wordt lime bij hover */}
                   <motion.circle
                     cx={x} cy={y}
-                    fill={aan ? "#7ee85c" : "#161f13"}
+                    fill={aan ? "#7ee85c" : "#1d3014"}
                     initial={{ r: 0 }}
                     animate={{ r }}
                     transition={{ duration: 0.5, delay: 0.15 + i * 0.09, ease: "easeOut" }}

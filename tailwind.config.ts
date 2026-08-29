@@ -24,10 +24,10 @@ const config: Config = {
       /* Domio brand + Interactive tokens */
       colors: {
         /* Domio landing (v2), vaste tokens, los van shadcn theming */
-        forest: '#161f13',
-        'forest-2': '#0f160c',
-        lime: '#94f477',
-        'lime-2': '#7ee85c',
+        forest: '#1d3014',
+        'forest-2': '#15230f',
+        lime: '#c8e957',
+        'lime-2': '#bcdf45',
         ink: '#1a1c18',
         grey: '#55554e',
         'grey-2': '#97978f',
@@ -42,11 +42,11 @@ const config: Config = {
           'accent-hover': 'var(--color-accent-500)',
         },
         interactive: {
-          primary: 'var(--color-interactive-primary)',     /* #163300 – neutral interactive, active items */
-          accent: 'var(--color-interactive-accent)',       /* #9FE870 – primary buttons */
+          primary: 'var(--color-interactive-primary)',     /* #1d3014 – neutral interactive, active items */
+          accent: 'var(--color-interactive-accent)',       /* #c8e957 – primary buttons */
           secondary: 'var(--color-interactive-secondary)', /* #868685 – input/checkbox borders, clear btn */
-          control: 'var(--color-interactive-control)',     /* #163300 – text/icons on Bright Green */
-          contrast: 'var(--color-interactive-contrast)',    /* #9FE870 – text/icons on Forest Green */
+          control: 'var(--color-interactive-control)',     /* #1d3014 – text/icons on Bright Green */
+          contrast: 'var(--color-interactive-contrast)',    /* #c8e957 – text/icons on Forest Green */
         },
         primary: {
           '50': 'var(--color-primary-50)',

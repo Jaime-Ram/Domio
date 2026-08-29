@@ -24,7 +24,7 @@ export function ConfirmationBlock({
   return (
     <div className="mt-8 sm:mt-12 space-y-8 text-center">
       <div>
-        <div className="mx-auto mb-6 flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-[#94f477] text-[#161f13]">
+        <div className="mx-auto mb-6 flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-[#c8e957] text-[#1d3014]">
           <Icon className="h-12 w-12 sm:h-14 sm:w-14" />
         </div>
         <h3 className="text-4xl font-bold text-gray-900 tracking-tight">
@@ -38,7 +38,7 @@ export function ConfirmationBlock({
         {primaryButton.href ? (
           <Button
             asChild
-            className="w-full h-12 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90 font-semibold text-base border-0 shadow-sm"
+            className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
           >
             {primaryButton.href.startsWith('http') ? (
               <a href={primaryButton.href} target="_blank" rel="noopener noreferrer">
@@ -51,7 +51,7 @@ export function ConfirmationBlock({
         ) : (
           <Button
             onClick={primaryButton.onClick}
-            className="w-full h-12 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90 font-semibold text-base border-0 shadow-sm"
+            className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
           >
             {primaryButton.label}
           </Button>
@@ -81,7 +81,7 @@ export function ConfirmationBlock({
           )
         )}
         {footerLink && (
-          <Link href={footerLink.href} className="block text-sm font-medium text-[#161f13] underline underline-offset-2 hover:no-underline pt-2">
+          <Link href={footerLink.href} className="block text-sm font-medium text-[#1d3014] underline underline-offset-2 hover:no-underline pt-2">
             {footerLink.label}
           </Link>
         )}

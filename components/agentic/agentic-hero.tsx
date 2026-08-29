@@ -13,24 +13,24 @@ export function AgenticHero() {
         <p className="text-[14px] font-semibold uppercase tracking-[0.14em] text-[#15803D]">
           Agentic vastgoedbeheer
         </p>
-        <h1 className="mt-5 text-[2.75rem] font-semibold leading-[1.02] tracking-tight text-[#163300] sm:text-6xl md:text-[4.25rem]">
+        <h1 className="mt-5 text-[2.75rem] font-semibold leading-[1.02] tracking-tight text-[#1d3014] sm:text-6xl md:text-[4.25rem]">
           Onderhoud dat<br />zichzelf regelt
         </h1>
-        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#163300]/60 md:text-xl">
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#1d3014]/60 md:text-xl">
           Een team van agents handelt je vastgoedonderhoud af, van melding tot factuur. Volledig
           zelfstandig, terwijl jij de regie houdt.
         </p>
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <Link
             href="/registreren"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#163300] px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#163300]/90"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#1d3014] px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#1d3014]/90"
           >
             Start direct
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-lg border border-[#163300]/15 bg-white px-6 py-3 text-[15px] font-semibold text-[#163300] transition-colors hover:border-[#163300]/30"
+            className="inline-flex items-center gap-2 rounded-lg border border-[#1d3014]/15 bg-white px-6 py-3 text-[15px] font-semibold text-[#1d3014] transition-colors hover:border-[#1d3014]/30"
           >
             Boek een demo
           </Link>

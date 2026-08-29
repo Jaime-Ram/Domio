@@ -16,7 +16,7 @@ export default function AssistPage() {
 
         {/* Title */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl md:text-3xl text-[#161f13] dark:text-[#94f477] leading-tight tracking-tight flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0">
+          <h1 className="text-2xl md:text-3xl text-[#1d3014] dark:text-[#c8e957] leading-tight tracking-tight flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0">
             <span className="font-bold">Domio</span>
             <span className="font-normal">Agentic</span>
           </h1>
@@ -45,7 +45,7 @@ export default function AssistPage() {
             {QUICK_ACTIONS.map(({ icon: Icon, label }) => (
               <div
                 key={label}
-                className="size-10 shrink-0 rounded-full flex items-center justify-center bg-[#94f477] text-[#161f13] shadow-sm"
+                className="size-10 shrink-0 rounded-full flex items-center justify-center bg-[#c8e957] text-[#1d3014] shadow-sm"
               >
                 <Icon className="h-4 w-4" strokeWidth={2} />
               </div>

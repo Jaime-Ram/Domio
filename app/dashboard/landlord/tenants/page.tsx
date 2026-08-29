@@ -378,7 +378,7 @@ function TenantsPageContent() {
             <a
               href={`mailto:${tenant.email}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-block max-w-full text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate leading-tight hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors"
+              className="inline-block max-w-full text-[12.5px] text-[#97978f] dark:text-[#97978f] truncate leading-tight hover:text-[#1d3014] dark:hover:text-[#c8e957] hover:underline transition-colors"
             >{tenant.email}</a>
           </div>
         </div>
@@ -425,7 +425,7 @@ function TenantsPageContent() {
       render: (tenant) => (
         <div onClick={(e) => e.stopPropagation()}>
           {tenant.profileId !== null ? (
-            <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#94f477]">
+            <div className="flex items-center gap-1.5 text-[#2F5711] dark:text-[#c8e957]">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span className="text-[12.5px] font-medium">Actief</span>
             </div>
@@ -446,7 +446,7 @@ function TenantsPageContent() {
             <button
               onClick={() => sendInvite(tenant.id)}
               disabled={invitingIds.has(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#161f13] hover:text-[#161f13] dark:hover:border-[#94f477] dark:hover:text-[#94f477] transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#1d3014] hover:text-[#1d3014] dark:hover:border-[#c8e957] dark:hover:text-[#c8e957] transition-colors disabled:opacity-50"
             >
               {invitingIds.has(tenant.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
               Uitnodigen
@@ -454,7 +454,7 @@ function TenantsPageContent() {
           ) : (
             <button
               onClick={() => openEmailDialog(tenant.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#161f13] hover:text-[#161f13] dark:hover:border-[#94f477] dark:hover:text-[#94f477] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[12.5px] font-medium text-[#55554e] dark:text-gray-300 hover:border-[#1d3014] hover:text-[#1d3014] dark:hover:border-[#c8e957] dark:hover:text-[#c8e957] transition-colors"
             >
               <Mail className="h-3.5 w-3.5" />
               Uitnodigen
@@ -589,7 +589,7 @@ function TenantsPageContent() {
             <button
               onClick={submitEmailAndInvite}
               disabled={emailDialogSaving || !emailDialogValue.trim()}
-              className="flex items-center gap-2 rounded-xl bg-[#161f13] text-white text-sm font-medium px-4 py-2 hover:bg-[#1e4a00] disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-[#1d3014] text-white text-sm font-medium px-4 py-2 hover:bg-[#1e4a00] disabled:opacity-50 transition-colors"
             >
               {emailDialogSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Opslaan & uitnodigen

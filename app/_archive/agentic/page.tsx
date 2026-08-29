@@ -31,10 +31,10 @@ const TRUST = ['13.000+ units beheerd', '99,9% uptime', 'AVG-proof', 'Nederlands
 function TrustStrip() {
   return (
     <div className="mx-auto max-w-6xl px-6 md:px-8">
-      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-black/[0.08] pt-10 text-[14px] font-medium text-[#163300]/45">
+      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-black/[0.08] pt-10 text-[14px] font-medium text-[#1d3014]/45">
         {TRUST.map((t, i) => (
           <span key={t} className="flex items-center gap-8">
-            {i > 0 && <span className="hidden h-1 w-1 rounded-full bg-[#163300]/20 sm:block" />}
+            {i > 0 && <span className="hidden h-1 w-1 rounded-full bg-[#1d3014]/20 sm:block" />}
             {t}
           </span>
         ))}
@@ -69,13 +69,13 @@ function ProductSection({
             <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#15803D]">
               {eyebrow}
             </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#163300] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#1d3014] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
               {title}
             </h2>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-[#163300]/60">{body}</p>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-[#1d3014]/60">{body}</p>
             <ul className="mt-8 space-y-4 border-t border-black/[0.08] pt-6">
               {bullets.map((b) => (
-                <li key={b} className="flex items-start gap-3 text-[15px] text-[#163300]/80">
+                <li key={b} className="flex items-start gap-3 text-[15px] text-[#1d3014]/80">
                   <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#15803D]" />
                   {b}
                 </li>
@@ -98,9 +98,9 @@ const STATS = [
 
 function StatBand() {
   return (
-    <section className="bg-[#163300]">
+    <section className="bg-[#1d3014]">
       <div className="mx-auto max-w-7xl px-6 py-20 md:px-8 md:py-24">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#9FE870]">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#c8e957]">
           Meetbaar resultaat
         </p>
         <div className="mt-10 grid gap-12 md:grid-cols-3 md:gap-8">
@@ -138,10 +138,10 @@ function FeatureGrid() {
           <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#15803D]">
             Eén platform
           </p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#163300] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-[#1d3014] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
             Alles voor je vastgoedbeheer op één plek
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-[#163300]/60">
+          <p className="mt-5 text-lg leading-relaxed text-[#1d3014]/60">
             Onderhoud is het begin. Domio brengt je hele beheer samen en de agents pakken overal het
             werk op.
           </p>
@@ -150,8 +150,8 @@ function FeatureGrid() {
           {FEATURES.map((f) => (
             <div key={f.title}>
               <f.icon className="h-6 w-6 text-[#15803D]" strokeWidth={1.75} />
-              <h3 className="mt-4 text-lg font-semibold tracking-tight text-[#163300]">{f.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-[#163300]/55">{f.desc}</p>
+              <h3 className="mt-4 text-lg font-semibold tracking-tight text-[#1d3014]">{f.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-[#1d3014]/55">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -165,18 +165,18 @@ function Testimonial() {
   return (
     <section className="border-y border-black/[0.06] bg-[#FBFAF7]">
       <div className="mx-auto max-w-4xl px-6 py-24 text-center md:px-8 md:py-32">
-        <blockquote className="text-[1.75rem] font-medium leading-[1.35] tracking-tight text-[#163300] sm:text-3xl md:text-[2.25rem]">
+        <blockquote className="text-[1.75rem] font-medium leading-[1.35] tracking-tight text-[#1d3014] sm:text-3xl md:text-[2.25rem]">
           &ldquo;Sinds Domio Agentic onze meldingen afhandelt blijft er niets meer liggen. Laatst werd
           &apos;s nachts een lekkage gemeld, automatisch getrieerd en de volgende ochtend al opgelost,
           zonder dat ik er iets voor hoefde te doen.&rdquo;
         </blockquote>
         <div className="mt-10 flex items-center justify-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#163300] text-[13px] font-semibold text-white">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1d3014] text-[13px] font-semibold text-white">
             SW
           </span>
           <div className="text-left">
-            <p className="text-[15px] font-medium text-[#163300]">Sanne de Wit</p>
-            <p className="text-[13px] text-[#163300]/50">Vastgoedbeheerder, Lindehof Vastgoedbeheer</p>
+            <p className="text-[15px] font-medium text-[#1d3014]">Sanne de Wit</p>
+            <p className="text-[13px] text-[#1d3014]/50">Vastgoedbeheerder, Lindehof Vastgoedbeheer</p>
           </div>
         </div>
       </div>
@@ -189,20 +189,20 @@ function FinalCta() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-28 text-center md:px-8 md:py-40">
-        <h2 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-[#163300] sm:text-5xl md:text-[4rem] md:leading-[1.02]">
+        <h2 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-[#1d3014] sm:text-5xl md:text-[4rem] md:leading-[1.02]">
           Tijd is geld.<br />Bespaar allebei.
         </h2>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/registreren"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#163300] px-7 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#163300]/90"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#1d3014] px-7 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#1d3014]/90"
           >
             Start direct
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-lg border border-[#163300]/15 bg-white px-7 py-3.5 text-[15px] font-semibold text-[#163300] transition-colors hover:border-[#163300]/30"
+            className="inline-flex items-center gap-2 rounded-lg border border-[#1d3014]/15 bg-white px-7 py-3.5 text-[15px] font-semibold text-[#1d3014] transition-colors hover:border-[#1d3014]/30"
           >
             Praat met sales
           </Link>

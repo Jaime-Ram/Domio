@@ -107,7 +107,7 @@ export default function AgentFlow() {
           <use
             key={`l-${a.key}`}
             href={`#path-${a.key}`}
-            stroke={a.key === active.key ? "#94f477" : "#dcdcd6"}
+            stroke={a.key === active.key ? "#c8e957" : "#dcdcd6"}
             strokeWidth={a.key === active.key ? 2.5 : 1.5}
             className="transition-all duration-500"
           />

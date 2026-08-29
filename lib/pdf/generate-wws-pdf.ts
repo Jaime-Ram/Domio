@@ -47,15 +47,15 @@ export function generateWWSHTML(data: WWSPDFData): string {
     @media print { body { margin: 0; } }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
-    h1 { font-size: 22px; color: #163300; margin-bottom: 4px; }
-    h2 { font-size: 15px; margin-top: 24px; margin-bottom: 8px; color: #163300; border-bottom: 2px solid #163300; padding-bottom: 4px; }
+    h1 { font-size: 22px; color: #1d3014; margin-bottom: 4px; }
+    h2 { font-size: 15px; margin-top: 24px; margin-bottom: 8px; color: #1d3014; border-bottom: 2px solid #1d3014; padding-bottom: 4px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 3px solid #163300; padding-bottom: 14px; }
-    .header-logo { font-size: 26px; font-weight: 700; color: #163300; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 3px solid #1d3014; padding-bottom: 14px; }
+    .header-logo { font-size: 26px; font-weight: 700; color: #1d3014; }
     .header-meta { text-align: right; font-size: 12px; color: #64748b; }
     .score-box { display: flex; gap: 24px; margin: 20px 0; }
     .score-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; }
-    .score-card.primary { border-color: #163300; background: #f0fdf4; }
+    .score-card.primary { border-color: #1d3014; background: #f0fdf4; }
     .score-value { font-size: 28px; font-weight: 700; }
     .score-label { font-size: 12px; color: #64748b; margin-top: 4px; }
     .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; }
@@ -111,16 +111,16 @@ export function generateWWSHTML(data: WWSPDFData): string {
   <table>
     <thead>
       <tr style="background:#f8fafc;">
-        <th style="padding:8px 12px; text-align:left; border-bottom:2px solid #163300;">Categorie</th>
-        <th style="padding:8px 12px; text-align:right; border-bottom:2px solid #163300;">Punten</th>
-        <th style="padding:8px 12px; text-align:left; border-bottom:2px solid #163300;">Toelichting</th>
+        <th style="padding:8px 12px; text-align:left; border-bottom:2px solid #1d3014;">Categorie</th>
+        <th style="padding:8px 12px; text-align:right; border-bottom:2px solid #1d3014;">Punten</th>
+        <th style="padding:8px 12px; text-align:left; border-bottom:2px solid #1d3014;">Toelichting</th>
       </tr>
     </thead>
     <tbody>
       ${breakdownRows}
       <tr style="background:#f0fdf4;">
         <td style="padding:8px 12px; font-weight:700;">Totaal</td>
-        <td style="padding:8px 12px; text-align:right; font-weight:700; font-size:16px; color:#163300;">${result.punten}</td>
+        <td style="padding:8px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d3014;">${result.punten}</td>
         <td style="padding:8px 12px;"></td>
       </tr>
     </tbody>

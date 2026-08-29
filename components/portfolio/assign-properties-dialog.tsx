@@ -120,7 +120,7 @@ export function AssignPropertiesDialog({
                 <button
                   type="button"
                   onClick={toggleAll}
-                  className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                  className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
                 >
                   {allSelected ? 'Deselecteer alles' : 'Selecteer alles'}
                 </button>
@@ -136,7 +136,7 @@ export function AssignPropertiesDialog({
                     className={cn(
                       'w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-colors',
                       selected.has(prop.id)
-                        ? 'bg-[#163300]/5 dark:bg-[#9FE870]/8'
+                        ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/8'
                         : 'hover:bg-gray-50 dark:hover:bg-neutral-800/50'
                     )}
                   >
@@ -145,12 +145,12 @@ export function AssignPropertiesDialog({
                       className={cn(
                         'h-5 w-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-colors',
                         selected.has(prop.id)
-                          ? 'bg-[#163300] dark:bg-[#9FE870] border-[#163300] dark:border-[#9FE870]'
+                          ? 'bg-[#1d3014] dark:bg-[#c8e957] border-[#1d3014] dark:border-[#c8e957]'
                           : 'border-gray-300 dark:border-neutral-600'
                       )}
                     >
                       {selected.has(prop.id) && (
-                        <Check className="h-3 w-3 text-white dark:text-[#163300]" />
+                        <Check className="h-3 w-3 text-white dark:text-[#1d3014]" />
                       )}
                     </div>
 

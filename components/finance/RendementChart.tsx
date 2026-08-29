@@ -494,7 +494,7 @@ export function RendementChart({ properties }: RendementChartProps) {
               key={key}
               onClick={() => setChartPeriod(key)}
               className={cn(
-                'px-3 py-1 text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] dark:focus-visible:ring-[#94f477]',
+                'px-3 py-1 text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] dark:focus-visible:ring-[#c8e957]',
                 chartPeriod === key
                   ? 'bg-gray-900 dark:bg-white text-white dark:text-[#1a1c18]'
                   : 'text-[#97978f] dark:text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 hover:text-[#55554e] dark:hover:text-gray-200'

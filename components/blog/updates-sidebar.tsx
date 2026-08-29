@@ -10,7 +10,7 @@ export function UpdatesSidebar({ className }: { className?: string }) {
 
   return (
     <div className={cn('rounded-2xl bg-gray-100 dark:bg-neutral-800 p-5', className)}>
-      <h3 className="flex items-center gap-2 text-xl font-semibold text-[#163300] dark:text-[#9FE870]">
+      <h3 className="flex items-center gap-2 text-xl font-semibold text-[#1d3014] dark:text-[#c8e957]">
         <Calendar className="h-6 w-6 shrink-0" />
         Wat verandert er?
       </h3>
@@ -32,7 +32,7 @@ export function UpdatesSidebar({ className }: { className?: string }) {
       </ul>
       <Link
         href="/blog/updates"
-        className="mt-3 flex items-center gap-1 text-sm font-medium text-[#163300] hover:underline"
+        className="mt-3 flex items-center gap-1 text-sm font-medium text-[#1d3014] hover:underline"
       >
         Volledige tijdlijn
         <ArrowRight className="h-4 w-4" />

@@ -32,7 +32,7 @@ export function AgenticCapabilities() {
   return (
     <section id="hoe-het-werkt" className="scroll-mt-20 bg-[#FBFAF7] py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <h2 className="max-w-5xl text-3xl font-medium leading-snug tracking-tight text-[#163300] sm:text-4xl md:text-[2.5rem] md:leading-[1.2]">
+        <h2 className="max-w-5xl text-3xl font-medium leading-snug tracking-tight text-[#1d3014] sm:text-4xl md:text-[2.5rem] md:leading-[1.2]">
           Agentic AI verandert hoe vastgoedonderhoud werkt:<br className="hidden md:block" /> van
           melding tot factuur loopt alles vanzelf, volledig op de automaat.
         </h2>

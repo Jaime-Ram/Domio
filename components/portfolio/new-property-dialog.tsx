@@ -394,9 +394,9 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                     className={cn(
                       'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
                       i === stepIndex
-                        ? 'bg-[#163300] dark:bg-[#9FE870]'
+                        ? 'bg-[#1d3014] dark:bg-[#c8e957]'
                         : i < stepIndex
-                        ? 'bg-[#163300]/35 dark:bg-[#9FE870]/35'
+                        ? 'bg-[#1d3014]/35 dark:bg-[#c8e957]/35'
                         : 'bg-gray-200 dark:bg-neutral-700'
                     )}
                   />
@@ -441,7 +441,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                       size="icon"
                       onClick={handleSearch}
                       disabled={searching}
-                      className="rounded-xl h-10 w-10 bg-[#163300] hover:bg-[#163300]/90 text-white dark:bg-[#9FE870] dark:text-[#163300] shrink-0"
+                      className="rounded-xl h-10 w-10 bg-[#1d3014] hover:bg-[#1d3014]/90 text-white dark:bg-[#c8e957] dark:text-[#1d3014] shrink-0"
                     >
                       {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                     </Button>
@@ -460,7 +460,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
               {results.length > 0 && (
                 <div className="space-y-1.5">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3 text-[#163300] dark:text-[#9FE870]" />
+                    <Sparkles className="h-3 w-3 text-[#1d3014] dark:text-[#c8e957]" />
                     {results.length} adres{results.length !== 1 ? 'sen' : ''} gevonden (PDOK)
                   </p>
                   <div className="rounded-2xl border border-gray-100 dark:border-neutral-800 divide-y divide-gray-50 dark:divide-neutral-800 overflow-hidden">
@@ -472,8 +472,8 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                         className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors text-left group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="h-8 w-8 rounded-lg bg-[#163300]/6 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-                            <MapPin className="h-3.5 w-3.5 text-[#163300] dark:text-[#9FE870]" />
+                          <div className="h-8 w-8 rounded-lg bg-[#1d3014]/6 dark:bg-[#c8e957]/10 flex items-center justify-center shrink-0">
+                            <MapPin className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957]" />
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -484,7 +484,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                             </p>
                           </div>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-[#163300] dark:group-hover:text-[#9FE870] shrink-0 transition-colors" />
+                        <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-[#1d3014] dark:group-hover:text-[#c8e957] shrink-0 transition-colors" />
                       </button>
                     ))}
                   </div>
@@ -513,9 +513,9 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
             <>
               {/* Geselecteerd adres card */}
               {selectedAdres && (
-                <div className="flex items-start gap-3 bg-[#163300]/5 dark:bg-[#9FE870]/8 rounded-2xl px-4 py-3.5">
-                  <div className="h-9 w-9 rounded-xl bg-[#163300] dark:bg-[#9FE870] flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="h-4 w-4 text-white dark:text-[#163300]" />
+                <div className="flex items-start gap-3 bg-[#1d3014]/5 dark:bg-[#c8e957]/8 rounded-2xl px-4 py-3.5">
+                  <div className="h-9 w-9 rounded-xl bg-[#1d3014] dark:bg-[#c8e957] flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin className="h-4 w-4 text-white dark:text-[#1d3014]" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -525,7 +525,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                       {selectedAdres.postcode} {selectedAdres.woonplaatsnaam} · {selectedAdres.gemeentenaam}
                     </p>
                     {enrichmentLoading && (
-                      <p className="text-xs text-[#163300] dark:text-[#9FE870] mt-1 flex items-center gap-1">
+                      <p className="text-xs text-[#1d3014] dark:text-[#c8e957] mt-1 flex items-center gap-1">
                         <Loader2 className="h-3 w-3 animate-spin" />
                         Gegevens ophalen (EAN, WOZ, energielabel)…
                       </p>
@@ -536,7 +536,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                         form.woz_value ||
                         form.energy_label ||
                         form.build_year) && (
-                      <p className="text-xs text-[#163300] dark:text-[#9FE870] mt-1 flex items-center gap-1">
+                      <p className="text-xs text-[#1d3014] dark:text-[#c8e957] mt-1 flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Beschikbare gegevens automatisch ingevuld
                       </p>
@@ -626,7 +626,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     Bouwjaar
                     {form.build_year && !enrichmentLoading && (
-                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">BAG</Badge>
+                      <Badge className="text-[10px] h-4 bg-[#1d3014]/8 text-[#1d3014] dark:bg-[#c8e957]/10 dark:text-[#c8e957] border-0 font-medium px-1.5 py-0">BAG</Badge>
                     )}
                   </Label>
                   <Input
@@ -643,7 +643,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     Oppervlak (m²)
                     {form.surface && !enrichmentLoading && (
-                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">BAG</Badge>
+                      <Badge className="text-[10px] h-4 bg-[#1d3014]/8 text-[#1d3014] dark:bg-[#c8e957]/10 dark:text-[#c8e957] border-0 font-medium px-1.5 py-0">BAG</Badge>
                     )}
                   </Label>
                   <Input
@@ -699,7 +699,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     EAN elektriciteit
                     {form.ean_electricity && !enrichmentLoading && (
-                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">
+                      <Badge className="text-[10px] h-4 bg-[#1d3014]/8 text-[#1d3014] dark:bg-[#c8e957]/10 dark:text-[#c8e957] border-0 font-medium px-1.5 py-0">
                         auto
                       </Badge>
                     )}
@@ -716,7 +716,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                   <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     EAN gas
                     {form.ean_gas && !enrichmentLoading && (
-                      <Badge className="text-[10px] h-4 bg-[#163300]/8 text-[#163300] dark:bg-[#9FE870]/10 dark:text-[#9FE870] border-0 font-medium px-1.5 py-0">
+                      <Badge className="text-[10px] h-4 bg-[#1d3014]/8 text-[#1d3014] dark:bg-[#c8e957]/10 dark:text-[#c8e957] border-0 font-medium px-1.5 py-0">
                         auto
                       </Badge>
                     )}
@@ -758,7 +758,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                         className={cn(
                           'w-full text-left rounded-2xl border px-4 py-3 transition-colors',
                           selected
-                            ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300]/5 dark:bg-[#9FE870]/10'
+                            ? 'border-[#1d3014] dark:border-[#c8e957] bg-[#1d3014]/5 dark:bg-[#c8e957]/10'
                             : 'border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
                         )}
                       >
@@ -769,7 +769,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
                               {METHOD_LABELS[k.method] ?? k.method}
                             </p>
                           </div>
-                          {selected && <CheckCircle2 className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />}
+                          {selected && <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />}
                         </div>
                       </button>
                     )
@@ -804,7 +804,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
             {step === 'search' ? (
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-50 text-[#1d3014] text-sm font-semibold px-4 py-2 shrink-0"
                 onClick={handleSearch}
                 disabled={searching || !postcode.trim()}
               >
@@ -814,7 +814,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
             ) : step === 'confirm' ? (
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-50 text-[#1d3014] text-sm font-semibold px-4 py-2 shrink-0"
                 onClick={() => setStep('allocation')}
                 disabled={!form.address && !selectedAdres}
               >
@@ -824,7 +824,7 @@ export function NewPropertyDialog({ open, onOpenChange, onCreated, portfolios, d
             ) : (
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-50 text-[#163300] text-sm font-semibold px-4 py-2 shrink-0"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-50 text-[#1d3014] text-sm font-semibold px-4 py-2 shrink-0"
                 onClick={handleSave}
                 disabled={saving || (!form.address && !selectedAdres) || !form.cost_allocation_key_id}
               >

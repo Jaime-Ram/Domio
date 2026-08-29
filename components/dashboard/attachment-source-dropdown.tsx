@@ -71,21 +71,21 @@ export function AttachmentSourceDropdown({
             requestAnimationFrame(() => onPickComputer())
           }}
         >
-          <Laptop className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
+          <Laptop className="h-4 w-4 mr-2 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
           Deze computer
         </DropdownMenuItem>
         <DropdownMenuItem
           className="rounded-lg cursor-pointer"
           onSelect={() => onPickDomioDocuments()}
         >
-          <FolderOpen className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
+          <FolderOpen className="h-4 w-4 mr-2 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
           Domio documenten
         </DropdownMenuItem>
         <DropdownMenuItem
           className="rounded-lg cursor-pointer"
           onSelect={() => onPickGoogleDrive()}
         >
-          <Cloud className="h-4 w-4 mr-2 text-[#161f13] dark:text-[#94f477] shrink-0" />
+          <Cloud className="h-4 w-4 mr-2 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
           Google Drive
         </DropdownMenuItem>
       </DropdownMenuContent>

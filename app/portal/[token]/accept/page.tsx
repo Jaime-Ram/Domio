@@ -22,8 +22,8 @@ interface Summary {
 const transition = { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }
 const slideIn = { initial: { opacity: 0, x: 32 }, animate: { opacity: 1, x: 0 }, transition }
 
-const INPUT_CLS = 'h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#163300] focus-visible:border-[#163300]'
-const PRIMARY_BTN = 'w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm'
+const INPUT_CLS = 'h-12 text-base rounded-xl border-gray-300 focus-visible:ring-[#1d3014] focus-visible:border-[#1d3014]'
+const PRIMARY_BTN = 'w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm'
 
 export default function AcceptInvitationPage() {
   return (
@@ -138,8 +138,8 @@ function AcceptInvitationInner() {
   // Samenvattingskaart — op elke variant getoond
   const summaryCard = summary?.property ? (
     <div className="mt-8 flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#163300]">
-        <MapPin className="h-5 w-5 text-[#9FE870]" />
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1d3014]">
+        <MapPin className="h-5 w-5 text-[#c8e957]" />
       </div>
       <div className="min-w-0">
         <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Uitnodiging van {summary.landlord}</div>
@@ -155,7 +155,7 @@ function AcceptInvitationInner() {
   if (emailMismatch) {
     return (
       <motion.div {...slideIn}>
-        <h1 className="text-4xl font-bold text-[#163300]">Verkeerd account</h1>
+        <h1 className="text-4xl font-bold text-[#1d3014]">Verkeerd account</h1>
         <p className="mt-2 text-sm text-gray-600">
           Deze uitnodiging is gericht aan <strong className="text-gray-800">{summary!.email}</strong>, maar je bent ingelogd als <strong className="text-gray-800">{loggedInEmail}</strong>.
         </p>
@@ -172,7 +172,7 @@ function AcceptInvitationInner() {
   if (loggedInEmail) {
     return (
       <motion.div {...slideIn}>
-        <h1 className="text-4xl font-bold text-[#163300]">Aanvraag accepteren</h1>
+        <h1 className="text-4xl font-bold text-[#1d3014]">Aanvraag accepteren</h1>
         <p className="mt-2 text-sm text-gray-600">
           Je bent ingelogd als <strong className="text-gray-800">{loggedInEmail}</strong>.
         </p>
@@ -189,10 +189,10 @@ function AcceptInvitationInner() {
   if (magicSent) {
     return (
       <motion.div {...slideIn}>
-        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#9FE870]/20">
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#c8e957]/20">
           <Mail className="h-7 w-7 text-[#15803D]" />
         </div>
-        <h1 className="text-4xl font-bold text-[#163300]">Check je e-mail</h1>
+        <h1 className="text-4xl font-bold text-[#1d3014]">Check je e-mail</h1>
         <p className="mt-2 text-sm text-gray-600">
           We hebben een inloglink gestuurd naar <strong className="text-gray-800">{summary?.email}</strong>. Klik op de knop in die e-mail — je aanvraag staat dan klaar.
         </p>
@@ -203,7 +203,7 @@ function AcceptInvitationInner() {
   // ── Niet ingelogd: inloggen óf account aanmaken ──
   return (
     <motion.div {...slideIn}>
-      <h1 className="text-4xl font-bold text-[#163300]">Activeer je account</h1>
+      <h1 className="text-4xl font-bold text-[#1d3014]">Activeer je account</h1>
       <p className="mt-2 text-sm text-gray-600">
         Kies een wachtwoord om je account te activeren. Heb je al een Domio-account? Vul je bestaande wachtwoord in.
       </p>
@@ -225,7 +225,7 @@ function AcceptInvitationInner() {
             {resetSent ? (
               <span className="text-sm text-[#15803D]">Reset-link verstuurd</span>
             ) : (
-              <button type="button" onClick={handleForgotPassword} className="text-sm text-[#163300] underline underline-offset-2 hover:no-underline">
+              <button type="button" onClick={handleForgotPassword} className="text-sm text-[#1d3014] underline underline-offset-2 hover:no-underline">
                 Vergeten?
               </button>
             )}

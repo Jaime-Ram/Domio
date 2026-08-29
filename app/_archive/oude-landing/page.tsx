@@ -134,7 +134,7 @@ export default function Home() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0"
+              className="md:hidden text-[#1d3014] hover:bg-gray-100 hover:text-[#1d3014] flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -153,15 +153,15 @@ export default function Home() {
                 className="relative"
                 onMouseEnter={() => { setFunctionsMenuOpen(true); setHelpMenuOpen(false); }}
               >
-                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
+                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1d3014] flex items-center gap-1 py-2">
                   Functies
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${functionsMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
               </div>
-              <Link href="#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
+              <Link href="#pricing" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1d3014]">
                 Prijzen
               </Link>
-              <Link href="/blog" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300]">
+              <Link href="/blog" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1d3014]">
                 Kennisbank
               </Link>
               {/* Hulp & Contact - ondersteuning + contact gegevens */}
@@ -169,7 +169,7 @@ export default function Home() {
                 className="relative"
                 onMouseEnter={() => { setHelpMenuOpen(true); setFunctionsMenuOpen(false); }}
               >
-                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#163300] flex items-center gap-1 py-2">
+                <button type="button" className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1d3014] flex items-center gap-1 py-2">
                   Hulp & Contact
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${helpMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -186,7 +186,7 @@ export default function Home() {
                     onClick={() => setUserMenuOpen(v => !v)}
                     className="flex items-center gap-2.5 rounded-full pl-1 pr-3 py-1 hover:bg-gray-100 transition-colors focus:outline-none"
                   >
-                    <div className="h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-[#1d3014] flex items-center justify-center shrink-0">
                       <span className="text-xs font-semibold text-white select-none leading-none">
                         {userName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                       </span>
@@ -205,7 +205,7 @@ export default function Home() {
                           onClick={() => { setUserMenuOpen(false); router.push('/dashboard/landlord/settings?tab=account') }}
                           className="flex items-center gap-3 w-full rounded-lg px-2 py-1.5 transition-colors hover:bg-[#f4f4f4] text-left"
                         >
-                          <div className="h-10 w-10 shrink-0 rounded-full bg-[#163300] text-white text-sm font-semibold flex items-center justify-center">
+                          <div className="h-10 w-10 shrink-0 rounded-full bg-[#1d3014] text-white text-sm font-semibold flex items-center justify-center">
                             {userName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ export default function Home() {
                         <Link
                           href="/dashboard/landlord"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
+                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#c8e957] hover:text-[#1d3014] transition-colors"
                         >
                           <Building2 className="h-4 w-4 shrink-0" />
                           Dashboard
@@ -227,7 +227,7 @@ export default function Home() {
                         <Link
                           href="/dashboard/landlord/settings"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#9FE870] hover:text-[#163300] transition-colors"
+                          className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-[#c8e957] hover:text-[#1d3014] transition-colors"
                         >
                           <Settings className="h-4 w-4 shrink-0" />
                           Instellingen
@@ -253,10 +253,10 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#163300] rounded-full px-4 py-2">
+                  <Button asChild variant="ghost" size="sm" className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-[#1d3014] rounded-full px-4 py-2">
                     <Link href="/login">Inloggen</Link>
                   </Button>
-                  <Button asChild variant="secondary" className="rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
+                  <Button asChild variant="secondary" className="rounded-full !bg-[#c8e957] !text-[#1d3014] hover:!bg-[#c8e957]/90 border-0 px-4 py-2 text-sm font-semibold shadow-sm">
                     <Link href="/registreren">Registreren</Link>
                   </Button>
                 </>
@@ -268,7 +268,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden h-8 w-8 rounded-full bg-[#163300] flex items-center justify-center shrink-0"
+              className="md:hidden h-8 w-8 rounded-full bg-[#1d3014] flex items-center justify-center shrink-0"
               aria-label="Menu openen"
             >
               <span className="text-xs font-semibold text-white select-none leading-none">
@@ -276,7 +276,7 @@ export default function Home() {
               </span>
             </button>
           ) : (
-            <Button asChild variant="ghost" size="icon" className="md:hidden text-[#163300] hover:bg-gray-100 hover:text-[#163300] flex-shrink-0" aria-label="Account">
+            <Button asChild variant="ghost" size="icon" className="md:hidden text-[#1d3014] hover:bg-gray-100 hover:text-[#1d3014] flex-shrink-0" aria-label="Account">
               <Link href="/login"><User className="h-6 w-6" /></Link>
             </Button>
           )}
@@ -328,9 +328,9 @@ export default function Home() {
                     { title: 'Scan & Herken Functie', desc: 'Documenten scannen en herkennen', icon: Scan },
                   ].map((item, i) => (
                     <Link key={item.title} href="/functies" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: `${25 + i * 35}ms` }}>
-                      <item.icon className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                      <item.icon className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[#163300] group-hover:text-[#163300]">{item.title}</p>
+                        <p className="text-sm font-semibold text-[#1d3014] group-hover:text-[#1d3014]">{item.title}</p>
                         <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                       </div>
                     </Link>
@@ -351,16 +351,16 @@ export default function Home() {
               <div key={helpMenuOpen ? 'h-open' : 'h-closed'} className="mx-auto w-full max-w-7xl px-4 pt-4 pb-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:items-stretch">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-1 place-content-start md:min-h-[200px]">
                   <Link href="/hulp" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '0ms' }}>
-                    <MessageCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <MessageCircle className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#163300]">Klantenservice</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">Klantenservice</p>
                       <p className="text-xs text-gray-500 mt-0.5">Live chat, telefoon &amp; e-mail</p>
                     </div>
                   </Link>
                   <Link href="/faq" className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors group dropdown-item-in flex gap-3 items-start" style={{ animationDelay: '25ms' }}>
-                    <HelpCircle className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <HelpCircle className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#163300]">Veelgestelde vragen</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">Veelgestelde vragen</p>
                       <p className="text-xs text-gray-500 mt-0.5">Antwoord op veelgestelde vragen</p>
                     </div>
                   </Link>
@@ -370,13 +370,13 @@ export default function Home() {
                     style={{ animationDelay: '100ms' }}
                     aria-label="Telefoon — opent de bel-app"
                   >
-                    <Phone className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <Phone className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[#163300]">Telefoon</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">Telefoon</p>
                       <p className="text-xs text-gray-500 mt-0.5">+31 6 46 23 16 96</p>
                     </div>
                     <ArrowUpRight
-                      className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#163300] mt-0.5"
+                      className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#1d3014] mt-0.5"
                       aria-hidden
                     />
                   </a>
@@ -386,38 +386,38 @@ export default function Home() {
                     style={{ animationDelay: '125ms' }}
                     aria-label={`E-mail — opent je mailapp (${CONTACT_EMAIL})`}
                   >
-                    <Mail className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <Mail className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[#163300]">E-mail</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">E-mail</p>
                       <p className="text-xs text-gray-500 mt-0.5">{CONTACT_EMAIL}</p>
                     </div>
                     <ArrowUpRight
-                      className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#163300] mt-0.5"
+                      className="h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#1d3014] mt-0.5"
                       aria-hidden
                     />
                   </a>
                   <button type="button" onClick={() => handleCopy('92211542', 'kvk')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full" style={{ animationDelay: '150ms' }}>
-                    <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <Copy className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#163300]">KVK</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">KVK</p>
                       <p className="text-xs text-gray-500 mt-0.5 tabular-nums">{copiedField === 'kvk' ? 'Gekopieerd!' : '92211542'}</p>
                     </div>
                   </button>
                   <button type="button" onClick={() => handleCopy('NL003830384B29', 'btw')} className="py-2.5 px-3 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer group dropdown-item-in flex gap-3 items-start text-left w-full" style={{ animationDelay: '175ms' }}>
-                    <Copy className="size-5 text-[#163300] shrink-0 mt-0.5" />
+                    <Copy className="size-5 text-[#1d3014] shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#163300]">BTW</p>
+                      <p className="text-sm font-semibold text-[#1d3014]">BTW</p>
                       <p className="text-xs text-gray-500 mt-0.5 font-mono">{copiedField === 'btw' ? 'Gekopieerd!' : 'NL003830384B29'}</p>
                     </div>
                   </button>
                 </div>
                 <div className="dropdown-item-in flex md:min-h-[200px]" style={{ animationDelay: '150ms' }}>
-                  <Link href="/registreren" className="rounded-2xl bg-[#163300] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
-                    <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-32 h-32" color="#9FE870" opacity={0.18} layers={2} />
+                  <Link href="/registreren" className="rounded-2xl bg-[#1d3014] text-white px-6 py-5 flex flex-col justify-center min-h-[200px] w-full relative overflow-hidden group">
+                    <GeometricShapes variant="trapezoid" className="right-0 bottom-0 w-32 h-32" color="#c8e957" opacity={0.18} layers={2} />
                     <div className="relative z-10 flex flex-col items-start gap-3">
                       <h3 className="text-2xl font-semibold tracking-tight leading-snug text-white">Overstappen binnen een uur</h3>
                       <p className="text-sm text-white/90 leading-6">Met OCR lezen we je contracten en documenten in en zetten we alles in één keer over. Geen handmatig werk.</p>
-                      <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] px-4 py-2.5 text-sm font-semibold shadow-sm group-hover:bg-[#9FE870]/90 transition-colors">
+                      <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c8e957] text-[#1d3014] px-4 py-2.5 text-sm font-semibold shadow-sm group-hover:bg-[#c8e957]/90 transition-colors">
                         Bekijk hoe overstappen werkt
                         <ArrowUpRight className="h-4 w-4 shrink-0" />
                       </span>
@@ -459,13 +459,13 @@ export default function Home() {
                   {/* Sidebar Navigation */}
                   <nav className="flex-1 overflow-y-auto p-4 space-y-2">
                     {/* Proefperiode Card of Welkom - Smaller */}
-                    <div className="bg-[#163300] rounded-xl p-4 mb-4 relative overflow-hidden">
+                    <div className="bg-[#1d3014] rounded-xl p-4 mb-4 relative overflow-hidden">
                       <div className="relative z-10">
                         {userName ? (
                           <>
                             <h3 className="text-lg font-semibold text-white mb-1">Hallo, {userName}</h3>
                             <p className="text-xs text-white/90 mb-3">Ga direct naar je dashboard</p>
-                            <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
+                            <Button asChild className="bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 rounded-xl w-full text-sm">
                               <Link href="/mijn-domio" onClick={() => setMobileMenuOpen(false)}>Mijn Domio</Link>
                             </Button>
                           </>
@@ -474,7 +474,7 @@ export default function Home() {
                             <h3 className="text-lg font-semibold text-white mb-1">Probeer Domio</h3>
                             <p className="text-base font-semibold text-white mb-2">30 dagen gratis</p>
                             <p className="text-xs text-white/90 mb-3">Geen creditcard nodig, op elk moment opzegbaar.</p>
-                            <Button asChild className="bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 rounded-xl w-full text-sm">
+                            <Button asChild className="bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 rounded-xl w-full text-sm">
                               <Link href="/registreren" onClick={() => setMobileMenuOpen(false)}>Registreren</Link>
                             </Button>
                           </>
@@ -484,7 +484,7 @@ export default function Home() {
                       <GeometricShapes 
                         variant="trapezoid" 
                         className="right-0 bottom-0 w-40 h-40"
-                        color="#9FE870"
+                        color="#c8e957"
                         opacity={0.12}
                         layers={2}
                       />
@@ -494,28 +494,28 @@ export default function Home() {
                     <div className="space-y-1 mb-4">
             <Link
               href="#features"
-                        className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg"
+                        className="block py-3.5 px-4 text-base font-medium text-[#1d3014] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Functies
             </Link>
             <Link
               href="#pricing"
-                        className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg"
+                        className="block py-3.5 px-4 text-base font-medium text-[#1d3014] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Prijzen
             </Link>
             <Link
               href="/blog"
-                        className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg"
+                        className="block py-3.5 px-4 text-base font-medium text-[#1d3014] transition-colors hover:bg-gray-50 rounded-lg"
               onClick={() => setMobileMenuOpen(false)}
             >
               Kennisbank
             </Link>
             <Link
               href="/contact"
-              className="block py-3.5 px-4 text-base font-medium text-[#163300] transition-colors hover:bg-gray-50 rounded-lg !text-[#163300]"
+              className="block py-3.5 px-4 text-base font-medium text-[#1d3014] transition-colors hover:bg-gray-50 rounded-lg !text-[#1d3014]"
               onClick={() => setMobileMenuOpen(false)}
             >
               Hulp & Contact
@@ -525,11 +525,11 @@ export default function Home() {
                     {/* Inloggen / Mijn Domio Button */}
                     <div className="pt-2 mb-4">
                       {userName ? (
-                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
+                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#1d3014]">
                           <Link href="/mijn-domio" onClick={() => setMobileMenuOpen(false)}>Mijn Domio</Link>
                         </Button>
                       ) : (
-                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#163300]">
+                        <Button asChild variant="ghost" className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-[#1d3014]">
                           <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Inloggen</Link>
                         </Button>
                       )}
@@ -540,21 +540,21 @@ export default function Home() {
                       <div className="flex flex-col gap-2 px-4">
                         <Link
                           href="/privacy"
-                          className="text-xs text-gray-500 hover:text-[#163300] transition-colors"
+                          className="text-xs text-gray-500 hover:text-[#1d3014] transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Privacy
                         </Link>
                         <Link
                           href="/terms"
-                          className="text-xs text-gray-500 hover:text-[#163300] transition-colors"
+                          className="text-xs text-gray-500 hover:text-[#1d3014] transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                 >
                           Algemene voorwaarden
                         </Link>
                         <Link
                           href="/faq"
-                          className="text-xs text-gray-500 hover:text-[#163300] transition-colors"
+                          className="text-xs text-gray-500 hover:text-[#1d3014] transition-colors"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           FAQ
@@ -582,14 +582,14 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-5 lg:px-6">
           {/* Boven: headline + tekst + CTA (geen illustratie) */}
           <div className="max-w-2xl">
-            <h2 className="text-base font-semibold leading-7 text-[#163300] mb-2">Beheerder types</h2>
-            <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#163300] sm:text-5xl md:text-6xl">
+            <h2 className="text-base font-semibold leading-7 text-[#1d3014] mb-2">Beheerder types</h2>
+            <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#1d3014] sm:text-5xl md:text-6xl">
               Voor elke soort beheerder
             </h2>
             <p className="mt-4 text-lg text-gray-600 max-w-xl">
               Duizenden verhuurders en beheerders vertrouwen op Domio om hun vastgoedportefeuille te beheren. Of je nu een VvE, particuliere eigenaar of professioneel beheerder bent.
             </p>
-            <Button asChild variant="secondary" className="mt-6 rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+            <Button asChild variant="secondary" className="mt-6 rounded-full !bg-[#c8e957] !text-[#1d3014] hover:!bg-[#c8e957]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
               <Link href="/registreren">Bekijk hoe Domio jou ondersteunt</Link>
             </Button>
           </div>
@@ -597,32 +597,32 @@ export default function Home() {
           {/* Drie componenten: link naar functies-pagina, icoon wordt pijl rechtsboven bij hover */}
           <div className="mt-16 grid grid-cols-1 gap-10 sm:gap-8 md:grid-cols-3">
             <Link href="/functies" className="group cursor-pointer transition-colors block">
-              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#c8e957] group-hover:text-[#1d3014] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#c8e957] dark:group-hover:text-[#1d3014]">
                 <Building2 className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
                 <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
-              <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">VvE&apos;s</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
+              <h3 className="text-lg font-semibold text-[#1d3014] dark:text-white mb-1 transition-colors group-hover:text-[#1d3014]">VvE&apos;s</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#1d3014] dark:group-hover:text-[#1d3014]">
                 Perfect voor verenigingen van eigenaren die hun gebouwen efficiënt willen beheren.
               </p>
             </Link>
             <Link href="/functies" className="group cursor-pointer transition-colors block">
-              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#c8e957] group-hover:text-[#1d3014] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#c8e957] dark:group-hover:text-[#1d3014]">
                 <HomeIcon className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
                 <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
-              <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">Eigen vastgoed</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
+              <h3 className="text-lg font-semibold text-[#1d3014] dark:text-white mb-1 transition-colors group-hover:text-[#1d3014]">Eigen vastgoed</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#1d3014] dark:group-hover:text-[#1d3014]">
                 Ideaal voor particuliere vastgoedeigenaren die hun portefeuille zelf beheren.
               </p>
             </Link>
             <Link href="/functies" className="group cursor-pointer transition-colors block">
-              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#9FE870] group-hover:text-[#163300] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#9FE870] dark:group-hover:text-[#163300]">
+              <div className="mb-4 relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors group-hover:bg-[#c8e957] group-hover:text-[#1d3014] dark:bg-neutral-700 dark:text-gray-400 dark:group-hover:bg-[#c8e957] dark:group-hover:text-[#1d3014]">
                 <Briefcase className="h-8 w-8 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 absolute" />
                 <ArrowUpRight className="h-8 w-8 opacity-0 scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 absolute" />
               </div>
-              <h3 className="text-lg font-semibold text-[#163300] dark:text-white mb-1 transition-colors group-hover:text-[#163300]">Vastgoedbeheerder</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#163300] dark:group-hover:text-[#163300]">
+              <h3 className="text-lg font-semibold text-[#1d3014] dark:text-white mb-1 transition-colors group-hover:text-[#1d3014]">Vastgoedbeheerder</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors group-hover:text-[#1d3014] dark:group-hover:text-[#1d3014]">
                 Gemaakt voor professionele vastgoedbeheerders die meerdere portefeuilles beheren.
               </p>
             </Link>
@@ -633,11 +633,11 @@ export default function Home() {
       {/* App Section — tijdelijk uitgeschakeld, activeren zodra de app live is
       <section className="relative z-20 pt-24 pb-12">
         <div className="container mx-auto w-full max-w-7xl px-5 md:px-6 relative z-10">
-          <div className="rounded-3xl bg-[#163300] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
+          <div className="rounded-3xl bg-[#1d3014] pt-8 px-8 pb-0 md:pt-12 md:px-12 md:pb-0 lg:pt-16 lg:px-8 lg:pb-0 relative z-10 overflow-hidden">
             <GeometricShapes
               variant="trapezoid"
               className="right-0 bottom-0 w-[112px] h-[112px] lg:w-[144px] lg:h-[144px]"
-              color="#9FE870"
+              color="#c8e957"
               opacity={0.18}
               layers={2}
             />
@@ -724,10 +724,10 @@ export default function Home() {
               <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col justify-end md:justify-center min-h-[650px] md:min-h-[600px]">
                 <div className="max-w-xl">
                   {/* Small label */}
-                  <h2 className="text-base font-semibold leading-7 text-[#163300] whitespace-nowrap mb-4 w-fit">Over ons</h2>
+                  <h2 className="text-base font-semibold leading-7 text-[#1d3014] whitespace-nowrap mb-4 w-fit">Over ons</h2>
                   
                   {/* Main heading */}
-                  <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#163300] sm:text-5xl md:text-6xl mb-6 w-fit">
+                  <h2 className="text-4xl font-semibold tracking-tight text-balance text-[#1d3014] sm:text-5xl md:text-6xl mb-6 w-fit">
                     Domio is meer dan software
                   </h2>
                   
@@ -739,7 +739,7 @@ export default function Home() {
                   </p>
                   
                   {/* CTA Button */}
-                  <Button asChild variant="secondary" className="w-fit rounded-full !bg-[#9FE870] !text-[#163300] hover:!bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+                  <Button asChild variant="secondary" className="w-fit rounded-full !bg-[#c8e957] !text-[#1d3014] hover:!bg-[#c8e957]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
                     <Link href="/registreren">Meer over ons</Link>
                   </Button>
                 </div>
@@ -756,12 +756,12 @@ export default function Home() {
         {/* Background that extends from middle of CTA into footer */}
         <div className="absolute inset-x-0 top-1/2 bottom-0 bg-white dark:bg-gray-900" />
         <div className="container mx-auto w-full max-w-7xl px-5 md:px-6 relative z-10">
-          <div className="rounded-3xl bg-[#163300] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
+          <div className="rounded-3xl bg-[#1d3014] p-8 md:p-12 lg:p-16 relative z-10 overflow-hidden">
             {/* Geometric decorative element - positioned where no text (bottom right, shifted more right/bottom on mobile) */}
             <GeometricShapes 
               variant="trapezoid" 
               className="right-0 bottom-0 translate-x-4 translate-y-4 lg:translate-x-0 lg:translate-y-0 w-56 h-56 lg:w-72 lg:h-72"
-              color="#9FE870"
+              color="#c8e957"
               opacity={0.18}
               layers={2}
             />
@@ -775,7 +775,7 @@ export default function Home() {
                   Probeer Domio 30 dagen volledig gratis. Geen creditcard nodig, nergens aan vast en op elk moment opzegbaar. Ontdek hoe Domio jouw vastgoedbeheer kan verbeteren.
                 </p>
                 <div className="flex flex-row flex-wrap items-center justify-start gap-4">
-                  <Button asChild className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
+                  <Button asChild className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 border-0 px-8 py-6 text-base font-semibold shadow-sm">
                     <Link href="/registreren">Registreren</Link>
                   </Button>
                   <Link

@@ -78,21 +78,21 @@ export default function UpgradePage() {
                 key={plan.id}
                 className={`flex-1 rounded-2xl border p-7 flex flex-col transition-shadow ${
                   plan.highlight
-                    ? 'border-[#161f13] dark:border-[#94f477] shadow-[0_0_0_1px_#161f13] dark:shadow-[0_0_0_1px_#94f477] bg-[#161f13] dark:bg-[#161f13]'
+                    ? 'border-[#1d3014] dark:border-[#c8e957] shadow-[0_0_0_1px_#1d3014] dark:shadow-[0_0_0_1px_#c8e957] bg-[#1d3014] dark:bg-[#1d3014]'
                     : 'border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-2.5 mb-5">
-                  <div className={`p-1.5 rounded-lg ${plan.highlight ? 'bg-[#94f477]/20' : 'bg-[#f4f4f1] dark:bg-neutral-800'}`}>
-                    <Icon className={`h-4 w-4 ${plan.highlight ? 'text-[#94f477]' : 'text-[#161f13] dark:text-[#94f477]'}`} />
+                  <div className={`p-1.5 rounded-lg ${plan.highlight ? 'bg-[#c8e957]/20' : 'bg-[#f4f4f1] dark:bg-neutral-800'}`}>
+                    <Icon className={`h-4 w-4 ${plan.highlight ? 'text-[#c8e957]' : 'text-[#1d3014] dark:text-[#c8e957]'}`} />
                   </div>
-                  <span className={`font-semibold text-base ${plan.highlight ? 'text-white' : 'text-[#161f13] dark:text-white'}`}>
+                  <span className={`font-semibold text-base ${plan.highlight ? 'text-white' : 'text-[#1d3014] dark:text-white'}`}>
                     {plan.name}
                   </span>
                 </div>
 
                 <div className="mb-1">
-                  <span className={`text-4xl font-bold ${plan.highlight ? 'text-white' : 'text-[#161f13] dark:text-white'}`}>
+                  <span className={`text-4xl font-bold ${plan.highlight ? 'text-white' : 'text-[#1d3014] dark:text-white'}`}>
                     €{plan.price}
                   </span>
                   <span className={`text-sm ml-1.5 ${plan.highlight ? 'text-white/60' : 'text-[#97978f]'}`}>/maand</span>
@@ -104,7 +104,7 @@ export default function UpgradePage() {
                 <ul className="flex flex-col gap-2.5 mb-8 flex-1">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${plan.highlight ? 'text-[#94f477]' : 'text-[#161f13] dark:text-[#94f477]'}`} strokeWidth={2.5} />
+                      <Check className={`h-4 w-4 mt-0.5 shrink-0 ${plan.highlight ? 'text-[#c8e957]' : 'text-[#1d3014] dark:text-[#c8e957]'}`} strokeWidth={2.5} />
                       <span className={`text-sm ${plan.highlight ? 'text-white/85' : 'text-[#55554e] dark:text-gray-300'}`}>{f}</span>
                     </li>
                   ))}
@@ -116,8 +116,8 @@ export default function UpgradePage() {
                   onClick={() => startCheckout(plan.id)}
                   className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     plan.highlight
-                      ? 'bg-[#94f477] text-[#161f13] hover:bg-[#8fd960] disabled:opacity-50'
-                      : 'bg-[#161f13] text-white hover:bg-[#1e4500] disabled:opacity-50 dark:bg-[#94f477] dark:text-[#161f13] dark:hover:bg-[#8fd960]'
+                      ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#8fd960] disabled:opacity-50'
+                      : 'bg-[#1d3014] text-white hover:bg-[#1e4500] disabled:opacity-50 dark:bg-[#c8e957] dark:text-[#1d3014] dark:hover:bg-[#8fd960]'
                   } ${loadingPlan ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {isLoading ? 'Laden…' : `Start ${plan.name}`}

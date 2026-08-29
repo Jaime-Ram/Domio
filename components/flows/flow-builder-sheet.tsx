@@ -107,7 +107,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
       onClick={() => onChange(!on)}
       className={cn(
         'relative inline-flex w-9 h-5 rounded-full shrink-0 transition-colors duration-200',
-        on ? 'bg-[#163300] dark:bg-[#9FE870]' : 'bg-gray-200 dark:bg-neutral-700'
+        on ? 'bg-[#1d3014] dark:bg-[#c8e957]' : 'bg-gray-200 dark:bg-neutral-700'
       )}
     >
       <span
@@ -188,7 +188,7 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
       subtitle="Flow instellen"
       headerLeft={Icon ? (
         <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-          <Icon className="h-[18px] w-[18px] text-[#163300] dark:text-[#9FE870]" strokeWidth={2} />
+          <Icon className="h-[18px] w-[18px] text-[#1d3014] dark:text-[#c8e957]" strokeWidth={2} />
         </div>
       ) : undefined}
       footer={
@@ -202,7 +202,7 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
           </button>
           <Button
             onClick={handleActivate}
-            className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
+            className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] font-semibold text-sm h-9 px-5"
           >
             Flow activeren
           </Button>
@@ -226,7 +226,7 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
             <div className="space-y-2">
               <Label>Trigger</Label>
               <div className="h-10 flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 text-sm text-gray-700 dark:text-gray-300">
-                <Zap className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />
+                <Zap className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                 {template.trigger}
               </div>
             </div>
@@ -300,15 +300,15 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors border-b border-gray-100 dark:border-neutral-800',
                   scopeType === 'all'
-                    ? 'bg-[#163300]/5 dark:bg-[#9FE870]/5 text-gray-900 dark:text-white'
+                    ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/5 text-gray-900 dark:text-white'
                     : 'bg-white dark:bg-neutral-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800/60'
                 )}
               >
                 <div className={cn(
                   'w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
-                  scopeType === 'all' ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300] dark:bg-[#9FE870]' : 'border-gray-300 dark:border-neutral-600'
+                  scopeType === 'all' ? 'border-[#1d3014] dark:border-[#c8e957] bg-[#1d3014] dark:bg-[#c8e957]' : 'border-gray-300 dark:border-neutral-600'
                 )}>
-                  {scopeType === 'all' && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#163300]" />}
+                  {scopeType === 'all' && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#1d3014]" />}
                 </div>
                 <span className="font-medium">Alle panden</span>
               </button>
@@ -318,15 +318,15 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors',
                   scopeType === 'specific'
-                    ? 'bg-[#163300]/5 dark:bg-[#9FE870]/5 text-gray-900 dark:text-white'
+                    ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/5 text-gray-900 dark:text-white'
                     : 'bg-white dark:bg-neutral-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-neutral-800/60'
                 )}
               >
                 <div className={cn(
                   'w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
-                  scopeType === 'specific' ? 'border-[#163300] dark:border-[#9FE870] bg-[#163300] dark:bg-[#9FE870]' : 'border-gray-300 dark:border-neutral-600'
+                  scopeType === 'specific' ? 'border-[#1d3014] dark:border-[#c8e957] bg-[#1d3014] dark:bg-[#c8e957]' : 'border-gray-300 dark:border-neutral-600'
                 )}>
-                  {scopeType === 'specific' && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#163300]" />}
+                  {scopeType === 'specific' && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-[#1d3014]" />}
                 </div>
                 <span className="font-medium">Specifieke panden kiezen</span>
               </button>
@@ -351,10 +351,10 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
                             <div className={cn(
                               'w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors',
                               selected
-                                ? 'bg-[#163300] dark:bg-[#9FE870] border-[#163300] dark:border-[#9FE870]'
+                                ? 'bg-[#1d3014] dark:bg-[#c8e957] border-[#1d3014] dark:border-[#c8e957]'
                                 : 'border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-900'
                             )}>
-                              {selected && <Check className="h-2.5 w-2.5 text-white dark:text-[#163300]" strokeWidth={3} />}
+                              {selected && <Check className="h-2.5 w-2.5 text-white dark:text-[#1d3014]" strokeWidth={3} />}
                             </div>
                             <Building2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                             <span className="text-gray-700 dark:text-gray-300 truncate">{p.name}</span>
@@ -389,7 +389,7 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
                       <div className={cn(
                         'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0',
                         step.enabled
-                          ? 'bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300]'
+                          ? 'bg-[#1d3014] dark:bg-[#c8e957] text-white dark:text-[#1d3014]'
                           : 'bg-gray-200 dark:bg-neutral-700 text-gray-400 dark:text-neutral-500'
                       )}>
                         {i + 1}
@@ -447,7 +447,7 @@ export function FlowBuilderSheet({ open, template, onClose, onActivate, properti
                                       className={cn(
                                         'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all',
                                         step.channel === ch
-                                          ? 'bg-[#163300]/10 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] border-[#163300]/20 dark:border-[#9FE870]/20'
+                                          ? 'bg-[#1d3014]/10 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] border-[#1d3014]/20 dark:border-[#c8e957]/20'
                                           : 'bg-gray-50 dark:bg-neutral-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600'
                                       )}
                                     >

@@ -594,7 +594,7 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
                 </div>
                 <div className="flex justify-between font-semibold border-t border-gray-200 dark:border-neutral-700 pt-2">
                   <span>Nieuwe huur</span>
-                  <span className="text-[#163300] dark:text-[#9FE870]">€{indexatiePreview.newRent.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-[#1d3014] dark:text-[#c8e957]">€{indexatiePreview.newRent.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
             ) : (
@@ -651,7 +651,7 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
                 'text-sm font-semibold px-4 py-2 rounded-full disabled:opacity-40 transition-colors flex items-center gap-1.5',
                 activeAction === 'opzeggen'
                   ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-[#163300] hover:bg-[#1f4a00] text-white'
+                  : 'bg-[#1d3014] hover:bg-[#1f4a00] text-white'
               )}
             >
               {actionSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
@@ -683,7 +683,7 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
                 type="button"
                 onClick={handleSave}
                 disabled={saving || !isDirty}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-40 text-[#163300] text-sm font-semibold px-5 py-2 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-40 text-[#1d3014] text-sm font-semibold px-5 py-2 transition-colors"
               >
                 {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Opslaan
@@ -902,7 +902,7 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
               <button
                 type="button"
                 onClick={() => { router.push(`${basePath}/financial/betalingen`); onClose() }}
-                className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
               >
                 Alle betalingen →
               </button>
@@ -962,7 +962,7 @@ export function TenantDetailSheet({ tenantId, open, onClose, onDeleted }: Tenant
                           <p className="text-xs text-gray-400 dark:text-gray-500">{date}{a.category ? ` · ${a.category}` : ''}</p>
                         </div>
                       </div>
-                      <p className={cn('text-sm font-semibold shrink-0 ml-3', amount >= 0 ? 'text-[#163300] dark:text-[#9FE870]' : 'text-red-600 dark:text-red-400')}>
+                      <p className={cn('text-sm font-semibold shrink-0 ml-3', amount >= 0 ? 'text-[#1d3014] dark:text-[#c8e957]' : 'text-red-600 dark:text-red-400')}>
                         {amount >= 0 ? '+' : ''}€ {amount.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
@@ -1066,14 +1066,14 @@ function EditRow({ icon: Icon, label, value, onChange, type = 'text' }: {
           type={type}
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#9FE870] transition-shadow"
+          className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#c8e957] transition-shadow"
         />
       </div>
     </div>
   )
 }
 
-const FIELD_CLS = 'w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#9FE870] transition-shadow resize-none'
+const FIELD_CLS = 'w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#c8e957] transition-shadow resize-none'
 
 function ActionField({ label, children }: { label: string; children: React.ReactNode }) {
   return (

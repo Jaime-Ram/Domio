@@ -71,7 +71,7 @@ export function WiseMonthPicker({
         onClick={() => setOpen((v) => !v)}
         className={cn(
           'w-full flex items-center justify-between border border-input bg-background text-left',
-          'hover:border-[#161f13] focus:outline-none focus:ring-2 focus:ring-[#161f13]/30 transition-colors',
+          'hover:border-[#1d3014] focus:outline-none focus:ring-2 focus:ring-[#1d3014]/30 transition-colors',
           compact
             ? 'rounded-full px-3 py-1.5 text-sm'
             : 'rounded-xl px-3 py-2 text-sm',
@@ -125,7 +125,7 @@ export function WiseMonthPicker({
                 className={cn(
                   'rounded-lg py-2 text-sm font-medium transition-colors',
                   isSelectedMonth(i)
-                    ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                    ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                     : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-800',
                 )}
               >

@@ -363,7 +363,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
                   className={cn(
                     'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                     propertyId
-                      ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                      ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                       : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600'
                   )}
                 >
@@ -381,7 +381,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
                         <button key={p.id} type="button"
                           onClick={() => { setPropertyId(p.id); setUnitId(''); setPropPickerOpen(false) }}
                           className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                            propertyId === p.id ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                            propertyId === p.id ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
                           )}
                         >
                           <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-400" />
@@ -410,7 +410,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
                   className={cn(
                     'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                     unitId
-                      ? 'border-[#163300] bg-[#163300]/5 text-[#163300] dark:border-[#9FE870] dark:bg-[#9FE870]/10 dark:text-[#9FE870]'
+                      ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                       : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
                   )}
                 >
@@ -430,7 +430,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
                         <button key={u.id} type="button"
                           onClick={() => { setUnitId(u.id); setUnitPickerOpen(false) }}
                           className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                            unitId === u.id ? 'bg-[#163300]/5 dark:bg-[#9FE870]/10 text-[#163300] dark:text-[#9FE870] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
+                            unitId === u.id ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800'
                           )}
                         >
                           <Home className="h-3.5 w-3.5 shrink-0 text-gray-400" />
@@ -618,7 +618,7 @@ export function NewTenantDialog({ open, onClose, onCreated }: NewTenantDialogPro
               <button
                 type="button"
                 onClick={() => setTenantSlots((prev) => [...prev, makeSlot()])}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#163300]/30 dark:border-[#9FE870]/30 bg-[#163300]/5 dark:bg-[#9FE870]/8 text-[#163300] dark:text-[#9FE870] text-sm font-semibold px-4 py-1.5 hover:bg-[#163300]/10 dark:hover:bg-[#9FE870]/15 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#1d3014]/30 dark:border-[#c8e957]/30 bg-[#1d3014]/5 dark:bg-[#c8e957]/8 text-[#1d3014] dark:text-[#c8e957] text-sm font-semibold px-4 py-1.5 hover:bg-[#1d3014]/10 dark:hover:bg-[#c8e957]/15 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Nieuwe huurder
@@ -683,7 +683,7 @@ function TenantSlotCard({
               className={cn(
                 'rounded-full px-2.5 py-1 font-medium transition-colors',
                 slot.mode === 'new'
-                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                  ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               )}
             >
@@ -695,7 +695,7 @@ function TenantSlotCard({
               className={cn(
                 'rounded-full px-2.5 py-1 font-medium transition-colors',
                 slot.mode === 'existing'
-                  ? 'bg-[#163300] text-white dark:bg-[#9FE870] dark:text-[#163300]'
+                  ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               )}
             >
@@ -727,8 +727,8 @@ function TenantSlotCard({
           </>
         ) : selectedTenant ? (
           /* Existing tenant selected — show summary with clear button */
-          <div className="flex items-center gap-3 rounded-xl bg-[#163300]/5 dark:bg-[#9FE870]/8 px-3 py-2.5">
-            <Check className="h-4 w-4 text-[#163300] dark:text-[#9FE870] shrink-0" />
+          <div className="flex items-center gap-3 rounded-xl bg-[#1d3014]/5 dark:bg-[#c8e957]/8 px-3 py-2.5">
+            <Check className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{selectedTenant.full_name}</p>
               {selectedTenant.email && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{selectedTenant.email}</p>}

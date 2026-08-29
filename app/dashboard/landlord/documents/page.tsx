@@ -644,7 +644,7 @@ export default function DocumentsPage() {
                   >
                     <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 overflow-hidden [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
                       <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-                        <DialogTitle className="text-[#161f13] dark:text-[#94f477] text-lg">
+                        <DialogTitle className="text-[#1d3014] dark:text-[#c8e957] text-lg">
                           Documenten uploaden
                         </DialogTitle>
                         <DialogDescription>
@@ -725,11 +725,11 @@ export default function DocumentsPage() {
                           onDrop={handleDrop}
                           disabled={uploading}
                           className={cn(
-                            'w-full rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-2',
+                            'w-full rounded-2xl border-2 border-dashed px-4 py-8 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-2',
                             stagedUploadFiles.length > 0 ? 'py-5' : 'py-10',
                             dropActive
-                              ? 'border-[#161f13] bg-[#94f477]/20 dark:bg-[#94f477]/10'
-                              : 'border-[#e3e3de] dark:border-neutral-600 bg-[#f4f4f1]/90 dark:bg-neutral-800/80 hover:border-[#161f13]/50 hover:bg-[#f4f4f1]/80 dark:hover:bg-neutral-800',
+                              ? 'border-[#1d3014] bg-[#c8e957]/20 dark:bg-[#c8e957]/10'
+                              : 'border-[#e3e3de] dark:border-neutral-600 bg-[#f4f4f1]/90 dark:bg-neutral-800/80 hover:border-[#1d3014]/50 hover:bg-[#f4f4f1]/80 dark:hover:bg-neutral-800',
                             uploading && 'pointer-events-none opacity-70'
                           )}
                         >
@@ -737,7 +737,7 @@ export default function DocumentsPage() {
                             className={cn(
                               'mx-auto h-8 w-8 mb-2',
                               stagedUploadFiles.length > 0 ? 'mb-1.5' : 'mb-3 h-10 w-10',
-                              dropActive ? 'text-[#161f13] dark:text-[#94f477]' : 'text-[#97978f] dark:text-[#97978f]'
+                              dropActive ? 'text-[#1d3014] dark:text-[#c8e957]' : 'text-[#97978f] dark:text-[#97978f]'
                             )}
                             aria-hidden
                           />
@@ -760,7 +760,7 @@ export default function DocumentsPage() {
                             <Link2 className="h-4 w-4 shrink-0" />
                             <span className="flex-1 text-left">Koppel document aan…</span>
                             {linkEnabled && linkSelectedId && (
-                              <span className="text-xs bg-[#94f477]/20 text-[#161f13] dark:text-[#94f477] px-2 py-0.5 rounded-full font-medium">
+                              <span className="text-xs bg-[#c8e957]/20 text-[#1d3014] dark:text-[#c8e957] px-2 py-0.5 rounded-full font-medium">
                                 Gekoppeld
                               </span>
                             )}
@@ -784,7 +784,7 @@ export default function DocumentsPage() {
                                     className={cn(
                                       'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                                       linkType === key
-                                        ? 'bg-[#161f13] text-white border-[#161f13] dark:bg-[#94f477] dark:text-[#161f13] dark:border-[#94f477]'
+                                        ? 'bg-[#1d3014] text-white border-[#1d3014] dark:bg-[#c8e957] dark:text-[#1d3014] dark:border-[#c8e957]'
                                         : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-[#97978f] border-[#e3e3de] dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
                                     )}
                                   >
@@ -801,7 +801,7 @@ export default function DocumentsPage() {
                                   value={linkSearch}
                                   onChange={(e) => setLinkSearch(e.target.value)}
                                   placeholder={`Zoek ${linkType === 'property' ? 'pand' : linkType === 'unit' ? 'woning' : linkType === 'lease' ? 'huurcontract' : 'ticket'}…`}
-                                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#161f13]/20 dark:focus:ring-[#94f477]/20"
+                                  className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20 dark:focus:ring-[#c8e957]/20"
                                 />
                               </div>
 
@@ -821,7 +821,7 @@ export default function DocumentsPage() {
                                     className={cn(
                                       'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
                                       linkSelectedId === opt.id
-                                        ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                        ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                                         : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 text-[#1a1c18] dark:text-gray-100'
                                     )}
                                   >
@@ -831,7 +831,7 @@ export default function DocumentsPage() {
                                         <span className={cn(
                                           'text-xs truncate block',
                                           linkSelectedId === opt.id
-                                            ? 'text-white/70 dark:text-[#161f13]/70'
+                                            ? 'text-white/70 dark:text-[#1d3014]/70'
                                             : 'text-[#97978f] dark:text-[#97978f]'
                                         )}>
                                           {opt.sublabel}
@@ -877,7 +877,7 @@ export default function DocumentsPage() {
                         )}
                         <Button
                           type="button"
-                          className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] disabled:opacity-60"
+                          className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] disabled:opacity-60"
                           onClick={stagedUploadFiles.length > 0 ? handleConfirmUpload : () => fileInputRef.current?.click()}
                           disabled={uploading}
                         >
@@ -907,7 +907,7 @@ export default function DocumentsPage() {
                   >
                     <DialogContent className="sm:max-w-md border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-900 p-0 gap-0 [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:p-0 [&>button]:h-8 [&>button]:w-8 [&>button]:rounded-full [&>button]:bg-[#f4f4f1] [&>button]:text-[#55554e] [&>button]:opacity-100 [&>button:hover]:bg-[#ebebe7] [&>button:hover]:text-[#1a1c18] dark:[&>button]:bg-neutral-800 dark:[&>button]:text-gray-300 dark:[&>button:hover]:bg-neutral-700 dark:[&>button:hover]:text-white">
                       <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-                        <DialogTitle className="text-[#161f13] dark:text-[#94f477] text-lg">
+                        <DialogTitle className="text-[#1d3014] dark:text-[#c8e957] text-lg">
                           Toewijzen
                         </DialogTitle>
                         <DialogDescription className="truncate">
@@ -930,7 +930,7 @@ export default function DocumentsPage() {
                               className={cn(
                                 'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
                                 assignType === key
-                                  ? 'bg-[#161f13] text-white border-[#161f13] dark:bg-[#94f477] dark:text-[#161f13] dark:border-[#94f477]'
+                                  ? 'bg-[#1d3014] text-white border-[#1d3014] dark:bg-[#c8e957] dark:text-[#1d3014] dark:border-[#c8e957]'
                                   : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-[#97978f] border-[#e3e3de] dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-400'
                               )}
                             >
@@ -947,7 +947,7 @@ export default function DocumentsPage() {
                             value={assignSearch}
                             onChange={(e) => setAssignSearch(e.target.value)}
                             placeholder={`Zoek ${assignType === 'property' ? 'pand' : assignType === 'unit' ? 'woning' : assignType === 'lease' ? 'huurcontract' : 'ticket'}…`}
-                            className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#161f13]/20 dark:focus:ring-[#94f477]/20"
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-xl border border-[#e3e3de] dark:border-neutral-600 bg-white dark:bg-neutral-800 text-[#1a1c18] dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20 dark:focus:ring-[#c8e957]/20"
                           />
                         </div>
 
@@ -967,7 +967,7 @@ export default function DocumentsPage() {
                               className={cn(
                                 'flex w-full items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors',
                                 assignSelectedId === opt.id
-                                  ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                  ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                                   : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 text-[#1a1c18] dark:text-gray-100'
                               )}
                             >
@@ -976,7 +976,7 @@ export default function DocumentsPage() {
                                 {opt.sublabel && (
                                   <span className={cn(
                                     'text-xs truncate block',
-                                    assignSelectedId === opt.id ? 'text-white/70 dark:text-[#161f13]/70' : 'text-[#97978f] dark:text-[#97978f]'
+                                    assignSelectedId === opt.id ? 'text-white/70 dark:text-[#1d3014]/70' : 'text-[#97978f] dark:text-[#97978f]'
                                   )}>
                                     {opt.sublabel}
                                   </span>
@@ -1003,7 +1003,7 @@ export default function DocumentsPage() {
                         </Button>
                         <Button
                           type="button"
-                          className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] disabled:opacity-60"
+                          className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] disabled:opacity-60"
                           onClick={handleAssignSave}
                           disabled={!assignSelectedId || assignSaving}
                         >

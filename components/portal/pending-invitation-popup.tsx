@@ -73,7 +73,7 @@ export function PendingInvitationPopup() {
       <DialogContent className="max-w-sm p-8" closeButtonClassName="rounded-full bg-gray-100 p-1.5 text-gray-400 hover:text-gray-600 dark:bg-neutral-800">
         {done ? (
           <div className="text-center py-4">
-            <div className="w-14 h-14 rounded-full bg-[#9FE870]/20 flex items-center justify-center mx-auto mb-5">
+            <div className="w-14 h-14 rounded-full bg-[#c8e957]/20 flex items-center justify-center mx-auto mb-5">
               <CheckCircle2 className="w-7 h-7 text-[#15803D]" />
             </div>
             <DialogTitle className="text-xl font-extrabold text-gray-900 mb-2">Aanvraag geaccepteerd!</DialogTitle>
@@ -90,8 +90,8 @@ export function PendingInvitationPopup() {
 
             {invite.property && (
               <div className="flex items-center gap-3 bg-[#f4f4f4] dark:bg-neutral-800 rounded-2xl px-4 py-3.5 mb-6 text-left">
-                <div className="w-8 h-8 rounded-xl bg-[#163300] flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4 text-[#9FE870]" />
+                <div className="w-8 h-8 rounded-xl bg-[#1d3014] flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4 text-[#c8e957]" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Jouw woning</p>
@@ -107,7 +107,7 @@ export function PendingInvitationPopup() {
             <button
               onClick={accept}
               disabled={loading}
-              className="flex items-center justify-center gap-2 w-full bg-[#9FE870] text-[#163300] font-bold text-base py-3.5 rounded-full hover:bg-[#8AD45F] transition-colors disabled:opacity-50"
+              className="flex items-center justify-center gap-2 w-full bg-[#c8e957] text-[#1d3014] font-bold text-base py-3.5 rounded-full hover:bg-[#8AD45F] transition-colors disabled:opacity-50"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               Aanvraag accepteren

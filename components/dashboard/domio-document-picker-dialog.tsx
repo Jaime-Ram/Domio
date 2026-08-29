@@ -67,7 +67,7 @@ export function DomioDocumentPickerDialog({ open, onOpenChange, documents, onPic
               }}
               className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-[#1a1c18] dark:text-gray-100 hover:bg-[#f4f4f4] dark:hover:bg-neutral-800"
             >
-              <FileText className="h-4 w-4 shrink-0 text-[#161f13] dark:text-[#94f477]" />
+              <FileText className="h-4 w-4 shrink-0 text-[#1d3014] dark:text-[#c8e957]" />
               <span className="truncate">{d.name}</span>
             </button>
           ))}

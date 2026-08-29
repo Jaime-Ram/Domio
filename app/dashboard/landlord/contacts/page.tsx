@@ -279,13 +279,13 @@ export default function ContactsPage() {
     {
       key: 'phone', header: 'Telefoon', width: 'minmax(0,1.2fr)',
       render: (c) => c.phone ? (
-        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors">{c.phone}</a>
+        <a href={`tel:${c.phone}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#1d3014] dark:hover:text-[#c8e957] hover:underline transition-colors">{c.phone}</a>
       ) : <span className="text-[12.5px] text-[#97978f] dark:text-[#55554e]">—</span>,
     },
     {
       key: 'email', header: 'E-mail', width: 'minmax(0,1.6fr)',
       render: (c) => c.email ? (
-        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#161f13] dark:hover:text-[#94f477] hover:underline transition-colors">{c.email}</a>
+        <a href={`mailto:${c.email}`} onClick={(e) => e.stopPropagation()} className="inline-block max-w-full text-[12.5px] text-[#55554e] dark:text-gray-300 truncate hover:text-[#1d3014] dark:hover:text-[#c8e957] hover:underline transition-colors">{c.email}</a>
       ) : <span className="text-[12.5px] text-[#97978f] dark:text-[#55554e]">—</span>,
     },
   ]
@@ -472,7 +472,7 @@ export default function ContactsPage() {
                 Annuleren
               </button>
               <button type="button" onClick={handleSaveEdit} disabled={editSaving || !editForm.name.trim()}
-                className="inline-flex items-center justify-center rounded-full bg-[#94f477] hover:bg-[#8AD45F] disabled:opacity-50 text-[#161f13] text-sm font-semibold px-5 py-2 transition-colors">
+                className="inline-flex items-center justify-center rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-50 text-[#1d3014] text-sm font-semibold px-5 py-2 transition-colors">
                 {editSaving ? 'Opslaan…' : 'Opslaan'}
               </button>
             </div>
@@ -564,14 +564,14 @@ export default function ContactsPage() {
                 )}
                 {detailContact.phone && (
                   <a href={`tel:${detailContact.phone}`}
-                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#161f13] dark:hover:text-[#94f477] transition-colors">
+                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#1d3014] dark:hover:text-[#c8e957] transition-colors">
                     <Phone className="h-4 w-4 text-[#97978f] shrink-0" />
                     {detailContact.phone}
                   </a>
                 )}
                 {detailContact.email && (
                   <a href={`mailto:${detailContact.email}`}
-                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#161f13] dark:hover:text-[#94f477] transition-colors">
+                    className="flex items-center gap-3 text-sm text-[#55554e] dark:text-neutral-300 hover:text-[#1d3014] dark:hover:text-[#c8e957] transition-colors">
                     <Mail className="h-4 w-4 text-[#97978f] shrink-0" />
                     {detailContact.email}
                   </a>
@@ -649,8 +649,8 @@ function LinkSelectors({
               return (
                 <button key={p.id} type="button" onClick={() => onToggleProperty(p.id)}
                   className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
-                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#161f13] border-[#161f13] dark:bg-[#94f477] dark:border-[#94f477]' : 'border-gray-300 dark:border-neutral-600')}>
-                    {sel && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#1d3014] border-[#1d3014] dark:bg-[#c8e957] dark:border-[#c8e957]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#1d3014]" />}
                   </span>
                   <Building2 className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
                   <span className="text-sm text-[#55554e] dark:text-gray-300 truncate">{p.name || p.address || 'Pand'}</span>
@@ -671,8 +671,8 @@ function LinkSelectors({
               return (
                 <button key={pf.id} type="button" onClick={() => onTogglePortfolio(pf.id)}
                   className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
-                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#161f13] border-[#161f13] dark:bg-[#94f477] dark:border-[#94f477]' : 'border-gray-300 dark:border-neutral-600')}>
-                    {sel && <Check className="h-3 w-3 text-white dark:text-[#161f13]" />}
+                  <span className={cn('h-4 w-4 rounded border flex items-center justify-center shrink-0', sel ? 'bg-[#1d3014] border-[#1d3014] dark:bg-[#c8e957] dark:border-[#c8e957]' : 'border-gray-300 dark:border-neutral-600')}>
+                    {sel && <Check className="h-3 w-3 text-white dark:text-[#1d3014]" />}
                   </span>
                   <Layers className="h-3.5 w-3.5 text-[#97978f] shrink-0" />
                   <span className="text-sm text-[#55554e] dark:text-gray-300 truncate">{pf.name || 'Portefeuille'}</span>

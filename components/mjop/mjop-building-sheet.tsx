@@ -324,7 +324,7 @@ export function MjopBuildingSheet({
       <DetailShell open={open} onClose={onClose} title="MJOP" footer={null}>
         <div className="flex flex-col items-center justify-center py-20 text-center px-6">
           <p className="text-gray-500">Gebouw niet gevonden.</p>
-          <button type="button" onClick={onClose} className="mt-4 text-sm text-[#163300] underline">Sluiten</button>
+          <button type="button" onClick={onClose} className="mt-4 text-sm text-[#1d3014] underline">Sluiten</button>
         </div>
       </DetailShell>
     )
@@ -338,8 +338,8 @@ export function MjopBuildingSheet({
         title={building.name}
         subtitle={building.address ?? undefined}
         headerLeft={
-          <div className="h-10 w-10 rounded-xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-            <Building2 className="h-5 w-5 text-[#163300] dark:text-[#9FE870]" />
+          <div className="h-10 w-10 rounded-xl bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center shrink-0">
+            <Building2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
           </div>
         }
         footer={null}
@@ -380,7 +380,7 @@ export function MjopBuildingSheet({
               <button
                 type="button"
                 onClick={openElemDialog}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] px-4 py-2 text-sm font-semibold hover:bg-[#9FE870]/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] text-[#1d3014] px-4 py-2 text-sm font-semibold hover:bg-[#c8e957]/90 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Element toevoegen
@@ -402,7 +402,7 @@ export function MjopBuildingSheet({
                 {elements.map((el: any) => (
                   <div
                     key={el.id}
-                    className="group flex items-center gap-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-4 py-3 hover:border-[#163300]/25 hover:shadow-sm transition-all cursor-pointer"
+                    className="group flex items-center gap-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-4 py-3 hover:border-[#1d3014]/25 hover:shadow-sm transition-all cursor-pointer"
                     onClick={() => setDetailElement(el)}
                   >
                     <ConditionDot score={el.conditiescore_huidig} />
@@ -458,7 +458,7 @@ export function MjopBuildingSheet({
               <button
                 type="button"
                 onClick={() => setInspDialogOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#9FE870] text-[#163300] px-4 py-2 text-sm font-semibold hover:bg-[#9FE870]/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] text-[#1d3014] px-4 py-2 text-sm font-semibold hover:bg-[#c8e957]/90 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Inspectie plannen
@@ -480,7 +480,7 @@ export function MjopBuildingSheet({
                 {inspections.map((ins: any) => (
                   <div
                     key={ins.id}
-                    className="group flex items-center gap-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-4 py-3 hover:border-[#163300]/25 hover:shadow-sm transition-all cursor-pointer"
+                    className="group flex items-center gap-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-4 py-3 hover:border-[#1d3014]/25 hover:shadow-sm transition-all cursor-pointer"
                     onClick={() => openInspectionDetail(ins)}
                   >
                     <div className={cn(
@@ -514,8 +514,8 @@ export function MjopBuildingSheet({
         {/* ── PLAN ── */}
         {tab === 'plan' && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="h-12 w-12 rounded-xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center mb-3">
-              <CalendarRange className="h-6 w-6 text-[#163300] dark:text-[#9FE870]" />
+            <div className="h-12 w-12 rounded-xl bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center mb-3">
+              <CalendarRange className="h-6 w-6 text-[#1d3014] dark:text-[#c8e957]" />
             </div>
             <p className="text-sm font-medium text-gray-700 dark:text-neutral-300 mb-1">Meerjarenplan</p>
             <p className="text-xs text-gray-400 dark:text-neutral-500 max-w-xs mb-4">
@@ -557,11 +557,11 @@ export function MjopBuildingSheet({
                       className={cn(
                         'w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors',
                         selectedType?.id === t.id
-                          ? 'bg-[#163300] text-white'
+                          ? 'bg-[#1d3014] text-white'
                           : 'hover:bg-gray-50 dark:hover:bg-neutral-800 border border-transparent hover:border-gray-200 dark:hover:border-neutral-700'
                       )}
                     >
-                      <span className={cn('text-[11px] font-mono font-bold shrink-0 w-7', selectedType?.id === t.id ? 'text-[#9FE870]' : 'text-gray-400 dark:text-neutral-500')}>
+                      <span className={cn('text-[11px] font-mono font-bold shrink-0 w-7', selectedType?.id === t.id ? 'text-[#c8e957]' : 'text-gray-400 dark:text-neutral-500')}>
                         {t.nlsfb_code}
                       </span>
                       <div className="flex-1 min-w-0">
@@ -668,7 +668,7 @@ export function MjopBuildingSheet({
                 className={cn(
                   'flex-1 rounded-xl px-2 py-2.5 text-center transition-colors border',
                   defectForm.ernst === o.value
-                    ? 'bg-[#163300] border-[#163300] text-white'
+                    ? 'bg-[#1d3014] border-[#1d3014] text-white'
                     : 'bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-300 hover:border-gray-300'
                 )}
               >
@@ -691,7 +691,7 @@ export function MjopBuildingSheet({
                 className={cn(
                   'flex-1 rounded-xl px-1 py-2.5 text-center transition-colors border',
                   defectForm.omvang === o.value
-                    ? 'bg-[#163300] border-[#163300] text-white'
+                    ? 'bg-[#1d3014] border-[#1d3014] text-white'
                     : 'bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-300 hover:border-gray-300'
                 )}
               >
@@ -714,7 +714,7 @@ export function MjopBuildingSheet({
                 className={cn(
                   'flex-1 rounded-xl px-2 py-2.5 text-center transition-colors border',
                   defectForm.intensiteit === o.value
-                    ? 'bg-[#163300] border-[#163300] text-white'
+                    ? 'bg-[#1d3014] border-[#1d3014] text-white'
                     : 'bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-gray-700 dark:text-neutral-300 hover:border-gray-300'
                 )}
               >
@@ -896,7 +896,7 @@ export function MjopBuildingSheet({
                           <button
                             type="button"
                             onClick={() => openDefectDialog(el)}
-                            className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 px-2 py-1 text-[11px] font-medium hover:border-[#163300]/30 hover:text-[#163300] dark:hover:text-[#9FE870] transition-colors"
+                            className="shrink-0 inline-flex items-center gap-1 rounded-lg bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-neutral-400 px-2 py-1 text-[11px] font-medium hover:border-[#1d3014]/30 hover:text-[#1d3014] dark:hover:text-[#c8e957] transition-colors"
                           >
                             <Plus className="h-3 w-3" />
                             Gebrek
@@ -965,7 +965,7 @@ function DetailStat({ label, value, accent }: { label: string; value: React.Reac
   return (
     <div className="rounded-xl bg-gray-50 dark:bg-neutral-800 px-3 py-2.5">
       <p className="text-[10px] text-gray-400 dark:text-neutral-500 uppercase tracking-wide">{label}</p>
-      <p className={cn('text-sm font-semibold mt-0.5', accent ? 'text-[#163300] dark:text-[#9FE870]' : 'text-gray-900 dark:text-white')}>
+      <p className={cn('text-sm font-semibold mt-0.5', accent ? 'text-[#1d3014] dark:text-[#c8e957]' : 'text-gray-900 dark:text-white')}>
         {value}
       </p>
     </div>

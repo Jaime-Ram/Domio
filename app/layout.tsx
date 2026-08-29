@@ -9,10 +9,7 @@ export const metadata: Metadata = {
   description: "Alles-in-één vastgoedbeheerplatform voor vastgoedbeheerders, huurders en verhuurders",
   icons: {
     icon: [
-      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
-    ],
-    apple: [
-      { url: '/icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
   },
 };

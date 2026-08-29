@@ -217,7 +217,7 @@ export function MegaPanel({ menu }: { menu: Menu }) {
               <span
                 className="select-none text-[clamp(2rem,4vw,3rem)] font-medium tracking-[-0.03em]"
                 style={{
-                  background: "linear-gradient(180deg, #161f13 55%, #94f477 125%)",
+                  background: "linear-gradient(180deg, #1d3014 55%, #c8e957 125%)",
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
                   color: "transparent",

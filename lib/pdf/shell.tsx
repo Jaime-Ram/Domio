@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 
 export const C = {
-  primary: '#163300',
-  accent: '#9FE870',
+  primary: '#1d3014',
+  accent: '#c8e957',
   gray: '#6B7280',
   lightGray: '#F9FAFB',
   border: '#E5E7EB',

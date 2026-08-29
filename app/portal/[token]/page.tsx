@@ -10,7 +10,7 @@ interface PortalPageProps {
 }
 
 const PRIMARY_BTN =
-  'flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#9FE870] text-[#163300] font-semibold text-base hover:bg-[#9FE870]/90 shadow-sm transition-colors border-0'
+  'flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#c8e957] text-[#1d3014] font-semibold text-base hover:bg-[#c8e957]/90 shadow-sm transition-colors border-0'
 
 export default async function PortalPage({ params }: PortalPageProps) {
   const { token } = await params
@@ -49,7 +49,7 @@ export default async function PortalPage({ params }: PortalPageProps) {
 
   return (
     <AuthPageShell>
-      <h1 className="text-4xl font-bold text-[#163300]">
+      <h1 className="text-4xl font-bold text-[#1d3014]">
         Je uitnodiging staat klaar
       </h1>
       <p className="mt-2 text-sm text-gray-600">
@@ -58,8 +58,8 @@ export default async function PortalPage({ params }: PortalPageProps) {
 
       {propertyLabel && (
         <div className="mt-8 flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#163300]">
-            <MapPin className="h-5 w-5 text-[#9FE870]" />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1d3014]">
+            <MapPin className="h-5 w-5 text-[#c8e957]" />
           </div>
           <div className="min-w-0">
             <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Jouw woning</div>
@@ -96,7 +96,7 @@ export default async function PortalPage({ params }: PortalPageProps) {
 function TokenExpiredView() {
   return (
     <AuthPageShell>
-      <h1 className="text-4xl font-bold text-[#163300]">Link verlopen</h1>
+      <h1 className="text-4xl font-bold text-[#1d3014]">Link verlopen</h1>
       <p className="mt-2 text-sm text-gray-600">
         Deze uitnodigingslink is niet meer geldig. Vraag je verhuurder om een nieuwe uitnodiging.
       </p>
@@ -108,10 +108,10 @@ function AlreadyAcceptedView({ tenantName }: { tenantName: string }) {
   const firstName = tenantName.split(' ')[0]
   return (
     <AuthPageShell>
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#9FE870]/20">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#c8e957]/20">
         <CheckCircle2 className="h-7 w-7 text-[#15803D]" />
       </div>
-      <h1 className="text-4xl font-bold text-[#163300]">Al geaccepteerd</h1>
+      <h1 className="text-4xl font-bold text-[#1d3014]">Al geaccepteerd</h1>
       <p className="mt-2 text-sm text-gray-600">
         Hoi {firstName}, je hebt deze uitnodiging al geaccepteerd.
       </p>

@@ -160,7 +160,7 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
   const itemClass = (active: boolean) => cn(
     "flex items-center w-full py-[5px] px-3 text-[14px] rounded-md transition-colors duration-150 focus:outline-none text-left",
     active
-      ? "bg-[#f4f4f1] text-[#161f13] font-medium dark:bg-neutral-800 dark:text-[#94f477]"
+      ? "bg-[#f4f4f1] text-[#1d3014] font-medium dark:bg-neutral-800 dark:text-[#c8e957]"
       : "text-[#55554e] hover:bg-[#f4f4f1] dark:text-neutral-300 dark:hover:bg-neutral-800"
   )
 
@@ -311,13 +311,13 @@ export function VastgoedSidebar({ isOpen = false, onClose, collapsed = false, on
                           )}
                           {item.badge && !item.comingSoon && (
                             <span className={cn(
-                              "px-1.5 py-0.5 text-[10px] font-medium bg-[#161f13] text-white rounded-full shrink-0 overflow-hidden transition-[max-width,opacity,margin] duration-300",
+                              "px-1.5 py-0.5 text-[10px] font-medium bg-[#1d3014] text-white rounded-full shrink-0 overflow-hidden transition-[max-width,opacity,margin] duration-300",
                               collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-auto"
                             )}>{item.badge}</span>
                           )}
                           {item.badge && (
                             <span className={cn(
-                              "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#161f13] rounded-full transition-opacity duration-300",
+                              "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-[#1d3014] rounded-full transition-opacity duration-300",
                               collapsed ? "opacity-100" : "opacity-0"
                             )} />
                           )}

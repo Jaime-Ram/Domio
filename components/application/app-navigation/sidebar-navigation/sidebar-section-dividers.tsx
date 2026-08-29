@@ -40,7 +40,7 @@ export function SidebarNavigationSectionDividers({
                 className={cn(
                     "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     itemActive
-                        ? "bg-[#163300]/10 text-[#163300] dark:bg-[#163300]/20"
+                        ? "bg-[#1d3014]/10 text-[#1d3014] dark:bg-[#1d3014]/20"
                         : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 )}
             >

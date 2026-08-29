@@ -247,7 +247,7 @@ function LoginContent() {
             <ArrowLeft className="h-4 w-4" />
             Terug
           </button>
-          <h1 className="text-4xl font-medium text-[#161f13]">Verificatie</h1>
+          <h1 className="text-4xl font-medium text-[#1d3014]">Verificatie</h1>
           <p className="mt-2 text-sm text-gray-600">
             Voer de 6-cijferige code uit je authenticator-app in.
           </p>
@@ -265,13 +265,13 @@ function LoginContent() {
               maxLength={6}
               value={totpCode}
               onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#161f13] focus-visible:border-[#161f13]"
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#1d3014] focus-visible:border-[#1d3014]"
               autoFocus
             />
             <Button
               type="submit"
               disabled={loading || totpCode.length !== 6}
-              className="w-full h-12 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90 font-semibold text-base border-0 shadow-sm"
+              className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
             >
               {loading ? 'Controleren…' : 'Bevestigen'}
             </Button>
@@ -286,7 +286,7 @@ function LoginContent() {
             <ArrowLeft className="h-4 w-4" />
             Terug
           </button>
-          <h1 className="text-4xl font-medium text-[#161f13]">Verificatie</h1>
+          <h1 className="text-4xl font-medium text-[#1d3014]">Verificatie</h1>
           <p className="mt-2 text-sm text-gray-600">
             We hebben een 6-cijferige code naar je e-mailadres gestuurd. Voer die hieronder in.
           </p>
@@ -304,13 +304,13 @@ function LoginContent() {
               maxLength={6}
               value={emailCode}
               onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#161f13] focus-visible:border-[#161f13]"
+              className="h-12 text-center text-xl tracking-[0.5em] font-mono rounded-lg border-gray-300 focus-visible:ring-[#1d3014] focus-visible:border-[#1d3014]"
               autoFocus
             />
             <Button
               type="submit"
               disabled={loading || emailCode.length !== 6}
-              className="w-full h-12 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90 font-semibold text-base border-0 shadow-sm"
+              className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
             >
               {loading ? 'Controleren…' : 'Bevestigen'}
             </Button>
@@ -328,12 +328,12 @@ function LoginContent() {
         </motion.div>
       ) : (
         <motion.div key="login" {...slideIn}>
-          <h1 className="text-4xl font-medium text-[#161f13]">
+          <h1 className="text-4xl font-medium text-[#1d3014]">
             Welkom terug!
           </h1>
           <p className="mt-2 text-sm text-gray-600">
             Nog geen account?{' '}
-            <Link href="/registreren" className="font-medium text-[#161f13] underline underline-offset-2 hover:no-underline">
+            <Link href="/registreren" className="font-medium text-[#1d3014] underline underline-offset-2 hover:no-underline">
               Registreren
             </Link>
           </p>
@@ -343,7 +343,7 @@ function LoginContent() {
             </Alert>
           )}
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#161f13]">
+            <label htmlFor="email" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#1d3014]">
               <span className="block text-[12px] text-gray-500">E-mailadres</span>
               <input
                 id="email"
@@ -359,12 +359,12 @@ function LoginContent() {
               <div className="mb-1.5 flex justify-end">
                 <Link
                   href="/forgot-password"
-                  className="text-[13px] text-[#161f13] underline underline-offset-2 hover:no-underline"
+                  className="text-[13px] text-[#1d3014] underline underline-offset-2 hover:no-underline"
                 >
                   Wachtwoord vergeten?
                 </Link>
               </div>
-              <label htmlFor="password" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#161f13]">
+              <label htmlFor="password" className="block cursor-text rounded-lg border border-gray-200 bg-white px-4 py-2.5 transition-colors focus-within:border-[#1d3014]">
                 <span className="block text-[12px] text-gray-500">Wachtwoord</span>
                 <input
                   id="password"
@@ -393,7 +393,7 @@ function LoginContent() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-14 rounded-lg bg-[#94f477] text-[#161f13] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
+              className="w-full h-14 rounded-lg bg-[#c8e957] text-[#1d3014] hover:bg-[#8fdc5f] font-medium text-[15px] border-0 shadow-none"
             >
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>

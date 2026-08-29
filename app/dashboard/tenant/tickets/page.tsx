@@ -226,18 +226,18 @@ function TenantTicketDetail({
                       <div className={cn(
                         'h-0.5 flex-1 transition-colors',
                         i === 0 ? 'opacity-0' :
-                          done ? 'bg-[#161f13] dark:bg-[#94f477]' : 'bg-gray-200 dark:bg-neutral-700',
+                          done ? 'bg-[#1d3014] dark:bg-[#c8e957]' : 'bg-gray-200 dark:bg-neutral-700',
                       )} />
                       <div className={cn(
                         'h-2 w-2 rounded-full shrink-0 transition-colors',
-                        done ? 'bg-[#161f13] dark:bg-[#94f477]' : 'bg-gray-200 dark:bg-neutral-700',
-                        active && 'ring-2 ring-offset-1 ring-[#161f13] dark:ring-[#94f477]',
+                        done ? 'bg-[#1d3014] dark:bg-[#c8e957]' : 'bg-gray-200 dark:bg-neutral-700',
+                        active && 'ring-2 ring-offset-1 ring-[#1d3014] dark:ring-[#c8e957]',
                       )} />
                       <div className={cn(
                         'h-0.5 flex-1 transition-colors',
                         isLast ? 'opacity-0' :
                           i < currentStepIdx && ticket?.status !== 'geannuleerd'
-                            ? 'bg-[#161f13] dark:bg-[#94f477]'
+                            ? 'bg-[#1d3014] dark:bg-[#c8e957]'
                             : 'bg-gray-200 dark:bg-neutral-700',
                       )} />
                     </div>
@@ -344,7 +344,7 @@ function TenantTicketDetail({
               onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendReply() }}
               placeholder="Stuur een bericht aan je verhuurder…"
               rows={2}
-              className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#94f477]/50 dark:text-gray-200 placeholder:text-gray-400"
+              className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#c8e957]/50 dark:text-gray-200 placeholder:text-gray-400"
             />
             <div className="flex justify-end mt-2">
               <Button
@@ -352,7 +352,7 @@ function TenantTicketDetail({
                 size="sm"
                 disabled={!replyText.trim() || sendingReply}
                 onClick={sendReply}
-                className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] text-xs font-semibold px-4"
+                className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] text-xs font-semibold px-4"
               >
                 {sendingReply
                   ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -477,7 +477,7 @@ export default function TenantTicketsPage() {
         </div>
         <Button
           onClick={() => setCreateOpen(true)}
-          className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] font-semibold"
+          className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] font-semibold"
         >
           <Plus className="h-4 w-4 mr-1.5" />
           Nieuwe melding
@@ -520,7 +520,7 @@ export default function TenantTicketsPage() {
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                   {t.category && (
-                    <span className="text-[10px] font-medium text-[#161f13] dark:text-[#94f477] bg-[#94f477]/20 dark:bg-[#94f477]/10 rounded px-1.5 py-0.5 capitalize">
+                    <span className="text-[10px] font-medium text-[#1d3014] dark:text-[#c8e957] bg-[#c8e957]/20 dark:bg-[#c8e957]/10 rounded px-1.5 py-0.5 capitalize">
                       {{ onderhoud: 'Onderhoud', klacht: 'Klacht', inspectie: 'Inspectie', overig: 'Overig', compliance: 'Compliance' }[t.category] ?? t.category}
                     </span>
                   )}
@@ -578,7 +578,7 @@ export default function TenantTicketsPage() {
                     className={cn(
                       'rounded-xl border px-3 py-2 text-xs font-medium transition-colors text-center',
                       category === cat.id
-                        ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                        ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                         : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300',
                     )}
                   >
@@ -608,7 +608,7 @@ export default function TenantTicketsPage() {
                           ? 'border-red-500 bg-red-50 text-red-700 dark:border-red-400 dark:bg-red-950/30 dark:text-red-400'
                           : p.id === 'hoog'
                             ? 'border-orange-400 bg-orange-50 text-orange-700 dark:border-orange-400 dark:bg-orange-950/30 dark:text-orange-400'
-                            : 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            : 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                         : 'border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-400 hover:border-gray-300',
                     )}
                   >
@@ -651,7 +651,7 @@ export default function TenantTicketsPage() {
                 value={dueDate}
                 min={new Date().toISOString().slice(0, 10)}
                 onChange={e => setDueDate(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#94f477]/50"
+                className="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c8e957]/50"
               />
             </div>
 
@@ -713,7 +713,7 @@ export default function TenantTicketsPage() {
             <Button
               onClick={handleSubmit}
               disabled={!title.trim() || submitting}
-              className="rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] font-semibold"
+              className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] font-semibold"
             >
               {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
               Versturen

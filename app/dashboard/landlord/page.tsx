@@ -45,7 +45,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
       <p className="font-medium text-[#55554e] dark:text-white mb-1">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: p.name === 'income' ? '#161f13' : '#97978f' }} />
+          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: p.name === 'income' ? '#1d3014' : '#97978f' }} />
           <span className="text-[#97978f] dark:text-[#97978f]">{p.name === 'income' ? 'Huurinkomsten' : 'Uitgaven'}</span>
           <span className="font-medium text-[#1a1c18] dark:text-white ml-auto">{fmt(p.value)}</span>
         </div>
@@ -73,7 +73,7 @@ function MetricItem({ label, value, href }: { label: string; value: React.ReactN
   const inner = (
     <>
       <p className="text-xs text-[#97978f] dark:text-[#97978f] leading-none mb-1.5">{label}</p>
-      <p className="text-2xl font-bold text-[#161f13] dark:text-[#94f477] leading-none">{value}</p>
+      <p className="text-2xl font-bold text-[#1d3014] dark:text-[#c8e957] leading-none">{value}</p>
     </>
   )
   return href ? <Link href={href} className="group">{inner}</Link> : <div>{inner}</div>
@@ -142,7 +142,7 @@ export default function EmployerDashboardPage() {
   const bezet = Math.min(kpi.huurders, kpi.eenheden)
   const leeg = Math.max(0, kpi.eenheden - bezet)
   const bezettingData = [
-    { name: 'Bezet', value: bezet, color: '#161f13' },
+    { name: 'Bezet', value: bezet, color: '#1d3014' },
     { name: 'Leeg', value: leeg, color: '#e3e3de' },
   ]
 
@@ -157,13 +157,13 @@ export default function EmployerDashboardPage() {
             <div className="min-w-0">
               <SectionLabel href="/dashboard/landlord/financial/betalingen">Huurinkomsten</SectionLabel>
               <div className="flex items-baseline gap-2 mt-1.5">
-                <p className="text-[26px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{fmt(verwacht)}</p>
+                <p className="text-[26px] font-bold text-[#1d3014] dark:text-[#c8e957] leading-none">{fmt(verwacht)}</p>
                 <TrendBadge value={incomeTrendPct} />
               </div>
             </div>
             <div className="flex items-center gap-3 text-[11px] text-[#97978f] dark:text-[#97978f] shrink-0">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-3 rounded-full bg-[#161f13] dark:bg-[#94f477] inline-block" />
+                <span className="h-2 w-3 rounded-full bg-[#1d3014] dark:bg-[#c8e957] inline-block" />
                 Huurinkomsten
               </span>
               <span className="flex items-center gap-1.5">
@@ -177,8 +177,8 @@ export default function EmployerDashboardPage() {
             <AreaChart data={history} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#161f13" stopOpacity={0.12} />
-                  <stop offset="100%" stopColor="#161f13" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#1d3014" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="#1d3014" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="uitgavenGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#97978f" stopOpacity={0.10} />
@@ -190,7 +190,7 @@ export default function EmployerDashboardPage() {
               <YAxis tick={{ fontSize: 11, fill: '#97978f' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `€${(v / 1000).toFixed(0)}k`} width={44} />
               <Tooltip content={<ChartTooltip />} />
               <Area type="monotone" dataKey="uitgaven" name="uitgaven" stroke="#97978f" strokeWidth={1.5} strokeDasharray="4 3" fill="url(#uitgavenGradient)" dot={false} activeDot={{ r: 3, fill: '#97978f' }} />
-              <Area type="monotone" dataKey="income" name="income" stroke="#161f13" strokeWidth={2.5} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#161f13' }} />
+              <Area type="monotone" dataKey="income" name="income" stroke="#1d3014" strokeWidth={2.5} fill="url(#incomeGradient)" dot={false} activeDot={{ r: 4, fill: '#1d3014' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -211,7 +211,7 @@ export default function EmployerDashboardPage() {
       <div className="rounded-2xl bg-white dark:bg-neutral-800 border border-[#e3e3de] dark:border-neutral-700 p-5 flex flex-col h-full">
         <SectionLabel>Bezetting</SectionLabel>
         <div className="flex items-baseline gap-2 mt-1.5">
-          <p className="text-[26px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{kpi.bezetting}%</p>
+          <p className="text-[26px] font-bold text-[#1d3014] dark:text-[#c8e957] leading-none">{kpi.bezetting}%</p>
           <span className="text-xs text-[#97978f] dark:text-[#97978f]">{bezet} / {kpi.eenheden} eenheden</span>
         </div>
 
@@ -226,7 +226,7 @@ export default function EmployerDashboardPage() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[28px] font-bold text-[#161f13] dark:text-[#94f477] leading-none">{kpi.bezetting}%</span>
+              <span className="text-[28px] font-bold text-[#1d3014] dark:text-[#c8e957] leading-none">{kpi.bezetting}%</span>
               <span className="text-[11px] text-[#97978f] dark:text-[#97978f] mt-1">bezet</span>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function EmployerDashboardPage() {
         {/* Legenda onderaan */}
         <div className="space-y-2 pt-3 border-t border-[#e3e3de] dark:border-neutral-700">
           <div className="flex items-center gap-2 text-xs">
-            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#161f13] dark:bg-[#94f477]" />
+            <span className="h-2.5 w-2.5 rounded-full shrink-0 bg-[#1d3014] dark:bg-[#c8e957]" />
             <span className="text-[#97978f] dark:text-[#97978f]">Bezet</span>
             <span className="ml-auto font-semibold text-[#55554e] dark:text-gray-200">{bezet}</span>
           </div>

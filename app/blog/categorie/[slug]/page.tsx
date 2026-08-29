@@ -24,7 +24,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
       <div className="min-h-screen bg-white">
         <section className="border-b border-gray-100 bg-gray-50/30 py-12 md:py-16">
           <div className="container mx-auto max-w-7xl px-4 md:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-[#163300] sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-[#1d3014] sm:text-4xl md:text-5xl">
               {title}
             </h1>
             <p className="mt-3 max-w-2xl text-lg text-gray-600">

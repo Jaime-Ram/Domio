@@ -1,8 +1,6 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
 
 export interface LogoProps {
   width?: number
@@ -13,53 +11,29 @@ export interface LogoProps {
   href?: string
 }
 
-export function Logo({ width = 140, height = 40, className, imgClassName, variant = 'default', href = '/' }: LogoProps) {
-  const [imgSrc, setImgSrc] = useState('/images/DomioLogo.png')
-  const [hasError, setHasError] = useState(false)
-
-  const handleError = () => {
-    if (imgSrc === '/images/DomioLogo.png') {
-      setImgSrc('/images/Logo.png')
-    } else if (imgSrc === '/images/Logo.png') {
-      setHasError(true)
-    } else {
-      setHasError(true)
-    }
-  }
-
-  if (hasError) {
-    return (
-      <Link href={href} className={`flex items-center gap-2 ${className || ''}`}>
-        <span className="text-2xl font-bold">
-          <span className={variant === 'white' ? 'text-white' : 'text-[#163300] dark:text-[#9FE870]'}>Dom</span>
-          <span className={variant === 'white' ? 'text-white/90' : 'text-[#356258] dark:text-[#9FE870]'}>io</span>
-        </span>
-      </Link>
-    )
-  }
-
-  const darkGreenFilter =
-    'brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(2000%) hue-rotate(128deg)'
-
+export function Logo({ height = 40, className, variant = 'default', href = '/' }: LogoProps) {
+  const color = variant === 'white' ? '#ffffff' : '#1d3014'
   return (
-    <Link href={href} className={`flex items-center overflow-visible ${className || ''}`}>
-      <Image
-        src={`${imgSrc}?v=2`}
-        alt="Domio Logo"
-        width={341}
-        height={70}
-        priority
-        className={imgClassName || ''}
-        style={{
-          height: height,
-          width: 'auto',
-          maxWidth: '100%',
-          ...(variant === 'white' ? { filter: 'brightness(0) invert(1)' } : {}),
-          ...(variant === 'default' ? { filter: darkGreenFilter } : {}),
-        }}
-        onError={handleError}
-        unoptimized={false}
-      />
+    <Link
+      href={href}
+      className={`flex items-center gap-2 overflow-visible ${className || ''}`}
+      aria-label="Domio"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+        style={{ height, width: height }}
+      >
+        <path d="M5 18.7L5 10.8Q5 9.5 6.01 8.68L10.99 4.62Q12 3.8 13.01 4.62L17.99 8.68Q19 9.5 19 10.8L19 18.7Q19 20 17.7 20L6.3 20Q5 20 5 18.7Z" />
+      </svg>
+      <span className="font-semibold tracking-tight" style={{ color, fontSize: Math.round(height * 0.5) }}>
+        Domio
+      </span>
     </Link>
   )
 }

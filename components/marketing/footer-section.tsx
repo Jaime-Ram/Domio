@@ -27,19 +27,19 @@ export function FooterSection() {
               <GooglePlayButton
                 size="md"
                 href="https://play.google.com/store/apps/details?id=com.domio"
-                className="bg-transparent border-[#163300] text-[#163300] hover:bg-[#163300]/10"
+                className="bg-transparent border-[#1d3014] text-[#1d3014] hover:bg-[#1d3014]/10"
               />
               <AppStoreButton
                 size="md"
                 href="https://apps.apple.com/app/domio"
-                className="bg-transparent border-[#163300] text-[#163300] hover:bg-[#163300]/10"
+                className="bg-transparent border-[#1d3014] text-[#1d3014] hover:bg-[#1d3014]/10"
               />
             </div>
 
             {/* AVG / GDPR pill */}
             <Link
               href="/privacy-en-beveiliging"
-              className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-1.5 pr-3.5 text-sm font-medium text-[#163300] transition-colors hover:border-[#163300] hover:bg-[#163300]/5 dark:border-gray-800 dark:bg-gray-900"
+              className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-1.5 pr-3.5 text-sm font-medium text-[#1d3014] transition-colors hover:border-[#1d3014] hover:bg-[#1d3014]/5 dark:border-gray-800 dark:bg-gray-900"
             >
               <Image
                 src="/images/gdpr-compliant.webp"
@@ -63,7 +63,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/functies"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Functies
                   </Link>
@@ -71,7 +71,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/#pricing"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Prijzen
                   </Link>
@@ -79,7 +79,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/blog"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Kennisbank
                   </Link>
@@ -87,7 +87,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/hulp"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#1d3014] dark:hover:text-[#1d3014]"
                   >
                     Hulp &amp; Contact
                   </Link>
@@ -95,7 +95,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#1d3014] dark:hover:text-[#1d3014]"
                   >
                     Contactformulier
                   </Link>
@@ -103,7 +103,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/faq"
-                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#163300] dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 dark:text-gray-400 transition-colors hover:text-[#1d3014] dark:hover:text-[#1d3014]"
                   >
                     FAQ
                   </Link>
@@ -118,7 +118,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/privacy"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Privacy
                   </Link>
@@ -126,7 +126,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/privacy-en-beveiliging"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Beveiliging &amp; Privacy
                   </Link>
@@ -134,7 +134,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/verwerkersovereenkomst"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Verwerkersovereenkomst
                   </Link>
@@ -142,7 +142,7 @@ export function FooterSection() {
                 <li>
                   <Link
                     href="/terms"
-                    className="text-sm text-gray-600 transition-colors hover:text-[#163300] dark:text-gray-400 dark:hover:text-[#163300]"
+                    className="text-sm text-gray-600 transition-colors hover:text-[#1d3014] dark:text-gray-400 dark:hover:text-[#1d3014]"
                   >
                     Voorwaarden
                   </Link>

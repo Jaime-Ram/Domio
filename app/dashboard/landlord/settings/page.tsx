@@ -407,7 +407,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account-blok — zelfde formaat/stijl als het Flows "maak je eigen flow"-blok */}
-      <div className="rounded-2xl bg-[#161f13] px-8 py-8 relative overflow-hidden">
+      <div className="rounded-2xl bg-[#1d3014] px-8 py-8 relative overflow-hidden">
         {/* Vastgoed-plaatje rechts, vervaagd */}
         <div
           className="absolute inset-y-0 right-0 w-2/5 bg-cover bg-center opacity-25"
@@ -420,7 +420,7 @@ export default function SettingsPage() {
         />
         <div className="relative z-10 flex flex-col gap-3 max-w-xl">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-[#94f477]/15 ring-2 ring-[#94f477]/30 flex items-center justify-center text-[#94f477] text-lg font-bold shrink-0">
+            <div className="h-14 w-14 rounded-full bg-[#c8e957]/15 ring-2 ring-[#c8e957]/30 flex items-center justify-center text-[#c8e957] text-lg font-bold shrink-0">
               {initialsLetters != null ? initialsLetters : <User className="h-7 w-7" aria-hidden />}
             </div>
             <div className="min-w-0">
@@ -462,15 +462,15 @@ export default function SettingsPage() {
                     <>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Naam</label>
-                        <input type="text" value={accountForm.name} onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                        <input type="text" value={accountForm.name} onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Telefoonnummer</label>
-                        <input type="tel" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                        <input type="tel" value={accountForm.phone} onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                       </div>
                       {fieldError && editingField !== 'login' && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
                       <div className="flex gap-2">
-                        <button onClick={handleSavePersonal} disabled={savingField === 'personal'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
+                        <button onClick={handleSavePersonal} disabled={savingField === 'personal'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50">
                           {savingField === 'personal' && <Loader2 className="h-4 w-4 animate-spin" />}
                           <span>Opslaan</span>
                         </button>
@@ -494,10 +494,10 @@ export default function SettingsPage() {
                   {isDemo ? (
                     <p className="text-sm text-[#97978f] dark:text-[#97978f]">Beschikbaar in de echte omgeving.</p>
                   ) : emailChangeStatus === 'sent' ? (
-                    <div className="rounded-xl border border-[#94f477]/40 bg-[#94f477]/10 px-4 py-3 space-y-1">
+                    <div className="rounded-xl border border-[#c8e957]/40 bg-[#c8e957]/10 px-4 py-3 space-y-1">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
-                        <p className="text-sm font-medium text-[#161f13] dark:text-[#94f477]">Bevestigingsmail verstuurd</p>
+                        <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
+                        <p className="text-sm font-medium text-[#1d3014] dark:text-[#c8e957]">Bevestigingsmail verstuurd</p>
                       </div>
                       <p className="text-xs text-[#55554e] dark:text-[#97978f]">Klik op de link in de e-mail naar <span className="font-medium">{newEmail}</span> om de wijziging te bevestigen.</p>
                     </div>
@@ -509,11 +509,11 @@ export default function SettingsPage() {
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Nieuw e-mailadres</label>
-                        <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nieuw@voorbeeld.nl" className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                        <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nieuw@voorbeeld.nl" className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                       </div>
                       {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
                       <p className="text-xs text-[#97978f] dark:text-[#97978f]">We sturen een bevestigingslink naar het nieuwe adres.</p>
-                      <button onClick={handleSendEmailVerification} disabled={savingField === 'login' || !newEmail.trim()} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
+                      <button onClick={handleSendEmailVerification} disabled={savingField === 'login' || !newEmail.trim()} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50">
                         {savingField === 'login' && <Loader2 className="h-4 w-4 animate-spin" />}
                         <span>Bevestigingsmail versturen</span>
                       </button>
@@ -538,45 +538,45 @@ export default function SettingsPage() {
                     <>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Bedrijfsnaam</label>
-                        <input type="text" value={accountForm.company_name} onChange={(e) => setAccountForm({ ...accountForm, company_name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                        <input type="text" value={accountForm.company_name} onChange={(e) => setAccountForm({ ...accountForm, company_name: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">KvK-nummer</label>
-                          <input type="text" value={accountForm.kvk_number} onChange={(e) => setAccountForm({ ...accountForm, kvk_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="text" value={accountForm.kvk_number} onChange={(e) => setAccountForm({ ...accountForm, kvk_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">BTW-nummer</label>
-                          <input type="text" value={accountForm.btw_number} onChange={(e) => setAccountForm({ ...accountForm, btw_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="text" value={accountForm.btw_number} onChange={(e) => setAccountForm({ ...accountForm, btw_number: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Zakelijk e-mailadres</label>
-                          <input type="email" value={accountForm.company_email} onChange={(e) => setAccountForm({ ...accountForm, company_email: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="email" value={accountForm.company_email} onChange={(e) => setAccountForm({ ...accountForm, company_email: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Zakelijk telefoonnummer</label>
-                          <input type="tel" value={accountForm.company_phone} onChange={(e) => setAccountForm({ ...accountForm, company_phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="tel" value={accountForm.company_phone} onChange={(e) => setAccountForm({ ...accountForm, company_phone: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Adres</label>
-                        <input type="text" value={accountForm.company_address} onChange={(e) => setAccountForm({ ...accountForm, company_address: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                        <input type="text" value={accountForm.company_address} onChange={(e) => setAccountForm({ ...accountForm, company_address: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Postcode</label>
-                          <input type="text" value={accountForm.company_postal_code} onChange={(e) => setAccountForm({ ...accountForm, company_postal_code: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="text" value={accountForm.company_postal_code} onChange={(e) => setAccountForm({ ...accountForm, company_postal_code: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Plaats</label>
-                          <input type="text" value={accountForm.company_city} onChange={(e) => setAccountForm({ ...accountForm, company_city: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                          <input type="text" value={accountForm.company_city} onChange={(e) => setAccountForm({ ...accountForm, company_city: e.target.value })} className="w-full rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                         </div>
                       </div>
                       {fieldError && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
                       <div className="flex gap-2">
-                        <button onClick={handleSaveCompany} disabled={savingField === 'company'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">
+                        <button onClick={handleSaveCompany} disabled={savingField === 'company'} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50">
                           {savingField === 'company' && <Loader2 className="h-4 w-4 animate-spin" />}
                           <span>Opslaan</span>
                         </button>
@@ -601,12 +601,12 @@ export default function SettingsPage() {
               {prefSection === 'taal' && (
                 <div className="pb-4 flex gap-2 flex-wrap items-center">
                   {(['nl', 'en'] as const).map((lang) => (
-                    <button key={lang} onClick={async () => { setLanguage(lang); await handleSavePrefs(lang) }} className={cn('px-4 py-1.5 rounded-full text-sm font-medium border transition-colors', language === lang ? 'bg-[#94f477] text-[#161f13] border-[#94f477]' : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-gray-300 border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300')}>
+                    <button key={lang} onClick={async () => { setLanguage(lang); await handleSavePrefs(lang) }} className={cn('px-4 py-1.5 rounded-full text-sm font-medium border transition-colors', language === lang ? 'bg-[#c8e957] text-[#1d3014] border-[#c8e957]' : 'bg-white dark:bg-neutral-800 text-[#55554e] dark:text-gray-300 border-[#e3e3de] dark:border-neutral-700 hover:border-gray-300')}>
                       {lang === 'nl' ? '🇳🇱 Nederlands' : '🇬🇧 English'}
                     </button>
                   ))}
                   {prefsSaving && <span className="flex items-center gap-1 text-xs text-[#97978f]"><Loader2 className="h-3 w-3 animate-spin" />Opslaan…</span>}
-                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#161f13] dark:text-[#94f477]"><Check className="h-3 w-3" />Opgeslagen</span>}
+                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#1d3014] dark:text-[#c8e957]"><Check className="h-3 w-3" />Opgeslagen</span>}
                 </div>
               )}
             </ActionListRow>
@@ -633,7 +633,7 @@ export default function SettingsPage() {
                         <p className="text-sm text-[#1a1c18] dark:text-gray-200">{label}</p>
                         {sub && <p className="text-xs text-[#97978f] dark:text-[#97978f]">{sub}</p>}
                       </div>
-                      <input type="checkbox" checked={notifPrefs[key]} onChange={async (e) => { const next = { ...notifPrefs, [key]: e.target.checked }; setNotifPrefs(next); await handleSavePrefs(undefined, next) }} className="h-4 w-4 rounded accent-[#161f13]" />
+                      <input type="checkbox" checked={notifPrefs[key]} onChange={async (e) => { const next = { ...notifPrefs, [key]: e.target.checked }; setNotifPrefs(next); await handleSavePrefs(undefined, next) }} className="h-4 w-4 rounded accent-[#1d3014]" />
                     </label>
                   ))}
                 </div>
@@ -711,7 +711,7 @@ export default function SettingsPage() {
                     We sturen een resetlink naar <span className="font-medium text-[#55554e] dark:text-gray-300">{displayEmail || 'je e-mailadres'}</span>.
                   </p>
                   {!isDemo ? (
-                    <button onClick={handleSendPasswordReset} disabled={pwResetCooldown > 0} className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors', pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#161f13] hover:bg-[#161f13]/90')}>
+                    <button onClick={handleSendPasswordReset} disabled={pwResetCooldown > 0} className={cn('flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors', pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#1d3014] hover:bg-[#1d3014]/90')}>
                       {pwResetStatus === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}
                       {pwResetStatus === 'saved' && <CheckCircle2 className="h-4 w-4" />}
                       <span>{pwResetStatus === 'error' ? (pwResetError || 'Fout bij versturen') : pwResetCooldown > 0 ? `Verstuurd — opnieuw in ${pwResetCooldown}s` : 'Resetlink versturen'}</span>
@@ -731,7 +731,7 @@ export default function SettingsPage() {
               right={
                 <div className="flex items-center gap-2 shrink-0">
                   {mfaMethod === 'totp' && (
-                    <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477]">Aan</span>
+                    <span className="inline-flex items-center rounded-full bg-[#c8e957]/20 dark:bg-[#c8e957]/10 px-2.5 py-0.5 text-xs font-medium text-[#1d3014] dark:text-[#c8e957]">Aan</span>
                   )}
                   <ChevronRight className={cn('h-4 w-4 text-[#97978f] dark:text-[#97978f] transition-transform', bevSection === '2fa' && 'rotate-90')} />
                 </div>
@@ -751,10 +751,10 @@ export default function SettingsPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">Geen verificatie</p>
                             <p className="text-sm text-[#97978f] dark:text-[#97978f]">Alleen e-mailadres en wachtwoord</p>
-                            <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Minder veilig</p>
+                            <p className="text-xs font-semibold text-[#1d3014] dark:text-[#c8e957] mt-0.5">Minder veilig</p>
                           </div>
                           {mfaMethod === 'none' ? (
-                            <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                            <CheckCircle2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                           ) : (
                             <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] shrink-0" />
                           )}
@@ -769,10 +769,10 @@ export default function SettingsPage() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">Authenticator-app</p>
                               <p className="text-sm text-[#97978f] dark:text-[#97978f]">Google Authenticator, 1Password of vergelijkbaar</p>
-                              <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Zeer veilig</p>
+                              <p className="text-xs font-semibold text-[#1d3014] dark:text-[#c8e957] mt-0.5">Zeer veilig</p>
                             </div>
                             {mfaMethod === 'totp' ? (
-                              <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                              <CheckCircle2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                             ) : (
                               <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] shrink-0" />
                             )}
@@ -785,7 +785,7 @@ export default function SettingsPage() {
                                     <div key={f.id}>
                                       <div className="flex items-center justify-between rounded-lg bg-white/60 dark:bg-neutral-800/60 border border-[#e3e3de] dark:border-neutral-700 px-3 py-2">
                                         <div className="flex items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                                          <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                                           <span className="text-sm font-medium text-[#1a1c18] dark:text-white">{f.friendly_name?.split(' ')?.[0] || 'Authenticator'}</span>
                                         </div>
                                         {unenrollFactorId === f.id ? (
@@ -832,11 +832,11 @@ export default function SettingsPage() {
                                   </div>
                                   <div className="space-y-1.5">
                                     <p className="text-xs font-medium text-[#55554e] dark:text-[#97978f]">Voer de 6-cijferige code in</p>
-                                    <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))} className="w-36 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#161f13]/20" />
+                                    <input type="text" inputMode="numeric" maxLength={6} placeholder="000000" value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))} className="w-36 rounded-lg border border-[#e3e3de] dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20" />
                                   </div>
                                   {totpError && <p className="text-xs text-red-600 dark:text-red-400">{totpError}</p>}
                                   <div className="flex gap-2">
-                                    <button onClick={handleVerifyTotp} disabled={totpVerifying || totpCode.length !== 6} className="px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50">{totpVerifying ? 'Verifiëren…' : 'Bevestigen'}</button>
+                                    <button onClick={handleVerifyTotp} disabled={totpVerifying || totpCode.length !== 6} className="px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50">{totpVerifying ? 'Verifiëren…' : 'Bevestigen'}</button>
                                     <button onClick={async () => { if (totpFactorId) await unenrollMfa(totpFactorId); setTotpEnrolling(false); setTotpQr(''); setTotpSecret(''); setTotpCode(''); setTotpError(''); setTotpFactorId('') }} className="px-4 py-2 text-sm font-medium text-[#97978f] hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 rounded-lg transition-colors">Annuleren</button>
                                   </div>
                                 </div>
@@ -858,7 +858,7 @@ export default function SettingsPage() {
               title="Huidige sessie"
               subtitle="Webbrowser · Nu actief"
               right={
-                <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477] shrink-0">Actief</span>
+                <span className="inline-flex items-center rounded-full bg-[#c8e957]/20 dark:bg-[#c8e957]/10 px-2.5 py-0.5 text-xs font-medium text-[#1d3014] dark:text-[#c8e957] shrink-0">Actief</span>
               }
             />
           </ActionListSection>
@@ -882,7 +882,7 @@ export default function SettingsPage() {
               title="Starter"
               subtitle="Tot 3 woningen · Tot 10 huurders · 500 MB opslag"
               right={
-                <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-semibold text-[#161f13] dark:text-[#94f477] shrink-0">Huidig</span>
+                <span className="inline-flex items-center rounded-full bg-[#c8e957]/20 dark:bg-[#c8e957]/10 px-2.5 py-0.5 text-xs font-semibold text-[#1d3014] dark:text-[#c8e957] shrink-0">Huidig</span>
               }
             />
           </ActionListSection>
@@ -892,7 +892,7 @@ export default function SettingsPage() {
               icon={CreditCard}
               title="Starter"
               subtitle="Tot 3 woningen, WWS-calculator, basisrapportages · Gratis"
-              right={<CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />}
+              right={<CheckCircle2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />}
             />
             <ActionListRow
               icon={CreditCard}

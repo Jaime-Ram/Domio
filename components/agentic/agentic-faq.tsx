@@ -30,7 +30,7 @@ export function AgenticFaq() {
     <section className="bg-[#FBFAF7] py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
-          <h2 className="text-3xl font-medium leading-tight tracking-tight text-[#163300] sm:text-4xl lg:col-span-4">
+          <h2 className="text-3xl font-medium leading-tight tracking-tight text-[#1d3014] sm:text-4xl lg:col-span-4">
             Veelgestelde
             <br />
             vragen
@@ -42,16 +42,16 @@ export function AgenticFaq() {
               return (
                 <div
                   key={item.q}
-                  className="border-t border-dotted border-[#163300]/20 first:border-t-0"
+                  className="border-t border-dotted border-[#1d3014]/20 first:border-t-0"
                 >
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : i)}
                     className="flex w-full items-center justify-between gap-6 py-5 text-left"
                   >
-                    <span className="text-lg text-[#163300]">{item.q}</span>
+                    <span className="text-lg text-[#1d3014]">{item.q}</span>
                     <ChevronDown
-                      className={`h-5 w-5 shrink-0 text-[#163300]/50 transition-transform duration-300 ${
+                      className={`h-5 w-5 shrink-0 text-[#1d3014]/50 transition-transform duration-300 ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -65,7 +65,7 @@ export function AgenticFaq() {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
                       >
-                        <p className="max-w-2xl pb-6 text-[15px] leading-7 text-[#163300]/60">
+                        <p className="max-w-2xl pb-6 text-[15px] leading-7 text-[#1d3014]/60">
                           {item.a}
                         </p>
                       </motion.div>

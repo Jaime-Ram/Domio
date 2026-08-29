@@ -64,7 +64,7 @@ export default function BevestigAccountPage() {
         <ArrowLeft className="h-5 w-5" />
       </button>
 
-      <h1 className="text-4xl font-bold text-[#163300]">
+      <h1 className="text-4xl font-bold text-[#1d3014]">
         Account niet herkend
       </h1>
       <p className="mt-3 text-sm text-gray-600 leading-relaxed">
@@ -83,7 +83,7 @@ export default function BevestigAccountPage() {
       <div className="mt-8 space-y-3">
         <Button
           onClick={handleConfirm}
-          className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold text-base border-0 shadow-sm"
+          className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold text-base border-0 shadow-sm"
         >
           Ja, maak account aan
         </Button>

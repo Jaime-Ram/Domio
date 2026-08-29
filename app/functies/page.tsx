@@ -154,7 +154,7 @@ export default function FunctiesPage() {
 
         {/* En nog veel meer! —zelfde design als FAQ op main page */}
         <section className="mx-auto max-w-4xl px-6 py-16 md:px-8 lg:py-20">
-          <h2 className="mb-8 text-4xl font-bold tracking-tight text-[#163300] sm:text-5xl md:text-6xl">
+          <h2 className="mb-8 text-4xl font-bold tracking-tight text-[#1d3014] sm:text-5xl md:text-6xl">
             En nog veel meer!
           </h2>
           <p className="mb-8 text-lg text-gray-600 dark:text-gray-400">
@@ -196,7 +196,7 @@ export default function FunctiesPage() {
                         <p className="pt-3 text-base text-gray-600 dark:text-gray-400">{item.description}</p>
                         <Link
                           href={item.demoHref}
-                          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#163300] hover:underline underline-offset-2"
+                          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#1d3014] hover:underline underline-offset-2"
                         >
                           Bekijk in demo
                           <ArrowUpRight className="h-3.5 w-3.5" />

@@ -114,7 +114,7 @@ export function MiniProgress({ pct }: { pct: number }) {
 
 /* vullende ring */
 export function MiniRing({
-  pct, formaat = 64, kleur = "#161f13", dik = 3, tekstKlasse = "text-[13px] text-forest", vol = false,
+  pct, formaat = 64, kleur = "#1d3014", dik = 3, tekstKlasse = "text-[13px] text-forest", vol = false,
 }: {
   pct: number;
   formaat?: number;
@@ -161,7 +161,7 @@ export function MiniSpark({ data, omlaag = false }: { data: number[]; omlaag?: b
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={punten} margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
           <YAxis hide domain={["dataMin - 0.4", "dataMax + 0.4"]} />
-          <Line type="monotone" dataKey="v" stroke={omlaag ? "#161f13" : "#161f13"} strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="v" stroke={omlaag ? "#1d3014" : "#1d3014"} strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

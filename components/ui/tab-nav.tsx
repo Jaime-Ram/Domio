@@ -100,7 +100,7 @@ export function TabNav<T extends string = string>({
           className={cn(
             'px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap',
             activeTab === tab.id
-              ? 'bg-[#94f477] text-[#161f13] dark:bg-[#94f477] dark:text-[#161f13]'
+              ? 'bg-[#c8e957] text-[#1d3014] dark:bg-[#c8e957] dark:text-[#1d3014]'
               : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-neutral-200 hover:bg-gray-50 dark:hover:bg-neutral-800/50',
           )}
         >
@@ -109,7 +109,7 @@ export function TabNav<T extends string = string>({
             <span className={cn(
               'ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full text-[10px] font-medium px-1',
               activeTab === tab.id
-                ? 'bg-[#161f13]/15 text-[#161f13]'
+                ? 'bg-[#1d3014]/15 text-[#1d3014]'
                 : 'bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400'
             )}>
               {tab.count}

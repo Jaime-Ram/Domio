@@ -57,7 +57,7 @@ export function TableToolbar({
       {hasLeft && (
         <div>
           {title && (
-            <p className="text-lg font-semibold text-[#161f13] dark:text-[#94f477]">{title}</p>
+            <p className="text-lg font-semibold text-[#1d3014] dark:text-[#c8e957]">{title}</p>
           )}
           {count !== undefined && (
             <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">{count}</p>
@@ -76,7 +76,7 @@ export function TableToolbar({
               onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
               className={cn(
                 'h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors shrink-0',
-                search && 'text-[#161f13] dark:text-[#94f477]',
+                search && 'text-[#1d3014] dark:text-[#c8e957]',
               )}
             >
               <Search className="h-4 w-4" />
@@ -92,7 +92,7 @@ export function TableToolbar({
                 onBlur={() => { if (!search) setSearchExpanded(false) }}
                 onKeyDown={e => { if (e.key === 'Escape') { onSearchChange(''); setSearchExpanded(false) } }}
                 placeholder={searchPlaceholder}
-                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#94f477]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#c8e957]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
               />
             </div>
           </div>
@@ -146,7 +146,7 @@ export function TableToolbar({
             type="button"
             onClick={onAdd}
             disabled={addDisabled}
-            className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
+            className="bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] rounded-full px-4 sm:px-5 h-9 text-sm font-medium gap-2 shrink-0 ml-1"
           >
             <Plus className="h-4 w-4" />
             {addLabel}

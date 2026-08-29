@@ -21,7 +21,7 @@ const history = [
   { month: "jul", begroot: 6800, werkelijk: 4900 },
 ];
 
-const FOREST = "#161f13";
+const FOREST = "#1d3014";
 const GREY = "#97978f";
 
 function fmt(n: number) {

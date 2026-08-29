@@ -112,14 +112,14 @@ export default function PrivacyEnBeveiligingPage() {
                 height={64}
                 className="rounded-full shrink-0"
               />
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#163300] px-3 py-1 text-sm font-medium text-white">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1d3014] px-3 py-1 text-sm font-medium text-white">
                 <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
                 AVG-conform
               </span>
             </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-[#163300] md:text-5xl md:leading-[1.12]">
+            <h1 className="text-4xl font-semibold tracking-tight text-[#1d3014] md:text-5xl md:leading-[1.12]">
               Privacy en beveiliging
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-gray-600 max-w-2xl">
@@ -131,17 +131,17 @@ export default function PrivacyEnBeveiligingPage() {
         {/* Technische maatregelen */}
         <section className="bg-white">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-14 lg:py-20">
-            <h2 className="text-2xl font-semibold text-[#163300] mb-8">
+            <h2 className="text-2xl font-semibold text-[#1d3014] mb-8">
               Technische en organisatorische maatregelen
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {MAATREGELEN.map((m) => (
                 <div key={m.titel} className="rounded-xl border border-gray-200 bg-white p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="flex items-center justify-center size-9 rounded-lg bg-[#163300]/8 text-[#163300] shrink-0">
+                    <span className="flex items-center justify-center size-9 rounded-lg bg-[#1d3014]/8 text-[#1d3014] shrink-0">
                       {m.icon}
                     </span>
-                    <h3 className="font-semibold text-[#163300]">{m.titel}</h3>
+                    <h3 className="font-semibold text-[#1d3014]">{m.titel}</h3>
                   </div>
                   <p className="text-sm leading-relaxed text-gray-500">{m.tekst}</p>
                 </div>
@@ -153,7 +153,7 @@ export default function PrivacyEnBeveiligingPage() {
         {/* Wat verwerken wij */}
         <section className="bg-gray-50">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-14 lg:py-20">
-            <h2 className="text-2xl font-semibold text-[#163300] mb-4">
+            <h2 className="text-2xl font-semibold text-[#1d3014] mb-4">
               Welke gegevens verwerken wij?
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
@@ -184,7 +184,7 @@ export default function PrivacyEnBeveiligingPage() {
         {/* Subverwerkers */}
         <section className="bg-white">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-14 lg:py-20">
-            <h2 className="text-2xl font-semibold text-[#163300] mb-4">
+            <h2 className="text-2xl font-semibold text-[#1d3014] mb-4">
               Subverwerkers
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
@@ -216,26 +216,26 @@ export default function PrivacyEnBeveiligingPage() {
         {/* Uw rechten */}
         <section className="bg-gray-50">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-14 lg:py-20">
-            <h2 className="text-2xl font-semibold text-[#163300] mb-4">
+            <h2 className="text-2xl font-semibold text-[#1d3014] mb-4">
               Uw rechten onder de AVG
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
               Als betrokkene heeft u de volgende rechten. U kunt deze uitoefenen door contact op te nemen via{' '}
-              <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#163300] font-medium hover:underline">
+              <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#1d3014] font-medium hover:underline">
                 privacy@domiovastgoedbeheer.nl
               </a>.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {RECHTEN.map((r) => (
                 <div key={r.recht} className="rounded-xl border border-gray-200 bg-white px-5 py-4">
-                  <p className="font-semibold text-[#163300] text-sm">{r.recht}</p>
+                  <p className="font-semibold text-[#1d3014] text-sm">{r.recht}</p>
                   <p className="mt-1 text-sm leading-relaxed text-gray-500">{r.uitleg}</p>
                 </div>
               ))}
             </div>
             <p className="mt-6 text-sm text-gray-500">
               U heeft ook het recht om een klacht in te dienen bij de{' '}
-              <a href="https://www.autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener noreferrer" className="text-[#163300] font-medium hover:underline">
+              <a href="https://www.autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener noreferrer" className="text-[#1d3014] font-medium hover:underline">
                 Autoriteit Persoonsgegevens
               </a>.
               Wij geven altijd de voorkeur aan het eerst intern oplossen van eventuele bezwaren.
@@ -246,7 +246,7 @@ export default function PrivacyEnBeveiligingPage() {
         {/* Contact */}
         <section className="bg-white">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-14 lg:py-20">
-            <h2 className="text-2xl font-semibold text-[#163300] mb-4">
+            <h2 className="text-2xl font-semibold text-[#1d3014] mb-4">
               Contact over privacy
             </h2>
             <p className="text-gray-600 leading-relaxed">
@@ -257,14 +257,14 @@ export default function PrivacyEnBeveiligingPage() {
               <p>KVK: 92211542</p>
               <p>
                 E-mail:{' '}
-                <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#163300] font-medium hover:underline">
+                <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#1d3014] font-medium hover:underline">
                   privacy@domiovastgoedbeheer.nl
                 </a>
               </p>
             </div>
             <p className="mt-6 text-sm text-gray-400">
               Laatste update: {new Date().toLocaleDateString('nl-NL', { year: 'numeric', month: 'long' })}. Wij behouden het recht deze pagina te wijzigen. Raadpleeg regelmatig de meest actuele versie. Zie ook onze{' '}
-              <Link href="/privacy" className="text-[#163300] hover:underline">volledige privacyverklaring</Link>.
+              <Link href="/privacy" className="text-[#1d3014] hover:underline">volledige privacyverklaring</Link>.
             </p>
           </div>
         </section>

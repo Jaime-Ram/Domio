@@ -138,7 +138,7 @@ export default function PuntentellingPage() {
         {/* Form */}
         <Card className={cn(dashboardCardClass(), 'lg:col-span-2')}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Puntentelling invoer</CardTitle>
+            <CardTitle className="text-base text-[#1d3014] dark:text-[#c8e957]">Puntentelling invoer</CardTitle>
             <CardDescription>Vul de gegevens van het object in om de WWS-score te berekenen.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -253,7 +253,7 @@ export default function PuntentellingPage() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-5xl font-bold text-[#161f13] dark:text-[#94f477] mb-1">{totaalPunten}</div>
+                      <div className="text-5xl font-bold text-[#1d3014] dark:text-[#c8e957] mb-1">{totaalPunten}</div>
                       <div className="text-sm text-[#97978f] dark:text-[#97978f]">WWS-punten</div>
                     </div>
                     <div className="text-right">
@@ -312,7 +312,7 @@ export default function PuntentellingPage() {
           {canCalculate && breakdown.length > 0 && (
             <Card className={dashboardCardClass()}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Puntenoverzicht</CardTitle>
+                <CardTitle className="text-base text-[#1d3014] dark:text-[#c8e957]">Puntenoverzicht</CardTitle>
               </CardHeader>
               <CardContent className="p-0 pb-1">
                 <div className="divide-y divide-gray-50 dark:divide-neutral-800/80">
@@ -322,12 +322,12 @@ export default function PuntentellingPage() {
                         <p className="text-sm font-medium text-[#1a1c18] dark:text-white">{item.label}</p>
                         <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">{item.toelichting}</p>
                       </div>
-                      <span className="text-sm font-bold text-[#161f13] dark:text-[#94f477] ml-4 shrink-0">+{item.punten}</span>
+                      <span className="text-sm font-bold text-[#1d3014] dark:text-[#c8e957] ml-4 shrink-0">+{item.punten}</span>
                     </div>
                   ))}
-                  <div className="flex items-center justify-between px-5 py-3.5 bg-[#161f13]/5 dark:bg-[#94f477]/5">
-                    <span className="text-sm font-bold text-[#161f13] dark:text-[#94f477]">Totaal</span>
-                    <span className="text-lg font-bold text-[#161f13] dark:text-[#94f477]">{totaalPunten} punten</span>
+                  <div className="flex items-center justify-between px-5 py-3.5 bg-[#1d3014]/5 dark:bg-[#c8e957]/5">
+                    <span className="text-sm font-bold text-[#1d3014] dark:text-[#c8e957]">Totaal</span>
+                    <span className="text-lg font-bold text-[#1d3014] dark:text-[#c8e957]">{totaalPunten} punten</span>
                   </div>
                 </div>
               </CardContent>
@@ -337,7 +337,7 @@ export default function PuntentellingPage() {
           {canCalculate && (
             <Card className={dashboardCardClass()}>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base text-[#161f13] dark:text-[#94f477]">Optimalisatie-adviezen</CardTitle>
+                <CardTitle className="text-base text-[#1d3014] dark:text-[#c8e957]">Optimalisatie-adviezen</CardTitle>
                 <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-1">Verbeteringen die extra punten en hogere maximale huur opleveren</p>
               </CardHeader>
               <CardContent className="space-y-3 pb-5">
@@ -346,7 +346,7 @@ export default function PuntentellingPage() {
                     <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{a.titel}</p>
                     <p className="text-xs text-[#97978f] dark:text-[#97978f] mt-0.5">{a.huidig} → {a.na}</p>
                     <div className="flex flex-wrap gap-3 mt-2">
-                      <span className="text-xs text-[#161f13] dark:text-[#94f477] font-medium">+{a.extraPunten} punten</span>
+                      <span className="text-xs text-[#1d3014] dark:text-[#c8e957] font-medium">+{a.extraPunten} punten</span>
                       <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">+€{a.extraHuur}/mnd</span>
                       <span className="text-xs text-[#97978f]">Investering €{a.investering.toLocaleString('nl-NL')}</span>
                       <span className="text-xs text-[#97978f]">~{a.terugverdientijd} jr terugverdien</span>

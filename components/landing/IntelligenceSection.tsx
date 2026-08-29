@@ -7,7 +7,7 @@ export default function IntelligenceSection() {
           className="relative flex min-h-[460px] flex-col justify-end overflow-hidden rounded-2xl p-8"
           style={{
             background:
-              "radial-gradient(120% 90% at 70% 15%, #25361d 0%, #161f13 55%, #0f160c 100%)",
+              "radial-gradient(120% 90% at 70% 15%, #25361d 0%, #1d3014 55%, #0f160c 100%)",
           }}
         >
           {/* soft light limes */}

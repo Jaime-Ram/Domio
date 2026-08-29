@@ -17,7 +17,7 @@ function getCardAccentHex(name: string): string {
   if (n.includes('abn')) return '#009488'   // ABN AMRO teal/groen (Pantone 3285 C)
   if (n.includes('ing')) return '#FF6200'   // ING oranje (Pantone 165 C)
   if (n.includes('rabo')) return '#2C3696'  // Rabobank blauw (Pantone 10249 C)
-  return '#161f13' // standaard Domio-groen
+  return '#1d3014' // standaard Domio-groen
 }
 
 function PasMiniatuur({ name, last4 }: { name: string; last4: string }) {
@@ -70,7 +70,7 @@ export function GekoppeldeRekeningenBlock({
   return (
     <div className={cn(sCard, 'overflow-hidden', className)}>
       <div className="p-5 sm:p-7">
-        <h2 className="text-2xl font-semibold text-[#161f13] dark:text-white">Gekoppelde rekeningen</h2>
+        <h2 className="text-2xl font-semibold text-[#1d3014] dark:text-white">Gekoppelde rekeningen</h2>
         <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-1">
           Bankrekeningen gekoppeld voor ontvangst en betalingen
         </p>
@@ -81,7 +81,7 @@ export function GekoppeldeRekeningenBlock({
             {onAddAccount && (
               <Button
                 onClick={onAddAccount}
-                className="mt-4 bg-[#161f13] hover:bg-[#356258] text-white"
+                className="mt-4 bg-[#1d3014] hover:bg-[#356258] text-white"
               >
                 Rekening koppelen
               </Button>

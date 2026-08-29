@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
                 exit={{ opacity: 0, x: -32 }}
                 transition={transition}
               >
-              <h1 className="text-3xl font-bold text-[#163300]">
+              <h1 className="text-3xl font-bold text-[#1d3014]">
                 Nieuw wachtwoord instellen
               </h1>
               <p className="mt-2 text-sm text-gray-600">
@@ -144,14 +144,14 @@ export default function ResetPasswordPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 font-semibold"
+                  className="w-full h-12 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 font-semibold"
                 >
                   {loading ? 'Bezig...' : 'Wachtwoord opslaan'}
                 </Button>
               </form>
 
               <div className="mt-6 text-center">
-                <Link href="/login" className="text-sm font-medium text-[#163300] underline underline-offset-2 hover:no-underline">
+                <Link href="/login" className="text-sm font-medium text-[#1d3014] underline underline-offset-2 hover:no-underline">
                   ← Terug naar inloggen
                 </Link>
               </div>

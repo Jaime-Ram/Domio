@@ -142,7 +142,7 @@ export function TenantPortalAccessSection({
               <Button
                 onClick={runInvite}
                 disabled={inviteDisabled}
-                className="rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] h-9 px-4 text-sm font-medium gap-2"
+                className="rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] h-9 px-4 text-sm font-medium gap-2"
               >
                 {pending && activeAction === 'invite' ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -279,7 +279,7 @@ export function TenantPortalAccessSection({
               <Button
                 onClick={runInvite}
                 disabled={pending || !hasEmail}
-                className="rounded-full bg-[#9FE870] hover:bg-[#8AD45F] text-[#163300] h-9 px-4 text-sm font-medium gap-2 disabled:opacity-60"
+                className="rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] h-9 px-4 text-sm font-medium gap-2 disabled:opacity-60"
               >
                 {pending && activeAction === 'invite' ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

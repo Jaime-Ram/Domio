@@ -148,8 +148,8 @@ export default function AccountingPage() {
       <Card className={dashboardCardClass('mb-8', isDemo)}>
         <CardHeader>
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-[#161f13]/10 dark:bg-[#94f477]/10 rounded-lg">
-              <Calculator className="h-6 w-6 text-[#161f13] dark:text-[#94f477]" />
+            <div className="p-3 bg-[#1d3014]/10 dark:bg-[#c8e957]/10 rounded-lg">
+              <Calculator className="h-6 w-6 text-[#1d3014] dark:text-[#c8e957]" />
             </div>
             <div className="flex-1">
               <CardTitle className="mb-2">Eigen Boekhouding</CardTitle>
@@ -164,7 +164,7 @@ export default function AccountingPage() {
             <div className="p-4 border border-[#e3e3de] dark:border-neutral-700 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="h-5 w-5 text-[#97978f]" />
-                <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">Facturen</h3>
+                <h3 className="font-semibold text-[#1d3014] dark:text-[#c8e957]">Facturen</h3>
               </div>
               <p className="text-sm text-[#55554e] dark:text-[#97978f] mb-3">
                 Creëer en beheer facturen
@@ -176,7 +176,7 @@ export default function AccountingPage() {
             <div className="p-4 border border-[#e3e3de] dark:border-neutral-700 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-[#97978f]" />
-                <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">Inkomsten & Uitgaven</h3>
+                <h3 className="font-semibold text-[#1d3014] dark:text-[#c8e957]">Inkomsten & Uitgaven</h3>
               </div>
               <p className="text-sm text-[#55554e] dark:text-[#97978f] mb-3">
                 Registreer en beheer financiële transacties
@@ -205,7 +205,7 @@ export default function AccountingPage() {
       {/* Gekoppelde Integraties */}
       {connectedIntegrations.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-[#161f13] dark:text-[#94f477] mb-4">
+          <h2 className="text-xl font-semibold text-[#1d3014] dark:text-[#c8e957] mb-4">
             Gekoppelde Integraties
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -215,7 +215,7 @@ export default function AccountingPage() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white dark:bg-neutral-800 rounded-lg">
-                        <Plug className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
+                        <Plug className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">{integration.name}</CardTitle>
@@ -264,12 +264,12 @@ export default function AccountingPage() {
 
       {/* Beschikbare Integraties */}
       <div>
-        <h2 className="text-xl font-semibold text-[#161f13] dark:text-[#94f477] mb-4">
+        <h2 className="text-xl font-semibold text-[#1d3014] dark:text-[#c8e957] mb-4">
           Beschikbare Integraties
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableIntegrations.map((integration) => (
-            <Card key={integration.id} className={dashboardCardClass('hover:border-[#161f13] dark:hover:border-[#94f477] transition-colors', isDemo)}>
+            <Card key={integration.id} className={dashboardCardClass('hover:border-[#1d3014] dark:hover:border-[#c8e957] transition-colors', isDemo)}>
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">
@@ -345,7 +345,7 @@ export default function AccountingPage() {
             </Button>
             <Button 
               onClick={confirmConnect}
-              className="bg-[#161f13] hover:bg-[#356258] text-white"
+              className="bg-[#1d3014] hover:bg-[#356258] text-white"
             >
               <Link2 className="h-4 w-4 mr-2" />
               Start Koppeling

@@ -21,7 +21,7 @@ export function BadgeWithDot({
         success: "bg-[#4ADE80]",
         warning: "bg-[#F59E0B]",
         error: "bg-[#EF4444]",
-        info: "bg-[#163300]",
+        info: "bg-[#1d3014]",
     };
 
     const sizeClasses = {

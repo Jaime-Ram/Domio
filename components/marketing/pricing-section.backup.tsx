@@ -30,8 +30,8 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
   return (
     <section id="pricing" className="relative isolate bg-white pt-16 sm:pt-20 pb-16 sm:pb-20 px-4 lg:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-base font-semibold leading-7 text-[#163300]">Pricing</h2>
-        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#163300] sm:text-6xl">
+        <h2 className="text-base font-semibold leading-7 text-[#1d3014]">Pricing</h2>
+        <p className="mt-2 text-5xl font-semibold tracking-tight text-balance text-[#1d3014] sm:text-6xl">
           Één product. Simpele prijs.
         </p>
         <p className="mx-auto mt-6 max-w-xl text-center text-lg font-medium text-gray-600 leading-8">
@@ -49,7 +49,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
           <span className={cn('text-sm font-medium', isYearly ? 'text-gray-900' : 'text-gray-400')}>
             Jaarlijks
           </span>
-          <span className={cn('text-sm font-medium', isYearly ? 'text-[#163300]' : 'text-gray-300')}>
+          <span className={cn('text-sm font-medium', isYearly ? 'text-[#1d3014]' : 'text-gray-300')}>
             (2 maanden gratis)
           </span>
         </div>
@@ -61,7 +61,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
         {/* ≤ 50 panden */}
         <div className="rounded-3xl border border-gray-200 bg-white p-8 flex flex-col">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-[#163300]">Tot 50 panden</span>
+            <span className="text-sm font-semibold text-[#1d3014]">Tot 50 panden</span>
             <span className="text-xs font-medium bg-gray-100 text-gray-500 rounded-full px-2.5 py-1">Standaard</span>
           </div>
           <div className="mt-6 flex items-baseline gap-1">
@@ -77,17 +77,17 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
           <button
             type="button"
             onClick={onSignupClick}
-            className="mt-8 w-full rounded-2xl border-2 border-[#163300] px-4 py-2.5 text-sm font-semibold text-[#163300] hover:bg-[#163300]/5 transition-colors"
+            className="mt-8 w-full rounded-2xl border-2 border-[#1d3014] px-4 py-2.5 text-sm font-semibold text-[#1d3014] hover:bg-[#1d3014]/5 transition-colors"
           >
             Gratis starten
           </button>
         </div>
 
         {/* > 50 panden */}
-        <div className="rounded-3xl bg-[#163300] p-8 flex flex-col shadow-xl">
+        <div className="rounded-3xl bg-[#1d3014] p-8 flex flex-col shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-[#9FE870]">Meer dan 50 panden</span>
-            <span className="text-xs font-medium bg-[#9FE870]/20 text-[#9FE870] rounded-full px-2.5 py-1">Grootschalig</span>
+            <span className="text-sm font-semibold text-[#c8e957]">Meer dan 50 panden</span>
+            <span className="text-xs font-medium bg-[#c8e957]/20 text-[#c8e957] rounded-full px-2.5 py-1">Grootschalig</span>
           </div>
           <div className="mt-6 flex items-baseline gap-1">
             <span className="text-5xl font-semibold tracking-tight text-white">{priceLarge}</span>
@@ -102,7 +102,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
           <button
             type="button"
             onClick={onSignupClick}
-            className="mt-8 w-full rounded-2xl bg-[#9FE870] px-4 py-2.5 text-sm font-semibold text-[#163300] hover:bg-[#8AD45F] transition-colors"
+            className="mt-8 w-full rounded-2xl bg-[#c8e957] px-4 py-2.5 text-sm font-semibold text-[#1d3014] hover:bg-[#8AD45F] transition-colors"
           >
             Gratis starten
           </button>
@@ -115,7 +115,7 @@ export function PricingSection({ onSignupClick }: PricingSectionProps) {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
           {FEATURES.map(f => (
             <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">
-              <Check className="h-4 w-4 shrink-0 text-[#163300]" />
+              <Check className="h-4 w-4 shrink-0 text-[#1d3014]" />
               {f}
             </li>
           ))}

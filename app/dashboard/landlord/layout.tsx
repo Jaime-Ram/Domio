@@ -63,7 +63,7 @@ export default function EmployerDashboardLayout({
     <DocumentPreviewProvider>
       <div className="relative flex h-screen overflow-hidden w-full flex-col bg-white dark:bg-gray-900">
         <div
-          className="pointer-events-none fixed inset-0 z-[100] bg-[#94f477] transition-opacity"
+          className="pointer-events-none fixed inset-0 z-[100] bg-[#c8e957] transition-opacity"
           style={{
             opacity: enterDone ? 0 : 1,
             transitionDuration: `${ENTER_DURATION_MS}ms`,

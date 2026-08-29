@@ -87,7 +87,7 @@ function Verify2FaContent() {
 
   return (
     <div className="w-full max-w-sm mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-[#163300] dark:text-[#9FE870] text-center">
+      <h1 className="text-2xl font-bold text-[#1d3014] dark:text-[#c8e957] text-center">
         Verificatiecode
       </h1>
       <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
@@ -112,7 +112,7 @@ function Verify2FaContent() {
         )}
         <Button
           type="submit"
-          className="w-full bg-[#163300] hover:bg-[#1e4000] text-white"
+          className="w-full bg-[#1d3014] hover:bg-[#1e4000] text-white"
           disabled={loading || code.length !== 6}
         >
           {loading ? 'Controleren…' : 'Verifiëren'}

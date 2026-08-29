@@ -47,10 +47,10 @@ export function generateContractHTML(data: ContractData): string {
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Times New Roman', Times, Georgia, serif; color: #1a1a1a; line-height: 1.65; font-size: 11pt; padding: 28px 36px; max-width: 820px; margin: 0 auto; }
 
-  h1 { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16pt; font-weight: 700; color: #163300; margin-bottom: 3px; }
+  h1 { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 16pt; font-weight: 700; color: #1d3014; margin-bottom: 3px; }
   .doc-address { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10pt; color: #6b7280; margin-bottom: 20px; }
 
-  h2 { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #163300; margin-top: 22px; margin-bottom: 6px; border-bottom: 1px solid #d1fae5; padding-bottom: 3px; }
+  h2 { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #1d3014; margin-top: 22px; margin-bottom: 6px; border-bottom: 1px solid #d1fae5; padding-bottom: 3px; }
 
   table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10pt; }
   td { padding: 5px 10px; vertical-align: top; border-bottom: 1px solid #f0f0f0; }
@@ -66,9 +66,9 @@ export function generateContractHTML(data: ContractData): string {
 
   .law-ref { font-size: 8pt; color: #9ca3af; font-style: italic; }
 
-  .signatures { display: flex; gap: 32px; margin-top: 36px; padding-top: 20px; border-top: 2px solid #163300; }
+  .signatures { display: flex; gap: 32px; margin-top: 36px; padding-top: 20px; border-top: 2px solid #1d3014; }
   .sig-block { flex: 1; }
-  .sig-party { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; font-weight: 700; color: #163300; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .sig-party { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; font-weight: 700; color: #1d3014; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
   .sig-field { margin-top: 12px; }
   .sig-label { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 8pt; color: #6b7280; margin-bottom: 2px; }
   .sig-line { border-bottom: 1px solid #374151; height: 24px; margin-bottom: 8px; }
@@ -79,7 +79,7 @@ export function generateContractHTML(data: ContractData): string {
 </head>
 <body>
 
-<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #163300;padding-bottom:16px;margin-bottom:24px;">
+<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #1d3014;padding-bottom:16px;margin-bottom:24px;">
   <div>
     <h1 style="margin-bottom:3px;">Huurovereenkomst woonruimte</h1>
     <div class="doc-address" style="margin-bottom:0;">${data.propertyAddress}</div>
@@ -263,7 +263,7 @@ export function generateContractHTML(data: ContractData): string {
 
 <div class="footer">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 360" role="img" aria-label="Domio" style="height:16px;width:auto;opacity:0.3;">
-    <text x="974" y="290" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="320" letter-spacing="-8" fill="#163300">Domio</text>
+    <text x="974" y="290" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="320" letter-spacing="-8" fill="#1d3014">Domio</text>
   </svg>
 </div>
 

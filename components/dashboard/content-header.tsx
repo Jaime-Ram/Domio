@@ -95,7 +95,7 @@ export function ContentHeader({
 
         {/* Page title */}
         {pageDef.title && (
-          <h1 className="self-end pb-2 text-[26px] font-bold text-[#161f13] dark:text-[#94f477] leading-none truncate">
+          <h1 className="self-end pb-2 text-[26px] font-bold text-[#1d3014] dark:text-[#c8e957] leading-none truncate">
             {pageDef.title}
           </h1>
         )}
@@ -116,7 +116,7 @@ export function ContentHeader({
                 ref={searchInputRef}
                 type="text"
                 placeholder="Zoeken…"
-                className="h-[30px] w-full rounded-full bg-[#f4f4f1] dark:bg-neutral-800 pl-8 pr-3 text-[12px] text-[#55554e] dark:text-gray-300 placeholder:text-[#97978f] dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#161f13]/20 dark:focus:ring-[#94f477]/20"
+                className="h-[30px] w-full rounded-full bg-[#f4f4f1] dark:bg-neutral-800 pl-8 pr-3 text-[12px] text-[#55554e] dark:text-gray-300 placeholder:text-[#97978f] dark:placeholder:text-neutral-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20 dark:focus:ring-[#c8e957]/20"
                 onKeyDown={(e) => { if (e.key === 'Escape') setSearchOpen(false) }}
               />
             </div>
@@ -153,7 +153,7 @@ export function ContentHeader({
             <div className="h-[34px] py-0 pl-1.5 pr-2.5 rounded-full flex items-center gap-1.5 opacity-60 pointer-events-none">
               <span className={cn(
                 'h-[26px] w-[26px] rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0',
-                loading ? 'bg-[#cfcfc8] dark:bg-neutral-600 animate-pulse' : 'bg-[#161f13] dark:bg-[#94f477] dark:text-[#161f13]'
+                loading ? 'bg-[#cfcfc8] dark:bg-neutral-600 animate-pulse' : 'bg-[#1d3014] dark:bg-[#c8e957] dark:text-[#1d3014]'
               )}>
                 {loading ? '' : avatarInitials}
               </span>
@@ -227,7 +227,7 @@ export function ContentHeader({
                 >
                   <span className={cn(
                     'h-[26px] w-[26px] rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0',
-                    loading ? 'bg-[#cfcfc8] dark:bg-neutral-600 animate-pulse' : 'bg-[#161f13] dark:bg-[#94f477] dark:text-[#161f13]'
+                    loading ? 'bg-[#cfcfc8] dark:bg-neutral-600 animate-pulse' : 'bg-[#1d3014] dark:bg-[#c8e957] dark:text-[#1d3014]'
                   )}>
                     {loading ? '' : avatarInitials}
                   </span>
@@ -243,7 +243,7 @@ export function ContentHeader({
                     onClick={() => router.push(`${basePath}/settings?tab=account`)}
                     className="flex items-center gap-3 w-full rounded-lg px-2 py-1.5 transition-colors hover:bg-[#f4f4f4] dark:hover:bg-neutral-700 text-left"
                   >
-                    <div className="h-10 w-10 shrink-0 rounded-full bg-[#161f13] text-white text-sm font-semibold flex items-center justify-center">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-[#1d3014] text-white text-sm font-semibold flex items-center justify-center">
                       {avatarInitials}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -268,7 +268,7 @@ export function ContentHeader({
                     <AppDropdownItem
                       key={label}
                       asChild
-                      className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-[#55554e] dark:text-gray-300 hover:bg-[#94f477] dark:hover:bg-[#94f477]/70 hover:text-[#161f13] dark:hover:text-[#161f13] focus:bg-[#94f477] dark:focus:bg-[#94f477]/70 focus:text-[#161f13] dark:focus:text-[#161f13]"
+                      className="flex items-center gap-3 w-full py-2 px-3 rounded-lg text-sm font-medium text-[#55554e] dark:text-gray-300 hover:bg-[#c8e957] dark:hover:bg-[#c8e957]/70 hover:text-[#1d3014] dark:hover:text-[#1d3014] focus:bg-[#c8e957] dark:focus:bg-[#c8e957]/70 focus:text-[#1d3014] dark:focus:text-[#1d3014]"
                     >
                       <Link href={href} className="flex items-center gap-3 w-full">
                         <Icon className="h-4 w-4 shrink-0" />
@@ -321,9 +321,9 @@ export function ContentHeader({
           >
             <span className="text-[12px] font-medium text-[#97978f] dark:text-[#97978f]">Proefperiode</span>
             <svg width="16" height="16" viewBox="0 0 18 18" className="shrink-0 -rotate-90">
-              <circle cx="9" cy="9" r="7" fill="none" strokeWidth="4" className="stroke-[#161f13]/15 dark:stroke-[#94f477]/20" />
+              <circle cx="9" cy="9" r="7" fill="none" strokeWidth="4" className="stroke-[#1d3014]/15 dark:stroke-[#c8e957]/20" />
               <circle cx="9" cy="9" r="7" fill="none" strokeWidth="4" strokeLinecap="round"
-                className="stroke-[#161f13] dark:stroke-[#94f477]"
+                className="stroke-[#1d3014] dark:stroke-[#c8e957]"
                 strokeDasharray={circumference}
                 strokeDashoffset={circumference * (1 - trialPct / 100)} />
             </svg>

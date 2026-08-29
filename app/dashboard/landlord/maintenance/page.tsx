@@ -570,7 +570,7 @@ export default function MaintenancePage() {
       {/* Toolbar — no Card wrapper */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-lg font-semibold text-[#161f13] dark:text-[#94f477]">Tickets</p>
+          <p className="text-lg font-semibold text-[#1d3014] dark:text-[#c8e957]">Tickets</p>
           <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-1">
             {filteredTickets.length} van {tickets.length} ticket{tickets.length === 1 ? '' : 's'}
           </p>
@@ -583,7 +583,7 @@ export default function MaintenancePage() {
               onClick={() => { setSearchExpanded(true); setTimeout(() => searchInputRef.current?.focus(), 0) }}
               className={cn(
                 'h-8 w-8 flex items-center justify-center rounded-full text-[#97978f] dark:text-[#97978f] hover:text-[#1a1c18] dark:hover:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors shrink-0',
-                searchQuery && 'text-[#161f13] dark:text-[#94f477]',
+                searchQuery && 'text-[#1d3014] dark:text-[#c8e957]',
               )}
             >
               <Search className="h-4 w-4" />
@@ -599,7 +599,7 @@ export default function MaintenancePage() {
                 onBlur={() => { if (!searchQuery) setSearchExpanded(false) }}
                 onKeyDown={e => { if (e.key === 'Escape') { setSearchQuery(''); setSearchExpanded(false) } }}
                 placeholder="Zoeken…"
-                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#94f477]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
+                className="pl-3 pr-3 h-8 w-40 rounded-full text-xs bg-[#f4f4f1] dark:bg-neutral-800 border-0 focus:outline-none focus:ring-2 focus:ring-[#c8e957]/40 text-[#55554e] dark:text-gray-200 placeholder:text-[#97978f]"
               />
             </div>
           </div>
@@ -699,7 +699,7 @@ export default function MaintenancePage() {
               resetCreateForm()
               setCreateOpen(true)
             }}
-            className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
+            className="bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] rounded-full px-4 sm:px-5 h-9 text-sm font-medium shrink-0"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nieuw ticket
@@ -726,7 +726,7 @@ export default function MaintenancePage() {
                 {selectedIds.length > 0 ? (
                   <button type="button" onClick={toggleSelectAll} className="ml-[26px] flex items-center justify-center">
                     {selectedIds.length === sortedTickets.length
-                      ? <CheckSquare className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+                      ? <CheckSquare className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957]" />
                       : <Square className="h-3.5 w-3.5 text-[#97978f]" />}
                   </button>
                 ) : (
@@ -747,7 +747,7 @@ export default function MaintenancePage() {
                   className={cn(
                     'group grid grid-cols-[48px_minmax(0,1fr)_152px_90px_96px_32px] w-full items-center gap-4 px-3 py-3 transition-colors rounded-xl cursor-pointer',
                     selectedIds.includes(t.id)
-                      ? 'bg-[#94f477]/20 dark:bg-[#94f477]/10'
+                      ? 'bg-[#c8e957]/20 dark:bg-[#c8e957]/10'
                       : 'hover:bg-[#f4f4f1] dark:hover:bg-neutral-800/40',
                   )}
                   onClick={() => openDetail(t.id)}
@@ -838,7 +838,7 @@ export default function MaintenancePage() {
                         className="h-5 w-5 flex items-center justify-center"
                       >
                         {selectedIds.includes(t.id)
-                          ? <CheckSquare className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+                          ? <CheckSquare className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957]" />
                           : <Square className="h-3.5 w-3.5 text-[#97978f]" />}
                       </button>
                     </div>
@@ -876,7 +876,7 @@ export default function MaintenancePage() {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477]"
+                      className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 text-[#97978f] hover:text-[#1d3014] dark:hover:text-[#c8e957]"
                       onClick={e => { e.stopPropagation(); router.push(`${basePath}/messages?ticket=${t.id}`) }}
                       aria-label="Open chat"
                     >
@@ -1054,7 +1054,7 @@ export default function MaintenancePage() {
               <button type="button" onClick={() => setCreateOpen(false)} className="text-sm text-[#97978f] hover:text-[#1a1c18] dark:text-[#97978f] dark:hover:text-gray-200 transition-colors px-1 py-1">Annuleren</button>
               <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] text-sm font-semibold px-4 py-2 disabled:opacity-50"
                 disabled={!newTitle.trim() || creating || (!isDemo && (!user?.id ||
                   (newScope === 'persoon' && !newLeaseId) ||
                   (newScope === 'pand' && !newPropertyId)

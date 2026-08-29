@@ -294,7 +294,7 @@ const ticketStatus = [
   { label: "Open", n: 12, color: "#e3e3de" },
   { label: "In behandeling", n: 34, color: "#7ee85c" },
   { label: "Wacht op onderdelen", n: 8, color: "#f4c04f" },
-  { label: "Opgelost", n: 46, color: "#161f13" },
+  { label: "Opgelost", n: 46, color: "#1d3014" },
 ];
 
 export function TicketStatusCard({ className = "" }: { className?: string }) {

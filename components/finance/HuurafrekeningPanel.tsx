@@ -359,7 +359,7 @@ function OverzichtTable({
               <td colSpan={9} className="px-3 py-2">
                 <button
                   onClick={onAddExpense}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#161f13] dark:text-[#94f477] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Kosten toevoegen
@@ -544,7 +544,7 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                 <div key={col.key} className="flex flex-col gap-0 rounded-2xl bg-[#f4f4f1]/80 dark:bg-neutral-800/50 p-3">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide">{col.label}</span>
-                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/15 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477] px-1.5">
+                    <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1d3014]/15 text-[11px] font-medium text-[#1d3014] dark:bg-[#c8e957]/20 dark:text-[#c8e957] px-1.5">
                       {colItems.length}
                     </span>
                   </div>
@@ -570,7 +570,7 @@ export const HuurafrekeningPanel = forwardRef<HuurafrekeningPanelRef, Huurafreke
                           onClick={() => openSettlement(s)}
                           className={cn(
                             'w-full text-left rounded-2xl bg-white dark:bg-neutral-900 px-4 py-4 flex flex-col gap-1.5 shadow-sm',
-                            'transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13]',
+                            'transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014]',
                             isVoided && 'opacity-50'
                           )}
                         >
@@ -1289,9 +1289,9 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               {settlementId ? 'Afrekening bewerken' : 'Nieuwe afrekening'}
             </DialogTitle>
             <div className="flex items-center gap-1.5 mt-2">
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 1 ? 'w-6' : 'w-3 opacity-30')} />
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 2 ? 'w-6' : 'w-3 opacity-30')} />
-              <span className={cn('h-1.5 rounded-full transition-all bg-[#161f13] dark:bg-[#94f477]', step === 3 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#1d3014] dark:bg-[#c8e957]', step === 1 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#1d3014] dark:bg-[#c8e957]', step === 2 ? 'w-6' : 'w-3 opacity-30')} />
+              <span className={cn('h-1.5 rounded-full transition-all bg-[#1d3014] dark:bg-[#c8e957]', step === 3 ? 'w-6' : 'w-3 opacity-30')} />
               <span className="ml-1 text-xs text-[#97978f]">
                 {step === 1 ? 'Eenheid & periode' : step === 2 ? 'Overzicht' : 'Samenvatting'}
               </span>
@@ -1321,7 +1321,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         className={cn(
                           'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                           propertyId
-                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                             : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600'
                         )}
                       >
@@ -1341,7 +1341,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 <button key={p.id} type="button"
                                   onClick={() => { setPropertyId(p.id); setUnitId(''); setPropPickerOpen(false) }}
                                   className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
                                   <Building2 className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1369,7 +1369,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                         className={cn(
                           'w-full flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-colors',
                           unitId
-                            ? 'border-[#161f13] bg-[#161f13]/5 text-[#161f13] dark:border-[#94f477] dark:bg-[#94f477]/10 dark:text-[#94f477]'
+                            ? 'border-[#1d3014] bg-[#1d3014]/5 text-[#1d3014] dark:border-[#c8e957] dark:bg-[#c8e957]/10 dark:text-[#c8e957]'
                             : 'border-[#e3e3de] dark:border-neutral-700 text-[#55554e] dark:text-[#97978f] hover:border-gray-300 dark:hover:border-neutral-600 disabled:opacity-40'
                         )}
                       >
@@ -1389,7 +1389,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 <button key={u.id} type="button"
                                   onClick={() => { setUnitId(u.id); setUnitPickerOpen(false) }}
                                   className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
-                                    isSel ? 'bg-[#161f13]/5 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
+                                    isSel ? 'bg-[#1d3014]/5 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957] font-semibold' : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                   )}
                                 >
                                   <Home className="h-3.5 w-3.5 shrink-0 text-[#97978f]" />
@@ -1416,7 +1416,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                             className={cn(
                               'rounded-full px-3 py-1 text-xs font-medium transition-colors',
                               periodMode === mode
-                                ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                                 : 'text-[#97978f] dark:text-[#97978f] hover:text-[#55554e] dark:hover:text-gray-200'
                             )}
                           >
@@ -1459,9 +1459,9 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 className={cn(
                                   'rounded-lg py-2.5 text-sm font-medium transition-colors',
                                   inRange && isEdge
-                                    ? 'bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13]'
+                                    ? 'bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014]'
                                     : inRange
-                                      ? 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]'
+                                      ? 'bg-[#1d3014]/10 text-[#1d3014] dark:bg-[#c8e957]/20 dark:text-[#c8e957]'
                                       : 'text-[#55554e] dark:text-gray-300 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                 )}
                               >
@@ -1532,9 +1532,9 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                                 className={cn(
                                   'flex items-center justify-center h-8 w-8 mx-auto text-sm transition-colors',
                                   isSelected
-                                    ? 'rounded-full bg-[#161f13] text-white dark:bg-[#94f477] dark:text-[#161f13] font-semibold'
+                                    ? 'rounded-full bg-[#1d3014] text-white dark:bg-[#c8e957] dark:text-[#1d3014] font-semibold'
                                     : inRange
-                                      ? 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/15 dark:text-[#94f477]'
+                                      ? 'bg-[#1d3014]/10 text-[#1d3014] dark:bg-[#c8e957]/15 dark:text-[#c8e957]'
                                       : 'rounded-full text-[#1a1c18] dark:text-gray-200 hover:bg-[#f4f4f1] dark:hover:bg-neutral-800'
                                 )}
                               >
@@ -1688,7 +1688,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                 type="button"
                 disabled={!step1Valid}
                 onClick={goToStep2}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 Volgende →
               </button>
@@ -1697,7 +1697,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
               <button
                 type="button"
                 onClick={() => setStep(3)}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] px-4 py-2 text-sm font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] px-4 py-2 text-sm font-semibold transition-colors"
               >
                 Volgende →
               </button>
@@ -1711,7 +1711,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
                 <Button
                   onClick={() => setConfirmOpen(true)}
                   disabled={saving}
-                  className="bg-[#161f13] hover:bg-[#356258]"
+                  className="bg-[#1d3014] hover:bg-[#356258]"
                 >
                   Publiceren
                 </Button>
@@ -1734,7 +1734,7 @@ function SettlementWizard({ open, onOpenChange, settlementId, onClose }: WizardP
             <AlertDialogAction
               onClick={() => save('definitief')}
               disabled={saving}
-              className="bg-[#161f13] hover:bg-[#356258]"
+              className="bg-[#1d3014] hover:bg-[#356258]"
             >
               {saving ? 'Bezig...' : 'Publiceren'}
             </AlertDialogAction>

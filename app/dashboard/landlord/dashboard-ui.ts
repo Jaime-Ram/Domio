@@ -50,13 +50,13 @@ export const DASHBOARD_TABLE_HEADER_TINT_CLASS =
  * Tabellen in dashboard-kaarten: `DashboardTableHead` (`px-5`); groene accenttekst op grijze kop (zie `DASHBOARD_TABLE_HEADER_TINT_CLASS` op `thead tr`).
  */
 export const DASHBOARD_TABLE_HEAD_CLASS =
-  'h-auto min-h-12 px-5 py-3 text-left align-middle text-sm font-semibold text-[#161f13] dark:text-[#94f477]'
+  'h-auto min-h-12 px-5 py-3 text-left align-middle text-sm font-semibold text-[#1d3014] dark:text-[#c8e957]'
 
 /**
  * Shadcn-tabelkoppen (gelijk aan toolbar); zelfde tint/tekst als `DASHBOARD_TABLE_HEAD_CLASS`.
  */
 export const DASHBOARD_TABLE_HEAD_SHADCN_CLASS =
-  'h-auto min-h-12 px-3.5 py-3 text-left align-middle text-sm font-semibold text-[#161f13] dark:text-[#94f477]'
+  'h-auto min-h-12 px-3.5 py-3 text-left align-middle text-sm font-semibold text-[#1d3014] dark:text-[#c8e957]'
 
 export const DASHBOARD_TABLE_CELL_CLASS =
   'px-5 py-3 align-middle text-sm'
@@ -109,7 +109,7 @@ export const DASHBOARD_TABLE_BLOCK_CLASS =
   '[&_thead_tr]:!border-b-0 [&_tfoot_tr]:!border-b-0 ' +
   '[&_thead_tr]:bg-[#f4f4f1] dark:[&_thead_tr]:bg-neutral-800/90 ' +
   '[&_thead_tr]:hover:!bg-[#f4f4f1] dark:[&_thead_tr]:hover:!bg-neutral-800/90 ' +
-  '[&_thead_th]:!min-h-0 [&_thead_th]:!py-2.5 [&_thead_th]:text-[#161f13] dark:[&_thead_th]:text-[#94f477] ' +
+  '[&_thead_th]:!min-h-0 [&_thead_th]:!py-2.5 [&_thead_th]:text-[#1d3014] dark:[&_thead_th]:text-[#c8e957] ' +
   '[&_tbody]:bg-white dark:[&_tbody]:bg-neutral-900 ' +
   '[&_tbody_td]:bg-transparent ' +
   '[&_tbody_td]:transition-colors duration-150 ' +

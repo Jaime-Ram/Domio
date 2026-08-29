@@ -129,7 +129,7 @@ export function InviteTenantDialog({ open, onClose, onInvited }: InviteTenantDia
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#163300] hover:bg-[#1e4a00] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#1d3014] hover:bg-[#1e4a00] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 Uitnodigen

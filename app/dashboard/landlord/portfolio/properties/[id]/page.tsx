@@ -191,7 +191,7 @@ export default function PropertyDetailPage() {
   if (!property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-[#161f13] dark:text-[#94f477] mb-4">
+        <h2 className="text-2xl font-bold text-[#1d3014] dark:text-[#c8e957] mb-4">
           Object niet gevonden
         </h2>
         <Button onClick={() => router.push(`${basePath}/portfolio`)}>
@@ -396,7 +396,7 @@ export default function PropertyDetailPage() {
               
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-[#161f13] dark:text-[#94f477] mb-2">
+                  <h1 className="text-3xl font-bold text-[#1d3014] dark:text-[#c8e957] mb-2">
                     {isEditing ? (editForm.name || 'Nieuw pand') : property.name}
                   </h1>
                   <div className="flex items-center gap-2 text-[#55554e] dark:text-[#97978f]">
@@ -668,7 +668,7 @@ export default function PropertyDetailPage() {
                         <Button
                           onClick={handleSave}
                           disabled={saving || !editForm.name || !editForm.address}
-                          className="bg-[#161f13] hover:bg-[#356258] text-white"
+                          className="bg-[#1d3014] hover:bg-[#356258] text-white"
                         >
                           {saving ? 'Opslaan...' : 'Opslaan'}
                         </Button>
@@ -688,7 +688,7 @@ export default function PropertyDetailPage() {
                         <CardDescription>Alle units in dit object</CardDescription>
                       </div>
                       <Button 
-                        className="bg-[#161f13] hover:bg-[#356258] text-white"
+                        className="bg-[#1d3014] hover:bg-[#356258] text-white"
                         onClick={handleAddUnit}
                         disabled={newUnitDraft !== null}
                       >
@@ -701,10 +701,10 @@ export default function PropertyDetailPage() {
                     <div className="space-y-4">
                       {/* New unit draft card */}
                       {newUnitDraft && (
-                        <div className="border-2 border-dashed border-[#161f13]/40 dark:border-[#94f477]/40 rounded-lg p-6">
+                        <div className="border-2 border-dashed border-[#1d3014]/40 dark:border-[#c8e957]/40 rounded-lg p-6">
                           <div className="flex items-center gap-3 mb-4">
-                            <DoorOpen className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
-                            <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">Nieuwe unit</h3>
+                            <DoorOpen className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
+                            <h3 className="font-semibold text-[#1d3014] dark:text-[#c8e957]">Nieuwe unit</h3>
                           </div>
 
                           {newUnitError && (
@@ -776,7 +776,7 @@ export default function PropertyDetailPage() {
                             <Button
                               onClick={handleSaveNewUnit}
                               disabled={savingNewUnit || !newUnitDraft.unit_number}
-                              className="bg-[#161f13] hover:bg-[#356258] text-white"
+                              className="bg-[#1d3014] hover:bg-[#356258] text-white"
                             >
                               {savingNewUnit ? 'Opslaan...' : 'Opslaan'}
                             </Button>
@@ -807,7 +807,7 @@ export default function PropertyDetailPage() {
                                   {/* Edit mode */}
                                   <div className="flex items-center gap-3 mb-4">
                                     <DoorOpen className="h-5 w-5 text-[#97978f]" />
-                                    <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">{unitForm.unit_number || unit.unit_number}</h3>
+                                    <h3 className="font-semibold text-[#1d3014] dark:text-[#c8e957]">{unitForm.unit_number || unit.unit_number}</h3>
                                   </div>
 
                                   {unitErrors[unit.id] && (
@@ -927,7 +927,7 @@ export default function PropertyDetailPage() {
                                       size="sm"
                                       onClick={() => handleSaveUnit(unit.id)}
                                       disabled={savingUnits.has(unit.id) || !unitForm.unit_number}
-                                      className="bg-[#161f13] hover:bg-[#356258] text-white"
+                                      className="bg-[#1d3014] hover:bg-[#356258] text-white"
                                     >
                                       {savingUnits.has(unit.id) ? 'Opslaan...' : 'Opslaan'}
                                     </Button>
@@ -941,7 +941,7 @@ export default function PropertyDetailPage() {
                                     <div className="flex items-center gap-3">
                                       <DoorOpen className="h-5 w-5 text-[#97978f]" />
                                       <div>
-                                        <h3 className="font-semibold text-[#161f13] dark:text-[#94f477]">{unit.unit_number}</h3>
+                                        <h3 className="font-semibold text-[#1d3014] dark:text-[#c8e957]">{unit.unit_number}</h3>
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -996,8 +996,8 @@ export default function PropertyDetailPage() {
                                       </div>
                                     ) : inviteUnitId === unit.id ? (
                                       /* Inline invite form */
-                                      <div className="border border-[#161f13]/20 dark:border-[#94f477]/20 rounded-lg p-4 space-y-3">
-                                        <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477]">Huurder uitnodigen</p>
+                                      <div className="border border-[#1d3014]/20 dark:border-[#c8e957]/20 rounded-lg p-4 space-y-3">
+                                        <p className="text-xs font-semibold text-[#1d3014] dark:text-[#c8e957]">Huurder uitnodigen</p>
                                         <Input
                                           placeholder="Volledige naam"
                                           value={inviteForm.name}
@@ -1025,7 +1025,7 @@ export default function PropertyDetailPage() {
                                           </Button>
                                           <Button
                                             size="sm"
-                                            className="bg-[#161f13] hover:bg-[#356258] text-white"
+                                            className="bg-[#1d3014] hover:bg-[#356258] text-white"
                                             onClick={() => handleInviteToUnit(unit.id)}
                                             disabled={inviteSending || !inviteForm.name || !inviteForm.email}
                                           >
@@ -1042,7 +1042,7 @@ export default function PropertyDetailPage() {
                                     ) : (
                                       <button
                                         onClick={() => { setInviteUnitId(unit.id); setInviteForm({ name: '', email: '' }); setInviteError(null) }}
-                                        className="w-full flex items-center justify-center gap-2 p-3 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg border border-dashed border-gray-300 dark:border-neutral-600 hover:border-[#161f13] dark:hover:border-[#94f477] hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors text-sm text-[#97978f] dark:text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477]"
+                                        className="w-full flex items-center justify-center gap-2 p-3 bg-[#f4f4f1] dark:bg-neutral-800 rounded-lg border border-dashed border-gray-300 dark:border-neutral-600 hover:border-[#1d3014] dark:hover:border-[#c8e957] hover:bg-[#f4f4f1] dark:hover:bg-neutral-700 transition-colors text-sm text-[#97978f] dark:text-[#97978f] hover:text-[#1d3014] dark:hover:text-[#c8e957]"
                                       >
                                         <Mail className="h-4 w-4" />
                                         Huurder uitnodigen
@@ -1069,14 +1069,14 @@ export default function PropertyDetailPage() {
                       ) : !newUnitDraft ? (
                         <div className="py-12 text-center">
                           <DoorOpen className="h-12 w-12 text-[#97978f] mx-auto mb-4" />
-                          <h3 className="text-lg font-medium text-[#161f13] dark:text-[#94f477] mb-2">
+                          <h3 className="text-lg font-medium text-[#1d3014] dark:text-[#c8e957] mb-2">
                             Geen units beschikbaar
                           </h3>
                           <p className="text-sm text-[#97978f] dark:text-[#97978f] mb-4">
                             Voeg units toe aan dit object
                           </p>
                           <Button 
-                            className="bg-[#161f13] hover:bg-[#356258] text-white"
+                            className="bg-[#1d3014] hover:bg-[#356258] text-white"
                             onClick={handleAddUnit}
                           >
                             <DoorOpen className="h-4 w-4 mr-2" />
@@ -1098,7 +1098,7 @@ export default function PropertyDetailPage() {
                         <CardTitle>Documenten</CardTitle>
                         <CardDescription>Alle documenten voor dit object</CardDescription>
                       </div>
-                      <Button className="bg-[#161f13] hover:bg-[#356258] text-white">
+                      <Button className="bg-[#1d3014] hover:bg-[#356258] text-white">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Document
                       </Button>
@@ -1113,7 +1113,7 @@ export default function PropertyDetailPage() {
                             className="flex items-center justify-between p-4 border border-[#e3e3de] dark:border-neutral-700 rounded-lg hover:bg-[#f4f4f1] dark:hover:bg-neutral-800 transition-colors"
                           >
                             <div className="flex items-center gap-3 flex-1">
-                              <FileText className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
+                              <FileText className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">
                                   {doc.name}

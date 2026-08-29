@@ -236,17 +236,17 @@ export default function TenantSettingsPage() {
       {/* Header card */}
       <div className={cn(sCard, 'overflow-hidden')}>
         <div
-          className="h-28 sm:h-32 bg-[#161f13] bg-cover bg-no-repeat"
+          className="h-28 sm:h-32 bg-[#1d3014] bg-cover bg-no-repeat"
           style={{ backgroundImage: "url('/images/Achtergrond2.jpg')", backgroundPosition: '50% 26%' }}
         />
         <div className="bg-white dark:bg-neutral-900 px-6 sm:px-8 pt-8 pb-6">
           <div className="-mt-[4.5rem] shrink-0">
-            <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#161f13] dark:text-[#94f477] text-xl font-semibold">
+            <div className="h-20 w-20 rounded-full bg-[#f4f4f4] dark:bg-neutral-800 flex items-center justify-center text-[#1d3014] dark:text-[#c8e957] text-xl font-semibold">
               {initialsLetters != null ? initialsLetters : <User className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden />}
             </div>
           </div>
           <div className="mt-2 flex flex-col gap-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#161f13] dark:text-[#94f477]">{displayName}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1d3014] dark:text-[#c8e957]">{displayName}</h1>
             <div className="flex flex-wrap gap-2">
               {tabs.map(({ key, label, icon: Icon }) => (
                 <button
@@ -255,7 +255,7 @@ export default function TenantSettingsPage() {
                   className={cn(
                     'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
                     activeTab === key
-                      ? 'bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90'
+                      ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90'
                       : 'bg-[#f4f4f4] dark:bg-neutral-800 text-gray-600 dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
                   )}
                 >
@@ -293,7 +293,7 @@ export default function TenantSettingsPage() {
                       type="text"
                       value={accountForm.name}
                       onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
-                      className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20"
+                      className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -302,7 +302,7 @@ export default function TenantSettingsPage() {
                       type="tel"
                       value={accountForm.phone}
                       onChange={(e) => setAccountForm({ ...accountForm, phone: e.target.value })}
-                      className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20"
+                      className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20"
                     />
                   </div>
                   {fieldError && accSection === 'personal' && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
@@ -310,7 +310,7 @@ export default function TenantSettingsPage() {
                     <button
                       onClick={handleSavePersonal}
                       disabled={savingField === 'personal'}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50"
                     >
                       {savingField === 'personal' && <Loader2 className="h-4 w-4 animate-spin" />}
                       Opslaan
@@ -337,10 +337,10 @@ export default function TenantSettingsPage() {
               {accSection === 'login' && (
                 <div className="pb-4 space-y-3">
                   {emailChangeStatus === 'sent' ? (
-                    <div className="rounded-xl border border-[#94f477]/40 bg-[#94f477]/10 px-4 py-3 space-y-1">
+                    <div className="rounded-xl border border-[#c8e957]/40 bg-[#c8e957]/10 px-4 py-3 space-y-1">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
-                        <p className="text-sm font-medium text-[#161f13] dark:text-[#94f477]">Bevestigingsmail verstuurd</p>
+                        <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
+                        <p className="text-sm font-medium text-[#1d3014] dark:text-[#c8e957]">Bevestigingsmail verstuurd</p>
                       </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         Klik op de link in de e-mail naar <span className="font-medium">{newEmail}</span> om de wijziging te bevestigen.
@@ -359,7 +359,7 @@ export default function TenantSettingsPage() {
                           value={newEmail}
                           onChange={(e) => setNewEmail(e.target.value)}
                           placeholder="nieuw@voorbeeld.nl"
-                          className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#161f13]/20"
+                          className="w-full rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20"
                         />
                       </div>
                       {fieldError && accSection === 'login' && <p className="text-xs text-red-600 dark:text-red-400">{fieldError}</p>}
@@ -367,7 +367,7 @@ export default function TenantSettingsPage() {
                       <button
                         onClick={handleSendEmailVerification}
                         disabled={savingField === 'login' || !newEmail.trim()}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50"
                       >
                         {savingField === 'login' && <Loader2 className="h-4 w-4 animate-spin" />}
                         Bevestigingsmail versturen
@@ -397,7 +397,7 @@ export default function TenantSettingsPage() {
                       className={cn(
                         'px-4 py-1.5 rounded-full text-sm font-medium border transition-colors',
                         language === lang
-                          ? 'bg-[#94f477] text-[#161f13] border-[#94f477]'
+                          ? 'bg-[#c8e957] text-[#1d3014] border-[#c8e957]'
                           : 'bg-white dark:bg-neutral-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-neutral-700 hover:border-gray-300'
                       )}
                     >
@@ -405,7 +405,7 @@ export default function TenantSettingsPage() {
                     </button>
                   ))}
                   {prefsSaving && <span className="flex items-center gap-1 text-xs text-gray-400"><Loader2 className="h-3 w-3 animate-spin" />Opslaan…</span>}
-                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#161f13] dark:text-[#94f477]"><Check className="h-3 w-3" />Opgeslagen</span>}
+                  {prefsSaved && <span className="flex items-center gap-1 text-xs text-[#1d3014] dark:text-[#c8e957]"><Check className="h-3 w-3" />Opgeslagen</span>}
                 </div>
               )}
             </ActionListRow>
@@ -440,7 +440,7 @@ export default function TenantSettingsPage() {
                           setNotifPrefs(next)
                           await handleSavePrefs(undefined, next)
                         }}
-                        className="h-4 w-4 rounded accent-[#161f13]"
+                        className="h-4 w-4 rounded accent-[#1d3014]"
                       />
                     </label>
                   ))}
@@ -496,7 +496,7 @@ export default function TenantSettingsPage() {
                     disabled={pwResetCooldown > 0}
                     className={cn(
                       'flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors',
-                      pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#161f13] hover:bg-[#161f13]/90'
+                      pwResetCooldown > 0 ? 'bg-gray-300 dark:bg-neutral-600 cursor-not-allowed' : 'bg-[#1d3014] hover:bg-[#1d3014]/90'
                     )}
                   >
                     {pwResetStatus === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -522,7 +522,7 @@ export default function TenantSettingsPage() {
               right={
                 <div className="flex items-center gap-2 shrink-0">
                   {mfaMethod === 'totp' && (
-                    <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477]">Aan</span>
+                    <span className="inline-flex items-center rounded-full bg-[#c8e957]/20 dark:bg-[#c8e957]/10 px-2.5 py-0.5 text-xs font-medium text-[#1d3014] dark:text-[#c8e957]">Aan</span>
                   )}
                   <ChevronRight className={cn('h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform', bevSection === '2fa' && 'rotate-90')} />
                 </div>
@@ -549,10 +549,10 @@ export default function TenantSettingsPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">Geen verificatie</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Alleen e-mailadres en wachtwoord</p>
-                      <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Minder veilig</p>
+                      <p className="text-xs font-semibold text-[#1d3014] dark:text-[#c8e957] mt-0.5">Minder veilig</p>
                     </div>
                     {mfaMethod === 'none'
-                      ? <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                      ? <CheckCircle2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                       : <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />}
                   </button>
 
@@ -569,10 +569,10 @@ export default function TenantSettingsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">Authenticator-app</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Google Authenticator, 1Password of vergelijkbaar</p>
-                        <p className="text-xs font-semibold text-[#161f13] dark:text-[#94f477] mt-0.5">Zeer veilig</p>
+                        <p className="text-xs font-semibold text-[#1d3014] dark:text-[#c8e957] mt-0.5">Zeer veilig</p>
                       </div>
                       {mfaMethod === 'totp'
-                        ? <CheckCircle2 className="h-5 w-5 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                        ? <CheckCircle2 className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                         : <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />}
                     </button>
 
@@ -584,7 +584,7 @@ export default function TenantSettingsPage() {
                               <div key={f.id}>
                                 <div className="flex items-center justify-between rounded-lg bg-white/60 dark:bg-neutral-800/60 border border-gray-100 dark:border-neutral-700 px-3 py-2">
                                   <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477] shrink-0" />
+                                    <CheckCircle2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957] shrink-0" />
                                     <span className="text-sm font-medium text-gray-900 dark:text-white">{f.friendly_name?.split(' ')?.[0] || 'Authenticator'}</span>
                                   </div>
                                   {unenrollFactorId === f.id ? (
@@ -638,7 +638,7 @@ export default function TenantSettingsPage() {
                                 placeholder="000000"
                                 value={totpCode}
                                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-                                className="w-36 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#161f13]/20"
+                                className="w-36 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#1d3014]/20"
                               />
                             </div>
                             {totpError && <p className="text-xs text-red-600 dark:text-red-400">{totpError}</p>}
@@ -646,7 +646,7 @@ export default function TenantSettingsPage() {
                               <button
                                 onClick={handleVerifyTotp}
                                 disabled={totpVerifying || totpCode.length !== 6}
-                                className="px-4 py-2 text-sm font-medium text-white bg-[#161f13] hover:bg-[#161f13]/90 rounded-lg transition-colors disabled:opacity-50"
+                                className="px-4 py-2 text-sm font-medium text-white bg-[#1d3014] hover:bg-[#1d3014]/90 rounded-lg transition-colors disabled:opacity-50"
                               >
                                 {totpVerifying ? 'Verifiëren…' : 'Bevestigen'}
                               </button>
@@ -676,7 +676,7 @@ export default function TenantSettingsPage() {
               title="Huidige sessie"
               subtitle="Webbrowser · Nu actief"
               right={
-                <span className="inline-flex items-center rounded-full bg-[#94f477]/20 dark:bg-[#94f477]/10 px-2.5 py-0.5 text-xs font-medium text-[#161f13] dark:text-[#94f477] shrink-0">Actief</span>
+                <span className="inline-flex items-center rounded-full bg-[#c8e957]/20 dark:bg-[#c8e957]/10 px-2.5 py-0.5 text-xs font-medium text-[#1d3014] dark:text-[#c8e957] shrink-0">Actief</span>
               }
             />
           </ActionListSection>

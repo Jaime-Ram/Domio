@@ -17,7 +17,7 @@ export default function BlogUpdatesPage() {
       <div className="min-h-screen bg-white">
         <section className="border-b border-gray-100 bg-gray-50/30 py-12 md:py-16">
           <div className="container mx-auto max-w-3xl px-4 md:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-[#163300] sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-[#1d3014] sm:text-4xl md:text-5xl">
               Wat verandert er?
             </h1>
             <p className="mt-3 text-lg text-gray-600">
@@ -29,8 +29,8 @@ export default function BlogUpdatesPage() {
         <div className="container mx-auto max-w-3xl px-4 py-10 md:px-8 md:py-14">
           {/* Actief */}
           <div className="mb-14">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#163300]">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#163300] text-white">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#1d3014]">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1d3014] text-white">
                 <Calendar className="h-4 w-4" />
               </span>
               Actief
@@ -45,8 +45,8 @@ export default function BlogUpdatesPage() {
 
           {/* Aankomend */}
           <div>
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#163300]">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#9FE870] text-[#163300]">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#1d3014]">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#c8e957] text-[#1d3014]">
                 <Calendar className="h-4 w-4" />
               </span>
               Aankomend
@@ -97,7 +97,7 @@ function TimelineItem({
         {item.relatedArticle && (
           <Link
             href={`/blog/${item.relatedArticle}`}
-            className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#163300] hover:underline"
+            className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#1d3014] hover:underline"
           >
             Lees meer
             <ArrowRight className="h-4 w-4" />

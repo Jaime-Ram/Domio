@@ -70,7 +70,7 @@ export default function NewUnitPage() {
     <div className="max-w-xl">
       <Link
         href={backHref}
-        className="inline-flex items-center gap-2 text-sm text-[#55554e] dark:text-[#97978f] hover:text-[#161f13] dark:hover:text-[#94f477] mb-6"
+        className="inline-flex items-center gap-2 text-sm text-[#55554e] dark:text-[#97978f] hover:text-[#1d3014] dark:hover:text-[#c8e957] mb-6"
       >
         <ArrowLeft className="h-4 w-4" />
         Terug naar pand
@@ -152,7 +152,7 @@ export default function NewUnitPage() {
               </div>
             </div>
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={loading} className="bg-[#161f13] hover:bg-[#356258]">
+              <Button type="submit" disabled={loading} className="bg-[#1d3014] hover:bg-[#356258]">
                 {loading ? 'Bezig...' : 'Unit toevoegen'}
               </Button>
               <Button type="button" variant="outline" asChild>

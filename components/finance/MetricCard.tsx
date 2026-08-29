@@ -28,7 +28,7 @@ export function MetricCard({ label, value, icon, delta, className }: MetricCardP
         {icon}
       </div>
       <div>
-        <p className="text-3xl font-bold text-[#161f13] dark:text-[#94f477] leading-tight">{value}</p>
+        <p className="text-3xl font-bold text-[#1d3014] dark:text-[#c8e957] leading-tight">{value}</p>
         <div className="flex items-baseline gap-2 mt-0.5">
           <p className="text-sm text-[#97978f] dark:text-[#97978f] font-medium">{label}</p>
           {delta && (

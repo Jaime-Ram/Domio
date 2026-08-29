@@ -393,7 +393,7 @@ function BoardView({ rows, onSelect }: { rows: UnitRow[]; onSelect: (id: string)
               <span className="text-xs font-semibold text-[#97978f] dark:text-[#97978f] uppercase tracking-wide">
                 {col.label}
               </span>
-              <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#161f13]/15 text-[11px] font-medium text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477] px-1.5">
+              <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1d3014]/15 text-[11px] font-medium text-[#1d3014] dark:bg-[#c8e957]/20 dark:text-[#c8e957] px-1.5">
                 {colRows.length}
               </span>
             </div>

@@ -28,7 +28,7 @@ export const ADD_DIALOG_FOOTER_CLASS =
 export const ADD_DIALOG_FOOTER_SPLIT_CLASS =
   'border-t border-gray-100 dark:border-neutral-800 p-4 flex w-full flex-row items-center justify-between gap-3'
 
-export const ADD_DIALOG_TITLE_CLASS = 'text-xl font-bold text-[#161f13] dark:text-[#94f477]'
+export const ADD_DIALOG_TITLE_CLASS = 'text-xl font-bold text-[#1d3014] dark:text-[#c8e957]'
 
 // ─── CreateDialogShell ────────────────────────────────────────────────────────
 
@@ -104,9 +104,9 @@ export function CreateDialogShell({
                     className={cn(
                       'h-1.5 min-h-[6px] rounded-full flex-1 transition-colors duration-300',
                       i === step - 1
-                        ? 'bg-[#161f13] dark:bg-[#94f477]'
+                        ? 'bg-[#1d3014] dark:bg-[#c8e957]'
                         : i < step - 1
-                        ? 'bg-[#161f13]/35 dark:bg-[#94f477]/35'
+                        ? 'bg-[#1d3014]/35 dark:bg-[#c8e957]/35'
                         : 'bg-gray-200 dark:bg-neutral-700'
                     )}
                   />
@@ -168,7 +168,7 @@ export function CreateDialogShell({
               type="button"
               onClick={onPrimary}
               disabled={primaryDisabled || primaryLoading}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] disabled:opacity-50 text-[#161f13] text-sm font-semibold px-4 py-2 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-50 text-[#1d3014] text-sm font-semibold px-4 py-2 transition-colors"
             >
               {isLastStep ? (
                 primaryLoading ? `${primaryLabel}…` : primaryLabel

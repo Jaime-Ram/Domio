@@ -23,7 +23,7 @@ export function AgenticHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-md px-3 py-2 text-[14px] font-medium text-[#163300]/70 transition-colors hover:text-[#163300]"
+                className="rounded-md px-3 py-2 text-[14px] font-medium text-[#1d3014]/70 transition-colors hover:text-[#1d3014]"
               >
                 {item.label}
               </Link>
@@ -34,13 +34,13 @@ export function AgenticHeader() {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="hidden rounded-md px-3 py-2 text-[14px] font-medium text-[#163300]/70 transition-colors hover:text-[#163300] sm:block"
+            className="hidden rounded-md px-3 py-2 text-[14px] font-medium text-[#1d3014]/70 transition-colors hover:text-[#1d3014] sm:block"
           >
             Inloggen
           </Link>
           <Link
             href="/registreren"
-            className="rounded-lg bg-[#163300] px-4 py-2 text-[14px] font-semibold text-white transition-colors hover:bg-[#163300]/90"
+            className="rounded-lg bg-[#1d3014] px-4 py-2 text-[14px] font-semibold text-white transition-colors hover:bg-[#1d3014]/90"
           >
             Start direct
           </Link>

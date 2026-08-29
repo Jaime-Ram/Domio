@@ -58,11 +58,11 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
         <div className="px-6 pt-6 pb-6 space-y-5">
           <DialogHeader>
             <div className="flex items-start gap-3.5">
-              <div className="h-10 w-10 rounded-full bg-[#161f13]/8 dark:bg-[#161f13]/20 flex items-center justify-center shrink-0 mt-0.5">
-                <AlertTriangle className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
+              <div className="h-10 w-10 rounded-full bg-[#1d3014]/8 dark:bg-[#1d3014]/20 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
               </div>
               <div>
-                <DialogTitle className="text-base font-semibold text-[#161f13] dark:text-white">
+                <DialogTitle className="text-base font-semibold text-[#1d3014] dark:text-white">
                   Account definitief verwijderen
                 </DialogTitle>
                 <DialogDescription className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">
@@ -83,7 +83,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
                 'Alle berichten en notities',
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#161f13]/40 dark:bg-[#94f477]/60 shrink-0" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#1d3014]/40 dark:bg-[#c8e957]/60 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -100,7 +100,7 @@ export function DeleteAccountDialog({ open, onOpenChange, onConfirm, isDemo }: D
                 <p className="text-sm text-[#55554e] dark:text-[#97978f]">
                   Typ de volgende zin om te bevestigen:
                 </p>
-                <p className="font-mono text-sm bg-[#161f13]/6 dark:bg-neutral-800 text-[#161f13] dark:text-[#94f477] px-3.5 py-2.5 rounded-xl select-all">
+                <p className="font-mono text-sm bg-[#1d3014]/6 dark:bg-neutral-800 text-[#1d3014] dark:text-[#c8e957] px-3.5 py-2.5 rounded-xl select-all">
                   {CONFIRM_PHRASE}
                 </p>
               </div>

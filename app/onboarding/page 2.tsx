@@ -26,7 +26,7 @@ export default function OnboardingPage() {
         animate={{ opacity: 1, x: 0 }}
         transition={transition}
       >
-      <h1 className="text-4xl font-bold text-[#163300]">
+      <h1 className="text-4xl font-bold text-[#1d3014]">
         Wat voor account wil je aanmaken?
       </h1>
       <p className="mt-2 text-sm text-gray-600">
@@ -41,7 +41,7 @@ export default function OnboardingPage() {
           className="flex w-full items-center gap-4 py-4 pr-2 text-left hover:bg-gray-50/80 active:bg-gray-100 transition-colors -mx-1 px-1 rounded-block disabled:opacity-50"
         >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
-            <Building2 className="h-5 w-5 text-[#163300]" />
+            <Building2 className="h-5 w-5 text-[#1d3014]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-gray-900">Beheerder</div>
@@ -57,7 +57,7 @@ export default function OnboardingPage() {
           className="flex w-full items-center gap-4 py-4 pr-2 text-left hover:bg-gray-50/80 active:bg-gray-100 transition-colors -mx-1 px-1 rounded-block disabled:opacity-50"
         >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white">
-            <Home className="h-5 w-5 text-[#163300]" />
+            <Home className="h-5 w-5 text-[#1d3014]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-gray-900">Bewoner</div>

@@ -41,7 +41,7 @@ export function FeatureCard({
       href={href}
       className={cn(
         'group flex flex-col bg-white dark:bg-neutral-900 overflow-hidden',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#163300] focus-visible:ring-offset-2',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-2',
         className
       )}
     >
@@ -59,7 +59,7 @@ export function FeatureCard({
       {/* Content – geen border, geen shadow op de kaart zelf */}
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         {/* Categorie: donkergroen, klein, geen achtergrond */}
-        <span className="text-xs font-normal text-[#163300] dark:text-[#9FE870] tracking-wide">
+        <span className="text-xs font-normal text-[#1d3014] dark:text-[#c8e957] tracking-wide">
           {category}
         </span>
 
@@ -75,7 +75,7 @@ export function FeatureCard({
 
         {/* Onderste rij: avatar + naam + meta (zoals auteur + datum + leestijd) */}
         <div className="mt-5 flex items-center gap-3 pt-4 border-t border-gray-100 dark:border-neutral-800">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#163300] dark:bg-[#9FE870] text-white dark:text-[#163300] text-sm font-semibold">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1d3014] dark:bg-[#c8e957] text-white dark:text-[#1d3014] text-sm font-semibold">
             D
           </div>
           <div className="min-w-0 flex-1">

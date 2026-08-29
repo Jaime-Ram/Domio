@@ -206,8 +206,8 @@ export default function BetaalflowPage() {
 
   function SortIcon({ col }: { col: SortCol }) {
     if (sort.column !== col) return <ChevronsUpDown className="h-3.5 w-3.5 text-[#97978f]" />
-    if (sort.direction === 'asc') return <ChevronUp className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
-    return <ChevronDown className="h-3.5 w-3.5 text-[#161f13] dark:text-[#94f477]" />
+    if (sort.direction === 'asc') return <ChevronUp className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957]" />
+    return <ChevronDown className="h-3.5 w-3.5 text-[#1d3014] dark:text-[#c8e957]" />
   }
 
   // ── Dialog open ───────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ export default function BetaalflowPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[#1a1c18] dark:text-white flex items-center gap-2">
-                  <Workflow className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                  <Workflow className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                   Betaalflow
                 </h2>
                 <p className="text-sm text-[#97978f] dark:text-[#97978f] mt-0.5">
@@ -308,7 +308,7 @@ export default function BetaalflowPage() {
               </div>
               <Button
                 onClick={openCreate}
-                className="bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-4 h-9 text-sm font-medium shrink-0"
+                className="bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] rounded-full px-4 h-9 text-sm font-medium shrink-0"
               >
                 <Plus className="h-4 w-4 mr-1.5" />
                 Nieuw profiel
@@ -365,8 +365,8 @@ export default function BetaalflowPage() {
                     <TableRow key={p.id} className="group cursor-pointer" onClick={() => openEdit(p)}>
                       <TableCell className="px-3.5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center shrink-0">
-                            <Workflow className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                          <div className="h-8 w-8 rounded-full bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center shrink-0">
+                            <Workflow className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-[#1a1c18] dark:text-white truncate">{p.name}</p>
@@ -507,7 +507,7 @@ export default function BetaalflowPage() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F] text-sm font-semibold px-5 py-2"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] text-sm font-semibold px-5 py-2"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {saving ? 'Opslaan…' : editingProfile ? 'Wijzigingen opslaan' : 'Profiel aanmaken'}

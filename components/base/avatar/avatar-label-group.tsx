@@ -54,7 +54,7 @@ export function AvatarLabelGroup({
     <div className={cn("flex items-center", sizes.gap, className)}>
       <Avatar className={sizes.avatar}>
         {src && <AvatarImage src={src} alt={alt || title} />}
-        <AvatarFallback className="bg-[#163300] text-white font-semibold">
+        <AvatarFallback className="bg-[#1d3014] text-white font-semibold">
           {initials}
         </AvatarFallback>
       </Avatar>

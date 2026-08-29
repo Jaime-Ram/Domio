@@ -82,7 +82,7 @@ export function FAQSection() {
 
   return (
     <section id="faq" className="mx-auto max-w-4xl px-6 py-16 md:px-8 lg:py-20">
-      <h2 className="mb-8 text-4xl font-bold tracking-tight text-[#163300] sm:text-5xl md:text-6xl">
+      <h2 className="mb-8 text-4xl font-bold tracking-tight text-[#1d3014] sm:text-5xl md:text-6xl">
         Veelgestelde vragen
       </h2>
 
@@ -210,7 +210,7 @@ export function FAQSection() {
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#9FE870]/90 transition-colors"
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90 transition-colors"
             aria-expanded={isExpanded}
             aria-label={isExpanded ? 'Minder vragen tonen' : 'Meer vragen tonen'}
           >

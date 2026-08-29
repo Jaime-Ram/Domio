@@ -55,7 +55,7 @@ export default function IntegrationsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-semibold text-[#1a1c18] dark:text-white">{integration.name}</span>
                     {integration.status === 'active' ? (
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#161f13]/10 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">In ontwikkeling</span>
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#1d3014]/10 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957]">In ontwikkeling</span>
                     ) : (
                       <span className="text-[10px] font-medium text-[#97978f] dark:text-neutral-500">Binnenkort</span>
                     )}

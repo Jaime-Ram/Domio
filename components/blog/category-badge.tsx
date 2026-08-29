@@ -16,7 +16,7 @@ export function CategoryBadge({
 
   const base = cn(
     'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-    'bg-[#163300]/10 text-[#163300]',
+    'bg-[#1d3014]/10 text-[#1d3014]',
     className
   )
 

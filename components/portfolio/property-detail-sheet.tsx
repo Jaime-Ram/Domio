@@ -113,7 +113,7 @@ const TABS = [
 
 type TabId = typeof TABS[number]['id']
 
-const FIELD_CLS = 'w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#9FE870] transition-shadow'
+const FIELD_CLS = 'w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-gray-900 dark:text-white px-3 py-2 outline-none focus:ring-2 focus:ring-[#c8e957] transition-shadow'
 
 interface PropertyDetailSheetProps {
   propertyId: string | null
@@ -378,7 +378,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#9FE870] hover:bg-[#8AD45F] disabled:opacity-40 text-[#163300] text-sm font-semibold px-5 py-2 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] disabled:opacity-40 text-[#1d3014] text-sm font-semibold px-5 py-2 transition-colors"
               >
                 {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Opslaan
@@ -461,15 +461,15 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                 {/* KPI strip */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">{totalUnits}</p>
+                    <p className="text-lg font-bold text-[#1d3014] dark:text-[#c8e957]">{totalUnits}</p>
                     <p className="text-xs text-gray-500 mt-0.5">Eenheden</p>
                   </div>
                   <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">{occupancyPct}%</p>
+                    <p className="text-lg font-bold text-[#1d3014] dark:text-[#c8e957]">{occupancyPct}%</p>
                     <p className="text-xs text-gray-500 mt-0.5">Bezetting</p>
                   </div>
                   <div className="bg-gray-50 dark:bg-neutral-800/60 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-[#163300] dark:text-[#9FE870]">
+                    <p className="text-lg font-bold text-[#1d3014] dark:text-[#c8e957]">
                       {totalRent > 0 ? `€${totalRent.toLocaleString('nl-NL')}` : '—'}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">Maandhuur</p>
@@ -599,7 +599,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                     <button
                       type="button"
                       onClick={() => setNewUnitOpen(true)}
-                      className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline flex items-center gap-1"
+                      className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline flex items-center gap-1"
                     >
                       <Plus className="h-3 w-3" />
                       Toevoegen
@@ -646,7 +646,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                           type="button"
                           onClick={handleSaveNewUnit}
                           disabled={savingNewUnit || !newUnitForm.unit_number}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#163300] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 transition-colors hover:bg-[#1f4a00]"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#1d3014] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 transition-colors hover:bg-[#1f4a00]"
                         >
                           {savingNewUnit && <Loader2 className="h-3 w-3 animate-spin" />}
                           Opslaan
@@ -734,7 +734,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                                     type="button"
                                     onClick={() => handleSaveUnit(unit.id)}
                                     disabled={isSaving || !form.unit_number}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#163300] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 hover:bg-[#1f4a00] transition-colors"
+                                    className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#1d3014] text-white px-3 py-1.5 rounded-lg disabled:opacity-40 hover:bg-[#1f4a00] transition-colors"
                                   >
                                     {isSaving && <Loader2 className="h-3 w-3 animate-spin" />}
                                     Opslaan
@@ -755,7 +755,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-2">
                                   {unit.rooms && <span>{unit.rooms} kamers</span>}
                                   {unit.size_m2 && <span>{unit.size_m2} m²</span>}
-                                  {unit.monthly_rent && <span className="font-medium text-[#163300] dark:text-[#9FE870]">€{Number(unit.monthly_rent).toLocaleString('nl-NL')}/mnd</span>}
+                                  {unit.monthly_rent && <span className="font-medium text-[#1d3014] dark:text-[#c8e957]">€{Number(unit.monthly_rent).toLocaleString('nl-NL')}/mnd</span>}
                                 </p>
                                 {historyLeases.length > 0 && (
                                   <p className="text-[11px] text-gray-400 dark:text-gray-600 mt-0.5">
@@ -841,7 +841,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
               <button
                 type="button"
                 onClick={() => { router.push(`${basePath}/financial/betalingen`); onClose() }}
-                className="text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
               >
                 Alle betalingen →
               </button>
@@ -880,7 +880,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                           <p className="text-xs text-gray-400 dark:text-gray-500">{date}{a.category ? ` · ${a.category}` : ''}</p>
                         </div>
                       </div>
-                      <p className={cn('text-sm font-semibold shrink-0 ml-3', amount >= 0 ? 'text-[#163300] dark:text-[#9FE870]' : 'text-red-600 dark:text-red-400')}>
+                      <p className={cn('text-sm font-semibold shrink-0 ml-3', amount >= 0 ? 'text-[#1d3014] dark:text-[#c8e957]' : 'text-red-600 dark:text-red-400')}>
                         {amount >= 0 ? '+' : ''}€ {amount.toLocaleString('nl-NL', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
@@ -899,7 +899,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
               <button
                 type="button"
                 onClick={() => { router.push(`${basePath}/documents`); onClose() }}
-                className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
               >
                 Alle documenten
                 <ArrowRight className="h-3 w-3" />
@@ -934,7 +934,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                         router.push(`${basePath}/documents?preview=${doc.id}`)
                         onClose()
                       }}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:border-[#163300] hover:text-[#163300] dark:hover:border-[#9FE870] dark:hover:text-[#9FE870] transition-colors shrink-0"
+                      className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-neutral-700 text-gray-600 dark:text-gray-300 hover:border-[#1d3014] hover:text-[#1d3014] dark:hover:border-[#c8e957] dark:hover:text-[#c8e957] transition-colors shrink-0"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       Bekijken
@@ -954,7 +954,7 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
               <button
                 type="button"
                 onClick={() => { router.push(`${basePath}/flows`); onClose() }}
-                className="inline-flex items-center gap-1 text-xs font-medium text-[#163300] dark:text-[#9FE870] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#1d3014] dark:text-[#c8e957] hover:underline"
               >
                 Beheer flows
                 <ArrowRight className="h-3 w-3" />
@@ -978,8 +978,8 @@ export function PropertyDetailSheet({ propertyId, open, onClose, onDeleted }: Pr
                   const enabledSteps = flow.configuredSteps?.filter((s: any) => s.enabled).length ?? 0
                   return (
                     <div key={flow.id} className="flex items-start gap-3 rounded-xl border border-gray-100 dark:border-neutral-800 px-4 py-3">
-                      <div className="h-9 w-9 rounded-xl bg-[#163300]/8 dark:bg-[#9FE870]/10 flex items-center justify-center shrink-0">
-                        <Workflow className="h-4 w-4 text-[#163300] dark:text-[#9FE870]" />
+                      <div className="h-9 w-9 rounded-xl bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center shrink-0">
+                        <Workflow className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">

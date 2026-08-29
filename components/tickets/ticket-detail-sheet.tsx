@@ -576,7 +576,7 @@ export function TicketDetailSheet({ ticketId, onClose, onTicketUpdate, isDemo, u
                       size="sm"
                       disabled={!replyText.trim() || sendingReply}
                       onClick={sendReply}
-                      className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-xs font-semibold px-4"
+                      className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] text-xs font-semibold px-4"
                     >
                       {sendingReply ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Send className="h-3.5 w-3.5 mr-1.5" />Versturen</>}
                     </Button>
@@ -869,7 +869,7 @@ export function TicketDetailSheet({ ticketId, onClose, onTicketUpdate, isDemo, u
                         size="sm"
                         disabled={creatingWo}
                         onClick={createWorkOrder}
-                        className="rounded-full bg-[#9FE870] text-[#163300] hover:bg-[#8AD45F] text-xs font-semibold px-4"
+                        className="rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F] text-xs font-semibold px-4"
                       >
                         {creatingWo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Werkbon aanmaken'}
                       </Button>
@@ -895,7 +895,7 @@ export function TicketDetailSheet({ ticketId, onClose, onTicketUpdate, isDemo, u
               <div className="px-6 py-5 space-y-4">
                 {/* Upload zone */}
                 <div
-                  className="border-2 border-dashed border-gray-200 dark:border-neutral-700 rounded-xl p-6 text-center cursor-pointer hover:border-[#9FE870] hover:bg-green-50/30 dark:hover:bg-green-900/5 transition-colors"
+                  className="border-2 border-dashed border-gray-200 dark:border-neutral-700 rounded-xl p-6 text-center cursor-pointer hover:border-[#c8e957] hover:bg-green-50/30 dark:hover:bg-green-900/5 transition-colors"
                   onClick={() => !isDemo && fileInputRef.current?.click()}
                   onDragOver={e => e.preventDefault()}
                   onDrop={e => {
@@ -914,7 +914,7 @@ export function TicketDetailSheet({ ticketId, onClose, onTicketUpdate, isDemo, u
                   />
                   {uploadingFile ? (
                     <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#9FE870]" />
+                      <Loader2 className="h-6 w-6 animate-spin text-[#c8e957]" />
                       <span className="text-sm">Uploaden…</span>
                     </div>
                   ) : (

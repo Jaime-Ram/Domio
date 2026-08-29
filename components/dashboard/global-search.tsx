@@ -262,7 +262,7 @@ export function GlobalSearch({ basePath = BP }: { basePath?: string }) {
                   )}
                 >
                   <div className="mt-0.5 flex-shrink-0 h-9 w-9 rounded-full bg-[#f4f4f4] dark:bg-neutral-900 flex items-center justify-center">
-                    <Icon className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                    <Icon className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">

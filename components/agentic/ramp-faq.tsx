@@ -36,7 +36,7 @@ export function RampFaq() {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-4xl px-6 py-20 md:px-8 md:py-28">
-        <h2 className="text-3xl font-semibold tracking-tight text-[#163300] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
+        <h2 className="text-3xl font-semibold tracking-tight text-[#1d3014] sm:text-4xl md:text-[2.75rem] md:leading-[1.05]">
           Veelgestelde vragen
         </h2>
         <div className="mt-12 border-t border-black/[0.08]">
@@ -49,8 +49,8 @@ export function RampFaq() {
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex w-full items-center justify-between gap-6 py-6 text-left"
                 >
-                  <span className="text-lg font-medium tracking-tight text-[#163300]">{item.q}</span>
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-black/10 text-[#163300]">
+                  <span className="text-lg font-medium tracking-tight text-[#1d3014]">{item.q}</span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-black/10 text-[#1d3014]">
                     {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                   </span>
                 </button>
@@ -59,7 +59,7 @@ export function RampFaq() {
                   style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-2xl pb-6 text-[15px] leading-relaxed text-[#163300]/60">
+                    <p className="max-w-2xl pb-6 text-[15px] leading-relaxed text-[#1d3014]/60">
                       {item.a}
                     </p>
                   </div>

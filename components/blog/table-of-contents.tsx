@@ -46,7 +46,7 @@ export function TableOfContents({ items, className }: { items: TocItem[]; classN
 
   return (
     <nav className={cn('rounded-xl border border-gray-200 bg-gray-50/50 p-4', className)} aria-label="Inhoudsopgave">
-      <h3 className="text-sm font-semibold text-[#163300]">Inhoudsopgave</h3>
+      <h3 className="text-sm font-semibold text-[#1d3014]">Inhoudsopgave</h3>
       <ul className="mt-3 space-y-1">
         {items.map((item) => {
           const isActive = activeId === item.id
@@ -59,9 +59,9 @@ export function TableOfContents({ items, className }: { items: TocItem[]; classN
                 href={`#${item.id}`}
                 onClick={() => handleClick(item.id)}
                 className={cn(
-                  'text-sm hover:text-[#163300] hover:underline transition-colors',
+                  'text-sm hover:text-[#1d3014] hover:underline transition-colors',
                   isActive
-                    ? 'font-bold text-[#163300]'
+                    ? 'font-bold text-[#1d3014]'
                     : 'font-normal text-gray-600'
                 )}
               >

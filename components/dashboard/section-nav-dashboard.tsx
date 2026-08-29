@@ -56,7 +56,7 @@ export function SectionNavDashboard({
                 className={cn(
                   'inline-flex items-center gap-2 px-[1.125rem] py-2 rounded-full text-sm font-medium transition-all',
                   active
-                    ? 'bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90'
+                    ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90'
                     : 'bg-[#f4f4f4] dark:bg-neutral-800 text-[#55554e] dark:text-gray-300 hover:bg-[#eaeaea] dark:hover:bg-neutral-600'
                 )}
               >

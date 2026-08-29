@@ -493,7 +493,7 @@ export default function PortfolioPage() {
                 <button
                   type="button"
                   onClick={() => setNewPortfolioOpen(true)}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] text-sm font-semibold px-4 py-2 transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] text-sm font-semibold px-4 py-2 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                   Eerste portefeuille aanmaken
@@ -521,25 +521,25 @@ export default function PortfolioPage() {
                           <div>
                             <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(isExpanded ? null : '__unassigned')}>
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center">
-                                  <Home className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center">
+                                  <Home className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                                 </div>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2">
                                     <span className="font-semibold text-[#1a1c18] dark:text-white text-sm">Algemene panden</span>
-                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">Standaard</span>
+                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#1d3014]/8 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957]">Standaard</span>
                                   </div>
                                 </div>
                               </div>
                               <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{unassigned.length}</p>
                               {unassignedIncome > 0
-                                ? <p className="text-sm font-semibold text-[#161f13] dark:text-[#94f477]">€{unassignedIncome.toLocaleString('nl-NL')}</p>
+                                ? <p className="text-sm font-semibold text-[#1d3014] dark:text-[#c8e957]">€{unassignedIncome.toLocaleString('nl-NL')}</p>
                                 : <span />
                               }
                               {unassigned.length > 0 ? (
                                 <div className="flex items-center gap-2">
                                   <div className="w-14 h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-700 overflow-hidden">
-                                    <div className="h-full rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all" style={{ width: `${unassignedOcc}%` }} />
+                                    <div className="h-full rounded-full bg-[#1d3014] dark:bg-[#c8e957] transition-all" style={{ width: `${unassignedOcc}%` }} />
                                   </div>
                                   <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{unassignedOcc}%</p>
                                 </div>
@@ -567,7 +567,7 @@ export default function PortfolioPage() {
                                       <div className="h-0 w-2 border-b-2 border-[#e3e3de] dark:border-neutral-700" />
                                     </div>
                                     <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                      <Building2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                                      <Building2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{prop.name}</p>
@@ -593,8 +593,8 @@ export default function PortfolioPage() {
                           <div key={pf.id}>
                             <DataTableRow cols={PF_COLS} onClick={() => setExpandedPortfolioId(isExpanded ? null : pf.id)}>
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#161f13]/8 dark:bg-[#94f477]/10 flex items-center justify-center">
-                                  <Briefcase className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                                <div className="h-8 w-8 rounded-xl shrink-0 bg-[#1d3014]/8 dark:bg-[#c8e957]/10 flex items-center justify-center">
+                                  <Briefcase className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                                 </div>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
@@ -611,10 +611,10 @@ export default function PortfolioPage() {
                                 </div>
                               </div>
                               <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{pf.properties.length}</p>
-                              <p className="text-sm font-semibold text-[#161f13] dark:text-[#94f477]">€{income.toLocaleString('nl-NL')}</p>
+                              <p className="text-sm font-semibold text-[#1d3014] dark:text-[#c8e957]">€{income.toLocaleString('nl-NL')}</p>
                               <div className="flex items-center gap-2">
                                 <div className="w-14 h-1.5 rounded-full bg-[#f4f4f1] dark:bg-neutral-700 overflow-hidden">
-                                  <div className="h-full rounded-full bg-[#161f13] dark:bg-[#94f477] transition-all" style={{ width: `${occ}%` }} />
+                                  <div className="h-full rounded-full bg-[#1d3014] dark:bg-[#c8e957] transition-all" style={{ width: `${occ}%` }} />
                                 </div>
                                 <p className="text-sm font-semibold text-[#1a1c18] dark:text-white">{occ}%</p>
                               </div>
@@ -654,7 +654,7 @@ export default function PortfolioPage() {
                                         <div className="h-0 w-2 border-b-2 border-[#e3e3de] dark:border-neutral-700" />
                                       </div>
                                       <div className={cn('h-8 w-8 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                                        <Building2 className="h-4 w-4 text-[#161f13] dark:text-[#94f477]" />
+                                        <Building2 className="h-4 w-4 text-[#1d3014] dark:text-[#c8e957]" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <p className="text-sm font-medium text-[#1a1c18] dark:text-white truncate">{prop.name}</p>
@@ -669,7 +669,7 @@ export default function PortfolioPage() {
                                         </div>
                                         <div>
                                           <p className="text-[11px] text-[#97978f]">Huur</p>
-                                          <p className="text-xs font-medium text-[#161f13] dark:text-[#94f477]">
+                                          <p className="text-xs font-medium text-[#1d3014] dark:text-[#c8e957]">
                                             {propIncome > 0 ? `€${propIncome.toLocaleString('nl-NL')}` : <span className="text-[#97978f]">Leeg</span>}
                                           </p>
                                         </div>
@@ -683,7 +683,7 @@ export default function PortfolioPage() {
                                     <button
                                       type="button"
                                       onClick={() => { setAssignPickerPortfolioId(pf.id); setAssignPickerOpen(true) }}
-                                      className="text-xs text-[#161f13] dark:text-[#94f477] font-medium hover:underline flex items-center gap-1"
+                                      className="text-xs text-[#1d3014] dark:text-[#c8e957] font-medium hover:underline flex items-center gap-1"
                                     >
                                       <Layers className="h-3.5 w-3.5" />
                                       Bestaand pand indelen
@@ -692,7 +692,7 @@ export default function PortfolioPage() {
                                   <button
                                     type="button"
                                     onClick={() => { setNewPropertyPortfolioId(pf.id); setNewPropertyOpen(true) }}
-                                    className="text-xs text-[#161f13] dark:text-[#94f477] font-medium hover:underline flex items-center gap-1"
+                                    className="text-xs text-[#1d3014] dark:text-[#c8e957] font-medium hover:underline flex items-center gap-1"
                                   >
                                     <Plus className="h-3.5 w-3.5" />
                                     Nieuw pand aanmaken
@@ -724,7 +724,7 @@ export default function PortfolioPage() {
                 <DataTableHeader cols="grid-cols-[1.5rem_minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_2rem]">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded accent-[#161f13] dark:accent-[#94f477] cursor-pointer"
+                    className="h-4 w-4 rounded accent-[#1d3014] dark:accent-[#c8e957] cursor-pointer"
                     checked={sortedProperties.length > 0 && sortedProperties.every((p) => selectedIds.has(p.id))}
                     onChange={(e) => setSelectedIds(e.target.checked ? new Set(sortedProperties.map((p) => p.id)) : new Set())}
                   />
@@ -749,7 +749,7 @@ export default function PortfolioPage() {
                       >
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded accent-[#161f13] dark:accent-[#94f477] cursor-pointer"
+                          className="h-4 w-4 rounded accent-[#1d3014] dark:accent-[#c8e957] cursor-pointer"
                           checked={selectedIds.has(prop.id)}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) =>
@@ -775,7 +775,7 @@ export default function PortfolioPage() {
                         <p className="text-sm text-[#55554e] dark:text-gray-300 capitalize truncate">{prop.type}</p>
                         <div>
                           {prop.portfolioName ? (
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#161f13]/8 dark:bg-[#94f477]/10 text-[#161f13] dark:text-[#94f477]">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#1d3014]/8 dark:bg-[#c8e957]/10 text-[#1d3014] dark:text-[#c8e957]">
                               {prop.portfolioName}
                             </span>
                           ) : (
@@ -785,7 +785,7 @@ export default function PortfolioPage() {
                         <div>
                           <span className={cn(
                             'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                            status === 'verhuurd' && 'bg-[#161f13]/10 text-[#161f13] dark:bg-[#94f477]/20 dark:text-[#94f477]',
+                            status === 'verhuurd' && 'bg-[#1d3014]/10 text-[#1d3014] dark:bg-[#c8e957]/20 dark:text-[#c8e957]',
                             status === 'leegstand' && 'bg-[#f4f4f1] text-[#97978f] dark:bg-neutral-800 dark:text-[#97978f]',
                             status === 'achterstand' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
                             status === 'gemengd' && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
@@ -793,7 +793,7 @@ export default function PortfolioPage() {
                             {status}
                           </span>
                         </div>
-                        <p className="text-sm font-medium text-[#161f13] dark:text-[#94f477]">
+                        <p className="text-sm font-medium text-[#1d3014] dark:text-[#c8e957]">
                           {income > 0 ? `€${income.toLocaleString('nl-NL')}` : <span className="text-[#97978f]">—</span>}
                         </p>
                         <ChevronRight className="h-4 w-4 text-[#97978f] dark:text-[#97978f] justify-self-end" />
@@ -871,7 +871,7 @@ export default function PortfolioPage() {
               type="button"
               onClick={handleBulkAssign}
               disabled={!bulkTargetPfId || bulkAssigning}
-              className="text-sm font-semibold bg-[#94f477] hover:bg-[#8AD45F] text-[#161f13] rounded-full px-3 py-1.5 disabled:opacity-40 shrink-0 transition-colors"
+              className="text-sm font-semibold bg-[#c8e957] hover:bg-[#8AD45F] text-[#1d3014] rounded-full px-3 py-1.5 disabled:opacity-40 shrink-0 transition-colors"
             >
               {bulkAssigning ? 'Bezig…' : 'Indelen'}
             </button>

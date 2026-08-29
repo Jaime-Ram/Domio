@@ -214,11 +214,11 @@ export default function AgentBrain() {
         ctx.beginPath();
         ctx.arc(x, y, n.r, 0, 6.2832);
         if (n.hub) {
-          ctx.fillStyle = "#161f13";
+          ctx.fillStyle = "#1d3014";
           ctx.fill();
           ctx.beginPath();
           ctx.arc(x, y, n.r - 2.4, 0, 6.2832);
-          ctx.fillStyle = "#94f477";
+          ctx.fillStyle = "#c8e957";
           ctx.fill();
         } else {
           const g = n.glow;

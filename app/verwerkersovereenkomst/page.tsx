@@ -91,10 +91,10 @@ export default function VerwerkersovereenkomstPage() {
         {/* Hero */}
         <section className="bg-gray-50">
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-16 lg:py-20">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#163300] px-3 py-1 text-sm font-medium text-white mb-6">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1d3014] px-3 py-1 text-sm font-medium text-white mb-6">
               AVG artikel 28
             </span>
-            <h1 className="text-4xl font-semibold tracking-tight text-[#163300] md:text-5xl md:leading-[1.12]">
+            <h1 className="text-4xl font-semibold tracking-tight text-[#1d3014] md:text-5xl md:leading-[1.12]">
               Verwerkersovereenkomst
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-gray-600 max-w-2xl">
@@ -117,7 +117,7 @@ export default function VerwerkersovereenkomstPage() {
           <div className="mx-auto max-w-4xl px-6 md:px-8 py-12 lg:py-16 space-y-10">
             {ARTIKELEN.map((art) => (
               <div key={art.titel}>
-                <h2 className="text-xl font-semibold text-[#163300] mb-3">{art.titel}</h2>
+                <h2 className="text-xl font-semibold text-[#1d3014] mb-3">{art.titel}</h2>
                 <div className="space-y-3">
                   {art.alineas.map((p, i) => (
                     <p key={i} className="text-sm leading-relaxed text-gray-600">{p}</p>
@@ -152,10 +152,10 @@ export default function VerwerkersovereenkomstPage() {
             <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-5 text-sm text-gray-600">
               <p>
                 Vragen over deze overeenkomst? Mail naar{' '}
-                <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#163300] font-medium hover:underline">
+                <a href="mailto:privacy@domiovastgoedbeheer.nl" className="text-[#1d3014] font-medium hover:underline">
                   privacy@domiovastgoedbeheer.nl
                 </a>. Zie ook onze{' '}
-                <Link href="/privacy-en-beveiliging" className="text-[#163300] font-medium hover:underline">
+                <Link href="/privacy-en-beveiliging" className="text-[#1d3014] font-medium hover:underline">
                   pagina Beveiliging &amp; Privacy
                 </Link>.
               </p>

@@ -202,17 +202,17 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Ik ben een
                     </label>
-                    <div className="relative inline-flex w-full rounded-lg border border-[#161f13] bg-gray-50 p-1">
+                    <div className="relative inline-flex w-full rounded-lg border border-[#1d3014] bg-gray-50 p-1">
                       {/* Sliding background indicator */}
                       <div
-                        className={`absolute top-1 bottom-1 rounded-md bg-[#161f13] transition-all duration-300 ease-in-out ${
+                        className={`absolute top-1 bottom-1 rounded-md bg-[#1d3014] transition-all duration-300 ease-in-out ${
                           role === 'employer' ? 'left-1 right-1/2' : 'left-1/2 right-1'
                         }`}
                       />
                       <button
                         type="button"
                         onClick={() => setRole('employer')}
-                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-0 ${
+                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-0 ${
                           role === 'employer'
                             ? 'text-white'
                             : 'text-gray-500 hover:text-gray-700'
@@ -223,7 +223,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                       <button
                         type="button"
                         onClick={() => setRole('employee')}
-                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#161f13] focus-visible:ring-offset-0 ${
+                        className={`relative z-10 flex-1 px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d3014] focus-visible:ring-offset-0 ${
                           role === 'employee'
                             ? 'text-white'
                             : 'text-gray-500 hover:text-gray-700'
@@ -366,7 +366,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
                 </div>
                 <button
                   type="button"
-                  className="text-sm font-medium text-[#161f13] hover:underline"
+                  className="text-sm font-medium text-[#1d3014] hover:underline"
                   onClick={() => {
                     window.location.href = '/forgot-password'
                   }}
@@ -380,11 +380,11 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
               type="submit" 
               className={`w-full h-12 rounded-full mt-auto ${
                 mode === 'login'
-                  ? 'bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90'
+                  ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90'
                   : mode === 'signup' && signupStep === 1
-                  ? 'bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90'
+                  ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90'
                   : mode === 'signup' && signupStep === 2
-                  ? 'bg-[#94f477] text-[#161f13] hover:bg-[#94f477]/90'
+                  ? 'bg-[#c8e957] text-[#1d3014] hover:bg-[#c8e957]/90'
                   : ''
               } font-semibold text-base border-0 shadow-sm`}
               disabled={loading}
@@ -436,7 +436,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
             <button
               type="button"
               onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
-              className="font-medium text-[#161f13] hover:underline"
+              className="font-medium text-[#1d3014] hover:underline"
             >
               {mode === 'login' ? 'Registreren' : 'Inloggen'}
             </button>

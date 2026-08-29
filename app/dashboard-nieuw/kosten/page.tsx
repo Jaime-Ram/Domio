@@ -137,7 +137,7 @@ const COL = {
   avatar: "w-6 shrink-0",
 };
 
-const FOREST = "#161f13";
+const FOREST = "#1d3014";
 const GREY = "#97978f";
 
 function gezondheid(f: Factuur): { toon: "goed" | "let-op" | "slecht"; titel: string } {

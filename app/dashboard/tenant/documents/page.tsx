@@ -162,7 +162,7 @@ export default function TenantDocumentsPage() {
       <Button
         type="button"
         size="sm"
-        className={cn('rounded-full bg-[#94f477] text-[#161f13] hover:bg-[#8AD45F]', layout === 'stack' && 'w-full justify-center')}
+        className={cn('rounded-full bg-[#c8e957] text-[#1d3014] hover:bg-[#8AD45F]', layout === 'stack' && 'w-full justify-center')}
         disabled={!d.storage_path && !isDemo}
         onClick={() => !isDemo && openDocumentUrl(d.id, true)}
       >
@@ -177,7 +177,7 @@ export default function TenantDocumentsPage() {
       {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-lg font-semibold text-[#161f13] dark:text-[#94f477]">Documenten</p>
+          <p className="text-lg font-semibold text-[#1d3014] dark:text-[#c8e957]">Documenten</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {filteredDocuments.length} van {documents.length} document{documents.length === 1 ? '' : 'en'}
           </p>
@@ -255,10 +255,10 @@ export default function TenantDocumentsPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-start gap-3 min-w-0">
                       <div className={cn('h-10 w-10 rounded-lg shrink-0', DASHBOARD_TABLE_ICON_WRAP_CLASS)}>
-                        <FileText className="h-5 w-5 text-[#161f13] dark:text-[#94f477]" />
+                        <FileText className="h-5 w-5 text-[#1d3014] dark:text-[#c8e957]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <CardTitle className="text-base font-semibold text-[#161f13] dark:text-[#94f477] line-clamp-2">
+                        <CardTitle className="text-base font-semibold text-[#1d3014] dark:text-[#c8e957] line-clamp-2">
                           {d.name}
                         </CardTitle>
                         {d.scopeLabel ? (
