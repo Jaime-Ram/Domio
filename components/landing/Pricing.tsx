@@ -1,42 +1,42 @@
 const tiers = [
   {
-    name: "Starter",
-    price: "€29",
-    per: "per maand",
-    desc: "Voor particuliere verhuurders met een paar panden.",
+    name: "Preview",
+    price: "Gratis",
+    per: "",
+    desc: "Zie je MJOP voordat je betaalt.",
     features: [
-      "Tot 10 eenheden",
-      "Onderhoudsmeldingen en werkbonnen",
-      "Huurdersportaal",
-      "E-mail support",
+      "Volledige preview van je plan",
+      "Bouwdelen en conditie in beeld",
+      "Kostenraming op hoofdlijnen",
+      "Geen creditcard nodig",
     ],
-    cta: "Gratis starten",
+    cta: "Maak gratis preview",
     featured: false,
   },
   {
-    name: "Groei",
-    price: "€89",
-    per: "per maand",
-    desc: "Voor beheerders die willen opschalen met agents.",
+    name: "Per MJOP",
+    price: "€299",
+    per: "per plan",
+    desc: "Eén compleet MJOP, klaar voor de vergadering.",
     features: [
-      "Tot 100 eenheden",
-      "Domio Assist (agent)",
-      "Facturen matchen en boekhouding",
-      "Vaklieden aansturen",
-      "Prioriteit support",
+      "Volledig MJOP als PDF",
+      "NEN 2767-conditie per bouwdeel",
+      "Kostenraming met indexering",
+      "Reservefonds-berekening",
+      "Wettelijk kloppend (art. 5:126 BW)",
     ],
-    cta: "Vraag demo aan",
+    cta: "Maak je MJOP",
     featured: true,
   },
   {
-    name: "Pro",
+    name: "Abonnement",
     price: "Op maat",
     per: "",
-    desc: "Voor professionele portefeuilles en corporaties.",
+    desc: "Voor beheerders met meerdere panden of VvE's.",
     features: [
-      "Onbeperkt eenheden",
-      "Koppelingen en API",
-      "Compliance en WWS",
+      "Meerdere panden en VvE's",
+      "MJOP altijd actueel houden",
+      "DMJOP met verduurzaming",
       "Dedicated onboarding",
     ],
     cta: "Neem contact op",
@@ -63,11 +63,11 @@ export default function Pricing() {
             Prijzen
           </span>
           <h2 className="display mt-3 text-[clamp(1.9rem,3.4vw,2.5rem)] text-ink">
-            Eén prijs voor je hele onderhoud.
+            Een fractie van wat een adviseur vraagt.
           </h2>
           <p className="mt-4 text-[clamp(1rem,1.5vw,1.15rem)] text-grey">
-            Geen setup-kosten. Maandelijks opzegbaar. Betaal per eenheid naarmate
-            je groeit.
+            Een adviseur rekent al snel 750 tot 2.500 euro. Bij Domio maak je
+            gratis een preview en betaal je pas bij de PDF-export.
           </p>
         </div>
 

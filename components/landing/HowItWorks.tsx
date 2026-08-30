@@ -1,28 +1,18 @@
 const steps = [
   {
     n: "01",
-    title: "Melding komt binnen",
-    desc: "Via het huurdersportaal, e-mail of WhatsApp. Alles komt samen op één plek.",
+    title: "Vul je adres in",
+    desc: "De pandgegevens laden automatisch via de BAG. Bouwjaar, oppervlakte en type pand staan er meteen bij.",
   },
   {
     n: "02",
-    title: "Assist trieert",
-    desc: "Categorie, prioriteit en pand worden automatisch bepaald en gekoppeld.",
+    title: "De AI stelt je plan op",
+    desc: "Domio herkent de bouwdelen, bepaalt de conditie volgens NEN 2767, en berekent cycli en kosten.",
   },
   {
     n: "03",
-    title: "De juiste vakman",
-    desc: "Domio stelt de juiste vakman voor en stuurt de werkbon, jij keurt goed.",
-  },
-  {
-    n: "04",
-    title: "Bewaken en opvolgen",
-    desc: "SLA's, status en communicatie worden bijgehouden tot de klus klaar is.",
-  },
-  {
-    n: "05",
-    title: "Factuur gematcht",
-    desc: "De factuur wordt uitgelezen, aan de werkbon gekoppeld en klaargezet om te boeken.",
+    title: "Download je MJOP",
+    desc: "Je krijgt een nette PDF: wettelijk kloppend, met kostenraming en reservefonds, klaar voor de vergadering.",
   },
 ];
 
@@ -35,15 +25,15 @@ export default function HowItWorks() {
             Zo werkt het
           </span>
           <h2 className="display mt-3 text-[clamp(1.9rem,3.4vw,2.5rem)] text-ink">
-            Van melding tot factuur in vijf stappen.
+            Van adres tot MJOP in drie stappen.
           </h2>
           <p className="mt-4 text-[clamp(1rem,1.5vw,1.15rem)] text-grey">
-            Elke stap draait automatisch. Jij keurt alleen de acties goed die er
-            echt toe doen.
+            Geen weken wachten op een adviseur. Je plan staat er in minuten,
+            onderbouwd en klaar om te delen.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-line md:grid-cols-3">
           {steps.map((s) => (
             <div key={s.n} className="flex flex-col bg-panel p-6">
               <span className="font-mono text-[13px] text-lime-2">{s.n}</span>

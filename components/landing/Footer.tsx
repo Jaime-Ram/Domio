@@ -4,23 +4,23 @@ const columns = [
   {
     title: "Product",
     links: [
-      "Onderhoudsmeldingen",
-      "Werkbonnen",
-      "Vaklieden aansturen",
-      "Facturen matchen",
+      "MJOP-generator",
+      "Bouwdeel-herkenning",
+      "NEN 2767-conditie",
+      "Kostenraming",
+      "Reservefonds-berekening",
+      "DMJOP en verduurzaming",
+      "PDF-export",
       "Domio Assist",
-      "Compliance en keuringen",
-      "Portefeuille",
-      "Koppelingen",
     ],
   },
   {
     title: "Voor wie",
     links: [
-      "Particuliere verhuurders",
+      "VvE's",
+      "VvE-beheerders",
       "Vastgoedbeheerders",
       "Beleggers",
-      "VvE's",
       "Makelaars",
       "Woningcorporaties",
     ],
@@ -50,14 +50,14 @@ export default function Footer() {
           <div>
             <Logo light />
             <p className="mt-4 max-w-xs text-[14px] text-white/55">
-              Van melding tot factuur. Agents doen het onderhoudswerk, jij houdt
-              de regie.
+              Dé AI-MJOP-tool van Nederland. Van adres tot meerjarenonderhoudsplan,
+              wettelijk kloppend en klaar binnen 24 uur.
             </p>
             <a
               href="#"
               className="mt-6 inline-block rounded-lg bg-lime px-4 py-2.5 text-[14px] font-medium text-ink transition-colors hover:bg-lime-2"
             >
-              Gratis starten
+              Maak je MJOP
             </a>
           </div>
 

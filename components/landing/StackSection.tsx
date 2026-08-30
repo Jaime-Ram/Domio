@@ -8,8 +8,8 @@ export default function StackSection() {
             <h2 className="display max-w-md text-[clamp(1.8rem,3vw,2.5rem)]">
               <span className="text-ink">Maak kennis met Domio Assist.</span>{" "}
               <span className="text-grey-2">
-                De agent die je meldingen opvangt, de juiste vakman aanstuurt en
-                de werkbon bijhoudt.
+                De AI die de bouwdelen herkent, de conditie bepaalt en je hele
+                MJOP opstelt.
               </span>
             </h2>
             <a
@@ -23,13 +23,13 @@ export default function StackSection() {
 
           <figure className="mt-12">
             <blockquote className="max-w-md text-[17px] leading-snug text-ink">
-              &ldquo;Assist vangt elke melding op, stuurt de juiste vakman aan en
-              houdt de werkbon bij. Wij keuren alleen nog goed.&rdquo;
+              &ldquo;Waar we vroeger weken op een adviseur wachtten, staat het
+              MJOP nu binnen een dag. We controleren het en zijn klaar.&rdquo;
             </blockquote>
             <figcaption className="mt-4">
               <div className="text-[14px] font-medium text-ink">Mark de Vries</div>
               <div className="text-[14px] text-grey">
-                Directeur, Havenstad Beheer
+                VvE-beheerder, Havenstad Beheer
               </div>
               <a
                 href="#"

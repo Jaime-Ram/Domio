@@ -13,9 +13,9 @@ import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
-  title: "Domio | Vastgoedonderhoud dat zichzelf regelt",
+  title: "Domio | Dé AI-MJOP-tool van Nederland",
   description:
-    "Domio is het onderhoudssysteem voor vastgoed waarin agents het werk doen. Van melding tot factuur: automatisch triëren, de juiste vakman aansturen en alles bijhouden, terwijl jij de regie houdt.",
+    "Vul je adres in en Domio's AI stelt een volledig meerjarenonderhoudsplan op: bouwdelen, conditie, onderhoudsplanning, kostenraming en reservefonds. Wettelijk kloppend, klaar binnen 24 uur, voor een fractie van de kosten van een adviseur.",
 };
 
 export default function V2Landing() {

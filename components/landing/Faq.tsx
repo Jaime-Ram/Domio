@@ -4,24 +4,24 @@ import { useState } from "react";
 
 const items = [
   {
-    q: "Wat doet Domio precies?",
-    a: "Domio vangt onderhoudsmeldingen op, trieert ze automatisch, stelt de juiste vakman voor en houdt werkbon en factuur bij. Jij keurt de acties goed die er echt toe doen.",
+    q: "Is een MJOP verplicht?",
+    a: "Voor VvE's wel. Volgens art. 5:126 BW moet je reserveren voor onderhoud, en dat kan op basis van een MJOP of via een vast bedrag van 0,5% van de herbouwwaarde per jaar. Met een MJOP reserveer je gericht in plaats van een grove vuistregel.",
   },
   {
-    q: "Blijf ik zelf de regie houden?",
-    a: "Ja. Agents bereiden het werk voor, maar handelingen die iets versturen of betalen gaan altijd via jouw goedkeuring. Alles is transparant en terug te zien.",
+    q: "Hoe accuraat is de AI?",
+    a: "De AI werkt met je pandgegevens uit de BAG en de NEN 2767-conditiesystematiek, en is getraind op duizenden bouwdelen en onderhoudscycli. Je ziet elke aanname terug in het plan en kunt bouwdelen, condities en kosten zelf bijstellen voordat je exporteert.",
   },
   {
-    q: "Werkt Domio met mijn bestaande tools?",
-    a: "Domio koppelt met je boekhouding, bank en andere tools. Facturen en betalingen worden automatisch gematcht aan de juiste werkbon.",
+    q: "Kan ik dit gebruiken voor mijn VvE en reservefonds?",
+    a: "Ja. Domio stelt het MJOP op inclusief kostenraming en een reservefonds-berekening, zodat je onderbouwd kunt reserveren en het plan klaar is voor de vergadering.",
   },
   {
-    q: "Voor wie is Domio geschikt?",
-    a: "Van particuliere verhuurders met een paar panden tot professionele beheerders, VvE's en corporaties. Het platform groeit met je mee.",
+    q: "Wat kost het?",
+    a: "Een preview is gratis. Een volledig MJOP als PDF kost vanaf 299 euro per plan. Beheer je meerdere panden of VvE's, dan is er een abonnement op maat. Een adviseur vraagt al snel 750 tot 2.500 euro.",
   },
   {
-    q: "Hoe snel ben ik live?",
-    a: "Binnen enkele minuten. Je maakt een account aan, voegt je panden toe en kunt direct meldingen laten binnenkomen.",
+    q: "Hoe houd ik het plan actueel?",
+    a: "Je MJOP blijft in Domio staan en je werkt het met een paar klikken bij zodra er iets verandert of onderhoud is uitgevoerd. Zo blijft je planning en reservefonds altijd kloppen.",
   },
   {
     q: "Zijn mijn gegevens veilig?",

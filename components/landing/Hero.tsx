@@ -16,17 +16,17 @@ export default function Hero() {
             className="inline-flex items-center gap-2 rounded-full border border-line bg-white py-1 pr-3 pl-1 text-sm shadow-sm transition hover:bg-panel"
           >
             <span className="rounded-full bg-forest px-2 py-0.5 text-xs font-semibold text-white">Nieuw</span>
-            <span className="font-medium text-ink">Agents voor je onderhoud</span>
+            <span className="font-medium text-ink">AI die je MJOP opstelt</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-grey">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </a>
 
           <h1 className="display mt-5 text-[clamp(2.5rem,5vw,4.25rem)] text-ink">
-            Al je onderhoud geregeld onder een dak
+            Je meerjarenonderhoudsplan, opgesteld door AI
           </h1>
           <p className="mt-5 max-w-lg text-lg text-grey md:text-xl">
-            Beheer meldingen, huurders, compliance en financiën vanuit een platform. Domio-agents pakken het onderhoud van begin tot eind voor je op.
+            Vul je adres in en Domio stelt een volledig MJOP op: bouwdelen, conditie, planning, kostenraming en reservefonds. Wettelijk kloppend en klaar binnen 24 uur, voor een fractie van de kosten van een adviseur.
           </p>
 
           <form onSubmit={(e) => e.preventDefault()} className="mt-8 flex w-full max-w-lg flex-col gap-3 md:mt-10 md:flex-row md:items-center">
@@ -40,10 +40,10 @@ export default function Hero() {
               type="submit"
               className="h-12 shrink-0 rounded-xl bg-lime px-6 font-medium text-forest transition hover:bg-lime-2"
             >
-              Aan de slag
+              Maak je MJOP
             </button>
           </form>
-          <p className="mt-3 text-sm text-grey">Wij gaan zorgvuldig met je gegevens om.</p>
+          <p className="mt-3 text-sm text-grey">Gratis preview van je plan. Je betaalt pas bij de PDF-export.</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default function Hero() {
             <div className="overflow-hidden rounded-xl ring-1 ring-line">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                alt="Domio dashboard"
+                alt="Domio MJOP-generator in beeld"
                 src="https://www.untitledui.com/marketing/screen-mockups/dashboard-desktop-mockup-light-01.webp"
                 className="object-cover object-left-top"
               />

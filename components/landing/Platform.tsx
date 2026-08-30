@@ -53,16 +53,16 @@ function ChatMock() {
         {...pop(0.1)}
         className="max-w-[85%] rounded-2xl rounded-bl-md bg-paper p-4 text-[13px] leading-relaxed text-ink shadow-sm ring-1 ring-line"
       >
-        Melding: lekkage onder de keukenkraan, Prinsengracht 42.
+        Pand: Prinsengracht 42, bouwjaar 1932, plat dak met bitumen.
       </motion.div>
       <motion.div
         {...pop(0.7)}
         className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-paper p-4 text-[13px] leading-relaxed text-ink shadow-sm ring-1 ring-line"
       >
-        Getrieerd als loodgieter, prioriteit hoog. Loodgieter Jansen
-        voorgesteld, kan morgen langs.
+        Bouwdeel herkend: dakbedekking bitumen, conditie 3.
+        Vervangingscyclus 20 jaar, volgende beurt in 2031.
         <br />
-        Concept-werkbon staat klaar. Keur goed om te versturen.
+        Toegevoegd aan je MJOP met kostenraming.
       </motion.div>
       <motion.div
         {...pop(1.4)}
@@ -79,8 +79,8 @@ function ChatMock() {
           </svg>
         </motion.span>
         <span>
-          <span className="block text-[13px] font-medium">Werkbon verstuurd</span>
-          <span className="block text-[12px] text-white/70">Loodgieter Jansen</span>
+          <span className="block text-[13px] font-medium">Toegevoegd aan MJOP</span>
+          <span className="block text-[12px] text-white/70">Dakbedekking bitumen</span>
         </span>
       </motion.div>
     </div>
@@ -96,28 +96,28 @@ function InvoiceMock() {
           <span className="h-2 w-2 rounded-full bg-line" />
           <span className="h-2 w-2 rounded-full bg-line" />
         </span>
-        <span>Domio.Onderhoud</span>
+        <span>Domio.MJOP</span>
       </div>
       <div className="p-5">
         <div className="text-[15px] font-medium text-ink">
-          Werkbon #WB-2043
+          Bouwdeel #BD-2043
         </div>
         <div className="mt-4 text-[12px] uppercase tracking-wide text-grey-2">
-          Opdracht
+          Beoordeling
         </div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-[12px] text-grey-2">01</span>
           <div className="flex-1 rounded-lg border border-line px-3 py-2 text-[13px] text-ink">
-            Kraan keuken vervangen
+            Kozijnen hout, buiten
           </div>
           <div className="rounded-lg border border-line px-3 py-2 text-[13px] text-ink">
-            2 uur
+            Conditie 3
           </div>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-3 text-[11px] text-grey-2">
-          <span>Vakman</span>
-          <span>Pand</span>
-          <span>Categorie</span>
+          <span>Bouwdeel</span>
+          <span>Cyclus</span>
+          <span>Conditie</span>
         </div>
       </div>
     </div>
@@ -127,16 +127,16 @@ function InvoiceMock() {
 function AccountingMock() {
   const t = useTick(5200);
   const rows = [
-    ["Loodgieter Jansen", "Werkbon WB-2043", true],
-    ["Gamma", "Materiaal", true],
-    ["Schildersbedrijf", "Werkbon WB-2044", true],
-    ["Dakdekker West", "Werkbon WB-2045", false],
+    ["Dakbedekking bitumen", "€ 8.400", true],
+    ["Schilderwerk buiten", "€ 6.200", true],
+    ["CV-ketel vervangen", "€ 3.100", true],
+    ["Gevelvoegwerk", "€ 4.750", false],
   ];
   return (
     <div className="mt-10 overflow-hidden rounded-xl bg-paper ring-1 ring-line">
       <div className="flex items-center justify-between border-b border-line px-4 py-2 text-[11px] uppercase tracking-wide text-grey-2">
-        <span>Factuur gematcht</span>
-        <span className="text-grey">Klaar om te boeken</span>
+        <span>Kostenraming</span>
+        <span className="text-grey">Geïndexeerd</span>
       </div>
       <ul key={t} className="divide-y divide-line">
         {rows.map(([v, gl, ok], i) => (
@@ -167,8 +167,8 @@ function BankingMock() {
   return (
     <div className="mt-10 flex flex-col justify-between rounded-xl bg-paper p-5 ring-1 ring-line">
       <div className="flex items-baseline justify-between">
-        <span className="text-[12px] uppercase tracking-wide text-grey-2">Onderhoudsbudget 2026</span>
-        <span className="rounded-full bg-panel px-2 py-0.5 text-[11px] font-medium text-ink">68% besteed</span>
+        <span className="text-[12px] uppercase tracking-wide text-grey-2">Reservefonds 2026</span>
+        <span className="rounded-full bg-panel px-2 py-0.5 text-[11px] font-medium text-ink">op peil</span>
       </div>
       <div className="mt-1 text-[28px] tracking-tight text-ink">&euro;84.250</div>
       <div key={t} className="mt-4 flex items-end gap-1.5 h-16">
@@ -190,7 +190,7 @@ function BankingMock() {
 
 function IntegrationsMock() {
   const tick = useTick(5200);
-  const tiles = ["ING", "Exact", "Rabo", "iDEAL", "KvK", "BAG", "Yuki", "Mollie"];
+  const tiles = ["BAG", "WOZ", "NEN 2767", "Kadaster", "CBS-index", "EPA", "RVO", "3D BAG"];
   return (
     <div key={tick} className="mt-10 grid grid-cols-4 gap-2">
       {tiles.map((t, i) => (
@@ -213,9 +213,9 @@ export default function Platform() {
     <section className="bg-paper py-20 lg:py-28">
       <div className="mx-auto max-w-[1440px] px-6 lg:px-16">
         <h2 className="display max-w-[755px] text-[clamp(1.9rem,3.4vw,2.5rem)]">
-          <span className="text-ink">Eén systeem voor al je onderhoud.</span>{" "}
+          <span className="text-ink">Alles wat in een MJOP hoort.</span>{" "}
           <span className="text-grey-2">
-            Agents doen het werk, jij houdt de regie.
+            De AI stelt het op, jij controleert en past aan.
           </span>
         </h2>
 
@@ -224,13 +224,13 @@ export default function Platform() {
             href="#"
             className="rounded-lg bg-lime px-5 py-3 text-[15px] font-medium text-ink transition-colors hover:bg-lime-2"
           >
-            Overstappen in dagen, niet maanden
+            Maak je eerste MJOP
           </a>
           <a
             href="#"
             className="rounded-lg border border-line bg-paper px-5 py-3 text-[15px] font-medium text-ink transition-colors hover:bg-panel"
           >
-            Bekijk demo
+            Bekijk voorbeeld-MJOP
           </a>
         </div>
 
@@ -238,7 +238,7 @@ export default function Platform() {
         <div className="mt-14 grid gap-4 lg:grid-cols-2">
           <article className="group flex flex-col rounded-2xl bg-panel p-8">
             <div className="flex items-start justify-between">
-              <CardHead black="Meldingen" grey="die zichzelf triëren" />
+              <CardHead black="Bouwdelen" grey="die de AI automatisch herkent" />
               <Arrow />
             </div>
             <ChatMock />
@@ -246,7 +246,7 @@ export default function Platform() {
 
           <article className="group flex flex-col rounded-2xl bg-panel p-8">
             <div className="flex items-start justify-between">
-              <CardHead black="Van melding tot werkbon" grey="zonder heen-en-weer gebel" />
+              <CardHead black="Conditie volgens NEN 2767" grey="onderbouwd per bouwdeel" />
               <Arrow />
             </div>
             <InvoiceMock />
@@ -256,18 +256,18 @@ export default function Platform() {
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
           {[
             {
-              b: "Facturen automatisch",
-              g: "gematcht aan de werkbon",
+              b: "Kostenraming",
+              g: "met indexering per jaar",
               mock: <AccountingMock />,
             },
             {
-              b: "Onderhoudsbudget",
-              g: "bewaakt per pand",
+              b: "Reservefonds",
+              g: "berekend en onderbouwd",
               mock: <BankingMock />,
             },
             {
-              b: "Koppelingen",
-              g: "met de tools die je al gebruikt",
+              b: "Altijd actueel",
+              g: "en klaar voor verduurzaming",
               mock: <IntegrationsMock />,
             },
           ].map(({ b, g, mock }) => (

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 
 const logos = [
-  "Havenstad Beheer",
+  "VvE Havenstad",
   "Norderhuis",
   "Kade 12",
   "Brightpand",
@@ -20,10 +20,10 @@ const logos = [
 ];
 
 const stats = [
-  { big: "3 dagen", small: "sneller opgelost", company: "Havenstad Beheer" },
-  { big: "30%", small: "goedkoper onderhoud", company: "Norderhuis" },
-  { big: "75%", small: "minder handwerk", company: "Kade 12 Vastgoed" },
-  { big: "2x", small: "zoveel panden beheerd", company: "Brightpand" },
+  { big: "1.200+", small: "MJOP's opgesteld", company: "sinds de lancering" },
+  { big: "24 uur", small: "van adres tot plan", company: "gemiddelde doorlooptijd" },
+  { big: "€ 1.800", small: "bespaard per plan", company: "t.o.v. een adviseur" },
+  { big: "500+", small: "VvE's geholpen", company: "en beheerders" },
 ];
 
 export default function SocialProof() {
@@ -43,10 +43,10 @@ export default function SocialProof() {
         <div className="max-w-2xl">
           <h2 className="display text-[clamp(1.6rem,2.8vw,2.1rem)]">
             <span className="text-ink">
-              Sluit je aan bij 2.000+ verhuurders en beheerders
+              Al 500+ VvE's en beheerders
             </span>{" "}
             <span className="text-grey-2">
-              die hun onderhoud sneller en rustiger regelen.
+              lieten hun MJOP door Domio opstellen.
             </span>
           </h2>
           <a

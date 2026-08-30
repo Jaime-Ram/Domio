@@ -4,17 +4,17 @@ export default function AgenticStatement() {
       <div className="mx-auto max-w-[1440px] px-6 text-center lg:px-16">
         <h2 className="display mx-auto max-w-[1000px] text-[clamp(1.9rem,3.4vw,2.5rem)]">
           <span className="block text-ink">
-            Gebouwd op duizenden onderhoudsklussen.
+            Getraind op duizenden bouwdelen en onderhoudscycli.
           </span>
           <span className="block text-grey-2">
-            Eén platform voor het agentic tijdperk.
+            De AI doet het rekenwerk, jij houdt de regie.
           </span>
         </h2>
         <a
           href="#"
           className="mt-10 inline-flex rounded-lg bg-lime px-5 py-3 text-[15px] font-medium text-forest transition-colors hover:bg-lime-2"
         >
-          Ontdek Domio Assist
+          Maak je eerste MJOP
         </a>
       </div>
     </section>

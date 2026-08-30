@@ -62,7 +62,7 @@ export default function Nav() {
       {bar && (
         <div className="relative bg-forest px-10 py-2.5 text-center text-[13.5px] text-paper">
           <span className="text-white/90">
-            Nieuw: laat Domio Assist je onderhoudsmeldingen automatisch triëren.{" "}
+            Nieuw: laat Domio je meerjarenonderhoudsplan automatisch opstellen.{" "}
             <a href="#" className="font-medium text-white underline underline-offset-2">
               Meer weten
             </a>
@@ -120,7 +120,7 @@ export default function Nav() {
               href="#"
               className="rounded-lg bg-lime px-4 py-3 text-[14px] font-medium leading-none text-ink transition-colors hover:bg-lime-2"
             >
-              Vraag demo aan
+              Maak je MJOP
             </a>
           </div>
 
@@ -173,7 +173,7 @@ export default function Nav() {
                 href="#"
                 className="rounded-lg bg-lime px-4 py-3 text-center text-[16px] font-medium text-ink"
               >
-                Vraag demo aan
+                Maak je MJOP
               </a>
             </div>
           </div>
