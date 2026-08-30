@@ -48,9 +48,11 @@ export default function Hero() {
       </div>
 
       {/* Rechterkant: foto + dashboard-mockup */}
-      <div className="relative mt-16 w-full px-4 md:px-8 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-full lg:w-1/2 lg:overflow-hidden lg:px-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="absolute inset-0 size-full object-cover" src="/images/hero/hero-bg.webp" alt="" />
+      <div className="relative mt-16 w-full px-4 md:px-8 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-full lg:w-1/2 lg:py-12 lg:pr-8 lg:pl-0">
+        <div className="absolute inset-4 overflow-hidden rounded-3xl ring-1 ring-line md:inset-8 lg:inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="absolute inset-0 size-full object-cover" src="/images/hero/hero-bg.webp" alt="" />
+        </div>
         <div className="relative mx-auto w-full max-w-xl lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[32rem] lg:max-w-none">
           <div className="w-full max-w-5xl rounded-2xl bg-white p-1 shadow-2xl ring-1 ring-line lg:absolute lg:-top-24 lg:left-16 lg:w-max">
             <div className="overflow-hidden rounded-xl ring-1 ring-line">
