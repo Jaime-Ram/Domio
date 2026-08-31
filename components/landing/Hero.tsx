@@ -23,7 +23,7 @@ export default function Hero() {
           </a>
 
           <h1 className="display mt-5 text-[clamp(2.5rem,5vw,4.25rem)] text-ink">
-            Je meerjarenonderhoudsplan, opgesteld door AI
+            Jouw MJOP schrijft zichzelf
           </h1>
           <p className="mt-5 max-w-lg text-lg text-grey md:text-xl">
             Vul je adres in en Domio stelt een volledig MJOP op: bouwdelen, conditie, planning, kostenraming en reservefonds. Wettelijk kloppend en klaar binnen 24 uur, voor een fractie van de kosten van een adviseur.
